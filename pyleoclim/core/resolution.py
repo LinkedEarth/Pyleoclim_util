@@ -6,6 +6,8 @@ Resolution objects are designed to contain, display, and analyze information on 
 
 from ..utils import tsutils, plotting, tsmodel, tsbase
 
+import warnings
+
 import numpy as np
 import seaborn as sns
 import pandas as pd
@@ -24,7 +26,7 @@ class Resolution:
 
     '''
 
-    def __init__(self,resolution,resolution_unit=None,label=None,timeseries=None):
+    def __init__(self,resolution,time=None,resolution_unit=None,label=None,timeseries=None,):
         time = np.ndarray(time)
         resolution = np.ndarray(resolution)
 
@@ -32,11 +34,20 @@ class Resolution:
         self.timeseries = timeseries
         self.label = label
 
+        if time is None:
+            self.time = self.timeseries.time[1:]
+
         if resolution_unit is None:
             if timeseries is not None:
                 self.resolution_unit = timeseries.time_unit
             else:
                 self.resolution_unit = resolution_unit
+
+        #Include time reasoning
+        elif resolution_unit is not None:
+            if timeseries is not None:
+                if timeseries.time_unit.lower().replace(' ','') != resolution_unit.lower().replace(' ',''):
+                    warnings.warn('Original series time unit and passed resolution unit do not match')
         
 
     def describe(self):
@@ -170,9 +181,8 @@ class Resolution:
                 resolution.plot()
 
         '''
-        # generate default axis labels
-        time_label = f'{self.time_name} [{self.time_unit}]'
-        value_label = 'Resolution'
+
+        time_label,value_label = make_labels(self)
 
         if xlabel is None:
             xlabel = time_label
@@ -220,88 +230,119 @@ class Resolution:
 
         return res
     
-def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                  ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
-        ''' Plot the distribution of the timeseries values
+    def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
+                    ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
+            ''' Plot the distribution of the resolution values
 
-        Parameters
-        ----------
+            Parameters
+            ----------
 
-        figsize : list
-            a list of two integers indicating the figure size
+            figsize : list
+                a list of two integers indicating the figure size
 
-        title : str
-            the title for the figure
+            title : str
+                the title for the figure
 
-        savefig_settings : dict
-            the dictionary of arguments for plt.savefig(); some notes below:
-              - "path" must be specified; it can be any existed or non-existed path,
-                with or without a suffix; if the suffix is not given in "path", it will follow "format"
-              - "format" can be one of {"pdf", "eps", "png", "ps"}
+            savefig_settings : dict
+                the dictionary of arguments for plt.savefig(); some notes below:
+                - "path" must be specified; it can be any existed or non-existed path,
+                    with or without a suffix; if the suffix is not given in "path", it will follow "format"
+                - "format" can be one of {"pdf", "eps", "png", "ps"}
 
-        ax : matplotlib.axis, optional
-            A matplotlib axis
+            ax : matplotlib.axis, optional
+                A matplotlib axis
 
-        ylabel : str
-            Label for the count axis
+            ylabel : str
+                Label for the count axis
 
-        vertical : {True,False}
-            Whether to flip the plot vertically
+            vertical : {True,False}
+                Whether to flip the plot vertically
 
-        edgecolor : matplotlib.color
-            The color of the edges of the bar
+            edgecolor : matplotlib.color
+                The color of the edges of the bar
 
-        plot_kwargs : dict
-            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
+            plot_kwargs : dict
+                Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
 
-        See also
-        --------
+            See also
+            --------
 
-        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+            pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
 
-        Examples
-        --------
+            Examples
+            --------
 
-        Distribution of the SOI record
+            Distribution of the SOI record
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+            .. ipython:: python
+                :okwarning:
+                :okexcept:
 
-            import pyleoclim as pyleo
-            ts = pyleo.utils.load_dataset('SOI')
-            @savefig ts_plot5.png
-            fig, ax = ts.plot()
-            pyleo.closefig(fig)
+                import pyleoclim as pyleo
+                ts = pyleo.utils.load_dataset('SOI')
+                @savefig ts_plot5.png
+                fig, ax = ts.plot()
+                pyleo.closefig(fig)
 
-            @savefig ts_hist.png
-            fig, ax = ts.histplot()
-            pyleo.closefig(fig)
+                @savefig ts_hist.png
+                fig, ax = ts.histplot()
+                pyleo.closefig(fig)
+
+            '''
+            savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+            if ax is None:
+                fig, ax = plt.subplots(figsize=figsize)
+
+            #make the data into a dataframe so we can flip the figure
+            time_label,value_label = make_labels(self)
+            
+            if vertical == True:
+                data=pd.DataFrame({'value':self.resolution})
+                ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+                ax.set_ylabel(value_label)
+                ax.set_xlabel(ylabel)
+            else:
+                ax = sns.histplot(self.resolution, ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+                ax.set_xlabel(value_label)
+                ax.set_ylabel(ylabel)
+
+            if title is not None:
+                ax.set_title(title)
+
+            if 'fig' in locals():
+                if 'path' in savefig_settings:
+                    plotting.savefig(fig, settings=savefig_settings)
+                return fig, ax
+            else:
+                return ax
+        
+    def make_labels(self):
+        '''
+        Initialization of plot labels based on Series metadata
+
+        Returns
+        -------
+        time_header : str
+            Label for the time axis
+        value_header : str
+            Label for the value axis
 
         '''
-        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
-        #make the data into a dataframe so we can flip the figure
-        time_label = f'{self.time_name} [{self.time_unit}]'
-        value_label = 'Resolution'
-        if vertical == True:
-            data=pd.DataFrame({'value':self.resolution})
-            ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
-            ax.set_ylabel(value_label)
-            ax.set_xlabel(ylabel)
+        if self.timeseries.time_name is not None:
+            time_name_str = self.timeseries.time_name
         else:
-            ax = sns.histplot(self.resolution, ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
-            ax.set_xlabel(value_label)
-            ax.set_ylabel(ylabel)
+            time_name_str = 'time'
 
-        if title is not None:
-            ax.set_title(title)
+        value_name_str = 'resolution'
 
-        if 'fig' in locals():
-            if 'path' in savefig_settings:
-                plotting.savefig(fig, settings=savefig_settings)
-            return fig, ax
+        if self.resolution_unit is not None:
+            value_header = f'{value_name_str} [{self.resolution_unit}]'
         else:
-            return ax
+            value_header = f'{value_name_str}'
+
+        if self.timeseries.time_unit is not None:
+            time_header = f'{time_name_str} [{self.timeseries.time_unit}]'
+        else:
+            time_header = f'{time_name_str}'
+
+        return time_header, value_header
