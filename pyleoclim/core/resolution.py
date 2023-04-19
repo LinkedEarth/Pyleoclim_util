@@ -27,8 +27,7 @@ class Resolution:
     '''
 
     def __init__(self,resolution,time=None,resolution_unit=None,label=None,timeseries=None,):
-        time = np.ndarray(time)
-        resolution = np.ndarray(resolution)
+        resolution = np.array(resolution)
 
         self.resolution = resolution
         self.timeseries = timeseries
@@ -36,6 +35,9 @@ class Resolution:
 
         if time is None:
             self.time = self.timeseries.time[1:]
+        else:
+            time = np.array(time)
+            self.time = time
 
         if resolution_unit is None:
             if timeseries is not None:
@@ -182,7 +184,7 @@ class Resolution:
 
         '''
 
-        time_label,value_label = make_labels(self)
+        time_label,value_label = self.make_labels()
 
         if xlabel is None:
             xlabel = time_label
@@ -294,7 +296,7 @@ class Resolution:
                 fig, ax = plt.subplots(figsize=figsize)
 
             #make the data into a dataframe so we can flip the figure
-            time_label,value_label = make_labels(self)
+            time_label,value_label = self.make_labels()
             
             if vertical == True:
                 data=pd.DataFrame({'value':self.resolution})
@@ -315,7 +317,7 @@ class Resolution:
                 return fig, ax
             else:
                 return ax
-        
+            
     def make_labels(self):
         '''
         Initialization of plot labels based on Series metadata
