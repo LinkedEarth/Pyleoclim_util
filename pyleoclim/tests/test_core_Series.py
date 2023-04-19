@@ -799,7 +799,19 @@ class TestUISeriesGkernel:
 
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts_interp=ts2.gkernel(h=15)
+        
+    def test_gkernel_t3(self):
+        ''' Test the gkernel function with specified bandwidth'''
 
+        ts = gen_ts(nt=550, alpha=1.0)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(ts.time)), n_del, replace=False)
+        t_unevenly =  np.delete(ts.time, deleted_idx)
+        v_unevenly =  np.delete(ts.value, deleted_idx)
+
+        ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts2.gkernel(step_style='median')
 
 class TestUISeriesInterp():
     ''' Unit tests for the interpolation function
