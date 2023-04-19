@@ -3976,7 +3976,7 @@ class Series:
 
         return new
 
-    def gkernel(self, step_type='median', keep_log = False, **kwargs):
+    def gkernel(self, step_type='max', keep_log = False, **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
         Like .bin() this technique is conservative and uses the max space between points
@@ -4012,7 +4012,7 @@ class Series:
 
         new=self.copy()
 
-        ti, vi = tsutils.gkernel(self.time, self.value, **kwargs) # apply kernel
+        ti, vi = tsutils.gkernel(self.time, self.value, step_style=step_type, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
 
