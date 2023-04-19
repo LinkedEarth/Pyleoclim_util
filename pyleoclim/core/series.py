@@ -3976,7 +3976,7 @@ class Series:
 
         return new
 
-    def gkernel(self, step_type='max', keep_log = False, **kwargs):
+    def gkernel(self, step_style='max', keep_log = False, step_type=None, **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
         Like .bin() this technique is conservative and uses the max space between points
@@ -3989,7 +3989,7 @@ class Series:
         Parameters
         ----------
 
-        step_type : str
+        step_style : str
 
             type of timestep: 'mean', 'median', or 'max' of the time increments
 
@@ -4012,10 +4012,12 @@ class Series:
 
         pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
         '''
-
+        if step_type is not None:
+            warnings.warn("step_type is deprecated. Please use step_style instead",
+                          DeprecationWarning, stacklevel=2)
+        
         new=self.copy()
-
-        ti, vi = tsutils.gkernel(self.time, self.value, step_style=step_type, **kwargs) # apply kernel
+        ti, vi = tsutils.gkernel(self.time, self.value, step_style=step_style, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
 
