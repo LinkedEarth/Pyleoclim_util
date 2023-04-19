@@ -801,7 +801,7 @@ class TestUISeriesGkernel:
         ts_interp=ts2.gkernel(h=15)
         
     def test_gkernel_t3(self):
-        ''' Test the gkernel function with specified bandwidth'''
+        ''' Test the gkernel function with specified step_style'''
 
         ts = gen_ts(nt=550, alpha=1.0)
         # randomly remove some data pts
