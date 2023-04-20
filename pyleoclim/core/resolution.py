@@ -13,7 +13,8 @@ import seaborn as sns
 import pandas as pd
 import scipy.stats as st
 import matplotlib.pyplot as plt
-from copy import deepcopy
+
+from matplotlib import gridspec
 
 class Resolution:
     ''' Resolution object
@@ -31,7 +32,12 @@ class Resolution:
 
         self.resolution = resolution
         self.timeseries = timeseries
-        self.label = label
+
+        if label is None:
+            if self.timeseries.label is None:
+                self.label = 'Resolution'
+            else:
+                self.label = self.timeseries.label
 
         if time is None:
             self.time = self.timeseries.time[1:]
@@ -60,6 +66,13 @@ class Resolution:
         
         stats : dict
             Dictionary of relevant stats produced by scipy.stats.describe()
+
+        Examples
+        --------
+
+        >>> ts = pyleo.utils.load_dataset('SOI')
+        >>> resolution = ts.resolution()
+        >>> resolution.describe()
             
         See Also
         --------
@@ -173,14 +186,9 @@ class Resolution:
         Examples
         --------
 
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
-
-                import pyleoclim as pyleo
-                ts = pyleo.utils.load_dataset('SOI')
-                resolution = ts.resolution()
-                resolution.plot()
+        >>> ts = pyleo.utils.load_dataset('SOI')
+        >>> resolution = ts.resolution()
+        >>> resolution.plot()
 
         '''
 
@@ -276,19 +284,9 @@ class Resolution:
 
             Distribution of the SOI record
 
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
-
-                import pyleoclim as pyleo
-                ts = pyleo.utils.load_dataset('SOI')
-                @savefig ts_plot5.png
-                fig, ax = ts.plot()
-                pyleo.closefig(fig)
-
-                @savefig ts_hist.png
-                fig, ax = ts.histplot()
-                pyleo.closefig(fig)
+            >>> ts = pyleo.utils.load_dataset('SOI')
+            >>> res = ts.resolution()
+            >>> res.histplot()
 
             '''
             savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -296,7 +294,7 @@ class Resolution:
                 fig, ax = plt.subplots(figsize=figsize)
 
             #make the data into a dataframe so we can flip the figure
-            time_label,value_label = self.make_labels()
+            _,value_label = self.make_labels()
             
             if vertical == True:
                 data=pd.DataFrame({'value':self.resolution})
@@ -317,6 +315,77 @@ class Resolution:
                 return fig, ax
             else:
                 return ax
+            
+    def dashboard(self, figsize=[11, 8], plot_kwargs=None, histplot_kwargs=None, savefig_settings=None):
+        '''Resolution plot dashboard
+
+        Parameters
+        ----------
+        
+        figsize : list or tuple, optional
+            Figure size. The default is [11,8].
+
+        plot_kwargs : dict
+            the dictionary of keyword arguments for ax.plot()
+
+        histplot_kwargs : dict, optional
+            The dictionary of keyword arguments for ax.histplot()
+
+        savefig_settings : dict, optional
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}.
+            The default is None.
+
+        Returns
+        -------
+        
+        fig : matplotlib.figure
+
+            The figure
+
+        ax : matplolib.axis
+
+            The axis
+
+        See also
+        --------
+
+
+        Examples
+        --------
+
+        >>> ts = pyleo.utils.load_dataset('SOI')
+        >>> resolution = ts.resolution()
+        >>> resolution.dashboard()
+
+        '''
+
+        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        histplot_kwargs = {} if histplot_kwargs is None else histplot_kwargs.copy()
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+        fig = plt.figure(figsize=figsize)
+        ax = {}
+
+        gs = gridspec.GridSpec(1, 3, wspace=0)
+        gs.update(left=0, right=1.2)
+
+        ax['res'] = fig.add_subplot(gs[0, :-1])
+        self.plot(ax=ax['res'],**plot_kwargs)
+
+        ax['res_hist'] = fig.add_subplot(gs[0, -1:])
+        self.histplot(ax=ax['res_hist'],ylabel='Counts',vertical=True,**histplot_kwargs)
+
+        if 'ylabel' not in histplot_kwargs:  
+            ax['res_hist'].set_yticklabels([])
+            ax['res_hist'].set_ylabel('')
+
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+
+        return fig, ax
             
     def make_labels(self):
         '''
