@@ -316,7 +316,7 @@ class Resolution:
             else:
                 return ax
             
-    def dashboard(self, figsize=[11, 8], plot_kwargs=None, histplot_kwargs=None, savefig_settings=None):
+    def dashboard(self, figsize=[11, 8], title=None, plot_kwargs=None, histplot_kwargs=None, savefig_settings=None):
         '''Resolution plot dashboard
 
         Parameters
@@ -324,6 +324,9 @@ class Resolution:
         
         figsize : list or tuple, optional
             Figure size. The default is [11,8].
+
+        title : str
+            Figure title
 
         plot_kwargs : dict
             the dictionary of keyword arguments for ax.plot()
@@ -381,6 +384,9 @@ class Resolution:
         if 'ylabel' not in histplot_kwargs:  
             ax['res_hist'].set_yticklabels([])
             ax['res_hist'].set_ylabel('')
+
+        if title:
+            fig.suptitle(title)
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
