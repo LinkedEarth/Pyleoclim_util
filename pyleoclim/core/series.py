@@ -4141,7 +4141,6 @@ class Series:
 
         To create a resolution object, apply the .resolution() method to a Series object
 
-        >>> import pyleoclim as pyleo
         >>> ts = pyleo.utils.load_dataset('SOI')
         >>> resolution = ts.resolution()
 
