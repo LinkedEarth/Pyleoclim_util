@@ -4134,7 +4134,34 @@ class Series:
         -------
         
         resolution : Resolution
-            Resolution object"""
+            Resolution object
+            
+        Examples
+        --------
+
+        To create a resolution object, apply the .resolution() method to a Series object
+
+        >>> import pyleoclim as pyleo
+        >>> ts = pyleo.utils.load_dataset('SOI')
+        >>> resolution = ts.resolution()
+
+        Several methods are then available:
+
+        Summary statistics can be obtained via .describe()
+
+        >>> resolution.describe()
+
+        A simple plot can be created using .plot()
+
+        >>> resolution.plot()
+
+        The distribution of resolution 
+
+        >>> resolution.histplot()
+        
+        Or a dashboard
+        
+        >>> resolution.dashboard()"""
         
         res,_,_ = tsbase.resolution(self.time)
 
