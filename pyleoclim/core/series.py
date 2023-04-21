@@ -4141,7 +4141,7 @@ class Series:
 
         To create a resolution object, apply the .resolution() method to a Series object
 
-        >>> ts = pyleo.utils.load_dataset('SOI')
+        >>> ts = pyleo.utils.load_dataset('EDC-dD')
         >>> resolution = ts.resolution()
 
         Several methods are then available:
@@ -4158,7 +4158,7 @@ class Series:
 
         >>> resolution.histplot()
         
-        Or a dashboard
+        Or a dashboard combining plot() and histplot() side by side:
         
         >>> resolution.dashboard()"""
         

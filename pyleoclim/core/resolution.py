@@ -70,14 +70,14 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('SOI')
+        >>> ts = pyleo.utils.load_dataset('EDC-dD')
         >>> resolution = ts.resolution()
         >>> resolution.describe()
             
         See Also
         --------
         
-        scipy.stats.describe'''
+        `scipy.stats.describe <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html>`_'''
         
         stats = st.describe(self.resolution)._asdict()
 
@@ -186,7 +186,7 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('SOI')
+        >>> ts = pyleo.utils.load_dataset('EDC-dD')
         >>> resolution = ts.resolution()
         >>> resolution.plot()
 
@@ -282,9 +282,9 @@ class Resolution:
             Examples
             --------
 
-            Distribution of the SOI record
+            Distribution of the EDC-dD record
 
-            >>> ts = pyleo.utils.load_dataset('SOI')
+            >>> ts = pyleo.utils.load_dataset('EDC-dD')
             >>> res = ts.resolution()
             >>> res.histplot()
 
@@ -359,7 +359,7 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('SOI')
+        >>> ts = pyleo.utils.load_dataset('EDC-dD')
         >>> resolution = ts.resolution()
         >>> resolution.dashboard()
 
