@@ -37,6 +37,7 @@ EnsembleSeries (pyleoclim.EnsembleSeries)
 .. autoclass:: pyleoclim.core.ensembleseries.EnsembleSeries
    :members:
 
+
 SurrogateSeries (pyleoclim.SurrogateSeries)
 """""""""""""""""""""""""""""""""""""""""""
 
@@ -108,4 +109,10 @@ SsaRes (pyleoclim.SsaRes)
 """""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.ssares.SsaRes
+   :members:
+
+Resolution (pyleoclim.Resolution)
+"""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.resolution.Resolution
    :members:
