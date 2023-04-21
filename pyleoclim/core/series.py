@@ -26,6 +26,7 @@ from ..core.scalograms import Scalogram
 from ..core.coherence import Coherence
 from ..core.corr import Corr
 from ..core.surrogateseries import SurrogateSeries
+from ..core.resolution import Resolution
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -4127,6 +4128,53 @@ class Series:
         ser = self.to_pandas()
         
         return SeriesResampler(rule, ser, md, keep_log, kwargs)
+    
+    def resolution(self):
+        """Generate a resolution object
+
+        Increments are assigned to the preceding time value.
+        E.g. for time_axis = [0,1,3], resolution.resolution = [1,2] resolution.time = [0,1]
+        
+        Returns
+        -------
+        
+        resolution : Resolution
+            Resolution object
+            
+        Examples
+        --------
+
+        To create a resolution object, apply the .resolution() method to a Series object
+
+        >>> ts = pyleo.utils.load_dataset('EDC-dD')
+        >>> resolution = ts.resolution()
+
+        Several methods are then available:
+
+        Summary statistics can be obtained via .describe()
+
+        >>> resolution.describe()
+
+        A simple plot can be created using .plot()
+
+        >>> resolution.plot()
+
+        The distribution of resolution 
+
+        >>> resolution.histplot()
+        
+        Or a dashboard combining plot() and histplot() side by side:
+        
+        >>> resolution.dashboard()"""
+        
+        res,_,_ = tsbase.resolution(self.time)
+
+        resolution = Resolution(
+            resolution = res,
+            timeseries = self
+        )
+
+        return resolution
 
 
 class SeriesResampler:

@@ -868,53 +868,6 @@ def annualize(ys, ts):
 
     return ys_ann, year_int
 
-
-# def gaussianize(X):
-#     """ Quantile maps a matrix to a Gaussian distribution
-
-#     Parameters
-#     ----------
-
-#     X : array
-#         Timeseries arrayed by column
-
-#     Returns
-#     -------
-
-#     Xn : array
-#         Gaussianized array
-        
-#     References
-#     ----------
-
-#     van Albada, S., and P. Robinson (2007), Transformation of arbitrary 
-#         distributions to the normal distribution with application to EEG 
-#         test-retest reliability, Journal of Neuroscience Methods, 161(2), 
-#         205 - 211, doi:10.1016/j.jneumeth.2006.11.004.    
-
-#     See also
-#     --------
-
-#     pyleoclim.utils.tsutils.gaussianize_1d : Quantile maps a 1D array to a Gaussian distribution
-
-#     """
-
-#     # Give every record at least one dimensions, or else the code will crash.
-#     X = np.atleast_1d(X)
-
-#     # Make a blank copy of the array, retaining the data type of the original data variable.
-#     Xn = copy.deepcopy(X)
-#     Xn[:] = np.NAN
-
-#     if len(X.shape) == 1:
-#         Xn = gaussianize_1d(X)
-#     else:
-#         for i in range(X.shape[1]):
-#             Xn[:, i] = gaussianize_1d(X[:, i])
-
-#     return Xn
-
-
 def gaussianize(ys):
     """ Maps a 1D array to a Gaussian distribution using the inverse Rosenblatt transform
     
