@@ -65,7 +65,7 @@ class Resolution:
         -------
         
         stats : dict
-            Dictionary of relevant stats produced by scipy.stats.describe()
+            Dictionary of relevant stats produced by `scipy.stats.describe <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html>`_
 
         Examples
         --------
@@ -73,11 +73,8 @@ class Resolution:
         >>> ts = pyleo.utils.load_dataset('EDC-dD')
         >>> resolution = ts.resolution()
         >>> resolution.describe()
-            
-        See Also
-        --------
         
-        `scipy.stats.describe <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html>`_'''
+        '''
         
         stats = st.describe(self.resolution)._asdict()
 
