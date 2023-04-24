@@ -89,7 +89,7 @@ class LipdSeries(Series):
 
     def __init__(self, tso, clean_ts=True, verbose=False):
         warnings.warn(
-            'The LipdSeries class is being deprecated and will be removed in Pyleoclim v1.0.0. It will be replaced by the GeoSeries class (currently in development).',
+            'The LipdSeries class is being deprecated and will be removed in Pyleoclim v1.0.0. It will be replaced by the geoSeries class (currently in development).',
             DeprecationWarning,
             stacklevel=2)
         if type(tso) is list:

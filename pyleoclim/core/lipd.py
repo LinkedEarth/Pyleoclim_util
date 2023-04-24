@@ -62,7 +62,7 @@ class Lipd:
 
     def __init__(self, usr_path=None, lipd_dict=None, validate=False, remove=False):
         warnings.warn(
-            'The Lipd class is being deprecated and will be removed in Pyleoclim v1.0.0. It will be replaced by the MultipleGeoSeries class (currently in development).',
+            'The Lipd class is being deprecated and will be removed in Pyleoclim v1.0.0. Functionalities will instead be handled by the pyLipd package.',
             DeprecationWarning,
             stacklevel=2)
         
