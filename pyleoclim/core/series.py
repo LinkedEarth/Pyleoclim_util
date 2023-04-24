@@ -964,10 +964,11 @@ class Series:
 
         return res
 
-    def stripes(self, ref_period, LIM = 2.8, thickness=1.0, figsize=[8, 1], xlim=None,
-              top_label=None, bottom_label=None, label_color = 'gray', label_size = None,
-              xlabel=None, savefig_settings=None, ax=None, invert_xaxis=False,
-              show_xaxis=False, x_offset = 0.05):
+    def stripes(self, figsize=[8, 1], cmap = 'RdBu_r', ref_period=None,  
+                sat=0.9, top_label=None, bottom_label=None, 
+                label_color = 'gray', label_size = None, xlim=None, 
+                xlabel=None, savefig_settings=None, ax=None, invert_xaxis=False,
+                show_xaxis=False, x_offset = 0.05):
         '''Represents the Series as an Ed Hawkins "stripes" pattern
 
         Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
@@ -977,14 +978,15 @@ class Series:
         ref_period : array-like (2-elements)
             dates of the reference period, in the form "(first, last)"
 
-        thickness : float, optional
-            vertical thickness of the stripe . The default is 1.0
-
-        LIM : float
-            scaling factor for color saturation. default is 2.8
-
         figsize : list
             a list of two integers indicating the figure size (in inches)
+        
+        cmap: str
+            seaborn-friendly colormap name (https://seaborn.pydata.org/tutorial/color_palettes.html#sequential-color-palettes)    
+            
+        sat : float > 0
+            Controls the saturation of the colormap normalization by scaling the vmin, vmax in https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
+            default = 0.9
 
         xlim : list
             time axis limits
@@ -1036,7 +1038,8 @@ class Series:
         pyleoclim.utils.plotting.stripes : stripes representation of a timeseries
 
         pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
-
+        
+        
         Examples
         --------
 
@@ -1044,13 +1047,15 @@ class Series:
         
         >>> gmst = pyleo.utils.load_dataset('HadCRUT5')
         >>> fig, ax = gmst.stripes(ref_period=(1971,2000))
-        >>> pyleo.closefig(fig)
 
-        If you wanted to show the time axis:
+        To change the colormap:
+        
+        >>> fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='Spectral_r')
+        >>> fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='magma_r')
 
-         >>> gmst = pyleo.utils.load_dataset('HadCRUT5')
-         >>> fig, ax = gmst.stripes(ref_period=(1971,2000), show_xaxis=True, figsize=[8, 1.2])
-         >>> pyleo.closefig(fig)
+        If you wanted to show the time axis: [REPAIR]
+
+        >>> fig, ax = gmst.stripes(ref_period=(1971,2000), show_xaxis=True, figsize=[8, 1.2])
 
         Note that we had to increase the figure height to make space for the extra text.
         '''
@@ -1060,17 +1065,24 @@ class Series:
 
         if bottom_label is None:
             bottom_label = self.value_name
-
-        idx0 = (np.abs(self.time - ref_period[0])).argmin()
-        idx1 = (np.abs(self.time - ref_period[1])).argmin()
-
-        LIMs = self.value.std()*LIM
+        
+        if ref_period is None:
+            ref_period = [self.time.min(), self.time.max()]
+            
+        if sat <= 0:
+            raise ValueError('sat must be a strictly positive number, ideally close to unity.')
+         
+        #LIMs = self.value.std()*LIM
         # Ed Hawkins says: Currently I use HadCRUT5 with a 1971-2000 baseline
         # and a colour scaling of +/- 0.75K (which is probably similar to LIM).
         # It should be relatively simple to duplicate the stripes exactly
-
-        res = plotting.stripes_xy(
-            x=self.time, y=self.value, ref_period=(idx0,idx1), LIM = LIMs, thickness = thickness,
+        
+        # center and normalize values for proper display
+        yc =  self.center(timespan=ref_period).value
+        ys = yc/np.abs(yc).max()
+        vmax = 1.0/sat
+        
+        res = plotting.stripes_xy(x=self.time, y=ys, cmap=cmap, vmin=-vmax, vmax=vmax,
             top_label = top_label, bottom_label = bottom_label, label_color = label_color,
             figsize=figsize, ax=ax,  xlim=xlim, invert_xaxis=invert_xaxis,  label_size=label_size,
             savefig_settings=savefig_settings, show_xaxis=show_xaxis, x_offset = x_offset,

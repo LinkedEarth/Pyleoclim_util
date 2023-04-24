@@ -11,9 +11,11 @@ import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
 import numpy as np
+import pandas as pd
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import ListedColormap
+import seaborn as sns
 
 
 def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None, 
@@ -294,10 +296,11 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     else:
         return ax
     
-def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlabel=None, 
-               ylabel=None, title=None, xlim=None, savefig_settings=None, ax=None, 
-               x_offset = 0.05, label_size = None, show_xaxis = False,
-               invert_xaxis=False, top_label = None, bottom_label = None, label_color = None): 
+def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
+               vmin=None, vmax=None, xlabel=None, ylabel=None,
+               title=None, xlim=None, savefig_settings=None, label_color = None,
+               x_offset = None, label_size = None, show_xaxis = False,
+               invert_xaxis=False, top_label = None, bottom_label = None): 
     '''
     Represent y = f(x) as an Ed Hawkins "warming stripes" pattern
     
@@ -308,15 +311,17 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlab
     x : array
         Independent variable
     y : array
-        Dependent variable
-    ref_period : 2-tuple or 2-vector
-        indices of the reference period, in the form "(first, last)"
-    thickness : float, optional
-        vertical thickness of the stripe . The default is 1.0     
-    LIM : float, optional 
-        size of the y-value range (default: 0.7) 
+        Dependent variable (asumees centered and normalized to unit standard deviation)
+    cmap: str
+        seaborn-friendly colormap 
     figsize : list
         a list of two integers indicating the figure size
+    ax : pyplot.axis
+        the pyplot.axis object, default is None
+    vmin: float 
+        lower bound for colormap normalization
+    vmax: float 
+        upper bound for colormap normalization    
     top_label : str
         the "title" label for the stripe
     bottom_label : str
@@ -325,12 +330,11 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlab
         size of the text in labels (in points). Default is the Matplotlib 'axes.labelsize'] rcParams
     xlim : list
         set the limits of the x axis
-    x_offset : float
+    x_offset : float (0-1)
         value controlling the horizontal offset between stripes and labels (default = 0.05)
     show_xaxis : bool
         flag indicating whether or not the x-axis should be shown (default = False)
-    ax : pyplot.axis
-        the pyplot.axis object
+    
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existing or non-existing path,
@@ -338,10 +342,15 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlab
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     invert_xaxis : bool, optional
         if True, the x-axis of the plot will be inverted
+        
+    See Also
+    --------
+    https://seaborn.pydata.org/tutorial/color_palettes.html#sequential-color-palettes
+    https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
    
     Returns
     -------
-    ax, or fig, ax (if no axes were provided)
+    ax, or (fig, ax) if no axes were provided.
 
     '''
     # handle dict defaults
@@ -352,53 +361,61 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlab
       
     if label_size is None:
         label_size = mpl.rcParams['axes.labelsize']
-      
-    if thickness is None:
-        thickness = 5*label_size
         
-    ax.get_yaxis().set_visible(False) # remove parasitic lines and labels
-    ax.get_xaxis().set_visible(show_xaxis) # remove parasitic lines and labels
-    ax.spines[:].set_visible(False)
-    
-    dx = np.diff(x).mean()
-    xmin = x.min()
-    xmax = x.max() + dx # inclusive
-    
-    # Reference period for the center of the color scale    
-    reference = y[ref_period[0]:ref_period[1]].mean()
-    
-    # colormap: the 8 more saturated colors from the 9 blues / 9 reds
-    cmap = ListedColormap([
-        '#08306b', '#08519c', '#2171b5', '#4292c6',
-        '#6baed6', '#9ecae1', '#c6dbef', '#deebf7',
-        '#fee0d2', '#fcbba1', '#fc9272', '#fb6a4a',
-        '#ef3b2c', '#cb181d', '#a50f15', '#67000d',
-    ])
-    
-    col = PatchCollection([
-        Rectangle((yl, 0), 1, 1)
-        for yl in range(int(xmin), int(xmax))
-        ])
 
-    # set data, colormap and color limits
-    col.set_array(y)
-    col.set_cmap(cmap)
-    col.set_clim(reference - LIM, reference + LIM)
-    ax.add_collection(col)
-    # adjust axes
-    ax.set_ylim(0, thickness)
-    ax.set_xlim(xmin, xmax);
+    # ax.get_yaxis().set_visible(False) # remove parasitic lines and labels
     
-    # add label to the right 
-    #offset = y_offsets[column] / 72
-    #trans = mtransforms.ScaledTranslation(0, offset, fig.dpi_scale_trans)
-    #trans = ax.transData #+ trans
     
-    ypos = 0.4*thickness
-    ax.text(xmax+dx+x_offset, 0.6*thickness, top_label, color=label_color, 
+    
+   
+    
+    # # Reference period for the center of the color scale    
+    # reference = y[ref_period[0]:ref_period[1]].mean()
+    
+    # # colormap: the 8 more saturated colors from the 9 blues / 9 reds
+    # cmap = ListedColormap([
+    #     '#08306b', '#08519c', '#2171b5', '#4292c6',
+    #     '#6baed6', '#9ecae1', '#c6dbef', '#deebf7',
+    #     '#fee0d2', '#fcbba1', '#fc9272', '#fb6a4a',
+    #     '#ef3b2c', '#cb181d', '#a50f15', '#67000d',
+    # ])
+    
+    # col = PatchCollection([
+    #     Rectangle((yl, 0), 1, 1)
+    #     for yl in range(int(xmin), int(xmax))
+    #     ])
+
+    # # set data, colormap and color limits
+    # col.set_array(y)
+    # col.set_cmap(cmap)
+    # col.set_clim(reference - LIM, reference + LIM)
+    # ax.add_collection(col)
+    # # adjust axes
+    # ax.set_ylim(0, thickness)
+    # ax.set_xlim(xmin, xmax);
+    
+    
+    sns.heatmap(data=y[np.newaxis,:], ax =ax,
+                          cmap=cmap, cbar=False,
+                          vmin=vmin, vmax=vmax, center=0.,
+                          xticklabels=False, yticklabels=False,
+                          )
+    if show_xaxis:
+        tx = ax.twiny()
+        tx.plot(x*np.nan)
+        #ax.get_xaxis().set_visible(show_xaxis) # apply show_xasis
+    
+    # parameters for label position
+    thickness = ax.get_ybound()[1]
+    
+    xmax = ax.get_xbound()[1]*(1+x_offset)
+
+    ax.text(xmax, 0.85*thickness, top_label, color=label_color, 
             fontsize=label_size, fontweight = 'bold')
-    ax.text(xmax+dx+x_offset, 0.2*thickness, bottom_label, color=label_color,
+    ax.text(xmax, 0.30*thickness, bottom_label, color=label_color,
             fontsize=label_size)
+    
+
 
     if xlabel is not None:
         ax.set_xlabel(xlabel)
@@ -416,7 +433,7 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlab
         ax.invert_xaxis()       
 
     if 'fig' in locals():
-        fig.tight_layout()
+        #fig.tight_layout()
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
         return fig, ax
