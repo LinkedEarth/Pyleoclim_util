@@ -61,6 +61,11 @@ class Lipd:
     '''
 
     def __init__(self, usr_path=None, lipd_dict=None, validate=False, remove=False):
+        warnings.warn(
+            'The Lipd class is being deprecated and will be removed in Pyleoclim v1.0.0. It will be replaced by the MultipleGeoSeries class (currently in development).',
+            DeprecationWarning,
+            stacklevel=2)
+        
         self.plot_default = {'ice-other': ['#FFD600','h'],
                 'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
