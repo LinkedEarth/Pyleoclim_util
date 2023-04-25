@@ -2024,8 +2024,9 @@ class MultipleSeries:
         else:
             return ax
         
-    def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  time_unit=None,
-                LIM = 2.8, thickness=1.0, labels='auto',  label_color = 'gray',
+    def stripes(self, cmap = 'RdBu_r', sat=0.9, ref_period=None,
+                figsize=None, savefig_settings=None,  time_unit=None,
+                labels='auto',  label_color = 'gray', show_xaxis=False,
                 common_time_kwargs=None, xlim=None, font_scale=0.8, x_offset = 0.05):
         '''
         Represents a MultipleSeries object as a quilt of Ed Hawkins' "stripes" patterns
@@ -2039,21 +2040,23 @@ class MultipleSeries:
 
         Parameters
         ----------
-
+        cmap: str
+            seaborn-friendly colormap name (https://seaborn.pydata.org/tutorial/color_palettes.html#sequential-color-palettes)    
+            
         ref_period : TYPE, optional
             dates of the reference period, in the form "(first, last)".
             The default is None, which will pick the beginning and end of the common time axis.
         
-        LIM : float
-            scaling factor for color saturation. default is 2.8. 
-            The higher the LIM, the more compressed the color range (milder hues)
-        
-        thickness : float, optional
-            vertical thickness of the stripe . The default is 1.0
-            
         figsize : list
+            a list of two integers indicating the figure size (in inches)
         
-            Size of the figure.
+        
+        sat : float > 0
+            Controls the saturation of the colormap normalization by scaling the vmin, vmax in https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
+            default = 0.9
+            
+        show_xaxis : bool
+            flag indicating whether or not the x-axis should be shown (default = False) 
             
         savefig_settings : dictionary
         
@@ -2188,19 +2191,21 @@ class MultipleSeries:
         fig, axs = plt.subplots(n_ts, 1, sharex=True, figsize=figsize, layout = 'tight')
         ax = axs.flatten()
 
-        if xlim is None:
-            xlim = [time.min(), time.max()]
-
         for idx in range(n_ts-1):  # loop over series
-            ts = msc.series_list[idx].gaussianize()
-            ts.stripes(ref_period, LIM = LIM, label_color = label_color,
+            ts = msc.series_list[idx]
+            ts.stripes(ref_period, sat=sat, cmap= cmap,
+                       label_color = label_color,
                        ax=ax[idx], x_offset=x_offset) 
             
         # handle bottom plot
-        ts = msc.series_list[last].gaussianize()
-        ts.stripes(ref_period, LIM = LIM, label_color = label_color, 
-                   ax=ax[last], x_offset=x_offset, show_xaxis=True) 
-        ax[last].set_xlabel(time_label)
+        ts = msc.series_list[last]
+        ts.stripes(ref_period, sat=sat, cmap=cmap,
+                   label_color = label_color, show_xaxis=show_xaxis,
+                   ax=ax[last], x_offset=x_offset) 
+        
+        #ax[last].set_xlabel(time_label)
+        if xlim is None:
+            xlim = [time.min(), time.max()]
         ax[last].set_xlim(xlim)
 
         if 'fig' in locals():

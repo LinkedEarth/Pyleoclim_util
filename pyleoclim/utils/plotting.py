@@ -300,11 +300,12 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
                vmin=None, vmax=None, xlabel=None, ylabel=None,
                title=None, xlim=None, savefig_settings=None, label_color = None,
                x_offset = 0.05, label_size = None, show_xaxis = False,
-               invert_xaxis=False, top_label = None, bottom_label = None): 
+               time_label = 'time', invert_xaxis=False, 
+               top_label = None, bottom_label = None): 
     '''
     Represent y = f(x) as an Ed Hawkins "warming stripes" pattern
     
-    Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
+    Credit: https://esmvalgroup.github.io/ESMValTool_Tutorial/files/warming_stripes.py
     
     Parameters
     ----------
@@ -334,7 +335,8 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
         value controlling the horizontal offset between stripes and labels (default = 0.05)
     show_xaxis : bool
         flag indicating whether or not the x-axis should be shown (default = False)
-    
+    time_label : str
+        string for the time axis
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existing or non-existing path,
@@ -361,30 +363,25 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
       
     if label_size is None:
         label_size = mpl.rcParams['axes.labelsize']
-    # form dataframe to pass to seaborn
-    df = pd.DataFrame(y[np.newaxis,:]); df.columns = x
-    
+
+    ones = np.array([0, 1])
+    ax.pcolormesh(x, ones, np.vstack([y, y]), cmap=cmap, 
+                  vmin=vmin, vmax=vmax, shading='auto')
+    ax.get_yaxis().set_visible(False)
+    ax.get_xaxis().set_visible(show_xaxis)
+
     if show_xaxis:
-        ax.plot(x,(x-x.min())/x.ptp()) # create dummy plot to extract xticks/labels
+        if time_label is not None:
+            ax.set_xlabel(time_label)
     
-    xpos = [df.columns.get_loc(c) for c in ax.get_xticks() if c in df]
-    xlabs = x[xpos].astype(int)
-    # draw the heat map
-    ax = sns.heatmap(data=df, ax =ax,
-                          cmap=cmap, cbar=False,
-                          vmin=vmin, vmax=vmax, center=0.,
-                          xticklabels=False, yticklabels=False,
-                          )
-    # adjust ticks (empty or not)
-    ax.set_xticks(xpos)
-    ax.set_xticklabels(xlabs)
-    
+
     # parameters for label position
     thickness = ax.get_ybound()[1]
-    xmax = ax.get_xbound()[1]*(1+x_offset)
-    ax.text(xmax, 0.85*thickness, top_label, color=label_color, 
+    xmax = ax.get_xbound()[1]*(1+x_offset/10)
+    #xmax = x.max()*0.8*(1+x_offset)
+    ax.text(xmax, 0.4*thickness, top_label, color=label_color, 
             fontsize=label_size, fontweight = 'bold')
-    ax.text(xmax, 0.30*thickness, bottom_label, color=label_color,
+    ax.text(xmax, -0.1*thickness, bottom_label, color=label_color,
             fontsize=label_size)
 
     if xlabel is not None:

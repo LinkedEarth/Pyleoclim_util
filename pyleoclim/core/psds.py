@@ -324,7 +324,7 @@ class PSD:
         elif method == 'ar1asym':
             std = self.timeseries.stats()['std'] # assess standard deviation 
             if np.abs(std-1) > 0.1: 
-                warnings.warn("Asymptoics are only defined for a standard deviation of unity. Please apply to a standardized series only")
+                warnings.warn("Asymptotics are only defined for a standard deviation of unity. Please apply to a standardized series only")
             
             new=self.copy()
 
