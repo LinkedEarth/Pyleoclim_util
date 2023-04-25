@@ -968,7 +968,7 @@ class Series:
                 sat=0.9, top_label=None, bottom_label=None, 
                 label_color = 'gray', label_size = None, xlim=None, 
                 xlabel=None, savefig_settings=None, ax=None, invert_xaxis=False,
-                show_xaxis=False, x_offset = 0.05):
+                show_xaxis=False, x_offset = 0.03):
         '''Represents the Series as an Ed Hawkins "stripes" pattern
 
         Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
@@ -1053,11 +1053,10 @@ class Series:
         >>> fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='Spectral_r')
         >>> fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='magma_r')
 
-        If you wanted to show the time axis: [REPAIR]
+        If you wanted to show the time axis: 
 
-        >>> fig, ax = gmst.stripes(ref_period=(1971,2000), show_xaxis=True, figsize=[8, 1.2])
+        >>> fig, ax = gmst.stripes(ref_period=(1971,2000), show_xaxis=True)
 
-        Note that we had to increase the figure height to make space for the extra text.
         '''
 
         if top_label is None:

@@ -299,7 +299,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
                vmin=None, vmax=None, xlabel=None, ylabel=None,
                title=None, xlim=None, savefig_settings=None, label_color = None,
-               x_offset = None, label_size = None, show_xaxis = False,
+               x_offset = 0.05, label_size = None, show_xaxis = False,
                invert_xaxis=False, top_label = None, bottom_label = None): 
     '''
     Represent y = f(x) as an Ed Hawkins "warming stripes" pattern
@@ -323,9 +323,9 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     vmax: float 
         upper bound for colormap normalization    
     top_label : str
-        the "title" label for the stripe
+        the "title" label for the stripe. Set to '' if no label is wanted
     bottom_label : str
-        the "ylabel" explaining which variable is being plotted
+        the "ylabel" explaining which variable is being plotted. Set to '' if no label is wanted
     label_size : int
         size of the text in labels (in points). Default is the Matplotlib 'axes.labelsize'] rcParams
     xlim : list
@@ -361,61 +361,31 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
       
     if label_size is None:
         label_size = mpl.rcParams['axes.labelsize']
-        
-
-    # ax.get_yaxis().set_visible(False) # remove parasitic lines and labels
+    # form dataframe to pass to seaborn
+    df = pd.DataFrame(y[np.newaxis,:]); df.columns = x
     
+    if show_xaxis:
+        ax.plot(x,(x-x.min())/x.ptp()) # create dummy plot to extract xticks/labels
     
-    
-   
-    
-    # # Reference period for the center of the color scale    
-    # reference = y[ref_period[0]:ref_period[1]].mean()
-    
-    # # colormap: the 8 more saturated colors from the 9 blues / 9 reds
-    # cmap = ListedColormap([
-    #     '#08306b', '#08519c', '#2171b5', '#4292c6',
-    #     '#6baed6', '#9ecae1', '#c6dbef', '#deebf7',
-    #     '#fee0d2', '#fcbba1', '#fc9272', '#fb6a4a',
-    #     '#ef3b2c', '#cb181d', '#a50f15', '#67000d',
-    # ])
-    
-    # col = PatchCollection([
-    #     Rectangle((yl, 0), 1, 1)
-    #     for yl in range(int(xmin), int(xmax))
-    #     ])
-
-    # # set data, colormap and color limits
-    # col.set_array(y)
-    # col.set_cmap(cmap)
-    # col.set_clim(reference - LIM, reference + LIM)
-    # ax.add_collection(col)
-    # # adjust axes
-    # ax.set_ylim(0, thickness)
-    # ax.set_xlim(xmin, xmax);
-    
-    
-    sns.heatmap(data=y[np.newaxis,:], ax =ax,
+    xpos = [df.columns.get_loc(c) for c in ax.get_xticks() if c in df]
+    xlabs = x[xpos].astype(int)
+    # draw the heat map
+    ax = sns.heatmap(data=df, ax =ax,
                           cmap=cmap, cbar=False,
                           vmin=vmin, vmax=vmax, center=0.,
                           xticklabels=False, yticklabels=False,
                           )
-    if show_xaxis:
-        tx = ax.twiny()
-        tx.plot(x*np.nan)
-        #ax.get_xaxis().set_visible(show_xaxis) # apply show_xasis
+    # adjust ticks (empty or not)
+    ax.set_xticks(xpos)
+    ax.set_xticklabels(xlabs)
     
     # parameters for label position
     thickness = ax.get_ybound()[1]
-    
     xmax = ax.get_xbound()[1]*(1+x_offset)
-
     ax.text(xmax, 0.85*thickness, top_label, color=label_color, 
             fontsize=label_size, fontweight = 'bold')
     ax.text(xmax, 0.30*thickness, bottom_label, color=label_color,
             fontsize=label_size)
-    
-
 
     if xlabel is not None:
         ax.set_xlabel(xlabel)
