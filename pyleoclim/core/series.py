@@ -965,7 +965,7 @@ class Series:
         return res
 
     def stripes(self, figsize=[8, 1], cmap = 'RdBu_r', ref_period=None,  
-                sat=0.9, top_label=None, bottom_label=None, 
+                sat=1.0, top_label=None, bottom_label=None, 
                 label_color = 'gray', label_size = None, xlim=None, 
                 xlabel=None, savefig_settings=None, ax=None, invert_xaxis=False,
                 show_xaxis=False, x_offset = 0.03):
@@ -982,7 +982,7 @@ class Series:
             a list of two integers indicating the figure size (in inches)
         
         cmap: str
-            seaborn-friendly colormap name (https://seaborn.pydata.org/tutorial/color_palettes.html#sequential-color-palettes)    
+            colormap name (https://matplotlib.org/stable/tutorials/colors/colormaps.html)
             
         sat : float > 0
             Controls the saturation of the colormap normalization by scaling the vmin, vmax in https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
@@ -1034,9 +1034,7 @@ class Series:
 
         See also
         --------
-
         pyleoclim.utils.plotting.stripes : stripes representation of a timeseries
-
         pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
         
         
@@ -1044,20 +1042,17 @@ class Series:
         --------
 
         Plot the HadCRUT5 Global Mean Surface Temperature
-        
         >>> gmst = pyleo.utils.load_dataset('HadCRUT5')
         >>> fig, ax = gmst.stripes(ref_period=(1971,2000))
         
-        For inclusion in a Pottery Barn catalog, dial down saturation:
-        >>>  fig, ax = gmst.stripes(ref_period=(1971,2000), sat = 0.6)
+        For a more pastel tone, dial down saturation:
+        >>>  fig, ax = gmst.stripes(ref_period=(1971,2000), sat = 0.8)
 
-        To change the colormap:
-        
+        To change the colormap:    
         >>> fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='Spectral_r')
         >>> fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='magma_r')
         
-        If you wanted to show the time axis: 
-
+        To show the time axis: 
         >>> fig, ax = gmst.stripes(ref_period=(1971,2000), show_xaxis=True)
 
         '''
@@ -1080,15 +1075,14 @@ class Series:
         
         # center and normalize values for proper display
         yc =  self.center(timespan=ref_period).value
-        ys = yc/np.abs(yc).max()
-        vmax = 1.0/sat
+        vmax = np.abs(yc).max()/sat
         
         time_label, _ = self.make_labels()
 
-        res = plotting.stripes_xy(x=self.time, y=ys, cmap=cmap, vmin=-vmax, vmax=vmax,
+        res = plotting.stripes_xy(x=self.time, y=yc, cmap=cmap, vmin=-vmax, vmax=vmax,
             top_label = top_label, bottom_label = bottom_label, label_color = label_color,
             figsize=figsize, ax=ax,  xlim=xlim, invert_xaxis=invert_xaxis,  
-            label_size=label_size, time_label = time_label, x_offset = x_offset,
+            label_size=label_size, xlabel = time_label, x_offset = x_offset,
             savefig_settings=savefig_settings, show_xaxis=show_xaxis, 
         )
 

@@ -300,11 +300,10 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
                vmin=None, vmax=None, xlabel=None, ylabel=None,
                title=None, xlim=None, savefig_settings=None, label_color = None,
                x_offset = 0.05, label_size = None, show_xaxis = False,
-               time_label = 'time', invert_xaxis=False, 
-               top_label = None, bottom_label = None): 
+               invert_xaxis=False, top_label = None, bottom_label = None): 
     '''
     Represent y = f(x) as an Ed Hawkins "warming stripes" pattern
-    
+    Uses Matplotlib's pcolormesh'
     Credit: https://esmvalgroup.github.io/ESMValTool_Tutorial/files/warming_stripes.py
     
     Parameters
@@ -314,7 +313,7 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     y : array
         Dependent variable (asumees centered and normalized to unit standard deviation)
     cmap: str
-        seaborn-friendly colormap 
+        colormap name
     figsize : list
         a list of two integers indicating the figure size
     ax : pyplot.axis
@@ -335,8 +334,7 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
         value controlling the horizontal offset between stripes and labels (default = 0.05)
     show_xaxis : bool
         flag indicating whether or not the x-axis should be shown (default = False)
-    time_label : str
-        string for the time axis
+    
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existing or non-existing path,
@@ -347,7 +345,7 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
         
     See Also
     --------
-    https://seaborn.pydata.org/tutorial/color_palettes.html#sequential-color-palettes
+    https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.pcolormesh.html
     https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
    
     Returns
@@ -365,27 +363,26 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
         label_size = mpl.rcParams['axes.labelsize']
 
     ones = np.array([0, 1])
+    #ax.set_axis_off()
     ax.pcolormesh(x, ones, np.vstack([y, y]), cmap=cmap, 
                   vmin=vmin, vmax=vmax, shading='auto')
+    # hide y axis
     ax.get_yaxis().set_visible(False)
+    ax.spines['left'].set_visible(False)
+    # manage x axis
+    ax.spines['bottom'].set_visible(show_xaxis)
     ax.get_xaxis().set_visible(show_xaxis)
-
-    if show_xaxis:
-        if time_label is not None:
-            ax.set_xlabel(time_label)
+    if show_xaxis is True and xlabel is not None:
+        ax.set_xlabel(xlabel)
     
-
     # parameters for label position
     thickness = ax.get_ybound()[1]
     xmax = ax.get_xbound()[1]*(1+x_offset/10)
     #xmax = x.max()*0.8*(1+x_offset)
-    ax.text(xmax, 0.4*thickness, top_label, color=label_color, 
+    ax.text(xmax, 0.5*thickness, top_label, color=label_color, 
             fontsize=label_size, fontweight = 'bold')
-    ax.text(xmax, -0.1*thickness, bottom_label, color=label_color,
+    ax.text(xmax, 0*thickness, bottom_label, color=label_color,
             fontsize=label_size)
-
-    if xlabel is not None:
-        ax.set_xlabel(xlabel)
 
     if ylabel is not None:
         ax.set_ylabel(ylabel)

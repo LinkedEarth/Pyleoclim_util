@@ -2024,7 +2024,7 @@ class MultipleSeries:
         else:
             return ax
         
-    def stripes(self, cmap = 'RdBu_r', sat=0.9, ref_period=None,
+    def stripes(self, cmap = 'RdBu_r', sat=1.0, ref_period=None,
                 figsize=None, savefig_settings=None,  time_unit=None,
                 labels='auto',  label_color = 'gray', show_xaxis=False,
                 common_time_kwargs=None, xlim=None, font_scale=0.8, x_offset = 0.05):
@@ -2041,7 +2041,8 @@ class MultipleSeries:
         Parameters
         ----------
         cmap: str
-            seaborn-friendly colormap name (https://seaborn.pydata.org/tutorial/color_palettes.html#sequential-color-palettes)    
+            colormap name (https://matplotlib.org/stable/tutorials/colors/colormaps.html)
+            Default is 'RdBu_r'
             
         ref_period : TYPE, optional
             dates of the reference period, in the form "(first, last)".
@@ -2053,7 +2054,7 @@ class MultipleSeries:
         
         sat : float > 0
             Controls the saturation of the colormap normalization by scaling the vmin, vmax in https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
-            default = 0.9
+            default = 1.0
             
         show_xaxis : bool
             flag indicating whether or not the x-axis should be shown (default = False) 
@@ -2129,12 +2130,11 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            d = pyleo.Lipd(usr_path = url)
-            tslist = d.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
-            @savefig md76_stripes.png
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            lr04 = pyleo.utils.load_dataset('LR04')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = lr04.flip() & edc & co2ts # create MS object
+            @savefig ms_stripes.png
             fig, ax = ms.stripes()
             pyleo.closefig(fig)
              
@@ -2147,16 +2147,14 @@ class MultipleSeries:
             :okwarning:
             :okexcept:
 
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            d = pyleo.Lipd(usr_path = url)
-            tslist = d.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
-            @savefig md76_stripes2.png
-            fig, ax = ms.stripes(common_time_kwargs={'step': 0.5}, x_offset = 200, 
-                                 LIM=4, figsize=[8,3])
-            pyleo.closefig(fig)     
+             import pyleoclim as pyleo
+             co2ts = pyleo.utils.load_dataset('AACO2')
+             lr04 = pyleo.utils.load_dataset('LR04')
+             edc = pyleo.utils.load_dataset('EDC-dD')
+             ms = lr04.flip() & edc & co2ts # create MS object
+             @savefig ms_stripes2.png
+             fig, ax = ms.stripes(figsize=(8,2.5),show_xaxis=True, sat = 0.8)
+             pyleo.closefig(fig)
             
         '''
         current_style = deepcopy(mpl.rcParams)
@@ -2203,10 +2201,11 @@ class MultipleSeries:
                    label_color = label_color, show_xaxis=show_xaxis,
                    ax=ax[last], x_offset=x_offset) 
         
-        #ax[last].set_xlabel(time_label)
         if xlim is None:
             xlim = [time.min(), time.max()]
         ax[last].set_xlim(xlim)
+        
+        fig.tight_layout()
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
