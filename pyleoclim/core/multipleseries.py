@@ -2162,6 +2162,10 @@ class MultipleSeries:
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
         
+        if len(self.series_list)>20:
+            warnings.warn("You are trying to plot over 20 series; results will be hard to see",
+                          UserWarning, stacklevel=2)
+        
         # deal with time units
         self = self.convert_time_unit(time_unit=time_unit)
 
