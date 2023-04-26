@@ -127,6 +127,7 @@ class TestMultipleSeriesPlot:
         assert_allclose(t_1, x_plot_1)
         assert_allclose(v_0, y_plot_0)
         assert_allclose(v_1, y_plot_1)
+        pyleo.closefig(fig)
 
 class TestMultipleSeriesStripes:
     '''Test for MultipleSeries.stripes()
@@ -140,17 +141,14 @@ class TestMultipleSeriesStripes:
         t_1, v_1 = gen_normal()
 
         #Create series objects
-        ts_0 = pyleo.Series(time = t_0, value = v_0)
-        ts_1 = pyleo.Series(time = t_1, value = v_1)
-
-        #Create a list of series objects
-        serieslist = [ts_0, ts_1]
+        ts_0 = pyleo.Series(time = t_0, value = v_0, label='series 1')
+        ts_1 = pyleo.Series(time = t_1, value = v_1, label='series 2')
 
         #Turn this list into a multiple series object
-        ts_M = pyleo.MultipleSeries(serieslist)
+        ts_M = ts_0 &  ts_1
 
-        fig, ax = ts_M.stripes(LIM=4, x_offset=2, label_color = 'red')
-
+        fig, ax = ts_M.stripes(sat=0.9, label_color = 'red', cmap='cividis_r')
+        pyleo.closefig(fig)
 
 class TestMultipleSeriesStandardize:
     '''Test for MultipleSeries.standardize()

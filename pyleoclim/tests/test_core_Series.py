@@ -1037,22 +1037,17 @@ class TestUiSeriesPlot:
 
         x_plot = line.get_xdata()
         y_plot = line.get_ydata()
-
-
         pyleo.closefig(fig)
 
 class TestUiSeriesStripes:
-    '''Test for Series.stripes()
-
-    Series.stripes outputs a matplotlib figure and axis object, so we will compare the time axis
-    of the axis object to the time array.'''
-
-    def test_stripes(self):
+    '''Test for Series.stripes()'''
+    @pytest.mark.parametrize('show_xaxis', [True, False])
+    def test_stripes(self, show_xaxis):
 
         ts = gen_normal()
 
-        fig, ax = ts.stripes(ref_period=[61,90],x_offset=2)
-
+        fig, ax = ts.stripes(ref_period=[61,90], show_xaxis=show_xaxis)
+        assert ax.xaxis.get_ticklabels() != []
         pyleo.closefig(fig)
 
 

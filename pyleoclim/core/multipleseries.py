@@ -2024,8 +2024,9 @@ class MultipleSeries:
         else:
             return ax
         
-    def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  time_unit=None,
-                LIM = 2.8, thickness=1.0, labels='auto',  label_color = 'gray',
+    def stripes(self, cmap = 'RdBu_r', sat=1.0, ref_period=None,
+                figsize=None, savefig_settings=None,  time_unit=None,
+                labels='auto',  label_color = 'gray', show_xaxis=False,
                 common_time_kwargs=None, xlim=None, font_scale=0.8, x_offset = 0.05):
         '''
         Represents a MultipleSeries object as a quilt of Ed Hawkins' "stripes" patterns
@@ -2039,21 +2040,24 @@ class MultipleSeries:
 
         Parameters
         ----------
-
+        cmap: str
+            colormap name (https://matplotlib.org/stable/tutorials/colors/colormaps.html)
+            Default is 'RdBu_r'
+            
         ref_period : TYPE, optional
             dates of the reference period, in the form "(first, last)".
             The default is None, which will pick the beginning and end of the common time axis.
         
-        LIM : float
-            scaling factor for color saturation. default is 2.8. 
-            The higher the LIM, the more compressed the color range (milder hues)
-        
-        thickness : float, optional
-            vertical thickness of the stripe . The default is 1.0
-            
         figsize : list
+            a list of two integers indicating the figure size (in inches)
         
-            Size of the figure.
+        
+        sat : float > 0
+            Controls the saturation of the colormap normalization by scaling the vmin, vmax in https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
+            default = 1.0
+            
+        show_xaxis : bool
+            flag indicating whether or not the x-axis should be shown (default = False) 
             
         savefig_settings : dictionary
         
@@ -2126,12 +2130,11 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            d = pyleo.Lipd(usr_path = url)
-            tslist = d.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
-            @savefig md76_stripes.png
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            lr04 = pyleo.utils.load_dataset('LR04')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = lr04.flip() & edc & co2ts # create MS object
+            @savefig ms_stripes.png
             fig, ax = ms.stripes()
             pyleo.closefig(fig)
              
@@ -2144,22 +2147,24 @@ class MultipleSeries:
             :okwarning:
             :okexcept:
 
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            d = pyleo.Lipd(usr_path = url)
-            tslist = d.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
-            @savefig md76_stripes2.png
-            fig, ax = ms.stripes(common_time_kwargs={'step': 0.5}, x_offset = 200, 
-                                 LIM=4, figsize=[8,3])
-            pyleo.closefig(fig)     
+             import pyleoclim as pyleo
+             co2ts = pyleo.utils.load_dataset('AACO2')
+             lr04 = pyleo.utils.load_dataset('LR04')
+             edc = pyleo.utils.load_dataset('EDC-dD')
+             ms = lr04.flip() & edc & co2ts # create MS object
+             @savefig ms_stripes2.png
+             fig, ax = ms.stripes(figsize=(8,2.5),show_xaxis=True, sat = 0.8)
+             pyleo.closefig(fig)
             
         '''
         current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+        
+        if len(self.series_list)>20:
+            warnings.warn("You are trying to plot over 20 series; results will be hard to see",
+                          UserWarning, stacklevel=2)
         
         # deal with time units
         self = self.convert_time_unit(time_unit=time_unit)
@@ -2188,20 +2193,23 @@ class MultipleSeries:
         fig, axs = plt.subplots(n_ts, 1, sharex=True, figsize=figsize, layout = 'tight')
         ax = axs.flatten()
 
-        if xlim is None:
-            xlim = [time.min(), time.max()]
-
         for idx in range(n_ts-1):  # loop over series
-            ts = msc.series_list[idx].gaussianize()
-            ts.stripes(ref_period, LIM = LIM, label_color = label_color,
+            ts = msc.series_list[idx]
+            ts.stripes(ref_period, sat=sat, cmap= cmap,
+                       label_color = label_color,
                        ax=ax[idx], x_offset=x_offset) 
             
         # handle bottom plot
-        ts = msc.series_list[last].gaussianize()
-        ts.stripes(ref_period, LIM = LIM, label_color = label_color, 
-                   ax=ax[last], x_offset=x_offset, show_xaxis=True) 
-        ax[last].set_xlabel(time_label)
+        ts = msc.series_list[last]
+        ts.stripes(ref_period, sat=sat, cmap=cmap,
+                   label_color = label_color, show_xaxis=show_xaxis,
+                   ax=ax[last], x_offset=x_offset) 
+        
+        if xlim is None:
+            xlim = [time.min(), time.max()]
         ax[last].set_xlim(xlim)
+        
+        fig.tight_layout()
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
