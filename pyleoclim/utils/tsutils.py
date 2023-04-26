@@ -41,7 +41,8 @@ from .filter import savitzky_golay
 
 from .tsbase import (
     clean_ts,
-    dropna
+    dropna,
+    is_evenly_spaced
 )
 
 
@@ -245,9 +246,6 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     x = np.array(x, dtype='float64')
     y = np.array(y, dtype='float64')
     
-    if (bin_size is not None or bin_edges is not None or time_axis is not None) and no_nans:
-        warnings.warn('The step, time axis, or bin edges have been set, the series may not be evenly_spaced',stacklevel=3)
-    
     # Set the bin edges
     if bin_edges is not None:
         if start is not None or stop is not None or bin_size is not None or step_style is not None or time_axis is not None:
@@ -277,6 +275,12 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         'n': n,
         'error': error,
     }
+
+    if no_nans is True:
+        _,ts = dropna(binned_values,time_axis)
+        check = is_evenly_spaced(ts)
+        if not check:
+            warnings.warn('no_nans is set to True but has been overridden by other parameters. This has resulted in nans being present in the returned series',stacklevel=3)
 
     return  res_dict
 
@@ -437,9 +441,6 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
         # Make sure x and y are numpy arrays
     t = np.array(t, dtype='float64')
     y = np.array(y, dtype='float64')
-
-    if (step is not None or bin_edges is not None) and no_nans:
-        warnings.warn('The step or bins has been set, the series may not be evenly_spaced',stacklevel=3)
     
     # Set the bin edges
     if bin_edges is not None:
@@ -477,6 +478,12 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
             yc[i]  = sum(weight*yslice)/sum(weight) # normalize by the sum of weights
         else:
             yc[i] = np.nan
+
+        if no_nans is True:
+            _,ts = dropna(yc,time_axis)
+            check = is_evenly_spaced(ts)
+            if not check:
+                warnings.warn('no_nans is set to True but has been overridden by other parameters. This has resulted in nans being present in the returned series',stacklevel=3)
 
     return time_axis, yc
 
