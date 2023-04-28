@@ -240,7 +240,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     if evenly_spaced:
         no_nans=True
-        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=3)
+        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=2)
 
     # Make sure x and y are numpy arrays
     x = np.array(x, dtype='float64')
@@ -249,12 +249,12 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     # Set the bin edges
     if bin_edges is not None:
         if start is not None or stop is not None or bin_size is not None or step_style is not None or time_axis is not None:
-            warnings.warn('Bins have been passed with other bin relevant arguments {start,stop,bin_size,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=3)
+            warnings.warn('Bins have been passed with other bin relevant arguments {start,stop,bin_size,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=2)
         time_axis = (bin_edges[1:] + bin_edges[:-1])/2
     # A bit of wonk is required to get the proper bin edges from the time axis
     elif time_axis is not None:
         if start is not None or stop is not None or bin_size is not None or step_style is not None:
-            warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,bin_size,step_style}. Time_axis takes priority and will be used.',stacklevel=3)
+            warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,bin_size,step_style}. Time_axis takes priority and will be used.',stacklevel=2)
         bin_edges = np.zeros(len(time_axis)+1)
         bin_edges[0] = time_axis[0]
         bin_edges[-1] = time_axis[-1]
@@ -276,11 +276,10 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         'error': error,
     }
 
-    if no_nans is True:
-        _,ts = dropna(binned_values,time_axis)
-        check = is_evenly_spaced(ts)
-        if not check:
-            warnings.warn('no_nans is set to True but has been overridden by other parameters. This has resulted in nans being present in the returned series',stacklevel=3)
+    if no_nans:
+        check = np.isnan(binned_values).any()
+        if check:
+            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See tsutils.bin() documentation for details on parameter hierarchy',stacklevel=2)
 
     return  res_dict
 
@@ -436,7 +435,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     
     if evenly_spaced:
         no_nans=True
-        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=3)
+        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=2)
 
         # Make sure x and y are numpy arrays
     t = np.array(t, dtype='float64')
@@ -445,12 +444,12 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     # Set the bin edges
     if bin_edges is not None:
         if start is not None or stop is not None or step is not None or step_style is not None or time_axis is not None:
-            warnings.warn('Bins have been passed with other axis relevant arguments {start,stop,step,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=3)
+            warnings.warn('Bins have been passed with other axis relevant arguments {start,stop,step,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=2)
         time_axis = (bin_edges[1:] + bin_edges[:-1])/2
     # A bit of wonk is required to get the proper bin edges from the time axis
     elif time_axis is not None:
         if start is not None or stop is not None or step is not None or step_style is not None:
-            warnings.warn('The time axis has been passed with other axis relevant arguments {start,stop,step,step_style}. Time_axis takes priority and will be used.',stacklevel=3)
+            warnings.warn('The time axis has been passed with other axis relevant arguments {start,stop,step,step_style}. Time_axis takes priority and will be used.',stacklevel=2)
         bin_edges = np.zeros(len(time_axis)+1)
         bin_edges[0] = time_axis[0]
         bin_edges[-1] = time_axis[-1]
@@ -479,11 +478,10 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
         else:
             yc[i] = np.nan
 
-        if no_nans is True:
-            _,ts = dropna(yc,time_axis)
-            check = is_evenly_spaced(ts)
-            if not check:
-                warnings.warn('no_nans is set to True but has been overridden by other parameters. This has resulted in nans being present in the returned series',stacklevel=3)
+    if no_nans:
+        check = np.isnan(yc).any()
+        if check:
+            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See tsutils.gkernel() documentation for details on parameter hierarchy.',stacklevel=2)
 
     return time_axis, yc
 
