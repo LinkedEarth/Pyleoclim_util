@@ -276,11 +276,10 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         'error': error,
     }
 
-    if no_nans is True:
-        _,ts = dropna(binned_values,time_axis)
-        check = is_evenly_spaced(ts)
-        if not check:
-            warnings.warn('no_nans is set to True but has been overridden by other parameters. This has resulted in nans being present in the returned series',stacklevel=3)
+    if no_nans:
+        check = np.isnan(binned_values).any()
+        if check:
+            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See tsutils.bin() documentation for details on parameter hierarchy',stacklevel=3)
 
     return  res_dict
 
@@ -479,11 +478,10 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
         else:
             yc[i] = np.nan
 
-        if no_nans is True:
-            _,ts = dropna(yc,time_axis)
-            check = is_evenly_spaced(ts)
-            if not check:
-                warnings.warn('no_nans is set to True but has been overridden by other parameters. This has resulted in nans being present in the returned series',stacklevel=3)
+    if no_nans:
+        check = np.isnan(yc).any()
+        if check:
+            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See tsutils.gkernel() documentation for details on parameter hierarchy.',stacklevel=3)
 
     return time_axis, yc
 
