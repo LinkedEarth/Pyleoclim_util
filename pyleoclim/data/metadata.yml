@@ -123,6 +123,37 @@ GISP2:
   time_column: Age [yr BP]
   value_column: d18O [permil]
 
+cenogrid_d18O:
+  filename: 'cenogrid'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_unit: 'My BP'
+    time_name: 'Tuned Time'
+    value_unit: '‰ (VPDB)'
+    value_name: '$\delta^{18} \mathrm{O}$'
+    label: 'CENOGRID'
+    archiveType: 'Marine Sediment'
+    importedFrom: 'https://doi.pangaea.de/10.1594/PANGAEA.917660'
+  time_column: Tuned time [Ma]
+  value_column: Foram bent δ18O [‰ PDB] (VPDB)
+
+cenogrid_d13C:
+  filename: 'cenogrid'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_unit: 'My BP'
+    time_name: 'Tuned Time'
+    value_unit: '‰ (VPDB)'
+    value_name: '$\delta^{13} \mathrm{C}$'
+    label: 'CENOGRID'
+    archiveType: 'Marine Sediment'
+    importedFrom: 'https://doi.pangaea.de/10.1594/PANGAEA.917660'
+  time_column: Tuned time [Ma]
+  value_column: Foram bent δ13C [‰ PDB] (VPDB)
 #nino_json:
 #  filename: 'Nino'
 #  file_extension: 'json'
