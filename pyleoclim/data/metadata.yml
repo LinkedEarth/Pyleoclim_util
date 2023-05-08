@@ -97,6 +97,9 @@ EDC-dD:
   pandas_kwargs:
     header: 0
   pyleo_kwargs:
+    lat: -75.1011
+    lon: 123.3478
+    elevation: 3233
     time_name: 'Age'
     time_unit: 'y BP'
     label: 'EPICA Dome C deuterium'

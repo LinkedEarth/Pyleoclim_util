@@ -5,6 +5,7 @@ Definition of the various Classes and in which Modules they may be found.
 """
 
 from .series import Series
+from .geoseries import GeoSeries
 from .psds import PSD, MultiplePSD
 from .multipleseries import MultipleSeries
 from .surrogateseries import SurrogateSeries

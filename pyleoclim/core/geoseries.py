@@ -23,13 +23,21 @@ class GeoSeries(Series):
     time : list or numpy.array
         independent variable (t)
 
-
     value : list of numpy.array
         values of the dependent variable (y)
+        
+    lat : float
+        latitude N in decimal degrees.
+        
+    lon : float
+        longitude East in decimal degrees. Negative values will be converted to an angle in [0 , 360)
+       
+    elevation : float
+        elevation of the sample, in meters above sea level.                                                                                          
 
     time_unit : string
         Units for the time vector (e.g., 'years').
-        Default is 'years'
+        Default is None
 
     time_name : string
         Name of the time vector (e.g., 'Time','Age').
@@ -53,12 +61,7 @@ class GeoSeries(Series):
     keep_log : bool
         Whether to keep a log of applied transformations. False by default
         
-    lat : float
-        latitude N in decimal degrees.
-        
-    lon : float
-        longitude East in decimal degrees. Negative values will be converted to an angle in [0 , 360)
-                                                                                             
+  
     importedFrom : string
         source of the dataset. If it came from a LiPD file, this could be the datasetID property 
 
@@ -90,12 +93,12 @@ class GeoSeries(Series):
           
     '''
 
-    def __init__(self, time, value, lat, lon):
+    def __init__(self, time, value, lat, lon, elevation = None, time_unit=None, time_name=None, 
+                 value_name=None, value_unit=None, label=None, 
+                 importedFrom=None, archiveType = None, log=None, keep_log=False,
+                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
         
-        # ensure ndarray instances
-        time = np.array(time)
-        value = np.array(value)
-        
+       
         # assign latitude
         if lat is not None:
             lat = float(lat) 
@@ -118,8 +121,27 @@ class GeoSeries(Series):
         else:
             self.lon = None # assign a default value to prevent bugs ?
             
-        
-        self.time = time
-        self.value = value
-        
-        
+        # elevation
+        self.elevation = elevation
+            
+        #assign all the rest
+        super().__init__(time, value, time_unit, time_name, value_name,
+                         value_unit, label, importedFrom, archiveType,
+                         log, keep_log, sort_ts, dropna, verbose, clean_ts)
+                      
+
+    @property
+    def metadata(self):
+        return dict(
+            lat = self.lat,
+            lon = self.lon,
+            elevation = self.elevation,
+            time_unit = self.time_unit,
+            time_name = self.time_name,
+            value_unit = self.value_unit,
+            value_name = self.value_name,
+            label = self.label,
+            archiveType = self.archiveType,
+            importedFrom = self.importedFrom,
+            log = self.log,
+        )

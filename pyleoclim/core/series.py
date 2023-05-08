@@ -71,14 +71,14 @@ class Series:
     ----------
 
     time : list or numpy.array
-        independent variable (t)
+        time axis (prograde or retrograde) 
 
     value : list of numpy.array
-        values of the dependent variable (y)
+        values of the dependent variable (y)3
 
     time_unit : string
-        Units for the time vector (e.g., 'years').
-        Default is 'years'
+        Units for the time vector (e.g., 'ky BP').
+        Default is None
 
     time_name : string
         Name of the time vector (e.g., 'Time','Age').
