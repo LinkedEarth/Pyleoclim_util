@@ -2712,17 +2712,14 @@ class Series:
         >>> lr04 = pyleo.utils.load_dataset('LR04')
         >>> fig, ax = lr04.plot(invert_yaxis=True)
         >>> ts_emd = lr04.detrend(method='emd',preserve_mean=True)
-        >>> ts_emd.plot(ax=ax)
-        
-        The label is made automatically, but can be overriden:
-        >>> ts_emd.plot(ax=ax, label = 'Pyleoclim rules!')
+        >>> ts_emd.plot(label=lr04.label+', EMD detrend',ax=ax)
        
         '''
         new = self.copy()
         v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, 
                                        preserve_mean=preserve_mean, **kwargs)
         new.value = v_mod
-        new.label = self.label +' (' + method +' detrended)'
+        #new.label = self.label +' (' + method +' detrended)'
 
         if keep_log == True:
             if new.log is None:
