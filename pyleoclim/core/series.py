@@ -2676,7 +2676,7 @@ class Series:
         return new
 
 
-    def detrend(self, method='emd', keep_log=False, **kwargs):
+    def detrend(self, method='emd', keep_log=False, preserve_mean = False, **kwargs):
         '''Detrend Series object
 
         Parameters
@@ -2689,8 +2689,11 @@ class Series:
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
                 * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
 
-        keep_log : Boolean
+        keep_log : boolean
             if True, adds the removed trend and method parameters to the series log.
+            
+        preserve_mean : boolean
+            if True, ensures that the mean of the series is preserved despite the detrending
 
         kwargs : dict
             Relevant arguments for each of the methods.
@@ -2706,99 +2709,17 @@ class Series:
 
         Examples
         --------
-
-        We will generate a harmonic signal with a nonlinear trend and use two  detrending options to recover the original signal.
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            import pyleoclim as pyleo
-            import numpy as np
-
-            # Generate a mixed harmonic signal with known frequencies
-            freqs=[1/20,1/80]
-            time=np.arange(2001)
-            signals=[]
-            for freq in freqs:
-                signals.append(np.cos(2*np.pi*freq*time))
-            signal=sum(signals)
-
-            # Add a non-linear trend
-            slope = 1e-5;  intercept = -1
-            nonlinear_trend = slope*time**2 + intercept
-
-            # Add a modicum of white noise
-            np.random.seed(2333)
-            sig_var = np.var(signal)
-            noise_var = sig_var / 2 #signal is twice the size of noise
-            white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
-            signal_noise = signal + white_noise
-
-            # Place it all in a series object and plot it:
-            ts = pyleo.Series(time=time,value=signal_noise + nonlinear_trend)
-            @savefig random_series.png
-            fig, ax = ts.plot(title='Timeseries with nonlinear trend'); pyleo.closefig(fig)
-
-            # Detrending with default parameters (using EMD method with 1 mode)
-            ts_emd1 = ts.detrend()
-            ts_emd1.label = 'default detrending (EMD, last mode)'
-            @savefig ts_emd1.png
-            fig, ax = ts_emd1.plot(title='Detrended with EMD method'); ax.plot(time,signal_noise,label='target signal'); ax.legend(); pyleo.closefig(fig)
-
-        We see that the default function call results in a "hockey stick" at the end, which is undesirable.
-        There is no automated way to fix this, but with a little trial and error, we find that removing
-        the 2 smoothest modes performs reasonably well:
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            ts_emd2 = ts.detrend(method='emd', n=2, keep_log=True)
-            ts_emd2.label = 'EMD detrending, last 2 modes'
-            @savefig ts_emd_n2.png
-            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)'); ax.plot(time,signal_noise,label='target signal'); ax.legend(); pyleo.closefig(fig)
-
-        Another option for removing a nonlinear trend is a Savitzky-Golay filter:
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            ts_sg = ts.detrend(method='savitzky-golay')
-            ts_sg.label = 'savitzky-golay detrending, default parameters'
-            @savefig ts_sg.png
-            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter'); ax.plot(time,signal_noise,label='target signal'); ax.legend(); pyleo.closefig(fig)
-
-        As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
-        It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges.
-        By default, this value is close to the length of the series. Choosing a value 10x smaller fixes the problem here, though you will have to tinker with that parameter until you get the result you seek.
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201}, keep_log=True)
-            ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
-            @savefig ts_sg2.png
-            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter'); ax.plot(time,signal_noise,label='target signal'); ax.legend(); pyleo.closefig(fig)
-
-        Finally, the method returns the trend that was previous, so it can be added back in if need be.
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            trend_ts = pyleo.Series(time = time, value = nonlinear_trend,
-                                    value_name= 'trend', label='original trend')
-            @savefig ts_trend.png
-            fig, ax = trend_ts.plot(title='Trend recovery'); ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label); ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label); ax.legend(); pyleo.closefig(fig)
-
-        Both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding.
+        >>> lr04 = pyleo.utils.load_dataset('LR04')
+        >>> fig, ax = lr04.plot(invert_yaxis=True)
+        >>> ts_emd = lr04.detrend(method='emd',preserve_mean=True)
+        >>> ts_emd.plot(label=lr04.label+', EMD detrend',ax=ax)
+       
         '''
         new = self.copy()
-        v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
+        v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, 
+                                       preserve_mean=preserve_mean, **kwargs)
         new.value = v_mod
+        #new.label = self.label +' (' + method +' detrended)'
 
         if keep_log == True:
             if new.log is None:
