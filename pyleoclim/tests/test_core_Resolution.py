@@ -13,7 +13,7 @@ Notes on how to test:
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
 
-import matplotlib.pyplot as plt
+import pyleoclim as pyleo
 
 class TestUIResolutionDescribe:
     """Tests for Resolution.describe()"""
@@ -27,21 +27,21 @@ class TestUIResolutionPlot:
 
     def test_plot_t0(self,unevenly_spaced_series):
         resolution = unevenly_spaced_series.resolution()
-        resolution.plot()
-        plt.close()
+        fig, ax = resolution.plot()
+        pyleo.closefig(fig)
 
 class TestUIHistPlot:
     """Tests for Resolution.plot()"""
 
     def test_histplot_t0(self,unevenly_spaced_series):
         resolution = unevenly_spaced_series.resolution()
-        resolution.histplot()
-        plt.close()
+        fig, ax = resolution.histplot()
+        pyleo.closefig(fig)
 
 class TestUIDashboard:
     """Tests for Resolution.dashboard()"""
 
     def test_dashboard_t0(self,unevenly_spaced_series):
         resolution = unevenly_spaced_series.resolution()
-        resolution.dashboard()
-        plt.close()
+        fig, ax = resolution.dashboard()
+        pyleo.closefig(fig)
