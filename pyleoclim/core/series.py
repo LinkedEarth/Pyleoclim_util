@@ -225,7 +225,15 @@ class Series:
         self.sort_ts = sort_ts
         self.clean_ts = clean_ts
         self.importedFrom = importedFrom
-        self.archiveType = archiveType  #TODO: implement a check on allowable values (take from LipdVerse + 'model' + 'instrumental')
+        self.archiveType = archiveType
+        if self.archiveType is not None:
+            if self.archiveType not in lipdutils.PLOT_DEFAULT.keys():
+                str_archive = list(lipdutils.PLOT_DEFAULT.keys())[0:-1]
+                mystring = ""
+                for item in str_archive:
+                    mystring += str(item) + ', '
+                warnings.warn('archiveType should be one of the following: ' + mystring)
+                
     
     def __repr__(self):
         ser = self.to_pandas(paleo_style=True)

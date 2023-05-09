@@ -132,14 +132,22 @@ def load_dataset(name):
         else:
             value = df[value_column]
         
-        if pyleo_kwargs['lat'] is not None and pyleo_kwargs['lon'] is not None:
-            # export to pyleo.GeoSeries
-            ts=pyleo.GeoSeries(
-                time=time, 
-                value=value,
-                **pyleo_kwargs, 
-                verbose=False
-            )
+        if 'lat' in pyleo_kwargs.keys() and 'lon' in pyleo_kwargs.keys():
+            if pyleo_kwargs['lat'] is not None and pyleo_kwargs['lon'] is not None:
+                ts=pyleo.GeoSeries(
+                    time=time, 
+                    value=value,
+                    **pyleo_kwargs, 
+                    verbose=False
+                )
+            else:
+               ts=pyleo.Series(
+                   time=time, 
+                   value=value,
+                   **pyleo_kwargs, 
+                   verbose=False
+               ) 
+
         else:
             # convert to pyleo.Series
             ts=pyleo.Series(

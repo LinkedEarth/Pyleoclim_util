@@ -15,6 +15,24 @@ import wget
 import string
 
 
+PLOT_DEFAULT = {'ice-other': ['#FFD600', 'h'],
+                     'ice/rock': ['#FFD600', 'h'],
+                     'coral': ['#FF8B00', 'o'],
+                     'documents': ['k', 'p'],
+                     'glacierice': ['#86CDFA', 'd'],
+                     'hybrid': ['#00BEFF', '*'],
+                     'lakesediment': ['#4169E0', 's'],
+                     'marinesediment': ['#8A4513', 's'],
+                     'sclerosponge': ['r', 'o'],
+                     'speleothem': ['#FF1492', 'd'],
+                     'wood': ['#32CC32', '^'],
+                     'molluskshells': ['#FFD600', 'h'],
+                     'peat': ['#2F4F4F', '*'],
+                     'midden': ['#824E2B', 'o'],
+                     'instrumental' : ['#8f21d8', '*'],
+                     'model' : ['#b4a7d6', "d"],
+                     'other': ['k', 'o']}
+
 """
 The following functions handle the LiPD files
 """
