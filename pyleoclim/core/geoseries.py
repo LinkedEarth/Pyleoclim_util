@@ -15,7 +15,8 @@ from copy import deepcopy
 from tqdm import tqdm
 
 class GeoSeries(Series):
-    '''The geoSeries class describes the most basic objects in Pyleoclim.
+    '''The geoSeries class is a child of the Series class, and requires geolocation
+    information (latitude, longitude). Elevation is optional, but can be used in mapping, if present.
     
     Parameters
     ----------
@@ -86,10 +87,11 @@ class GeoSeries(Series):
     Examples
     --------
 
-    Import the Southern Oscillation Index (SOI) and display a quick synopsis:
+    Import the EPICA Dome C deuterium record and display a quick synopsis:
 
-    >>> soi = pyleo.utils.load_dataset('SOI')
-    >>> soi.view()
+    >>> edc = pyleo.utils.load_dataset('EDC-dD')
+    >>> edc.metadata
+    >>> edc.view()
           
     '''
 
