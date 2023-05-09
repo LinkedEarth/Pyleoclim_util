@@ -74,7 +74,7 @@ def savitzky_golay(ys, window_length=None, polyorder=2, deriv=0, delta=1,
     -------
 
     yf : array
-        ndarray of shape (N), the smoothed signal (or it's n-th derivative).
+        ndarray of shape (N), the smoothed signal (or its n-th derivative).
 
     See also
     --------

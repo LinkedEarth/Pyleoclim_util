@@ -2676,7 +2676,7 @@ class Series:
         return new
 
 
-    def detrend(self, method='emd', keep_log=False, **kwargs):
+    def detrend(self, method='emd', keep_log=False, preserve_mean = False, **kwargs):
         '''Detrend Series object
 
         Parameters
@@ -2689,8 +2689,11 @@ class Series:
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
                 * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
 
-        keep_log : Boolean
+        keep_log : boolean
             if True, adds the removed trend and method parameters to the series log.
+            
+        preserve_mean : boolean
+            if True, ensures that the mean of the series is preserved despite the detrending
 
         kwargs : dict
             Relevant arguments for each of the methods.
@@ -2708,13 +2711,18 @@ class Series:
         --------
         >>> lr04 = pyleo.utils.load_dataset('LR04')
         >>> fig, ax = lr04.plot(invert_yaxis=True)
-        >>> ts_emd = lr04.detrend(method='emd')
-        >>> ts_emd.plot(label=lr04.label+', EMD detrend',ax=ax)
+        >>> ts_emd = lr04.detrend(method='emd',preserve_mean=True)
+        >>> ts_emd.plot(ax=ax)
+        
+        The label is made automatically, but can be overriden:
+        >>> ts_emd.plot(ax=ax, label = 'Pyleoclim rules!')
        
         '''
         new = self.copy()
-        v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
+        v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, 
+                                       preserve_mean=preserve_mean, **kwargs)
         new.value = v_mod
+        new.label = self.label +' (' + method +' detrended)'
 
         if keep_log == True:
             if new.log is None:

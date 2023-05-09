@@ -42,7 +42,6 @@ from .filter import savitzky_golay
 from .tsbase import (
     clean_ts,
     dropna,
-    is_evenly_spaced
 )
 
 
@@ -923,7 +922,7 @@ def gaussianize(ys):
     return yg
 
 
-def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
+def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None):
     """Detrend a timeseries according to four methods
 
     Detrending methods include: "linear", "constant", using a low-pass Savitzky-Golay filter, and Empirical Mode Decomposition (default).
@@ -946,6 +945,8 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
         - "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     n : int
         Works only if `method == 'emd'`. The number of smoothest modes to remove.
+    preserve_mean : boolean
+        flag to indicate whether the mean of the series should be preserved despite the detrending
     sg_kwargs : dict
         The parameters for the Savitzky-Golay filters.
 
@@ -967,6 +968,7 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
 
     """
     y = np.array(y)
+    mu = y.mean()
 
     if x is not None:
         x = np.array(x)
@@ -1003,7 +1005,10 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
 
         ys = y - trend
     else:
-        raise KeyError('Not a valid detrending method')
+        raise KeyError('Unknown method. Use one of linear, constant, savitzky-golay, emd (case-sensitive)')
+    
+    if preserve_mean:
+        ys = ys - ys.mean() + mu
 
     return ys, trend
 
