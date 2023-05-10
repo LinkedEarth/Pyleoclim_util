@@ -104,7 +104,7 @@ class TestSeriesIO:
         #clean up file
         os.unlink(filename)
 
-class TestUiSeriesMakeLabels:
+class TestUISeriesMakeLabels:
     ''' Tests for Series.make_labels()
 
     Since Series.make_labels() has several `if` statements,
@@ -162,7 +162,7 @@ class TestUiSeriesMakeLabels:
         assert value_header == 'Temperature [K]'
 
 
-class TestUiSeriesSpectral:
+class TestUISeriesSpectral:
     ''' Tests for Series.spectral()
 
     Since Series.spectral() has several `method` options along with different keyword arguments,
@@ -276,7 +276,7 @@ class TestUiSeriesSpectral:
         sig_psd = ts.spectral(method=spec_method,scalogram=scal)
         sig_psd.signif_test(number=2,scalogram=signif).plot()
 
-class TestUiSeriesBin:
+class TestUISeriesBin:
     ''' Tests for Series.bin()
 
     Functions to test the various kwargs arguments for binning a timeseries
@@ -312,7 +312,7 @@ class TestUiSeriesBin:
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts2_bin=ts2.bin(start=start_date,bin_size=bin_size,stop=end_date)
 
-class TestUiSeriesStats:
+class TestUISeriesStats:
     '''Test for Series.stats()
 
     Since Series.stats() is a numpy wrapper we will test it against known values'''
@@ -335,7 +335,7 @@ class TestUiSeriesStats:
 
         assert stats == key
 
-class TestUiSeriesCenter:
+class TestUISeriesCenter:
     '''Test for Series.center()
 
     Center removes the mean, so we'll simply test maximum and minimum values'''
@@ -352,7 +352,7 @@ class TestUiSeriesCenter:
 
         #assert ts.value.mean() == tsc.log[1]['previous_mean']
 
-class TestUiSeriesStandardize:
+class TestUISeriesStandardize:
     '''Test for Series.standardize()
 
     Standardize normalizes the series object, so we'll simply test maximum and minimum values'''
@@ -371,7 +371,7 @@ class TestUiSeriesStandardize:
         assert max(value) > max(value_std)
         assert min(value) < min(value_std)
 
-class TestUiSeriesClean:
+class TestUISeriesClean:
     '''Test for Series.clean()
 
     Since Series.clean() is intended to order the time axis,
@@ -393,7 +393,7 @@ class TestUiSeriesClean:
         assert time[len(time) - 1] >= time[0]
         assert len(time) == len(value)
 
-class TestUiSeriesGaussianize:
+class TestUISeriesGaussianize:
     '''Test for Series.gaussianize()
 
     Gaussianize normalizes the series object, so we'll simply test maximum and minimum values'''
@@ -407,7 +407,7 @@ class TestUiSeriesGaussianize:
         assert max(value) > max(value_std)
         assert min(value) < min(value_std)
 
-class TestUiSeriesSegment:
+class TestUISeriesSegment:
     '''Tests for Series.segment()
 
     Segment has an if and elif statement, so we will test each in turn'''
@@ -442,7 +442,7 @@ class TestUiSeriesSegment:
 
         assert ts_seg.series_list[0].label == 'series segment 1'
 
-class TestUiSeriesSlice:
+class TestUISeriesSlice:
     '''Test for Series.slice()
 
     We commit slices at known time intervals and check minimum and maximum values'''
@@ -512,7 +512,7 @@ class TestSel:
             ts.sel(time=1, value=1)
 
 
-class TestUiSeriesSurrogates:
+class TestUISeriesSurrogates:
     ''' Test Series.surrogates()
     '''
     def test_surrogates_t0(self, eps=0.2):
@@ -531,7 +531,7 @@ class TestUiSeriesSurrogates:
             g_surr = ar1_fit(ts_surr.value)
             assert np.abs(g_surr-g) < eps
 
-class TestUiSeriesSummaryPlot:
+class TestUISeriesSummaryPlot:
     ''' Test Series.summary_plot()
     '''
     def test_summary_plot_t0(self):
@@ -575,7 +575,7 @@ class TestUiSeriesSummaryPlot:
         plt.close(fig)
 
 
-class TestUiSeriesCorrelation:
+class TestUISeriesCorrelation:
     ''' Test Series.correlation()
     '''
     @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
@@ -616,11 +616,12 @@ class TestUiSeriesCorrelation:
     def test_correlation_t2(self, corr_method, eps=1):
         ''' Test correlation between two series with inconsistent time axis
         '''
-        data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/wtc_test_data_nino.csv')
-        nino = np.array(data['nino'])
-        air  = np.array(data['air'])
-        t = np.array(data['t'])
-
+        
+        nino_ts = pyleo.utils.load_dataset('NINO3') 
+        air_ts = pyleo.utils.load_dataset('AIR')
+        t = nino_ts.time
+        nino = nino_ts.value
+        air = air_ts.value
         # randomly delete 500 data pts
         n_del = 500
         deleted_idx_air = np.random.choice(range(np.size(t)), n_del, replace=False)
@@ -642,7 +643,7 @@ class TestUiSeriesCorrelation:
         r = corr_res.r
         assert np.abs(r-r_evenly) < eps
 
-class TestUiSeriesCausality:
+class TestUISeriesCausality:
     ''' Test Series.causality()
     '''
     @pytest.mark.parametrize('method', ['liang', 'granger'])
@@ -1021,7 +1022,7 @@ class TestUISeriesSsa():
     #     fig, ax = mraSsa.screeplot()
     #     pyleo.closefig(fig)
 
-class TestUiSeriesPlot:
+class TestUISeriesPlot:
     '''Test for Series.plot()
 
     Series.plot outputs a matplotlib figure and axis object, so we will compare the time axis
@@ -1039,7 +1040,7 @@ class TestUiSeriesPlot:
         y_plot = line.get_ydata()
         pyleo.closefig(fig)
 
-class TestUiSeriesStripes:
+class TestUISeriesStripes:
     '''Test for Series.stripes()'''
     @pytest.mark.parametrize('show_xaxis', [True, False])
     def test_stripes(self, show_xaxis):
@@ -1051,7 +1052,7 @@ class TestUiSeriesStripes:
         pyleo.closefig(fig)
 
 
-class TestUiSeriesHistplot:
+class TestUISeriesHistplot:
     '''Test for Series.histplot()'''
 
     def test_histplot_t0(self, max_axis = 5):
@@ -1075,7 +1076,7 @@ class TestUiSeriesHistplot:
 
         pyleo.closefig(fig)
 
-class TestUiSeriesFilter:
+class TestUISeriesFilter:
     '''Test for Series.filter()'''
 
     @pytest.mark.parametrize('method', ['butterworth', 'firwin','lanczos','savitzky-golay'])
