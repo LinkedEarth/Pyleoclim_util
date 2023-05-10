@@ -110,11 +110,11 @@ class EnsembleSeries(MultipleSeries):
 
             time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=2.0)
             
-            ts = pyleo.Series(time=time, value = signal).standardize()
+            ts = pyleo.Series(time=time, value = signal, verbose=False).standardize()
             noise = np.random.randn(nt,nn)
 
             for idx in range(nn):  # noise
-                ts = pyleo.Series(time=time, value=ts.value+5*noise[:,idx])
+                ts = pyleo.Series(time=time, value=ts.value+5*noise[:,idx], verbose=False)
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
@@ -171,7 +171,7 @@ class EnsembleSeries(MultipleSeries):
 
             for idx in range(nn):  # noise
                 noise = np.random.randn(nt,nn)*100
-                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx], verbose=False)
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
@@ -279,11 +279,11 @@ class EnsembleSeries(MultipleSeries):
 
             time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=2.0)
             
-            ts = pyleo.Series(time=time, value = signal).standardize()
+            ts = pyleo.Series(time=time, value = signal, verbose=False).standardize()
             noise = np.random.randn(nt,nn)
 
             for idx in range(nn):  # noise
-                ts = pyleo.Series(time=time, value=ts.value+5*noise[:,idx])
+                ts = pyleo.Series(time=time, value=ts.value+5*noise[:,idx], verbose=False)
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
@@ -453,11 +453,11 @@ class EnsembleSeries(MultipleSeries):
             series_list = []
 
             t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
-            signal = pyleo.Series(t,v)
+            signal = pyleo.Series(time=t,value=v, verbose=False)
 
             for idx in range(nn):  # noise
                 noise = np.random.randn(nt,nn)*100
-                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx], verbose=False)
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
@@ -619,11 +619,11 @@ class EnsembleSeries(MultipleSeries):
             series_list = []
 
             t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
-            signal = pyleo.Series(t,v)
+            signal = pyleo.Series(time=t,value=v, verbose=False)
 
             for idx in range(nn):  # noise
                 noise = np.random.randn(nt,nn)*100
-                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx], verbose=False)
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
@@ -791,7 +791,7 @@ class EnsembleSeries(MultipleSeries):
             noise = np.random.randn(nt,nn)
 
             for idx in range(nn):  # noise
-                ts = pyleo.Series(time=t, value=signal+noise[:,idx], label='trace #'+str(idx+1))
+                ts = pyleo.Series(time=t, value=signal+noise[:,idx], label='trace #'+str(idx+1), verbose=False)
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
@@ -979,11 +979,11 @@ class EnsembleSeries(MultipleSeries):
 
             time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
             
-            ts = pyleo.Series(time=time, value = signal).standardize()
+            ts = pyleo.Series(time=time, value = signal, verbose=False).standardize()
             noise = np.random.randn(nt,nn)
 
             for idx in range(nn):  # noise
-                ts = pyleo.Series(time=time, value=signal+noise[:,idx])
+                ts = pyleo.Series(time=time, value=signal+noise[:,idx], verbose=False)
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)

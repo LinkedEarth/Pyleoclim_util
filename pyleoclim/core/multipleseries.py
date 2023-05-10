@@ -137,8 +137,8 @@ class MultipleSeries:
 
             import pyleoclim as pyleo
             import numpy as np
-            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
-            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo', verbose=False)
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar', verbose=False)
             ms = pyleo.MultipleSeries([ts1, ts2])
             # Remove pyleo.Series labelled 'bar' from the multiple series:
             ms - 'bar'
@@ -166,11 +166,11 @@ class MultipleSeries:
 
             import pyleoclim as pyleo
             import numpy as np
-            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
-            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
-            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
-            ts4 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts4')
-            ts5 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts5')
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1', verbose=False)
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2', verbose=False)
+            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3', verbose=False)
+            ts4 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts4', verbose=False)
+            ts5 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts5', verbose=False)
             ms1 = pyleo.MultipleSeries([ts1, ts2, ts3])
             ms2 = pyleo.MultipleSeries([ts4, ts5])
         
@@ -205,9 +205,9 @@ class MultipleSeries:
 
             import pyleoclim as pyleo
             import numpy as np
-            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
-            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
-            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1', verbose=False)
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2', verbose=False)
+            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3', verbose=False)
             # Combine ts1, ts2, and ts3 into a multiple series:
             ms = ts1 & ts2 & ts3
         """
@@ -644,7 +644,7 @@ class MultipleSeries:
                 deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
                 tu =  np.delete(t, deleted_idx)
                 vu =  np.delete(v, deleted_idx)
-                ts = pyleo.Series(time = tu, value = vu, label = 'series ' + str(j+1))
+                ts = pyleo.Series(time = tu, value = vu, label = 'series {}'.format(j+1), verbose=False)
                 serieslist.append(ts)
 
             # create MS object from the list
@@ -821,10 +821,10 @@ class MultipleSeries:
             v0 = colored_noise(alpha=1, t=t0)
             noise = np.random.normal(loc=0, scale=1, size=nt)
 
-            ts0 = pyleo.Series(time=t0, value=v0)
-            ts1 = pyleo.Series(time=t0, value=v0+noise)
-            ts2 = pyleo.Series(time=t0, value=v0+2*noise)
-            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
+            ts0 = pyleo.Series(time=t0, value=v0, verbose=False)
+            ts1 = pyleo.Series(time=t0, value=v0+noise, verbose=False)
+            ts2 = pyleo.Series(time=t0, value=v0+2*noise, verbose=False)
+            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise, verbose=False)
 
             ts_list = [ts1, ts2, ts3]
 
