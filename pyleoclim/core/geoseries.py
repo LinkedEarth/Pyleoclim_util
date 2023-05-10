@@ -2,7 +2,7 @@
 The GeoSeries class is a child of Series, with additional metadata latitude (lat) and longitude (lon)
 This unlocks plotting capabilities like map() and dashboard(). 
 """
-from ..utils import plotting, mapping, lipdutils
+from ..utils import plotting, mapping, lipdutils, jsonutils
 from ..core.series import Series
 from ..core.multipleseries import MultipleSeries
 
@@ -151,6 +151,29 @@ class GeoSeries(Series):
             importedFrom = self.importedFrom,
             log = self.log,
         )
+    
+    @classmethod    
+    def from_json(cls, path):
+        ''' Creates a pyleoclim.Series from a JSON file
+        
+        The keys in the JSON file must correspond to the parameter associated with a Series object
+
+        Parameters
+        ----------
+        path : str
+            Path to the JSON file
+
+        Returns
+        -------
+        ts : pyleoclim.core.series.Series
+            A Pyleoclim Series object. 
+
+        '''
+        
+        a = jsonutils.open_json(path)
+        b = jsonutils.iterate_through_dict(a, 'GeoSeries')
+        
+        return cls(**b)
     
     def map(self, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False,

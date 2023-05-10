@@ -227,7 +227,7 @@ class Series:
         self.importedFrom = importedFrom
         self.archiveType = archiveType
         if self.archiveType is not None:
-            if self.archiveType not in lipdutils.PLOT_DEFAULT.keys():
+            if self.archiveType.lower().replace(" ", "") not in lipdutils.PLOT_DEFAULT.keys():
                 str_archive = list(lipdutils.PLOT_DEFAULT.keys())[0:-1]
                 mystring = ""
                 for item in str_archive:
