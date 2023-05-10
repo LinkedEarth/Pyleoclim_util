@@ -413,7 +413,7 @@ class PSD:
 
             import pyleoclim as pyleo
             t, v = pyleo.utils.tsmodel.gen_ts(model='colored_noise')
-            ts = pyleo.Series(time=t, value= v, label = 'fractal noise, unit slope')
+            ts = pyleo.Series(time=t, value= v, label = 'fractal noise, unit slope', verbose=False)
             psd = ts.detrend().spectral(method='cwt')
 
             # estimate the scaling slope
@@ -478,7 +478,7 @@ class PSD:
             import pyleoclim as pyleo
 
             t, v = pyleo.utils.tsmodel.gen_ts('colored_noise', alpha=1, m=1e5) # m=1e5 leads to aliasing
-            ts = pyleo.Series(time=t, value=v, label='colored noise')
+            ts = pyleo.Series(time=t, value=v, label='colored noise', verbose=False)
 
             # without the anti-aliasing filter
             @savefig color_noise_no_anti_alias.png
@@ -662,7 +662,7 @@ class PSD:
             import matplotlib.pyplot as plt
             
             t, v = pyleo.utils.tsmodel.gen_ts(model='colored_noise')
-            ts = pyleo.Series(time = t, value = v, label = 'fractal noise')
+            ts = pyleo.Series(time = t, value = v, label = 'fractal noise', verbose=False)
             tsn = ts.standardize()
     
             psd_sim = tsn.spectral(method='mtm').signif_test(number=20)
@@ -1368,11 +1368,11 @@ class MultiplePSD:
 
             time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
             
-            ts = pyleo.Series(time=time, value = signal).standardize()
+            ts = pyleo.Series(time=time, value = signal, verbose=False).standardize()
             noise = np.random.randn(nt,nn)
 
             for idx in range(nn):  # noise
-                ts = pyleo.Series(time=time, value=signal+10*noise[:,idx])
+                ts = pyleo.Series(time=time, value=signal+10*noise[:,idx], verbose=False)
                 psd = ts.spectral()
                 psds.append(psd)
 
