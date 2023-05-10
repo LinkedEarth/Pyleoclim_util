@@ -174,7 +174,8 @@ def objname_to_obj(objname):
                       'SpatialDecomp':pyleo.core.SpatialDecomp,
                       'SsaRes':pyleo.core.SsaRes,
                       'Lipd':pyleo.core.Lipd,
-                      'LipdSeries':pyleo.core.LipdSeries
+                      'LipdSeries':pyleo.core.LipdSeries,
+                      'GeoSeries':pyleo.core.GeoSeries,
         }
     
     try:
