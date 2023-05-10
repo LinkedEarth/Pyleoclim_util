@@ -1191,7 +1191,7 @@ class Series:
             pyleo.closefig(fig)
             nino_ssa = ts.ssa(M=60)
 
-        Let us now see how to make use of all these arrays. The first step is too inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
+        Let us now see how to make use of all these arrays. The first step is to inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
 
         .. ipython:: python
             :okwarning:
@@ -1663,7 +1663,6 @@ class Series:
                     ts_plot_kwargs = None, wavelet_plot_kwargs = None,
                     psd_plot_kwargs = None, gridspec_kwargs = None, y_label_loc = None,
                     legend = None, savefig_settings=None):
-
         ''' Produce summary plot of timeseries.
 
         Generate cohesive plot of timeseries alongside results of wavelet analysis and spectral analysis on said timeseries.
@@ -1738,7 +1737,7 @@ class Series:
             It is possible to tune the size and spacing of the various slots
                 - 'width_ratios': list of two values describing the relative widths of the column containig the timeseries/scalogram/colorbar and the column containig the PSD plot (default: [6, 1])
                 - 'height_ratios': list of three values describing the relative heights of the three timeseries, scalogram and colorbar (default: [2, 7, .35])
-                - 'hspace': vertical space between timeseries and scalogram (default: 0, however if either the scalogram xlabel or the PSD xlabel contain '\n', .05)
+                - 'hspace': vertical space between timeseries and scalogram (default: 0, however if either the scalogram xlabel or the PSD xlabel contain '\\n', .05)
                 - 'wspace': lateral space between scalogram and psd plot (default: 0)
                 - 'cbspace': vertical space between the scalogram and colorbar
 
@@ -3027,7 +3026,7 @@ class Series:
             Arguments for the specific wavelet method
 
         verbose : bool
-            If True, will print warning messages if there is any
+            If True, will print warning messages if there are any
 
         Returns
         -------
@@ -3088,7 +3087,7 @@ class Series:
             fig, ax = scal2.plot()
             pyleo.closefig(fig)
 
-        Notice that the two scalograms have different amplitude, which are relative.  Method-specific arguments
+        Notice that the two scalograms have different amplitudes, which are relative.  Method-specific arguments
         may be passed via `settings`.  For instance, if you wanted to change the default mother wavelet
         ('MORLET') to a derivative of a Gaussian (DOG), with degree 2 by default ("Mexican Hat wavelet"):
 
