@@ -131,14 +131,31 @@ def load_dataset(name):
             value=df.iloc[:, value_column]
         else:
             value = df[value_column]
+        
+        if 'lat' in pyleo_kwargs.keys() and 'lon' in pyleo_kwargs.keys():
+            if pyleo_kwargs['lat'] is not None and pyleo_kwargs['lon'] is not None:
+                ts=pyleo.GeoSeries(
+                    time=time, 
+                    value=value,
+                    **pyleo_kwargs, 
+                    verbose=False
+                )
+            else:
+               ts=pyleo.Series(
+                   time=time, 
+                   value=value,
+                   **pyleo_kwargs, 
+                   verbose=False
+               ) 
 
-        # convert to pyleo.Series
-        ts=pyleo.Series(
-            time=time, 
-            value=value,
-            **pyleo_kwargs, 
-            verbose=False
-        )
+        else:
+            # convert to pyleo.Series
+            ts=pyleo.Series(
+                time=time, 
+                value=value,
+                **pyleo_kwargs, 
+                verbose=False
+            )
     # if this is a json
     elif metadata['file_extension'] == 'json':
         ts=jsonutils.json_to_PyleoObj(str(path), 'Series')
