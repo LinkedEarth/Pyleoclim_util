@@ -1225,7 +1225,7 @@ class Series:
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
             @savefig ssa_recon.png
             fig, ax = ts.plot(title='SOI')
-            ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
+            ax.plot(nino_ssa.time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
             pyleo.closefig(fig)
 
