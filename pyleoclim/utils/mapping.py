@@ -197,7 +197,7 @@ def set_proj(projection='Robinson', proj_default = True):
 def map(lat, lon, criteria, marker=None, color =None,
             projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
-           figsize = None, ax = None, scatter_kwargs=None, legend=True,
+           figsize = None, ax = None, scatter_kwargs=None, legend=True, legend_title=None,
            lgd_kwargs=None,savefig_settings=None):
     """ Map the location of all lat/lon according to some criteria
     
@@ -265,6 +265,9 @@ def map(lat, lon, criteria, marker=None, color =None,
     
     legend : bool
         Whether the draw a legend on the figure
+    
+    legend_title : str
+        Use this instead of a dynamic range for legend
     
     lgd_kwargs : dict
         Dictionary of arguments for matplotlib.pyplot.legend (https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html)
@@ -364,8 +367,22 @@ def map(lat, lon, criteria, marker=None, color =None,
         
     
     # Get the indexes by criteria
-    for index, crit in enumerate(criteria): 
-        ax.scatter(np.array(lon)[index],np.array(lat)[index],
+    
+    if legend_title is not None:
+        for index, crit in enumerate(criteria):
+            ax.scatter(np.array(lon)[index],np.array(lat)[index],
+                    zorder = 10,
+                    label = legend_title,
+                    transform=data_crs,
+                    marker = color_data['marker'].iloc[index],
+                    color = color_data['color'].iloc[index],
+                    s = color_data['s'].iloc[index],
+                    edgecolors= color_data['edgecolors'].iloc[index], 
+                    **scatter_kwargs)
+        
+    else:
+        for index, crit in enumerate(criteria): 
+            ax.scatter(np.array(lon)[index],np.array(lat)[index],
                     zorder = 10,
                     label = crit,
                     transform=data_crs,

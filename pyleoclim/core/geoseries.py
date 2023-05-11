@@ -331,6 +331,12 @@ class GeoSeries(Series):
         archiveType = [archiveType]  # list so it will work with map
         marker = [marker]
         color = [color]
+        
+        if self.label is not None:
+            legend_title = self.label
+        else:
+            legend_title = None
+            
 
         if proj_default == True:
 
@@ -341,7 +347,7 @@ class GeoSeries(Series):
                                   background=background, borders=borders,
                                   rivers=rivers, lakes=lakes,
                                   figsize=figsize, ax=ax,
-                                  scatter_kwargs=scatter_kwargs, legend=legend,
+                                  scatter_kwargs=scatter_kwargs, legend=legend, legend_title=legend_title,
                                   lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings, )
 
             except:
@@ -352,7 +358,7 @@ class GeoSeries(Series):
                                       background=background, borders=borders,
                                       rivers=rivers, lakes=lakes,
                                       figsize=figsize, ax=ax,
-                                      scatter_kwargs=scatter_kwargs, legend=legend,
+                                      scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
                                       lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
                 except:
                     res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
@@ -361,7 +367,7 @@ class GeoSeries(Series):
                                       background=background, borders=borders,
                                       rivers=rivers, lakes=lakes,
                                       figsize=figsize, ax=ax,
-                                      scatter_kwargs=scatter_kwargs, legend=legend,
+                                      scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
                                       lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
 
         else:
@@ -371,8 +377,10 @@ class GeoSeries(Series):
                               background=background, borders=borders,
                               rivers=rivers, lakes=lakes,
                               figsize=figsize, ax=ax,
-                              scatter_kwargs=scatter_kwargs, legend=legend,
+                              scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+        
+        
         return res
     
     def dashboard(self, figsize=[11, 8], plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
