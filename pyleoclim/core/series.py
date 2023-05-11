@@ -596,7 +596,7 @@ class Series:
         time_unit : str
             the target time unit, possible input:
             {
-                'year', 'years', 'yr', 'yrs',
+                'year', 'years', 'yr', 'yrs', 'CE', 'AD',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
@@ -636,11 +636,11 @@ class Series:
             elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
                 time_unit_label = 'yrs BP'
                 time_name = 'Age'
-            elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
+            elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0 or tu.find('ad')>=0 or tu.find('ce')>=0:
                 time_unit_label = 'yrs'
                 time_name = 'Time'
             else:
-                raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
+                raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'CE', 'AD', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
         else:
             return new_ts
 
