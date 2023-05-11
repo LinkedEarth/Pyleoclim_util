@@ -92,13 +92,18 @@ def multiple_pinkgeoseries():
     nt = 200
     lats = np.random.default_rng(seed=seed).uniform(30.0,60.0,nrecs)
     lons = np.random.default_rng(seed=seed).uniform(-20.0,60.0,nrecs)
+    elevs = np.random.default_rng(seed=seed).uniform(0,4000,nrecs)
+    
     archives = np.random.default_rng(seed=seed).choice(list(pyleo.utils.PLOT_DEFAULT.keys()),size=nrecs)
+    obsTypes = np.random.default_rng(seed=seed).choice(['MXD', 'd18O', 'Sr/Ca'],size=nrecs)
+    
     
     ts_list = []
     for i in range(nrecs):
         t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=nt)
-        ts = pyleo.GeoSeries(t,v, verbose=False, archiveType=archives[i],label = f'pink series {i}',
-                             lat=lats[i], lon = lons[i]).standardize()
+        ts = pyleo.GeoSeries(t,v, verbose=False, label = f'pink series {i}',
+                             archiveType=archives[i], observationType=obsTypes[i],
+                             lat=lats[i], lon = lons[i], elevation=elevs[i]).standardize()
         ts_list.append(ts)
         
     return pyleo.MultipleGeoSeries(ts_list, label='Multiple Pink GeoSeries')

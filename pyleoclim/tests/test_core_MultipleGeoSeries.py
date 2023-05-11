@@ -5,15 +5,25 @@ Created on Thu May 11 09:47:08 2023
 
 @author: julieneg
 """
+import pyleoclim as pyleo
+from bs4 import BeautifulSoup
+import requests
 
 
-def create_MultipleGeoSeries():
+class TestUIMultipleGeoSeriesMap: 
+    def test_map_t0(multiple_pinkgeoseries):
+        '''
+    
+        '''
+        mgs = multiple_pinkgeoseries
+        mgs.map() 
+        # other checks?
+    
+def create_Euro2k():
     '''
     Tests the creation of Euro2k MultipleGeoSeries
     '''
-    from bs4 import BeautifulSoup
-    import requests
-    import pyleoclim as pyleo
+    
 
     url = 'https://github.com/LinkedEarth/Pyleoclim_util/tree/master/example_data/Euro2k_json'
     ext = 'json'
@@ -37,5 +47,5 @@ def create_MultipleGeoSeries():
         
     Euro2k = pyleo.MultipleGeoSeries(ts_list)
     # check lat/lon
-    lon = [ts.lon for ts in Euro2k.series_list]  # fail
+   
     

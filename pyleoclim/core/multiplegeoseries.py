@@ -46,9 +46,12 @@ class MultipleGeoSeries(MultipleSeries):
         if name is not None:
             warnings.warn("`name` is a deprecated property, which will be removed in future releases. Please use `label` instead.",
                           DeprecationWarning, stacklevel=2)
-        # check that all components are Series
+        # check that all components are GeoSeries
         if not all([isinstance(ts, GeoSeries) for ts in self.series_list]):
             raise ValueError('All components must be GeoSeries objects')
+            
+        # check that they all have lat/lon (do we need this?)
+        
 
         if self.time_unit is not None:
             new_ts_list = []
