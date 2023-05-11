@@ -69,7 +69,8 @@ class GeoSeries(Series):
 
     archiveType : string
         climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'                                                                                     
-    
+        Reference: https://lipdverse.org/vocabulary/archivetype/
+        
     sensorType : string
         sensor, e.g. a paleoclimate proxy sensor, defined in https://wiki.linked.earth/Category:ProxySensor_(L)
         

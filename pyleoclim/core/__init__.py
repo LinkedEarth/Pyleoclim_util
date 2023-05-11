@@ -8,12 +8,11 @@ from .series import Series
 from .geoseries import GeoSeries
 from .psds import PSD, MultiplePSD
 from .multipleseries import MultipleSeries
+from .multiplegeoseries import MultipleGeoSeries
 from .surrogateseries import SurrogateSeries
 from .ensembleseries import EnsembleSeries
 from .scalograms import Scalogram, MultipleScalogram
 from .coherence import Coherence
-#from .multiplepsd import MultiplePSD
-#from .MultipleScalogram import MultipleScalogram
 from .corr import Corr
 from .correns import CorrEns
 from .spatialdecomp import SpatialDecomp
