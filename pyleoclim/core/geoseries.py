@@ -36,7 +36,7 @@ class GeoSeries(Series):
         longitude East in decimal degrees. Negative values will be converted to an angle in [0 , 360)
        
     elevation : float
-        elevation of the sample, in meters above sea level.                                                                                          
+        elevation of the sample, in meters above sea level. Negative numbers indicate depth below global mean sea level, therefore.                                                                                          
 
     time_unit : string
         Units for the time vector (e.g., 'years').
