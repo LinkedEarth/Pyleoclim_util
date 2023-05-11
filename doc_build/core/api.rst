@@ -23,6 +23,12 @@ Series (pyleoclim.Series)
 .. autoclass:: pyleoclim.core.series.Series
    :members:
 
+GeoSeries (pyleoclim.GeoSeries)
+"""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.geoseries.GeoSeries
+   :members:
+
 
 MultipleSeries (pyleoclim.MultipleSeries)
 """""""""""""""""""""""""""""""""""""""""
