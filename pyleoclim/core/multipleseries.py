@@ -46,9 +46,9 @@ class MultipleSeries:
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
 
-    name : str
+    label : str
    
-        name of the collection of timeseries (e.g. 'PAGES 2k ice cores')
+        label of the collection of timeseries (e.g. 'PAGES 2k ice cores')
 
     Examples
     --------
@@ -70,7 +70,7 @@ class MultipleSeries:
         self.label = label
         self.name = name
         if name is not None:
-            warnings.warn("`name` is a deprecated property, which will be removed in future releases, Please use `label` instead",
+            warnings.warn("`name` is a deprecated property, which will be removed in future releases. Please use `label` instead.",
                           DeprecationWarning, stacklevel=2)
 
         if self.time_unit is not None:
@@ -344,7 +344,7 @@ class MultipleSeries:
 
         return ms
 
-    def append(self,ts):
+    def append(self,ts, inplace=False):
         '''Append timeseries ts to MultipleSeries object
 
         Parameters
@@ -375,16 +375,20 @@ class MultipleSeries:
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
-            ms = pyleo.MultipleSeries([soi], name = 'SOI x2')
-            ms.append(soi)
+            NINO3 = pyleo.utils.load_dataset('NINO3')
+            ms = pyleo.MultipleSeries([soi], label = 'ENSO')
+            ms.append(NINO3)
         '''
         for series in self.series_list:
             if series.equals(ts) == (True, True):
                 raise ValueError(f"Given series is identical to existing series {series}")
+
         ms = self.copy()
         ts_list = deepcopy(ms.series_list)
         ts_list.append(ts)
         ms = MultipleSeries(ts_list)
+        if inplace is True:
+            self.series_list = ts_list
         return ms
 
     def copy(self):
@@ -1723,7 +1727,7 @@ class MultipleSeries:
                   spine_lw=1.5, grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
         ''' Stack plot of multiple series
 
-        TIme units are harmonized prior to plotting. 
+        Time units are harmonized prior to plotting. 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
 
         Parameters
