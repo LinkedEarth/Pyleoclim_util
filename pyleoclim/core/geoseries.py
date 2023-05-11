@@ -135,7 +135,7 @@ class GeoSeries(Series):
             if 0 <= lon < 360:     
                 self.lon = lon
             elif -180 <= lon < 0:
-                self.lon = 360 - lon
+                self.lon = 360 + lon
             else:
                 ValueError('Longitude must be a number in [-180,360]')
         else:
