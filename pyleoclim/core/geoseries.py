@@ -18,6 +18,7 @@ import cartopy.feature as cfeature
 class GeoSeries(Series):
     '''The GeoSeries class is a child of the Series class, and requires geolocation
     information (latitude, longitude). Elevation is optional, but can be used in mapping, if present.
+    The class also allows for ancillary data and metadata, detailed below. 
     
     Parameters
     ----------
@@ -63,12 +64,26 @@ class GeoSeries(Series):
     keep_log : bool
         Whether to keep a log of applied transformations. False by default
         
-  
     importedFrom : string
         source of the dataset. If it came from a LiPD file, this could be the datasetID property 
 
     archiveType : string
-        climate archive, one of ....                                                                                    
+        climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'                                                                                     
+    
+    sensorType : string
+        sensor, e.g. a paleoclimate proxy sensor, defined in https://wiki.linked.earth/Category:ProxySensor_(L)
+        
+    observationType : string
+        observation type,  e.g. a paleoclimate proxy observation, defined in https://wiki.linked.earth/Category:ProxyObservation_(L)
+        
+    depth : array
+        depth at which the values were collected
+        
+    depth_name : string
+        name of the field, e.g. 'mid-depth', 'top-depth', etc   
+        
+    depth_unit : string
+         units of the depth axis, e.g. 'cm'
 
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
@@ -97,9 +112,11 @@ class GeoSeries(Series):
     '''
 
     def __init__(self, time, value, lat, lon, elevation = None, time_unit=None, time_name=None, 
-                 value_name=None, value_unit=None, label=None, 
-                 importedFrom=None, archiveType = None, log=None, keep_log=False,
-                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
+                 value_name=None, value_unit=None, label=None, importedFrom=None, 
+                 archiveType = None, sensorType = None, observationType = None,
+                 log=None, keep_log=False, verbose=True,
+                 depth = None, depth_name = None, depth_unit= None,
+                 sort_ts = 'ascending', dropna = True,  clean_ts=False):
         
        
         # assign latitude
@@ -126,6 +143,15 @@ class GeoSeries(Series):
             
         # elevation
         self.elevation = elevation
+        
+        # PSM 
+        self.sensorType = sensorType
+        self.observationType = observationType
+        
+        # depth infornation
+        self.depth = depth
+        self.depth_name = depth_name
+        self.depth_unit = depth_unit
             
         #assign all the rest
         super().__init__(time, value, time_unit, time_name, value_name,
