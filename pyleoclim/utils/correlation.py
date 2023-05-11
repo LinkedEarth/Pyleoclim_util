@@ -108,13 +108,17 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
         The proportion of false positives desired.
 
     method : {'original', 'general'}
+
         Method for performing the testing.
+        
             - 'original' follows Benjamini & Hochberg (1995);
             - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
             'original' is recommended, and if desired, using 'adj_method="mean"' to increase power.
 
     adj_method: {'mean', 'storey', 'two-stage'}
+
         Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
+
             - 'mean', the modified Storey estimator in Ventura et al. (2004)
             - 'storey', the method of Storey (2002)
             - 'two-stage', the iterative approach of Benjamini et al. (2001)
@@ -481,14 +485,9 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     References
     ----------
 
-    - Ebisuzaki, W, 1997: A method to estimate the statistical
-    significance of a correlation when the data are serially correlated.
-    J. of Climate, 10, 2147-2153.
+    - Ebisuzaki, W, 1997: A method to estimate the statistical significance of a correlation when the data are serially correlated. J. of Climate, 10, 2147-2153.
     
-    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series
-    with Several Simultaneously Measured Variables (1994)
-    Physical Review Letters, Vol 73, Number 7
-    (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
+    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7 (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
     '''
     r = pearsonr(y1, y2)[0]
 
@@ -550,8 +549,7 @@ def phaseran(recblk, nsurr):
     References
     ----------
 
-    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994)
-    Physical Review Letters, Vol 73, Number 7
+    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7
     
     - Carlos Gias (2020). Phase randomization, MATLAB Central File Exchange
     '''
@@ -821,45 +819,14 @@ def cov_shrink_rblw(S, n):
     Notes
     -----
 
-    This shrinkage estimator takes the form
-    .. math::
-        \hat{\Sigma} = (1-\gamma) \Sigma_{sample} + \gamma T
-    where :math:`\Sigma^{sample}` is the (noisy but unbiased) empirical
-    covariance matrix,
-    .. math::
-        \Sigma^{sample}_{ij} = \frac{1}{n-1} \sum_{k=1}^n
-            (x_{ki} - \bar{x}_i)(x_{kj} - \bar{x}_j),
-    the matrix :math:`T` is the shrinkage target, a less noisy but biased
-    estimator for the covariance, and the scalar :math:`\gamma \in [0, 1]` is
-    the shrinkage intensity (regularization strength). This approaches uses a
-    scaled identity target, :math:`T`:
-    .. math::
-        T = \frac{\mathrm{Tr}(S)}{p} I_p
-    The shrinkage intensity, :math:`\gamma`, is determined using the RBLW
-    estimator from [2]. The formula for :math:`\gamma` is
-    .. math::
-        \gamma = \min(\alpha + \frac{\beta}{U})
-    where :math:`\alpha`, :math:`\beta`, and :math:`U` are
-    .. math::
-        \alpha &= \frac{n-2}{n(n+2)} \\
-        \beta  &= \frac{(p+1)n - 2}{n(n+2)} \\
-        U      &= \frac{p\, \mathrm{Tr}(S^2)}{\mathrm{Tr}^2(S)} - 1
-    One particularly useful property of this estimator is that it's **very
-    fast**, because it doesn't require access to the data matrix at all (unlike
-    :func:`cov_shrink_ss`). It only requires the sample covariance matrix
-    and the number of data points `n`, as sufficient statistics.
-    For reference, note that [2] defines another estimator, called the oracle
-    approximating shrinkage estimator (OAS), but makes some mathematical errors
-    during the derivation, and futhermore their example code published with
-    the paper does not implement the proposed formulas.
+    See the `covar documentation <https://pythonhosted.org/covar/generated/covar.cov_shrink_rblw.html>`_. for 
+    math details.
+
 
     References
     ----------
 
-    [1]_ Y. Chen, A. Wiesel and A. O. Hero (2011), 
-    Robust Shrinkage Estimation of High-Dimensional Covariance Matrices,
-    IEEE Transactions on Signal Processing, vol. 59, no. 9, pp. 4097-4107, 
-    doi:10.1109/TSP.2011.2138698
+    - Y. Chen, A. Wiesel and A. O. Hero (2011), Robust Shrinkage Estimation of High-Dimensional Covariance Matrices, IEEE Transactions on Signal Processing, vol. 59, no. 9, pp. 4097-4107, doi:10.1109/TSP.2011.2138698
 
     See Also
     --------

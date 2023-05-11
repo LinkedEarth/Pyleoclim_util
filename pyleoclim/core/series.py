@@ -1697,7 +1697,8 @@ class Series:
                 - slot [4] contains the scalogram color bar
                 - slot [5] is empty
                 
-            It is possible to tune the size and spacing of the various slots
+            It is possible to tune the size and spacing of the various slots:
+
                 - 'width_ratios': list of two values describing the relative widths of the column containig the timeseries/scalogram/colorbar and the column containig the PSD plot (default: [6, 1])
                 - 'height_ratios': list of three values describing the relative heights of the three timeseries, scalogram and colorbar (default: [2, 7, .35])
                 - 'hspace': vertical space between timeseries and scalogram (default: 0, however if either the scalogram xlabel or the PSD xlabel contain '\\n', .05)
