@@ -78,8 +78,8 @@ def geometadata():
     }
 
 @pytest.fixture
-def pinkgeoseries():
+def pinkgeoseries(geometadata):
     """Pyleoclim geoseries with """
     t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=200, seed=251)
-    ts = pyleo.Series(t,v, verbose=False, **geometadata)
+    ts = pyleo.GeoSeries(t,v, verbose=False, **geometadata)
     return ts

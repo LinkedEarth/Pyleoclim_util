@@ -171,6 +171,8 @@ class GeoSeries(Series):
             value_name = self.value_name,
             label = self.label,
             archiveType = self.archiveType,
+            sensorType  = self.sensorType,
+            observationType = self.observationType, 
             importedFrom = self.importedFrom,
             log = self.log,
         )
