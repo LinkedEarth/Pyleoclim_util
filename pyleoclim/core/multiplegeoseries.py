@@ -33,19 +33,16 @@ class MultipleGeoSeries(MultipleSeries):
 
     Examples
     --------
-    TODO: Euro2k example
+    TODO: Euro2k example?
                 
     '''
-    def __init__(self, series_list, time_unit=None, label=None, name=None):
+    def __init__(self, series_list, time_unit=None, label=None):
         from ..core.geoseries import GeoSeries
         
         self.series_list = series_list
         self.time_unit = time_unit
         self.label = label
-        self.name = name
-        if name is not None:
-            warnings.warn("`name` is a deprecated property, which will be removed in future releases. Please use `label` instead.",
-                          DeprecationWarning, stacklevel=2)
+        
         # check that all components are GeoSeries
         if not all([isinstance(ts, GeoSeries) for ts in self.series_list]):
             raise ValueError('All components must be GeoSeries objects')
@@ -60,3 +57,6 @@ class MultipleGeoSeries(MultipleSeries):
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
+            
+            
+    # ============ MAP goes here ================

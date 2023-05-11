@@ -11,13 +11,32 @@ import requests
 
 
 class TestUIMultipleGeoSeriesMap: 
-    def test_map_t0(multiple_pinkgeoseries):
+    def test_map_archives(multiple_pinkgeoseries):
         '''
-    
+        test mapping semantics 
         '''
         mgs = multiple_pinkgeoseries
-        mgs.map() 
-        # other checks?
+        fig, ax = mgs.map(hue = 'archiveType')
+        pyleo.closefig(fig)
+        # assert something?
+        
+    def test_map_obs(multiple_pinkgeoseries):
+        '''
+        test mapping semantics 
+        '''
+        mgs = multiple_pinkgeoseries
+        fig, ax = mgs.map(hue = 'observationType')
+        pyleo.closefig(fig)
+        # assert something?
+        
+    def test_map_elevation(multiple_pinkgeoseries):
+        '''
+        test mapping semantics 
+        '''
+        mgs = multiple_pinkgeoseries
+        fig, ax = mgs.map(hue = 'elevation')
+        pyleo.closefig(fig)
+        # assert something?
     
 def create_Euro2k():
     '''
@@ -46,6 +65,5 @@ def create_Euro2k():
         
         
     Euro2k = pyleo.MultipleGeoSeries(ts_list)
-    # check lat/lon
    
     
