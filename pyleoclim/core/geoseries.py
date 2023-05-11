@@ -2,25 +2,23 @@
 The GeoSeries class is a child of Series, with additional metadata latitude (lat) and longitude (lon)
 This unlocks plotting capabilities like map() and dashboard(). 
 """
-from ..utils import plotting, mapping, lipdutils, jsonutils
+from ..utils import plotting, mapping, lipdutils, jsonutils, tsbase
 from ..core.series import Series
-from ..core.multipleseries import MultipleSeries
 
-import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from copy import deepcopy
+import re
+
+#from copy import deepcopy
 from matplotlib import gridspec
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
-from tqdm import tqdm
-import warnings
+#import warnings
 
 class GeoSeries(Series):
     '''The GeoSeries class is a child of the Series class, and requires geolocation
     information (latitude, longitude). Elevation is optional, but can be used in mapping, if present.
+    The class also allows for ancillary data and metadata, detailed below. 
     
     Parameters
     ----------
@@ -66,12 +64,26 @@ class GeoSeries(Series):
     keep_log : bool
         Whether to keep a log of applied transformations. False by default
         
-  
     importedFrom : string
         source of the dataset. If it came from a LiPD file, this could be the datasetID property 
 
     archiveType : string
-        climate archive, one of ....                                                                                    
+        climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'                                                                                     
+    
+    sensorType : string
+        sensor, e.g. a paleoclimate proxy sensor, defined in https://wiki.linked.earth/Category:ProxySensor_(L)
+        
+    observationType : string
+        observation type,  e.g. a paleoclimate proxy observation, defined in https://wiki.linked.earth/Category:ProxyObservation_(L)
+        
+    depth : array
+        depth at which the values were collected
+        
+    depth_name : string
+        name of the field, e.g. 'mid-depth', 'top-depth', etc   
+        
+    depth_unit : string
+         units of the depth axis, e.g. 'cm'
 
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
@@ -100,9 +112,11 @@ class GeoSeries(Series):
     '''
 
     def __init__(self, time, value, lat, lon, elevation = None, time_unit=None, time_name=None, 
-                 value_name=None, value_unit=None, label=None, 
-                 importedFrom=None, archiveType = None, log=None, keep_log=False,
-                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
+                 value_name=None, value_unit=None, label=None, importedFrom=None, 
+                 archiveType = None, sensorType = None, observationType = None,
+                 log=None, keep_log=False, verbose=True,
+                 depth = None, depth_name = None, depth_unit= None,
+                 sort_ts = 'ascending', dropna = True,  clean_ts=False):
         
        
         # assign latitude
@@ -129,6 +143,15 @@ class GeoSeries(Series):
             
         # elevation
         self.elevation = elevation
+        
+        # PSM 
+        self.sensorType = sensorType
+        self.observationType = observationType
+        
+        # depth infornation
+        self.depth = depth
+        self.depth_name = depth_name
+        self.depth_unit = depth_unit
             
         #assign all the rest
         super().__init__(time, value, time_unit, time_name, value_name,
@@ -148,6 +171,8 @@ class GeoSeries(Series):
             value_name = self.value_name,
             label = self.label,
             archiveType = self.archiveType,
+            sensorType  = self.sensorType,
+            observationType = self.observationType, 
             importedFrom = self.importedFrom,
             log = self.log,
         )
@@ -606,4 +631,109 @@ class GeoSeries(Series):
 
         return fig, ax
     
+    def resample(self, rule, keep_log = False, **kwargs):
+        """
+        Run analogue to pandas.Series.resample.
+    
+        This is a convenience method: doing
+    
+            ser.resample('AS').mean()
+    
+        will do the same thing as
+    
+            ser.pandas_method(lambda x: x.resample('AS').mean())
+        
+        but will also accept some extra resampling rules, such as `'Ga'` (see below).
+    
+        Parameters
+        ----------
+        rule : str
+            The offset string or object representing target conversion.
+            Can also accept pyleoclim units, such as 'ka' (1000 years),
+            'Ma' (1 million years), and 'Ga' (1 billion years).
+    
+            Check the [pandas resample docs](https://pandas.pydata.org/docs/dev/reference/api/pandas.DataFrame.resample.html)
+            for more details.
+    
+        kwargs : dict
+            Any other arguments which will be passed to pandas.Series.resample.
+        
+        Returns
+        -------
+        SeriesResampler
+            Resampler object, not meant to be used to directly. Instead,
+            an aggregation should be called on it, see examples below.
+        
+        Examples
+        --------
+        >>> ts = pyleo.utils.load_dataset('EDC-dD').convert_time_unit('ky BP')
+        >>> ts5k = ts.resample('1ka').mean()
+        >>> fig, ax = ts.plot()
+        >>> ts5k.plot(ax=ax,color='C1')
+                
+        """
+        search = re.search(r'(\d*)([a-zA-Z]+)', rule)
+        if search is None:
+            raise ValueError(f"Invalid rule provided, got: {rule}")
+    
+        md = self.metadata
+        if md['label'] is not None:
+            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+    
+        multiplier = search.group(1)
+        if multiplier == '':
+            multiplier = 1
+        else:
+            multiplier = int(multiplier)
+        unit = search.group(2)
+        if unit.lower() in tsbase.MATCH_A:
+            rule = f'{multiplier}AS'
+        elif unit.lower() in tsbase.MATCH_KA:
+            rule = f'{1_000*multiplier}AS'
+        elif unit.lower() in tsbase.MATCH_MA:
+            rule = f'{1_000_000*multiplier}AS'
+        elif unit.lower() in tsbase.MATCH_GA:
+            rule = f'{1_000_000_000*multiplier}AS'
+        
+        ser = self.to_pandas()
+        
+        return GeoSeriesResampler(rule, ser, md, keep_log, kwargs)
+    
+class GeoSeriesResampler:
+    """
+    This is only meant to be used internally, and is not meant to 
+    be public-facing or to be used directly by users.
+
+    If users call
+
+        ts.resample('1Y').mean()
+    
+    then they will get back a pyleoclim.GeoSeries, and `GeoSeriesResampler`
+    will only be used in an intermediate step. Think of it as an
+    implementation detail.
+    """
+    def __init__(self, rule, series, metadata, keep_log, kwargs):
+        self.rule = rule
+        self.series = series
+        self.metadata = metadata
+        self.keep_log = keep_log
+        self.kwargs = kwargs
+    
+    def __getattr__(self, attr):
+        attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
+        def func(*args, **kwargs):
+            series = attr(*args, **kwargs)
+            series.index = series.index + (series.index[1] - series.index[0])/2 # sample midpoints
+            _, __, direction = tsbase.time_unit_to_datum_exp_dir(self.metadata['time_unit'], self.metadata['time_name'])
+            if direction == 'prograde':
+                from_pandas = GeoSeries.from_pandas(series, metadata=self.metadata)
+            else:
+                from_pandas = GeoSeries.from_pandas(series.sort_index(ascending=False), metadata=self.metadata)
+            if self.keep_log == True:
+                if from_pandas.log is None:
+                    from_pandas.log=()
+                from_pandas.log += ({len(from_pandas.log): 'resample','rule': self.rule},)
+            return from_pandas
+        return func
+
     

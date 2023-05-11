@@ -19,26 +19,43 @@ Notes on how to test:
 """
 import pytest
 import pyleoclim as pyleo
+import numpy as np
+import pandas as pd
 from urllib.request import urlopen
 import json
 
+class TestUIGeoSeriesResample():
+    ''' test GeoSeries.Resample()
+    '''
+    def test_resample_edc(self):
+        EDC = pyleo.utils.load_dataset('EDC-dD')
+        EDC5k = EDC.resample('5ka').mean()
+        res = EDC5k.resolution()
+        assert np.isclose(res.describe()['mean'], 5000)
+        assert res.describe()['variance'] < 1e-3
+    
+
 class TestUiGeoSeriesMap():
-    ''' test LipdSeries.map()
+    ''' test GeoSeries.map()
     '''
     
-    def test_map_t0(self):
-        ts = pyleo.utils.datasets.load_dataset('EDC-dD')
+    def test_map_t0(self, pinkgeoseries):
+        ts = pinkgeoseries
         fig, ax = ts.map()
         pyleo.closefig(fig)
 
 class TestUiGeoSeriesDashboard():
-    ''' test LipdSeries.Dashboard
+    ''' test GeoSeries.Dashboard
     '''
     
     def test_dashboard_t0(self):
         ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-        ts_interp =ts.convert_time_unit('kyr BP').interp(step=.5)
-        fig, ax = ts_interp.dashboard()
+        ts_interp =ts.convert_time_unit('kyr BP').interp(step=10)
+        fig, ax = ts_interp.dashboard(spectralsignif_kwargs={'number':2})
+        pyleo.closefig(fig)
+    def test_dashboard_t1(self, pinkgeoseries):
+        ts = pinkgeoseries
+        fig, ax = ts.dashboard(spectralsignif_kwargs={'number':2})
         pyleo.closefig(fig)
 
 #class TestUiLipdSeriesMapNearRecord():

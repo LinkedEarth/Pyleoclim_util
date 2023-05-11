@@ -28,12 +28,10 @@ test_dirpath = pathlib.Path(__file__).parent.absolute()
 #from urllib.request import urlopen
 
 import pyleoclim as pyleo
-from pyleoclim.utils.tsmodel import (
-    ar1_sim,
-    ar1_fit)
+from pyleoclim.utils.tsmodel import ar1_fit
 
 from statsmodels.tsa.arima_process import arma_generate_sample
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 # a collection of useful functions
 
@@ -41,7 +39,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
 
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v, sort_ts='none')
+    ts=pyleo.Series(t,v, sort_ts='none', verbose=False)
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
@@ -49,7 +47,7 @@ def gen_normal(loc=0, scale=1, nt=100):
     '''
     t = np.arange(nt)
     v = np.random.normal(loc=loc, scale=scale, size=nt)
-    ts = pyleo.Series(t,v)
+    ts = pyleo.Series(t,v, verbose=False)
     return ts
 
 # def load_data():
@@ -172,90 +170,83 @@ class TestUISeriesSpectral:
     '''
 
     @pytest.mark.parametrize('spec_method', ['wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram','cwt'])
-    def test_spectral_t0(self, spec_method, eps=0.5):
+    def test_spectral_t0(self, pinkseries, spec_method, eps=0.5):
         ''' Test Series.spectral() with available methods using default arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
-        alpha=1
-        ts = gen_ts(nt=1000, alpha=alpha, seed=2333)
+        ts = pinkseries # has slope 1/f
         psd = ts.spectral(method=spec_method)
         beta = psd.beta_est().beta_est_res['beta']
-        assert np.abs(beta-alpha) < eps
+        assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('freq_method', ['log', 'scale', 'nfft', 'lomb_scargle', 'welch'])
-    def test_spectral_t1(self, freq_method, eps=0.3):
+    def test_spectral_t1(self, pinkseries, freq_method, eps=0.3):
         ''' Test Series.spectral() with MTM using available `freq_method` options with other arguments being default
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+        ts = pinkseries
         psd = ts.spectral(method='mtm', freq_method=freq_method)
         beta = psd.beta_est().beta_est_res['beta']
-        assert np.abs(beta-alpha) < eps
+        assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('nfreq', [10, 20, 30])
-    def test_spectral_t2(self, nfreq, eps=0.3):
+    def test_spectral_t2(self, pinkseries, nfreq, eps=0.3):
         ''' Test Series.spectral() with MTM using `freq_method='log'` with different values for its keyword argument `nfreq`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+        ts = pinkseries
         psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nfreq': nfreq})
         beta = psd.beta_est().beta_est_res['beta']
-        assert np.abs(beta-alpha) < eps
+        assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('dj', [0.25, 0.5, 1])
-    def test_spectral_t3(self, dj, eps=0.3):
+    def test_spectral_t3(self, pinkseries, dj, eps=0.3):
         ''' Test Series.spectral() with MTM using `freq_method='scale'` with different values for its keyword argument `nv`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+        ts = pinkseries
         psd = ts.spectral(method='mtm', freq_method='scale', freq_kwargs={'dj': dj})
         beta = psd.beta_est().beta_est_res['beta']
-        assert np.abs(beta-alpha) < eps
+        assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('dt, nf, ofac, hifac', [(None, 20, 1, 1), (None, None, 2, 0.5)])
-    def test_spectral_t4(self, dt, nf, ofac, hifac, eps=0.5):
+    def test_spectral_t4(self, pinkseries, dt, nf, ofac, hifac, eps=0.5):
         ''' Test Series.spectral() with Lomb_Scargle using `freq_method=lomb_scargle` with different values for its keyword arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+        ts = pinkseries
         psd = ts.spectral(method='mtm', freq_method='lomb_scargle', freq_kwargs={'dt': dt, 'nf': nf, 'ofac': ofac, 'hifac': hifac})
         beta = psd.beta_est().beta_est_res['beta']
-        assert np.abs(beta-alpha) < eps
+        assert np.abs(beta-1.0) < eps
 
-    def test_spectral_t5(self, eps=0.6):
+    def test_spectral_t5(self, pinkseries, eps=0.6):
         ''' Test Series.spectral() with WWZ with specified frequency vector passed via `settings`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         Note `asser_array_equal(psd.frequency, freq)` is used to make sure the specified frequency vector is really working.
         Also, we give `label` a test.
         '''
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+        ts = pinkseries
         freq = np.linspace(1/500, 1/2, 100)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
         beta = psd.beta_est(fmin=1/200, fmax=1/10).beta_est_res['beta']
         assert_array_equal(psd.frequency, freq)
-        assert np.abs(beta-alpha) < eps
+        assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('spec_method', ['wwz', 'lomb_scargle'])
-    def test_spectral_t6(self, spec_method, eps=0.3):
+    def test_spectral_t6(self, pinkseries, spec_method, eps=0.3):
         ''' Test Series.spectral() with WWZ and Lomb Scargle on unevenly-spaced data with default arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+        ts = pinkseries
         # randomly remove some data pts
-        n_del = 50
+        n_del = 3
         deleted_idx = np.random.choice(range(np.size(ts.time)), n_del, replace=False)
         t_unevenly =  np.delete(ts.time, deleted_idx)
         v_unevenly =  np.delete(ts.value, deleted_idx)
@@ -263,14 +254,14 @@ class TestUISeriesSpectral:
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
         psd = ts2.spectral(method=spec_method)
         beta = psd.beta_est().beta_est_res['beta']
-        assert np.abs(beta-alpha) < eps
+        assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('spec_method', ['wwz','cwt'])
-    def test_spectral_t7(self, spec_method,):
+    def test_spectral_t7(self, pinkseries, spec_method):
         '''Test the spectral significance testing with pre-generated scalogram objects
         '''
 
-        ts = gen_ts()
+        ts = pinkseries
         scal = ts.wavelet(method=spec_method)
         signif = scal.signif_test(number=2,export_scal = True)
         sig_psd = ts.spectral(method=spec_method,scalogram=scal)
@@ -282,10 +273,9 @@ class TestUISeriesBin:
     Functions to test the various kwargs arguments for binning a timeseries
     '''
 
-    def test_bin_t1(self):
+    def test_bin_t1(self, pinkseries):
         ''' Test the bin function with default parameter values'''
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+        ts = pinkseries
         # randomly remove some data pts
         n_del = 50
         deleted_idx = np.random.choice(range(np.size(ts.time)), n_del, replace=False)
@@ -296,10 +286,9 @@ class TestUISeriesBin:
         ts2_bin=ts2.bin(keep_log=True)
         print(ts2_bin.log[-1])
 
-    def test_bin_t2(self):
+    def test_bin_t2(self, pinkseries):
         ''' Test the bin function by passing arguments'''
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+        ts = pinkseries
         # randomly remove some data pts
         n_del = 50
         deleted_idx = np.random.choice(range(np.size(ts.time)), n_del, replace=False)
@@ -340,12 +329,11 @@ class TestUISeriesCenter:
 
     Center removes the mean, so we'll simply test maximum and minimum values'''
 
-    def test_center(self):
-        #Generate sample data
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+    def test_center(self, pinkseries):
+        # Generate sample data
+        ts = pinkseries
 
-        #Call function to be tested
+        # Call function to be tested
         tsc = ts.center(keep_log=True)
 
         assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon)
@@ -357,9 +345,8 @@ class TestUISeriesStandardize:
 
     Standardize normalizes the series object, so we'll simply test maximum and minimum values'''
 
-    def test_standardize(self):
-        alpha = 1
-        ts = gen_ts(nt=500, alpha=alpha)
+    def test_standardize(self, pinkseries):     
+        ts = pinkseries
 
         #Call function to be tested
         ts_std = ts.standardize(keep_log=True)
@@ -397,8 +384,8 @@ class TestUISeriesGaussianize:
     '''Test for Series.gaussianize()
 
     Gaussianize normalizes the series object, so we'll simply test maximum and minimum values'''
-    def test_gaussianize(self):
-        ts = gen_ts()
+    def test_gaussianize(self, pinkseries):
+        ts = pinkseries
         ts_gauss = ts.gaussianize(keep_log=True)
 
         value = ts.__dict__['value']
@@ -534,14 +521,14 @@ class TestUISeriesSurrogates:
 class TestUISeriesSummaryPlot:
     ''' Test Series.summary_plot()
     '''
-    def test_summary_plot_t0(self):
+    def test_summary_plot_t0(self, pinkseries):
         '''Testing that labels are being passed and that psd and scalogram objects dont fail when passed.
         Also testing that we can specify fewer significance tests than those stored in the scalogram object
         Note that we should avoid pyleo.showfig() in tests.
 
         Passing pre generated scalogram and psd.
         '''
-        ts = gen_ts()
+        ts = pinkseries
         scal = ts.wavelet(method='cwt')
         psd = ts.spectral(method='cwt')
         period_label='Period'
@@ -559,20 +546,19 @@ class TestUISeriesSummaryPlot:
         assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
         assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
 
-        plt.close(fig)
+        pyleo.closefig(fig)
 
-    def test_summary_plot_t1(self):
+    def test_summary_plot_t1(self, pinkseries):
         '''Testing that the bare function works
         Note that we should avoid pyleo.showfig() in tests.
 
         Passing just a pre generated psd.
         '''
-        ts = gen_ts()
+        ts = pinkseries
         scal = ts.wavelet(method='cwt')
         psd = ts.spectral(method='cwt')
         fig, ax = ts.summary_plot(psd=psd,scalogram=scal)
-
-        plt.close(fig)
+        pyleo.closefig(fig)
 
 
 class TestUISeriesCorrelation:

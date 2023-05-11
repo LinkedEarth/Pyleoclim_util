@@ -8,10 +8,10 @@ How to create and manipulate such objects is described in a short example below,
 """
 
 import datetime as dt
-import operator
+#import operator
 import re
 
-from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils, jsonutils
+from ..utils import tsutils, plotting, tsmodel, tsbase, lipdutils, jsonutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -106,7 +106,7 @@ class Series:
         source of the dataset. If it came from a LiPD file, this could be the datasetID property 
 
     archiveType : string
-        climate archive, one of ....                                                                                    
+        climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'                                                                                  
 
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
@@ -213,7 +213,6 @@ class Series:
             else:
                 print(f"Unknown sorting option {sort_ts}; no sorting applied")
          
-        
         self.time = time
         self.value = value
         self.time_name = time_name

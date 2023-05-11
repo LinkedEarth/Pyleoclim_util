@@ -102,10 +102,12 @@ EDC-dD:
     elevation: 3233
     time_name: 'Age'
     time_unit: 'y BP'
-    label: 'EPICA Dome C deuterium'
+    label: 'EPICA Dome C dD'
     value_name: '$\delta \mathrm{D}$' 
     value_unit: '‰'
-    archiveType: 'Glacier Ice'
+    archiveType: 'glacierice'
+    sensorType: 'ice sheet'
+    observationType: 'hydrogen isotopes'
     importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/epica_domec/edc3deuttemp2007.txt'
   time_column: Age
   value_column: Deuterium    
