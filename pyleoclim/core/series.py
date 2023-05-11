@@ -1246,7 +1246,6 @@ class Series:
 
 
             fig, ax = nino_mcssa.screeplot()
-            pyleo.closefig(fig)
 
             print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
@@ -1609,13 +1608,9 @@ class Series:
     #         value=data.iloc[:,2]
     #         ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
 
-    #         @savefig ts_plot5.png
     #         fig, ax = ts.plot()
-    #         pyleo.closefig(fig)
 
-    #         @savefig ts_dist.png
     #         fig, ax = ts.distplot()
-    #         pyleo.closefig(fig)
 
     #     '''
     #     warnings.warn(
