@@ -1332,8 +1332,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
     We use a sine wave with a period of 50 yrs as the signal for test.
     Then performing wavelet analysis should return an energy band around period of 50 yrs in the scalogram.
 
-    .. ipython:: python
-        :okwarning:
+    .. jupyter-execute::
 
         from pyleoclim import utils
         import matplotlib.pyplot as plt
@@ -1362,8 +1361,6 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
         ax.set_xlabel('Time (yr)')
         ax.set_ylabel('Period (yrs)')
         cb = plt.colorbar(cont, **cbar_args)
-        @savefig wwa_wwz.png
-        plt.show()
 
     '''
     #assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."

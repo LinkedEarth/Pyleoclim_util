@@ -72,8 +72,12 @@ def get_metadata(name):
 
     Examples
     --------
-    >>> from pyleoclim.utils.datasets import get_metadata
-    >>> meta = get_metadata('LR04')
+
+    .. jupyter-execute::
+
+        from pyleoclim.utils.datasets import get_metadata
+        meta = get_metadata('LR04')
+
     """
     all_metadata = load_datasets_metadata()
     metadata = all_metadata.get(name, None)
@@ -97,8 +101,11 @@ def load_dataset(name):
 
     Examples
     --------
-    >>> from pyleoclim.utils.datasets import load_dataset
-    >>> pyleo_series = load_dataset('LR04')
+
+    .. jupyter-execute::
+        from pyleoclim.utils.datasets import load_dataset
+        pyleo_series = load_dataset('LR04')
+
     """
     # load the metadata for this dataset
     metadata = get_metadata(name)

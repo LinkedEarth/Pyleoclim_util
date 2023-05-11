@@ -200,56 +200,40 @@ class PSD:
         
         Compute the spectrum of the Southern Oscillation Index and assess significance against an AR(1) benchmark:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             psd = soi.standardize().spectral('mtm',settings={'NW':2})
             psd_sim = psd.signif_test(number=20)
-            @savefig psd_sim.png
             fig, ax = psd_sim.plot()
-            pyleo.closefig(fig)
-            
+
         By default, this method uses 200 Monte Carlo simulations of an AR(1) process. 
         For a smoother benchmark, up the number of simulations. 
         Also, you may obtain and visualize several quantiles at once, e.g. 90% and 95%:
         
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
                 
             psd_1000 = psd.signif_test(number=100, qs=[0.90, 0.95])
-            @savefig psd_1000.png
             fig, ax = psd_1000.plot()
-            pyleo.closefig(fig)
-        
+
         Another option is to use a closed-form, asymptotic solution for the AR(1) spectrum:
             
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
             
             psd_asym = psd.signif_test(method='ar1asym',qs=[0.90, 0.95])
-            @savefig psd_asym.png
             fig, ax = psd_asym.plot()
-            pyleo.closefig(fig)
-            
+
         If significance tests from a comparable scalogram have been saved, they can be passed here to speed up the generation of noise realizations for significance testing.
         Setting export_scal to True saves the noise realizations generated during significance testing for future use:
             
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
                 
             scalogram = soi.standardize().wavelet().signif_test(number=20, export_scal=True)
 
         The psd can be calculated by using the previously generated scalogram
         
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
                 
             psd_scal = soi.standardize().spectral(scalogram=scalogram)
 
@@ -257,13 +241,9 @@ class PSD:
         Pyleoclim will dig through the scalogram object to find the saved 
         noise realizations and reuse them flexibly.
         
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
                 
-            @savefig psd_scal.png
             fig, ax = psd.signif_test(scalogram=scalogram).plot()
-            pyleo.closefig(fig)
 
         See also
         --------
@@ -407,9 +387,7 @@ class PSD:
 
         Generate fractal noise and verify that its scaling exponent is close to unity
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             t, v = pyleo.utils.tsmodel.gen_ts(model='colored_noise')
@@ -419,9 +397,7 @@ class PSD:
             # estimate the scaling slope
             psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
 
-            @savefig color_noise_beta.png
             fig, ax = psd_beta.plot(color='tab:blue',beta_kwargs={'color':'tab:red','linewidth':2})
-            pyleo.closefig(fig)
 
         See also
         --------
@@ -471,9 +447,7 @@ class PSD:
 
         Generate colored noise with scaling exponent equals to unity, and test the impact of anti-aliasing filter
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
 
@@ -481,11 +455,9 @@ class PSD:
             ts = pyleo.Series(time=t, value=v, label='colored noise', verbose=False)
 
             # without the anti-aliasing filter
-            @savefig color_noise_no_anti_alias.png
             fig, ax = ts.spectral(method='mtm').beta_est().plot()
 
             # with the anti-aliasing filter
-            @savefig color_noise_anti_alias.png
             fig, ax = ts.spectral(method='mtm').anti_alias().beta_est().plot()
 
         References
@@ -655,9 +627,7 @@ class PSD:
 
         Generate fractal noise, assess significance against an AR(1) benchmark, and plot:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import matplotlib.pyplot as plt
             
@@ -666,22 +636,15 @@ class PSD:
             tsn = ts.standardize()
     
             psd_sim = tsn.spectral(method='mtm').signif_test(number=20)
-            @savefig mtm_sim.png
             psd_sim.plot()
-            pyleo.closefig(fig)
-            
+
         If you add the estimate of the scaling exponent, the line of best fit 
         will be added to the plot, and the estimated exponent to its legend. For instance:
             
-        .. ipython:: python
-            :okwarning:
-            :okexcept:    
+        .. jupyter-execute::
             
             psd_beta = psd_sim.beta_est(fmin=1/100, fmax=1/2)
-
-            @savefig mtm_sig_beta.png
             fig, ax = psd_beta.plot()
-            pyleo.closefig(fig)
 
         See also
         --------
@@ -1356,9 +1319,7 @@ class MultiplePSD:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
             
             import pyleoclim as pyleo
             import numpy as np
@@ -1378,9 +1339,7 @@ class MultiplePSD:
 
             mPSD = pyleo.MultiplePSD(psds)
             
-            @savefig ens_specplot.png
             fig, ax = mPSD.plot_envelope()
-            pyleo.closefig(fig) 
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

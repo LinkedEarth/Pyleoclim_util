@@ -187,9 +187,7 @@ class Scalogram:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             series = pyleo.utils.load_dataset('SOI')
@@ -312,17 +310,13 @@ class Scalogram:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
             scalogram = ts.wavelet()
 
-            @savefig scal_basic.png
             fig,ax = scalogram.plot()
-            pyleo.closefig(fig)
         '''
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
@@ -496,9 +490,7 @@ class Scalogram:
 
         Generating scalogram, running significance tests, and saving the output for future use in generating psd objects or in summary_plot()
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
@@ -506,9 +498,7 @@ class Scalogram:
         By setting export_scal to True, the noise realizations used to generate the significance test will be saved. 
         These come in handy for generating summary plots and for running significance tests on spectral objects.
         
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
                 
             scalogram = ts.wavelet().signif_test(number=2, export_scal=True)
 

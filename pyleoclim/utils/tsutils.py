@@ -173,17 +173,15 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     Examples
     --------
 
-        Examples
-    --------
-
     There are several ways to specify the way binning is conducted via this function. Within these there is a hierarchy which we demonstrate below.
 
     Top priority is given to `bin_edges` if it is not None. All other arguments will be ignored (except for x and y).
     The resulting time axis will be comprised of the midpoints between bin edges.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
+
+        import numpy as np
+        import pyleoclim as pyleo
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
@@ -193,9 +191,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoints between time axis points.
     The first and last time point will be used as the left most and right most bin edges.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
@@ -204,9 +200,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     
     If `time_axis` is None, `bin_size` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defaults if not passed.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
@@ -215,9 +209,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
@@ -226,9 +218,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     If none of these are specified, the mean spacing will be used.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
@@ -373,57 +363,50 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     Top priority is given to `bin_edges` if it is not None. All other arguments will be ignored (except for x and y).
     The resulting time axis will be comprised of the midpoints between bin edges.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
+
+        import numpy as np
+        import pyleoclim as pyleo
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xc,yc = pyleo.utils.tsutils.gkernel(x,y,bin_edges=[1,4,8,12,16,20])
         xc
 
     Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoints between time axis points.
     The first and last time point will be used as the left most and right most bin edges.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xc,yc = pyleo.utils.tsutils.gkernel(x,y,time_axis=[1,4,8,12,16,20])
         xc
     
     If `time_axis` is None, `step` will be considered, overriding `step_style` if it is passed. `start` and `stop` will be generated using defaults if not passed.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xc,yc = pyleo.utils.tsutils.gkernel(x,y,step=2)
         xc
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xc,yc = pyleo.utils.tsutils.gkernel(x,y,step_style='max')
         xc
 
     If none of these are specified, the mean spacing will be used.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xc,yc = pyleo.utils.tsutils.gkernel(x,y)
         xc
 
@@ -442,11 +425,13 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     
     # Set the bin edges
     if bin_edges is not None:
+        bin_edges = np.array(bin_edges)
         if start is not None or stop is not None or step is not None or step_style is not None or time_axis is not None:
             warnings.warn('Bins have been passed with other axis relevant arguments {start,stop,step,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=2)
         time_axis = (bin_edges[1:] + bin_edges[:-1])/2
     # A bit of wonk is required to get the proper bin edges from the time axis
     elif time_axis is not None:
+        time_axis = np.array(time_axis)
         if start is not None or stop is not None or step is not None or step_style is not None:
             warnings.warn('The time axis has been passed with other axis relevant arguments {start,stop,step,step_style}. Time_axis takes priority and will be used.',stacklevel=2)
         bin_edges = np.zeros(len(time_axis)+1)
@@ -463,7 +448,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     yc[:] = np.nan
 
     for i in range(len(bin_edges)-1):
-        if i < len(bin_edges-1):
+        if i < len(bin_edges)-1:
             xslice = t[(t>=bin_edges[i])&(t<bin_edges[i+1])]
             yslice = y[(t>=bin_edges[i])&(t<bin_edges[i+1])]
         else:
@@ -610,45 +595,40 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
     Top priority will always go to `time_axis` if it is passed. All other arguments will be overwritten (except for x,y, and interp_type).
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
+
+        import numpy as np
+        import pyleoclim as pyleo
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xi,yi = pyleo.utils.tsutils.interp(x,y,time_axis=[1,4,8,12,16])
         xi
     
     If `time_axis` is None, `step` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defaults if not passed.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xi,yi = pyleo.utils.tsutils.interp(x,y,step=2)
         xi
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xi,yi = pyleo.utils.tsutils.interp(x,y,step_style='max')
         xi
 
     If none of these are specified, the mean spacing will be used.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
-        y = np.ones(len(t))
+        y = np.ones(len(x))
         xi,yi = pyleo.utils.tsutils.interp(x,y)
         xi
 
@@ -1413,7 +1393,8 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
 
     time_axis : np.ndarray
         An evenly spaced time axis.
-        """
+
+    """
     
     if start is None:
         if x is None:

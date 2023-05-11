@@ -70,9 +70,11 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('EDC-dD')
-        >>> resolution = ts.resolution()
-        >>> resolution.describe()
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD')
+            resolution = ts.resolution()
+            resolution.describe()
         
         '''
         
@@ -183,9 +185,11 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('EDC-dD')
-        >>> resolution = ts.resolution()
-        >>> resolution.plot()
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD')
+            resolution = ts.resolution()
+            resolution.plot()
 
         '''
 
@@ -280,10 +284,11 @@ class Resolution:
             --------
 
             Distribution of the EDC-dD record
+            .. jupyter-execute::
 
-            >>> ts = pyleo.utils.load_dataset('EDC-dD')
-            >>> res = ts.resolution()
-            >>> res.histplot()
+                ts = pyleo.utils.load_dataset('EDC-dD')
+                res = ts.resolution()
+                res.histplot()
 
             '''
             savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -356,9 +361,11 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('EDC-dD')
-        >>> resolution = ts.resolution()
-        >>> resolution.dashboard()
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD')
+            resolution = ts.resolution()
+            resolution.dashboard()
 
         '''
 
