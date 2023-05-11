@@ -79,7 +79,26 @@ def geometadata():
 
 @pytest.fixture
 def pinkgeoseries(geometadata):
-    """Pyleoclim geoseries with """
+    """Pyleoclim geoseries based on 1/f (pink) noise"""
     t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=200, seed=251)
-    ts = pyleo.GeoSeries(t,v, verbose=False, **geometadata)
+    ts = pyleo.GeoSeries(t,v, verbose=False, **geometadata).standardize()
     return ts
+
+@pytest.fixture
+def multiple_pinkgeoseries():
+    """Pyleoclim geoseries with """
+    nrecs = 10
+    seed = 101
+    nt = 200
+    lats = np.random.default_rng(seed=seed).uniform(30.0,60.0,nrecs)
+    lons = np.random.default_rng(seed=seed).uniform(-20.0,60.0,nrecs)
+    archives = np.random.default_rng(seed=seed).choice(list(pyleo.utils.PLOT_DEFAULT.keys()),size=nrecs)
+    
+    ts_list = []
+    for i in range(nrecs):
+        t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=nt)
+        ts = pyleo.GeoSeries(t,v, verbose=False, archiveType=archives[i],label = f'pink series {i}',
+                             lat=lats[i], lon = lons[i]).standardize()
+        ts_list.append(ts)
+        
+    return pyleo.MultipleGeoSeries(ts_list, label='Multiple Pink GeoSeries')
