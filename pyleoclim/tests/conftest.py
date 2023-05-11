@@ -52,3 +52,34 @@ def evenly_spaced_series():
     series = pyleo.Series(time=t, value=v, verbose=False)
     series.label = 'cosine'
     return series
+
+@pytest.fixture
+def pinkseries():
+    """Pyleoclim geoseries with 1/f spectrum """
+    t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=100, seed=251)
+    ts = pyleo.Series(t,v, sort_ts='none', verbose=False)
+    ts.label = 'pink noise'
+    return ts
+
+# Geoseries fixtures
+@pytest.fixture
+def geometadata():
+    return {'lat': -75.1011,
+            'lon': 123.3478,
+            'elevation': 3233,
+            'time_unit': 'ky BP',
+            'time_name': 'Age',
+            'value_unit': '‰',
+            'value_name': '$\\delta \\mathrm{D}$',
+            'label': 'pink noise geoseries',
+            'archiveType': 'Glacier Ice',
+            'importedFrom': 'who knows where',
+            'log': None
+    }
+
+@pytest.fixture
+def pinkgeoseries():
+    """Pyleoclim geoseries with """
+    t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=200, seed=251)
+    ts = pyleo.Series(t,v, verbose=False, **geometadata)
+    return ts
