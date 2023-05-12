@@ -44,22 +44,22 @@ def savitzky_golay(ys, window_length=None, polyorder=2, deriv=0, delta=1,
         
     window_length : int
         The length of the filter window. Must be a positive integer. 
-            If mode is 'interp', window_length must be less than or equal to the size of ys. 
-            Default is the size of ys.
+        If mode is 'interp', window_length must be less than or equal to the size of ys. 
+        Default is the size of ys.
     
     polyorder : int
         The order of the polynomial used to fit the samples. polyorder Must be less than window_length. 
-            Default is 2
+        Default is 2
     
     deriv : int
         The order of the derivative to compute. 
-            This must be a nonnegative integer. 
-            The default is 0, which means to filter the data without differentiating
+        This must be a nonnegative integer. 
+        The default is 0, which means to filter the data without differentiating
     
     delta : float
         The spacing of the samples to which the filter will be applied.
-            This is only used if deriv>0.
-            Default is 1.0
+        This is only used if deriv>0.
+        Default is 1.0
     
     axis : int
         The axis of the array ys along which the filter will be applied. Default is -1
@@ -137,20 +137,32 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
     ----------
 
     ys : numpy array
+
         Evenly-spaced timeseries
+
     ts : numpy array
+
         Time axis
+
     method : str
+
         the method to use to pad the series
+
         - ARIMA: uses a fitted ARIMA model
         - reflect (default): Reflects the time series around either end.
+
     params : tuple 
+
         the ARIMA model order parameters (p,d,q), Default corresponds to an AR(1) model
+
     reflect_type : str; {‘even’, ‘odd’}, optional
+
          Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
          For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
          For more details, see np.lib.pad()
+
     padFrac : float
+
         padding fraction (scalar) such that padLength = padFrac*length(series)
 
     Returns
@@ -212,22 +224,36 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
     ----------
 
     ys : numpy array
+
         Timeseries
+
     fc : float or list
+
         cutoff frequency. If scalar, it is interpreted as a low-frequency cutoff (lowpass)
         If fc is a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass)
+
     fs : float
+
         sampling frequency
+
     filter_order : int
+
         order n of Butterworth filter
+
     pad : str
+
         Indicates if padding is needed.
+
         - 'reflect': Reflects the timeseries
         - 'ARIMA': Uses an ARIMA model for the padding
         - None: No padding.
+
     params : tuple
+
         model parameters for ARIMA model (if pad = 'ARIMA')
+
     padFrac : float
+
         fraction of the series to be padded
 
     Returns
@@ -280,19 +306,31 @@ def lanczos(ys,fc,fs=1,pad='reflect',
     ----------
 
     ys : numpy array
+
         Timeseries
+
     fc : float
+
         cutoff frequency 
+
     fs : float
+
         sampling frequency
+
     pad : str
+
         Indicates if padding is needed
+
         - 'reflect': Reflects the timeseries
         - 'ARIMA': Uses an ARIMA model for the padding
         - None: No padding
+
     params : tuple
+
         model parameters for ARIMA model (if pad = 'ARIMA'). May require fiddling
+
     padFrac : float
+
         fraction of the series to be padded
 
     Returns
@@ -353,27 +391,45 @@ def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_
     ----------
 
     ys : numpy array
+
         Timeseries
+
     fc : float or list
+
         cutoff frequency. If scalar, it is interpreted as a low-frequency cutoff (lowpass)
         If fc is a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass)
+
     numptaps : int
+
         Length of the filter (number of coefficients, i.e. the filter order + 1). numtaps must be odd if a passband includes the Nyquist frequency.
         If None, will use the largest number that is smaller than 1/3 of the the data length.
+
     fs : float
+
         sampling frequency
+
     window : str or tuple of string and parameter values, optional
+
         Desired window to use. See scipy.signal.get_window for a list of windows and required parameters.
+
     pad : str
+
         Indicates if padding is needed.
+
         - 'reflect': Reflects the timeseries
         - 'ARIMA': Uses an ARIMA model for the padding
         - None: No padding.
+
     params : tuple
+
         model parameters for ARIMA model (if pad = True)
+
     padFrac : float
+
         fraction of the series to be padded
+
     kwargs : dict
+    
         a dictionary of keyword arguments for scipy.signal.firwin
 
     Returns
