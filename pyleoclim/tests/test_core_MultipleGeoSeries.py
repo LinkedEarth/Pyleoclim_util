@@ -11,39 +11,39 @@ import pyleoclim as pyleo
 import pytest
 
 
-class TestUIMultipleGeoSeriesMap: 
+class TestUIMultipleGeoSeriesMap:
     def test_map_archives(multiple_pinkgeoseries):
         '''
-        test mapping semantics 
+        test mapping semantics
         '''
         mgs = multiple_pinkgeoseries
         fig, ax = mgs.map(hue = 'archiveType')
         pyleo.closefig(fig)
         # assert something?
-        
+
     def test_map_obs(multiple_pinkgeoseries):
         '''
-        test mapping semantics 
+        test mapping semantics
         '''
         mgs = multiple_pinkgeoseries
         fig, ax = mgs.map(hue = 'observationType')
         pyleo.closefig(fig)
         # assert something?
-        
+
     def test_map_elevation(multiple_pinkgeoseries):
         '''
-        test mapping semantics 
+        test mapping semantics
         '''
         mgs = multiple_pinkgeoseries
         fig, ax = mgs.map(hue = 'elevation')
         pyleo.closefig(fig)
         # assert something?
-    
+
 # def create_Euro2k():
 #     '''
 #     Tests the creation of Euro2k MultipleGeoSeries
 #     '''
-    
+
 
 #     url = 'https://github.com/LinkedEarth/Pyleoclim_util/tree/master/example_data/Euro2k_json'
 #     ext = 'json'
@@ -63,8 +63,6 @@ class TestUIMultipleGeoSeriesMap:
 #     ts_list = []
 #     for item in files:
 #         ts_list.append(pyleo.GeoSeries.from_json(item))
-        
-        
+
+
 #     Euro2k = pyleo.MultipleGeoSeries(ts_list)
-   
-    
