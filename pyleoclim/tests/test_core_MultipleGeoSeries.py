@@ -12,7 +12,7 @@ import pytest
 
 
 class TestUIMultipleGeoSeriesMap:
-    def test_map_archives(multiple_pinkgeoseries):
+    def test_map_archives(self, multiple_pinkgeoseries):
         '''
         test mapping semantics
         '''
@@ -21,7 +21,7 @@ class TestUIMultipleGeoSeriesMap:
         pyleo.closefig(fig)
         # assert something?
 
-    def test_map_obs(multiple_pinkgeoseries):
+    def test_map_obs(self, multiple_pinkgeoseries):
         '''
         test mapping semantics
         '''
@@ -30,7 +30,7 @@ class TestUIMultipleGeoSeriesMap:
         pyleo.closefig(fig)
         # assert something?
 
-    def test_map_elevation(multiple_pinkgeoseries):
+    def test_map_elevation(self, multiple_pinkgeoseries):
         '''
         test mapping semantics
         '''
