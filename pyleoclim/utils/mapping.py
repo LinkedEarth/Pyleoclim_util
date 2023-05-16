@@ -20,6 +20,7 @@ def set_proj(projection='Robinson', proj_default = True):
     ----------
     
     projection : string
+
         the map projection. Available projections:
         'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
         'AzimuthalEquidistant','EquidistantConic','LambertConformal',
@@ -29,11 +30,12 @@ def set_proj(projection='Robinson', proj_default = True):
         'Geostationary','NearsidePerspective','EckertI','EckertII',
         'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
         'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+
     proj_default : bool; {True,False}
+
         If True, uses the standard projection attributes from Cartopy.
         Enter new attributes in a dictionary to change them. Lists of attributes
-        can be found in the Cartopy documentation: 
-            https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
     
     Returns
     -------
@@ -237,12 +239,10 @@ def map(lat, lon, criteria, marker=None, color =None,
     proj_default : bool
         If True, uses the standard projection attributes.
         Enter new attributes in a dictionary to change them. Lists of attributes
-        can be found in the Cartopy documentation: 
-            https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_. 
             
     background : bool
-        If True, uses a shaded relief background (only one 
-        available in Cartopy)
+        If True, uses a shaded relief background (only one available in Cartopy)
         
     borders : bool
         Draws the countries border. Defaults is off (False).
@@ -261,16 +261,18 @@ def map(lat, lon, criteria, marker=None, color =None,
         Return as axis instead of figure (useful to integrate plot into a subplot) 
         
     scatter_kwargs : dict
-        Dictionary of arguments available in matplotlib.pyplot.scatter (https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html).     
+        Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.     
     
     legend : bool
         Whether the draw a legend on the figure
     
     lgd_kwargs : dict
-        Dictionary of arguments for matplotlib.pyplot.legend (https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html)
+        Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
     
     savefig_settings : dict
+
         Dictionary of arguments for matplotlib.pyplot.saveFig.
+
         - "path" must be specified; it can be any existed or non-existed path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}

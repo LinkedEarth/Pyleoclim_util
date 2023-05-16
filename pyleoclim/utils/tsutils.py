@@ -524,7 +524,7 @@ def increments(x,step_style='median'):
 def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_style=None, time_axis=None,**kwargs):
     """ Interpolate y onto a new x-axis
 
-    Largely a wrapper for [scipy.interpolate.interp1d](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html)
+    Largely a wrapper for `scipy.interpolate.interp1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html>`_.
 
     Parameters
     ----------
@@ -906,8 +906,8 @@ def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None)
     """Detrend a timeseries according to four methods
 
     Detrending methods include: "linear", "constant", using a low-pass Savitzky-Golay filter, and Empirical Mode Decomposition (default).
-    Linear and constant methods use [scipy.signal.detrend](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html),
-    EMD uses [pyhht.emd.EMD](https://pyhht.readthedocs.io/en/stable/apiref/pyhht.html)
+    Linear and constant methods use `scipy.signal.detrend <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html>`_.,
+    EMD uses `pyhht.emd.EMD <https://pyhht.readthedocs.io/en/stable/apiref/pyhht.html>`_.
 
     Parameters
     ----------
@@ -1368,7 +1368,7 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
 
     pyleoclim.utils.tsutils.standardize : Centers and normalizes a given time series
 
-    pyleoclim.utils.tsutils.gaussianize_1d : Quantile maps a matrix to a Gaussian distribution
+    pyleoclim.utils.tsutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
 
     '''
 

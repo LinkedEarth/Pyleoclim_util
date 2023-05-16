@@ -468,22 +468,27 @@ def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
 def set_style(style='journal', font_scale=1.0, dpi=300):
     ''' Modify the visualization style
     
-    This function is inspired by [Seaborn](https://github.com/mwaskom/seaborn).
+    This function is inspired by `Seaborn <https://github.com/mwaskom/seaborn>`_.
    
     
     Parameters
     ----------
     
     style : {journal,web,matplotlib,_spines, _nospines,_grid,_nogrid}
+
         set the styles for the figure:
+
             - journal (default): fonts appropriate for paper
             - web: web-like font (e.g. ggplot)
             - matplotlib: the original matplotlib style
+
             In addition, the following options are available:
+            
             - _spines/_nospines: allow to show/hide spines
             - _grid/_nogrid: allow to show gridlines (default: _grid)
     
     font_scale : float
+
         Default is 1. Corresponding to 12 Font Size. 
     
     '''

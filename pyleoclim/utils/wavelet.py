@@ -312,8 +312,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     ----------
 
     - Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-    - Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-    Nonlinear Processes in Geophysics 12, 345–352 (2005).
+    - Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores. Nonlinear Processes in Geophysics 12, 345–352 (2005).
     - Kirchner, J. W. and Neal, C. (2013). Universal fractal scaling in stream chemistry and its implications for solute transport and water quality trend detection. Proc Natl Acad Sci USA 110:12213–12218.
 
     See also
@@ -335,7 +334,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
     
@@ -488,7 +487,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -636,8 +635,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     ----------
 
     - Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-    - Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-    Nonlinear Processes in Geophysics 12, 345–352 (2005).
+    - Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores. Nonlinear Processes in Geophysics 12, 345–352 (2005).
 
     See also
     --------
@@ -658,7 +656,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
@@ -818,7 +816,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -1003,7 +1001,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     assertPositiveInt(Neff_threshold)
@@ -1177,7 +1175,7 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     from . import f2py_wwz as f2py
@@ -1473,7 +1471,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     
     pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
 
@@ -1660,7 +1658,7 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     
     pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
 
@@ -2575,7 +2573,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     
     pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
     
@@ -2758,7 +2756,7 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
 
     pyleoclim.utils.wavelet.make_freq_vector : Makes frequency vector
     
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
