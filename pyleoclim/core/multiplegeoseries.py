@@ -74,6 +74,54 @@ class MultipleGeoSeries(MultipleSeries):
                 background=True, borders=False, rivers=False, lakes=False,
                 figsize=None, ax=None, scatter_kwargs=None, legend=True,
                 lgd_kwargs=None, savefig_settings=None, **kwargs):
+        '''
+        
+
+        Parameters
+        ----------
+        hue : TYPE, optional
+            DESCRIPTION. The default is 'archiveType'.
+        marker : TYPE, optional
+            DESCRIPTION. The default is None.
+        size : TYPE, optional
+            DESCRIPTION. The default is None.
+        color_pal : TYPE, optional
+            DESCRIPTION. The default is None.
+        legend_attribute : TYPE, optional
+            DESCRIPTION. The default is None.
+        projection : TYPE, optional
+            DESCRIPTION. The default is 'Robinson'.
+        proj_default : TYPE, optional
+            DESCRIPTION. The default is True.
+        background : TYPE, optional
+            DESCRIPTION. The default is True.
+        borders : TYPE, optional
+            DESCRIPTION. The default is False.
+        rivers : TYPE, optional
+            DESCRIPTION. The default is False.
+        lakes : TYPE, optional
+            DESCRIPTION. The default is False.
+        figsize : TYPE, optional
+            DESCRIPTION. The default is None.
+        ax : TYPE, optional
+            DESCRIPTION. The default is None.
+        scatter_kwargs : TYPE, optional
+            DESCRIPTION. The default is None.
+        legend : TYPE, optional
+            DESCRIPTION. The default is True.
+        lgd_kwargs : TYPE, optional
+            DESCRIPTION. The default is None.
+        savefig_settings : TYPE, optional
+            DESCRIPTION. The default is None.
+        **kwargs : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        '''
 
         def make_scalar_mappable(cmap, lims=None, n=None):
             if type(cmap) == list:
@@ -229,7 +277,7 @@ class MultipleGeoSeries(MultipleSeries):
         else:
             legend = True
 
-        ax2 = mp.map(lats, lons, legend_d[legend_attribute], marker=trait_d['marker']['attrib_vals'],
+        res = mp.map(lats, lons, legend_d[legend_attribute], marker=trait_d['marker']['attrib_vals'],
                      color=trait_d['hue']['attrib_vals'],
                      projection=projection, proj_default=proj_default,
                      background=background, borders=borders, rivers=rivers, lakes=lakes,
@@ -246,5 +294,6 @@ class MultipleGeoSeries(MultipleSeries):
                     handles.append(copy.copy(handles[0]))
                     handles[-1].set_alpha(0)
                     labels.append('')
-            ax2[1].legend(handles, labels,  bbox_to_anchor=(1,1), loc="upper left")
+            res[1].legend(handles, labels,  bbox_to_anchor=(1,1), loc="upper left")
 
+        return res

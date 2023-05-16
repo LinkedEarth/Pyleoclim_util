@@ -17,7 +17,7 @@ class TestUIMultipleGeoSeriesMap:
         test mapping semantics
         '''
         mgs = multiple_pinkgeoseries
-        fig, ax = mgs.map(hue = 'archiveType')
+        fig, ax = mgs.map(marker = 'archiveType')
         pyleo.closefig(fig)
         # assert something?
 
