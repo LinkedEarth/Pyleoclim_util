@@ -439,7 +439,7 @@ class Scalogram:
             Method to use to generate the surrogates.  ar1sim uses simulated timeseries with similar persistence. 
             ar1asym represents the theoretical, closed-form solution. The default is ar1sim
             
-       number : int 
+        number : int 
        
             Number of surrogates to generate for significance analysis based on simulations. 
             The default is 200.
