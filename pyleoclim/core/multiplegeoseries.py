@@ -69,7 +69,7 @@ class MultipleGeoSeries(MultipleSeries):
             self.series_list = new_ts_list
 
     # ============ MAP goes here ================
-    def map_all(self, hue='archiveType', marker=None, size=None,
+    def map(self, hue='archiveType', marker=None, size=None,
                 color_pal=None, legend_attribute=None, projection='Robinson', proj_default=True,
                 background=True, borders=False, rivers=False, lakes=False,
                 figsize=None, ax=None, scatter_kwargs=None, legend=True,
