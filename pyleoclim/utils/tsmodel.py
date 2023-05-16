@@ -400,7 +400,9 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
     ----------
 
     model : str, {'colored_noise', 'colored_noise_2regimes', 'ar1'}
+
         the timeseries model to use
+        
         - colored_noise : colored noise with one scaling slope
         - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
         - ar1 : AR(1) series

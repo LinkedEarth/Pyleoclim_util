@@ -913,21 +913,33 @@ def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None)
     ----------
 
     y : array
+
        The series to be detrended.
+
     x : array
+
        Abscissa for array y. Necessary for use with the Savitzky-Golay 
        method, since the series should be evenly spaced.
+
     method : str
+
         The type of detrending:
+
         - "linear": the result of a linear least-squares fit to y is subtracted from y.
         - "constant": only the mean of data is subtracted.
         - "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
         - "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     n : int
+
         Works only if `method == 'emd'`. The number of smoothest modes to remove.
+
     preserve_mean : boolean
+
         flag to indicate whether the mean of the series should be preserved despite the detrending
+
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filters.
 
     Returns
@@ -1313,21 +1325,32 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         The time axis for the timeseries. Necessary for use with
         the Savitzky-Golay filters method since the series should be evenly spaced.
+
     detrend : string
+
         'none'/False/None - no detrending will be applied;
         'emd' - the last mode is assumed to be the trend and removed from the series
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted.
+
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filter.
+
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+        
     standardize : bool
+
         If True, standardizes the timeseries
 
     Returns

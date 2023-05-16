@@ -246,32 +246,54 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+
     freq : array
+
         vector of frequency
+
     tau : array
+
         the evenly-spaced time points, namely the time shift for wavelet analysis
+
     c : float
+
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
+
     Neff_threshold : int
+
         the threshold of the number of effective degrees of freedom
+
     nproc :int
+
         fake argument, just for convenience
+
     detrend : string
+
         None - the original time series is assumed to have no trend (default);
         Types of detrending:
+
         - "linear" : the result of a linear least-squares fit to y is subtracted from y.
         - "constant" : only the mean of data is subtracted.
         - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
+
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+
     standardize : bool
+
         If True, standardizes the timeseries
 
     Returns
@@ -385,32 +407,54 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+        
     freq : array
+
         vector of frequency
+
     tau : array
+
         the evenly-spaced time points, namely the time shift for wavelet analysis
+
     c : float
+
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
+
     Neff_threshold : int
+
         the threshold of the number of effective degrees of freedom [default = 3]
+
     nproc : int
+
         the number of processes for multiprocessing [default = 8]
+
     detrend : string
+
        False - the original time series is assumed to have no trend; 
        Types of detrending:
+
        - "linear" : the result of a linear least-squares fit to y is subtracted from y.
        - "constant" : only the mean of data is subtracted.
        - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
        - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
+
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+
     standardize : bool
+
         If True, standardizes the timeseries
 
     Returns
@@ -526,32 +570,54 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+
     freq : array
+
         vector of frequency
+
     tau : array
+
         the evenly-spaced time points, namely the time shift for wavelet analysis
+
     c : float
+
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
+
     Neff_threshold : int
+
         the threshold of the number of effective degrees of freedom
+
     nproc : int
+
         fake argument for convenience, for parameter consistency between functions, does not need to be specified
+
     detrend : string
+
         None - the original time series is assumed to have no trend;
         Types of detrending:
+
         - "linear" : the result of a linear least-squares fit to y is subtracted from y.
         - "constant" : only the mean of data is subtracted.
         - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
+
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+
     standardize : bool
+
         If True, standardizes the timeseries
 
     Returns
@@ -676,31 +742,53 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+
     freq : array
+
         vector of frequency
+
     tau : array
+
         the evenly-spaced time points, namely the time shift for wavelet analysis
+
     c : float
+
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
+        
     Neff_threshold : int
+
         the threshold of the number of effective degrees of freedom
+
     nproc : int
+
         the number of processes for multiprocessing
+
     detrend : string
+
         Types of detrending:
+
         - "linear" : the result of a linear least-squares fit to y is subtracted from y.
         - "constant" : only the mean of data is subtracted.
         - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
+
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+
     standardize : bool
+
         If True, standardizes the timeseries
 
     Returns
@@ -827,32 +915,54 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+
     freq : array
+
         vector of frequency
+
     tau : array
+
         the evenly-spaced time points, namely the time shift for wavelet analysis
+
     c : float
+
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
+
     Neff_threshold : int
+
         the threshold of the number of effective degrees of freedom
+
     nproc : int
+
         fake argument, just for convenience
+
     detrend : string
+
         None - the original time series is assumed to have no trend;
         Types of detrending:
+
         - "linear" : the result of a linear least-squares fit to y is subtracted from y.
         - "constant" : only the mean of data is subtracted.
         - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
+
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+
     standardize : bool
+
         If True, standardizes the timeseries
 
     Returns
@@ -986,32 +1096,54 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+
     freq : array
+
         vector of frequency
+
     tau : array
+
         the evenly-spaced time points, namely the time shift for wavelet analysis
+
     c : float
+
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
+
     Neff_threshold : int
+
         the threshold of the number of effective degrees of freedom
+
     nproc : int
+
         fake argument, just for convenience
+
     detrend : string
+
         None - the original time series is assumed to have no trend;
         Types of detrending:
+
         - "linear" : the result of a linear least-squares fit to y is subtracted from y.
         - "constant" : only the mean of data is subtracted.
         - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     sg_kwargs : dict 
+
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
+        
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+
     standardize : bool
+
         If True, standardizes the timeseries
 
     Returns
@@ -1217,14 +1349,23 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
     ----------
 
     ys : array
+
         a time series, NaNs will be deleted automatically
+
     ts : array
+
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+        
     tau : array
+
         the evenly-spaced time vector for the analysis, namely the time shift for wavelet analysis
+
     freq : array
+
         vector of frequency
+
     freq_method : str
+
         Method to generate the frequency vector if not set directly. The following options are avialable:
 
         - 'log' (default)
@@ -1235,18 +1376,24 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
         See :func:`pyleoclim.utils.wavelet.make_freq_vector()` for details
 
     freq_kwargs : str
+
         used when freq=None for certain methods
+
     c : float
+
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
+
     Neff_threshold : int
+
         threshold for the effective number of points
 
     nproc : int
         the number of processes for multiprocessing
 
     detrend : string, {None, 'linear', 'constant', 'savitzy-golay'}
-        available methods for detrending, including
+
+        Available methods for detrending, including
 
         - None: the original time series is assumed to have no trend;
         - 'linear': a linear least-squares fit to `ys` is subtracted;
@@ -1255,10 +1402,12 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
         Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
 
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filter. See :func:`pyleoclim.utils.filter.savitzky_golay()` for details.
 
     method : string, {'Foster', 'Kirchner', 'Kirchner_f2py', 'Kirchner_numba'}
-        available specific implementation of WWZ, including
+
+        Available specific implementation of WWZ, including
 
         - 'Foster': the original WWZ method;
         - 'Kirchner': the method Kirchner adapted from Foster;
@@ -1266,12 +1415,15 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
         - 'Kirchner_numba': the method Kirchner adapted from Foster, implemented with Numba for acceleration (default);
 
     len_bd : int
+
         the number of the ghost grids want to creat on each boundary
 
     bc_mode : string, {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
+
         For more details, see np.lib.pad()
 
     reflect_type : string, optional, {‘even’, ‘odd’}
+
          Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
          For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
          For more details, see np.lib.pad()
@@ -1402,44 +1554,75 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     ----------
 
     ys1 : array
+
         first of two time series
+
     ys2 : array
+
         second of the two time series
+
     ts1 : array
+
         time axis of first time series
+
     ts2 : array
+
         time axis of the second time series
+
     tau : array
+
         the evenly-spaced time points
+
     freq : array
+
         vector of frequency
+
     c : float
+
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
+
     Neff_threshold : int
+
         threshold for the effective number of points
+
     nproc : int
+
         the number of processes for multiprocessing
+
     detrend : string
+
         - None: the original time series is assumed to have no trend;
         - 'linear': a linear least-squares fit to `ys` is subtracted;
         - 'constant': the mean of `ys` is subtracted
         - 'savitzy-golay': ys is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
+
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+
     standardize : bool
+
         If True, standardizes the timeseries
+
     method : string
+
         - 'Foster': the original WWZ method;
         - 'Kirchner': the method Kirchner adapted from Foster;
         - 'Kirchner_f2py': the method Kirchner adapted from Foster with f2py
         - 'Kirchner_numba': Kirchner's algorithm with Numba support for acceleration (default)
+
     verbose : bool
+
         If True, print warning messages  
+
     smooth_factor : float
+
         smoothing factor for the WTC (default: 0.25)
 
     Returns
@@ -1562,17 +1745,26 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
     ----------
 
     ts : array
+
         time axis of the time series
+
     dt : float
+
         The resolution of the data. If None, uses the median resolution. Defaults to None.
+
     nf : int
+
         Number of frequency points.
         If None, calculated as the difference between the highest and lowest frequencies (set by hifac and ofac) divided by resolution. Defaults to None
+
     ofac : float
+
         Oversampling rate that influences the resolution of the frequency axis,
                  when equals to 1, it means no oversamling (should be >= 1).
                  The default value 4 is usually a good value.
+
     hifac : float
+
         fhi/fnyq (should be <= 1), where fhi is the highest frequency that
         can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
 
@@ -1710,18 +1902,30 @@ def freq_vector_scale(ts, dj=0.25, s0=None,j1=None, mother='MORLET',param=None):
     ----------
 
     ts: numpy.array
+
         The time axis for the timeseries    
+
     dj : float, optional
+
         The spacing between discrete scales. The default is 0.25. A smaller number will give better scale resolution, but be slower to plot.
+
     s0 : float, optional
+
         the smallest scale of the wavelet. The default is None, representing 2*dT.
+
     j1 : float, optional
+
         the number of scales minus one. Scales range from S0 up to S0*2**(J1*DJ),
         to give a total of (J1+1) scales. The default is None, which represents (LOG2(N DT/S0))/DJ.
+
     mother : string, optional
+
         the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
+
     param : flaot, optional
+
         the mother wavelet parameter. The default is None since it varies for each mother
+
             - For 'MORLET' this is k0 (wavenumber), default is 6.
             - For 'PAUL' this is m (order), default is 4.
             - For 'DOG' this is m (m-th derivative), default is 2.
@@ -1844,11 +2048,17 @@ def make_freq_vector(ts, method='log', **kwargs):
     ----------
 
     ts : array
+
         Time axis of the time series
+
     method : string
+
         The method to use. Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
+
     kwargs : dict, optional
+
             For Lomb_Scargle, additional parameters may be passed:
+
             - nf (int): number of frequency points
             - ofac (float): Oversampling rate that influences the resolution of the frequency axis,
                  when equals to 1, it means no oversamling (should be >= 1).
@@ -1902,8 +2112,11 @@ def get_wwz_func(nproc, method):
     ----------
 
     nproc : int
+
         the number of processes for multiprocessing
+
     method : string
+
         'Foster' - the original WWZ method;
         'Kirchner' - the method Kirchner adapted from Foster;
         'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1945,26 +2158,43 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
     ----------
 
     ys : array
+
         a time series, NaNs will be deleted automatically
+
     ts : array
+
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+
     freq : array
+
         vector of frequency. If None, will be generated according to freq_method.
         may be set.
+
     freq_method : str
+
         when freq=None, freq will be ganerated according to freq_method
+
     freq_kwargs : str
+
         used when freq=None for certain methods
+
     tau : array
+
         The evenly-spaced time points, namely the time shift for wavelet analysis.
         If the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so.
         If None, at most 50 tau points will be generated from the input time span.
+
     len_bd : int
+
         the number of the ghost grid points desired on each boundary
+
     bc_mode : string
+
         {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
         For more details, see np.lib.pad()
+
     reflect_type : string
+
          {‘even’, ‘odd’}, optional
          Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
          For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
@@ -2264,34 +2494,60 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
 
     Parameters
     ----------
+
     ys : numpy.array
+
         the time series.
+
     ts : numpy.array
+
         the time axis.
+
     freq : numpy.array, optional
+
         The frequency vector. The default is None, which will prompt the use of one the underlying functions
+
     freq_method : string, optional
+
         The method by which to obtain the frequency vector. The default is 'log'.
         Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
+
     freq_kwargs : dict, optional
+
         Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
+
     scale : numpy.array
+
         Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored. 
+
     detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
+
         Whether to detrend and with which option. The default is False.
+
     sg_kwargs : dict, optional
+
         Additional parameters for the savitzy-golay method. The default is {}.
+
     gaussianize : bool, optional
+
         Whether to gaussianize. The default is False.
+
     standardize : bool, optional
+
         Whether to standardize. The default is True.
+
     pad : bool, optional
+
         Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
         This will not eliminate all edge effects. The default is False.
+
     mother : string, optional
+
         the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
+
     param : flaot, optional
+
         the mother wavelet parameter. The default is None since it varies for each mother
             - For 'MORLET' this is k0 (wavenumber), default is 6.
             - For 'PAUL' this is m (order), default is 4.
@@ -2400,47 +2656,82 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
     ----------
 
     ys1 : array
+
         first of two time series
+
     ys2 : array
+
         second of the two time series
+
     ts1 : array
+
         time axis of first time series
+
     ts2 : array
+
         time axis of the second time series (should be = ts1)
+
     tau : array
+
         evenly-spaced time points at which to evaluate coherence 
         Defaults to None, which uses ts1
+
     freq : array
+
         vector of frequency
+
     freq_method : string, optional
+
         The method by which to obtain the frequency vector. The default is 'log'.
         Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
+
     freq_kwargs : dict, optional
+
         Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
+
     scale : numpy.array
+
         Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored. 
+
     detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
+
         Whether to detrend and with which option. The default is False.
+
     sg_kwargs : dict, optional
+
         Additional parameters for the savitzy-golay method. The default is {}.
+
     gaussianize : bool, optional
+
         Whether to gaussianize. The default is False.
+
     standardize : bool, optional
+
         Whether to standardize. The default is True.
+
     pad : bool, optional
+
         Whether or not to pad the timeseries with zeroes to increase N to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT used to do the wavelet transform.
         This will not eliminate all edge effects. The default is False.
+
     mother : string, optional
+
         the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
-    param : flaot, optional
+
+    param : float, optional
+
         the mother wavelet parameter. The default is None since it varies for each mother
             - For 'MORLET' this is k0 (wavenumber), default is 6.
             - For 'PAUL' this is m (order), default is 4.
             - For 'DOG' this is m (m-th derivative), default is 2.
+
     smooth_factor : float
+
         smoothing factor for the WTC (default: 0.25)
+        
     Neff_threshold : int
+
         threshold for the effective number of points (3 by default, see make_coi())
 
     Returns
@@ -2535,18 +2826,27 @@ def tc_wavelet(Y, dt, scale, mother, param, pad=False):
     Parameters
     ----------
     Y : numpy.array
+
         the time series of length N.
+
     dt : float
+
         the sampling time
     
     mother : string, optional
+
         the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
+
     param : flaot, optional
+
         the mother wavelet parameter. The default is None since it varies for each mother
+
             - For 'MORLET' this is k0 (wavenumber), default is 6.
             - For 'PAUL' this is m (order), default is 4.
             - For 'DOG' this is m (m-th derivative), default is 2.
+
     pad : {True,False}, optional
+
         Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
         This will not eliminate all edge effects. The default is False.
@@ -2701,31 +3001,51 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
 
     Parameters
     ----------
+
     ys : numpy.array
+
         Values for the timeseries
+
     ts : numpy.array
+
         time vector.
+
     scale : numpy.array
+
         vector of scale
+
     mother : str
+
         Type of mother wavelet
+
     param : int
+
         mother wavelet parameter
+
     sigtest : {'chi-square','time-average','scale-average'}, optional
+
         Type of significance test to perform . The default is 'chi-square'.
+
         - chi-square: a regular chi-square test Eq(18) from Torrence and Compo
         - time-average: DOF should be set to NA, the number of local wavelet spectra that were averaged together.
              For the Global Wavelet Spectrum, this would be NA=N, where N is the number of points in your time series. Eq23 in Torrence and Compo
         -scale-average: In this case, DOF should be set to a two-element vector [S1,S2], which gives the scale range that was averaged together.
              e.g. if one scale-averaged scales between 2 and 8, then DOF=[2,8].
+
     qs : list, optional
+
         Significance level. The default is [0.95].
+
     dof : None, optional
+
         Degrees of freedon for signif test. The default is None, which will automatically assign:
+
             - chi-square: DOF = 2 (or 1 for MOTHER='DOG')
             - time-average: DOF = NA, the number of times averaged together.
             -scale-average: DOF = [S1,S2], the range of scales averaged.
+
     gws : np.array, optional
+    
         Global wavelet spectrum. a vector of the same length as scale. If input then this is used as the theoretical background spectrum, rather than white or red noise. The default is None.
 
     Returns
