@@ -152,7 +152,6 @@ class Coherence:
             x-axis limits. The default is None.
             
         in_scale : bool, optional
-        
             
             Plots scales instead of frequencies The default is True.
         

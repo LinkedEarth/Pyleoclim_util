@@ -107,7 +107,7 @@ class SsaRes:
 
         ax : matplotlib.axis, optional
             the axis object from matplotlib
-            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+            See `matplotlib.axes <https://matplotlib.org/api/axes_api.html>`_. for details.
 
         xlim : list, optional
             x-axis limits. The default is None.
