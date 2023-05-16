@@ -18,11 +18,11 @@ import pandas as pd
 import os
 
 from numpy.testing import assert_array_equal, assert_allclose
-from pandas.testing import assert_frame_equal
+#from pandas.testing import assert_frame_equal
 
 import pytest
-from urllib.request import urlopen
-import json
+#from urllib.request import urlopen
+#import json
 
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
