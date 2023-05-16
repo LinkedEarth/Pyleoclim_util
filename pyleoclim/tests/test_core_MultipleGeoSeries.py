@@ -6,7 +6,7 @@ Created on Thu May 11 09:47:08 2023
 @author: julieneg
 """
 import pyleoclim as pyleo
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 import requests
 import pytest
 
