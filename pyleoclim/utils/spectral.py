@@ -68,11 +68,17 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+
     window : string or tuple
+
         Desired window to use. Possible values:
+
             - boxcar
             - triang
             - blackman
@@ -93,39 +99,63 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
             - chebwin (needs attenuation)
             - exponential (needs decay scale)
             - tukey (needs taper fraction)
+
         If the window requires no parameters, then window can be a string.
         If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
         If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.
-      nperseg : int
-          Length of each segment. If none, nperseg=len(ys)/2. Default to None This will give three segments with 50% overlap
-      noverlap : int
-          Number of points to overlap. If None, noverlap=nperseg//2. Defaults to None, represents 50% overlap
-      nfft: int
-          Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg
-      return_onesided : bool
-          If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Defaults to True, but for complex data, a two-sided spectrum is always returned.
-      detrend : str
-          If None, no detrending is applied. Available detrending methods:
-              - None - no detrending will be applied (default);
-              - linear - a linear least-squares fit to `ys` is subtracted;
-              - constant - the mean of `ys` is subtracted
-              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-              - emd - Empirical mode decomposition
-      sg_kwargs : dict
-          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
-      gaussianize : bool
-          If True, gaussianizes the timeseries
-      standardize : bool
-          If True, standardizes the timeseries
-      scaling : {"density,"spectrum}
-          Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
-      average : {'mean','median'}
-          Method to use when combining periodograms. Defaults to ‘mean’.
+
+    nperseg : int
+
+        Length of each segment. If none, nperseg=len(ys)/2. Default to None This will give three segments with 50% overlap
+
+    noverlap : int
+
+        Number of points to overlap. If None, noverlap=nperseg//2. Defaults to None, represents 50% overlap
+
+    nfft: int
+
+        Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg
+
+    return_onesided : bool
+
+        If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Defaults to True, but for complex data, a two-sided spectrum is always returned.
+
+    detrend : str
+
+        If None, no detrending is applied. Available detrending methods:
+
+            - None - no detrending will be applied (default);
+            - linear - a linear least-squares fit to `ys` is subtracted;
+            - constant - the mean of `ys` is subtracted
+            - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+            - emd - Empirical mode decomposition
+
+    sg_kwargs : dict
+
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+
+    gaussianize : bool
+
+        If True, gaussianizes the timeseries
+
+    standardize : bool
+
+        If True, standardizes the timeseries
+
+    scaling : {"density,"spectrum}
+
+        Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
+
+    average : {'mean','median'}
+
+        Method to use when combining periodograms. Defaults to ‘mean’.
 
     Returns
     -------
     res_dict : dict
+
         the result dictionary, including
+        
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
 
@@ -139,7 +169,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
     pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     References
@@ -262,7 +292,7 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
     pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     '''
@@ -325,27 +355,43 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+
     freq : str or array
+
         vector of frequency.
         If string, uses the following method:
+
     freq_method : str
+
         Method to generate the frequency vector if not set directly. The following options are avialable:
+
             - log
             - lomb_scargle (default)
             - welch
             - scale
             - nfft
+
         See utils.wavelet.make_freq_vector for details
+
     freq_kwargs : dict
+
         Arguments for the method chosen in freq_method. See specific functions in utils.wavelet for details
         By default, uses dt=median(ts), ofac=4 and hifac=1 for Lomb-Scargle
+
     n50: int
+
         The number of 50% overlapping segment to apply
+
     window : str or tuple
+
         Desired window to use. Possible values:
+
             - boxcar
             - triang
             - blackman
@@ -366,30 +412,44 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
             - chebwin (needs attenuation)
             - exponential (needs decay scale)
             - tukey (needs taper fraction)
+
         If the window requires no parameters, then window can be a string.
         If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
         If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.
+
      detrend : str
-          If None, no detrending is applied. Available detrending methods:
-              - None - no detrending will be applied (default);
-              - linear - a linear least-squares fit to `ys` is subtracted;
-              - constant - the mean of `ys` is subtracted
-              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-              - emd - Empirical mode decomposition
+
+        If None, no detrending is applied. Available detrending methods:
+
+            - None - no detrending will be applied (default);
+            - linear - a linear least-squares fit to `ys` is subtracted;
+            - constant - the mean of `ys` is subtracted
+            - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+            - emd - Empirical mode decomposition
+
       sg_kwargs : dict
+
           The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+
       gaussianize : bool
+
           If True, gaussianizes the timeseries
+
       standardize : bool
+
           If True, standardizes the timeseriesprep_args : dict
+
       average : {'mean','median'}
+
           Method to use when averaging periodograms. Defaults to ‘mean’.
 
     Returns
     -------
 
     res_dict : dict
+
         the result dictionary, including
+
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
 
@@ -403,7 +463,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     References
@@ -532,17 +592,23 @@ def periodogram(ys, ts, window='hann', nfft=None,
            scaling='density'):
     ''' Spectral density estimation using a Blackman-Tukey periodogram
 
-    Based on the function from scipy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.periodogram.html
+    Based on the `function from scipy <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.periodogram.html>`_.
 
     Parameters
     ----------
 
     ys : array
+
         a time series
+
     ts : array
+
         time axis of the time series
+
     window : string or tuple
+
         Desired window to use. Possible values:
+
             - boxcar (default)
             - triang
             - blackman
@@ -563,34 +629,52 @@ def periodogram(ys, ts, window='hann', nfft=None,
             - chebwin (needs attenuation)
             - exponential (needs decay scale)
             - tukey (needs taper fraction)
+
         If the window requires no parameters, then window can be a string.
         If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
         If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.
-      nfft: int
-          Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg
-      return_onesided : bool
-          If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Defaults to True, but for complex data, a two-sided spectrum is always returned.
-      detrend : str
-          If None, no detrending is applied. Available detrending methods:
-              - None - no detrending will be applied (default);
-              - linear - a linear least-squares fit to `ys` is subtracted;
-              - constant - the mean of `ys` is subtracted
-              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-              - emd - Empirical mode decomposition
-      sg_kwargs : dict
-          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
-      gaussianize : bool
-          If True, gaussianizes the timeseries
-      standardize : bool
-          If True, standardizes the timeseries
-      scaling : {"density,"spectrum}
-          Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
+
+    nfft: int
+
+        Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg
+
+    return_onesided : bool
+
+        If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Defaults to True, but for complex data, a two-sided spectrum is always returned.
+
+    detrend : str
+
+        If None, no detrending is applied. Available detrending methods:
+
+            - None - no detrending will be applied (default);
+            - linear - a linear least-squares fit to `ys` is subtracted;
+            - constant - the mean of `ys` is subtracted
+            - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+            - emd - Empirical mode decomposition
+
+    sg_kwargs : dict
+
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+
+    gaussianize : bool
+
+        If True, gaussianizes the timeseries
+
+    standardize : bool
+
+        If True, standardizes the timeseries
+
+    scaling : {"density,"spectrum}
+
+        Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
 
     Returns
     -------
 
     res_dict : dict
+
         the result dictionary, including
+
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
 
@@ -603,7 +687,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
     pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     '''
@@ -672,12 +756,19 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     ----------
 
     ys : array
+
         a time series, NaNs will be deleted automatically
+
     ts : array
+
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+
     freq : array
+
         vector of frequency
+
     freq_method : str, {'log', 'lomb_scargle', 'welch', 'scale', 'nfft'}
+
         Method to generate the frequency vector if not set directly. The following options are avialable:
 
         - 'log' (default)
@@ -685,20 +776,29 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         - 'welch'
         - 'scale'
         - 'nfft'
+
         See :func:`pyleoclim.utils.wavelet.make_freq_vector` for details
 
     freq_kwargs : dict
+
         Arguments for the method chosen in freq_method. See specific functions in pyleoclim.utils.wavelet for details
+
     tau : array
+
         the evenly-spaced time vector for the analysis, namely the time shift for wavelet analysis
+
     c : float
+
         the decay constant that will determine the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1e-3 is good for most of the spectral analysis cases
+
     nproc : int
+
         the number of processes for multiprocessing
 
     detrend : str, {None, 'linear', 'constant', 'savitzy-golay'}
-        available methods for detrending, including
+
+        Methods for detrending include:
 
         - None: the original time series is assumed to have no trend;
         - 'linear': a linear least-squares fit to `ys` is subtracted;
@@ -706,14 +806,20 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         - 'savitzy-golay': ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
 
     sg_kwargs : dict
+
         The parameters for the Savitzky-Golay filters. See :func:`pyleoclim.utils.filter.savitzky_golay()` for details.
+
     gaussianize : bool
+
         If True, gaussianizes the timeseries
+
     standardize : bool
+
         If True, standardizes the timeseries
 
     method : string, {'Foster', 'Kirchner', 'Kirchner_f2py', 'Kirchner_numba'}
-        available specific implementation of WWZ, including
+
+        Available specific implementation of WWZ include:
 
         - 'Foster': the original WWZ method;
         - 'Kirchner': the method Kirchner adapted from Foster;
@@ -721,33 +827,45 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         - 'Kirchner_numba':  the method Kirchner adapted from Foster, implemented with Numba for acceleration (default);
 
     Neff_threshold : int
+
         threshold for the effective number of points
+
     anti_alias : bool
+
         If True, uses anti-aliasing
+
     avgs : int
+
         flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
         OR from measurements averaged over each sampling interval (avgs==1)
 
     wwa : array
+
         the weighted wavelet amplitude, returned from pyleoclim.utils.wavelet.wwz
 
     wwz_Neffs : array
+
         the matrix of effective number of points in the time-scale coordinates,
         returned from pyleoclim.utils.wavelet.wwz
 
     wwz_freq : array
+
         the returned frequency vector from pyleoclim.utils.wavelet.wwz
 
     Returns
     -------
 
     res : namedtuple
+
         a namedtuple that includes below items
 
-        psd : array
-            power spectral density
-        freq : array
-            vector of frequency
+    psd : array
+
+        power spectral density
+
+    freq : array
+
+        vector of frequency
 
     See Also
     --------
@@ -758,7 +876,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     References
@@ -799,39 +917,68 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
 
     Parameters
     ----------
+
     ys : numpy.array
+
         the time series.
+
     ts : numpy.array
+
         the time axis.
+
     freq : numpy.array, optional
+
         The frequency vector. The default is None, which will prompt the use of one the underlying functions
+
     freq_method : string, optional
+
         The method by which to obtain the frequency vector. The default is 'log'.
         Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
+
     freq_kwargs : dict, optional
+
         Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
+
     scale : numpy.array
+
         Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored. 
+
     detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
+
         Whether to detrend and with which option. The default is False.
+
     sg_kwargs : dict, optional
+
         Additional parameters for the savitzy-golay method. The default is {}.
+
     gaussianize : bool, optional
+
         Whether to gaussianize. The default is False.
+
     standardize : bool, optional
-        Whether to standardize. The default is True.     
+
+        Whether to standardize. The default is True.
+
     pad : bool, optional
+
         Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
         This will not eliminate all edge effects. The default is False.
+
     mother : string, optional
+
         the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
-    param : flaot, optional
+        
+    param : flaot, option
+
         the mother wavelet parameter. The default is None since it varies for each mother
+
             - For 'MORLET' this is k0 (wavenumber), default is 6.
             - For 'PAUL' this is m (order), default is 4.
             - For 'DOG' this is m (m-th derivative), default is 2.
+
     cwt_res : dict
+
         Results from pyleoclim.utils.wavelet.cwt
 
     Returns
@@ -855,7 +1002,7 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
     pyleoclim.utils.spectral.welch : Spectral estimation using Welch's periodogram
     pyleoclim.utils.spectral.wwz_psd : Spectral estimation using the Weighted Wavelet Z-transform
     pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
-    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.gaussianize: Quantile maps a 1D array to a Gaussian distribution 
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
     
     References
@@ -899,26 +1046,42 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', ve
     ----------
 
     psd : array
+
         the power spectral density
+
     freq : array
+
         the frequency vector
+
     fmin : float
+
         the min of frequency range for beta estimation
+
     fmax : float
+
         the max of frequency range for beta estimation
+
     verbose : bool
+
          if True, will print out debug information
 
     Returns
     -------
 
     beta : float
+
         the estimated slope
+
     f_binned : array
+
         binned frequency vector
+
     psd_binned : array
+
         binned power spectral density
+
     Y_reg : array
+
         prediction based on linear regression
 
     '''
@@ -1028,11 +1191,6 @@ def beta2Hurst(beta):
 
     H : float
         Hurst index, should be in (0, 1)
-
-    References
-    ----------
-
-    Equation 2 in http://www.bearcave.com/misl/misl_tech/wavelets/hurst/
     
     See also
     --------
@@ -1050,12 +1208,19 @@ def psd_ar(var_noise, freq, ar_params, f_sampling):
     ----------
 
     var_noise : float
+
         the variance of the noise of the AR process
+
     freq : array
+
         vector of frequency
+
     ar_params : array
+
         autoregressive coefficients, not including zero-lag
+
     f_sampling : float
+
         sampling frequency
 
     Returns
@@ -1084,10 +1249,15 @@ def psd_fBM(freq, ts, H):
     ----------
 
     freq : array
+
         vector of frequency
+
     ts : array
+
         the time axis of the time series
+
     H : float
+    
         Hurst exponent, should be in (0, 1)
 
     Returns

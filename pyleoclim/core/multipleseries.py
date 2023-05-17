@@ -52,9 +52,8 @@ class MultipleSeries:
 
     Examples
     --------
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+
+    .. jupyter-execute::
 
         import pyleoclim as pyleo        
         soi = pyleo.utils.load_dataset('SOI')
@@ -100,16 +99,17 @@ class MultipleSeries:
         
         Examples
         --------
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
 
-            import pyleoclim as pyleo        
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
             ms.name = 'ENSO'
             ms.view()
+
         '''
         return self.to_pandas(paleo_style=True)
     
@@ -137,9 +137,8 @@ class MultipleSeries:
 
         Examples
         --------
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             import numpy as np
@@ -148,6 +147,7 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries([ts1, ts2])
             # Remove pyleo.Series labelled 'bar' from the multiple series:
             ms - 'bar'
+
         """
         self.remove(label)
 
@@ -166,9 +166,8 @@ class MultipleSeries:
 
         Examples
         --------
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             import numpy as np
@@ -182,6 +181,7 @@ class MultipleSeries:
         
             # Combine the Multiple Series ms1 and ms2 by using the addition operator:
             ms = ms1 + ms2
+
         """
         from ..core.series import Series
         if isinstance(other, Series):
@@ -205,9 +205,8 @@ class MultipleSeries:
 
         Examples
         --------
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             import numpy as np
@@ -216,6 +215,7 @@ class MultipleSeries:
             ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3', verbose=False)
             # Combine ts1, ts2, and ts3 into a multiple series:
             ms = ts1 & ts2 & ts3
+
         """
         from ..core.series import Series
         if not isinstance(other, Series):
@@ -241,9 +241,7 @@ class MultipleSeries:
         Examples
         --------
         
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
@@ -255,6 +253,7 @@ class MultipleSeries:
             print()
             print('Converted timeseries:')
             print('time unit:', new_ms.time_unit)
+
         '''
         
         if time_unit is None: # if not provided, find a common time unit
@@ -328,15 +327,14 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
             ms_filter = ms.filter(method='lanczos',cutoff_scale=20)
+
         '''
 
         ms = self.copy()
@@ -375,15 +373,14 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             NINO3 = pyleo.utils.load_dataset('NINO3')
             ms = pyleo.MultipleSeries([soi], label = 'ENSO')
             ms.append(NINO3)
+
         '''
         for series in self.series_list:
             if series.equals(ts) == (True, True):
@@ -410,15 +407,14 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
             ms_copy = ms.copy()
+
         '''
         return deepcopy(self)
     
@@ -431,7 +427,6 @@ class MultipleSeries:
         axis : str, optional
             The axis along which the Series will be flipped. The default is 'value'.
             Other acceptable options are 'time' or 'both'.
-            TODO: enable time flipping after paleopandas is released
             
         Returns
         -------
@@ -441,21 +436,15 @@ class MultipleSeries:
          Examples
          --------
 
-         .. ipython:: python
-             :okwarning:
-             :okexcept:
+        .. jupyter-execute::
 
-             import pyleoclim as pyleo
-             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-             data = pyleo.Lipd(usr_path = url)
-             tslist = data.to_LipdSeriesList()
-             tslist = tslist[2:] # drop the first two series which only concerns age and depth
-             ms = pyleo.MultipleSeries(tslist)
-             
-             @savefig ms_flip.png
-             fig, ax = ms.flip().stackplot()
-             pyleo.closefig(fig) 
-            
+            import pyleoclim as pyleo        
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
+            ms.name = 'ENSO'
+            fig, ax = ms.flip().stackplot()
+        
         
         Note that labels have been updated to reflect the flip
         '''
@@ -480,15 +469,14 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
             ms_std = ms.standardize()
+
         '''
         ms=self.copy()
         for idx,item in enumerate(ms.series_list):
@@ -538,9 +526,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
@@ -635,9 +621,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import numpy as np
             import pyleoclim as pyleo
@@ -660,7 +644,6 @@ class MultipleSeries:
             # create MS object from the list
             ms = pyleo.MultipleSeries(serieslist)
 
-            @savefig ms_common_time.png
             fig, ax = plt.subplots(2,2,sharex=True,sharey=True, figsize=(10,8))
             ax = ax.flatten()
             # apply common_time with default parameters
@@ -680,7 +663,7 @@ class MultipleSeries:
             msc.plot(title=r'Gaussian kernel ($h=.5$)',ax=ax[3],legend=False)
             fig.tight_layout()
             # Optional close fig after plotting
-            pyleo.closefig(fig)
+
         '''
         
         if time_axis is not None:
@@ -818,9 +801,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             from pyleoclim.utils.tsmodel import colored_noise
@@ -843,18 +824,14 @@ class MultipleSeries:
 
         Correlation between the MultipleSeries object and a target Series. We also set an arbitrary random seed to ensure reproducibility:
        
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
            
             corr_res = ms.correlation(ts_target, settings={'nsim': 20}, seed=2333)
             print(corr_res)
         
         Correlation among the series of the MultipleSeries object
         
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             corr_res = ms.correlation(settings={'nsim': 20}, seed=2333)
             print(corr_res)
@@ -913,9 +890,7 @@ class MultipleSeries:
         Examples
         --------    
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
@@ -923,6 +898,7 @@ class MultipleSeries:
             ms = soi & nino
             flag, lengths = ms.equal_lengths()
             print(flag)
+
         '''
 
         lengths = []
@@ -989,9 +965,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -1002,13 +976,9 @@ class MultipleSeries:
 
             res = ms.pca() # carry out PCA
 
-            @savefig ms_pca1.png
             fig1, ax1 = res.screeplot() # plot the eigenvalue spectrum
-            pyleo.closefig(fig1)    # Optional close fig after plotting
-
-            @savefig ms_pca2.png
             fig2, ax2 = res.modeplot() # plot the first mode
-            pyleo.closefig(fig2)    # Optional close fig after plotting
+
         '''
         flag, lengths = self.equal_lengths()
 
@@ -1147,9 +1117,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -1158,6 +1126,7 @@ class MultipleSeries:
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist)
             msbin = ms.bin()
+
         '''
 
         ms = self.copy()
@@ -1205,9 +1174,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -1266,9 +1233,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -1395,9 +1360,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -1406,6 +1369,7 @@ class MultipleSeries:
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist)
             ms_psd = ms.spectral()
+
         '''
         settings = {} if settings is None else settings.copy()
 
@@ -1507,9 +1471,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -1651,9 +1613,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -1662,9 +1622,7 @@ class MultipleSeries:
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist)
 
-            @savefig ms_basic_plot.png
             fig, ax = ms.plot()
-            pyleo.closefig(fig) #Optional close fig after plotting
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -1840,9 +1798,7 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -1850,53 +1806,35 @@ class MultipleSeries:
             tslist = d.to_LipdSeriesList()
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist)
-            @savefig mts_stackplot.png
             fig, ax = ms.stackplot()
-            pyleo.closefig(fig)
 
         Let's change the labels on the left
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             sst = d.to_LipdSeries(number=5)
             d18Osw = d.to_LipdSeries(number=3)
             ms = pyleo.MultipleSeries([sst,d18Osw])
 
-            @savefig mts_stackplot_customlabels.png
             fig, ax = ms.stackplot(labels=['sst','d18Osw'])
-            pyleo.closefig(fig) 
 
         And let's remove them completely
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig mts_stackplot_nolabels.png
             fig, ax = ms.stackplot(labels=None)
-            pyleo.closefig(fig) #Optional figure close after plotting
 
         Now, let's add markers to the timeseries.
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig mts_stackplot_samemarkers.png
             fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
-            pyleo.closefig(fig) #Optional figure close after plotting
 
         Using different marker types on each series:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig mts_stackplot_differentmarkers.png
             fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
-            pyleo.closefig(fig) #Optional figure close after plotting
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -2135,37 +2073,29 @@ class MultipleSeries:
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             co2ts = pyleo.utils.load_dataset('AACO2')
             lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
             ms = lr04.flip() & edc & co2ts # create MS object
-            @savefig ms_stripes.png
             fig, ax = ms.stripes()
-            pyleo.closefig(fig)
              
         The default style has rather thick bands, intense colors, and too many stripes.
         The first issue can be solved by passing a figsize tuple; the second by increasing the LIM parameter; 
         the third by passing a step of 0.5 (500y) to common_time(). Finally, the 
         labels are too close to the edge of the plot, which can be adjusted with x_offset, like so:  
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
              import pyleoclim as pyleo
              co2ts = pyleo.utils.load_dataset('AACO2')
              lr04 = pyleo.utils.load_dataset('LR04')
              edc = pyleo.utils.load_dataset('EDC-dD')
              ms = lr04.flip() & edc & co2ts # create MS object
-             @savefig ms_stripes2.png
              fig, ax = ms.stripes(figsize=(8,2.5),show_xaxis=True, sat = 0.8)
-             pyleo.closefig(fig)
-            
+
         '''
         current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
@@ -2286,16 +2216,16 @@ class MultipleSeries:
         Examples
         --------
         This will place the NINO3 and SOI datasets into a MultipleSeries object and export it to enso.csv.
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
             ms.label = 'enso'
-            ms.to_csv()      
+            ms.to_csv()
+
         '''
         if path is None:  
             path = self.label.split('.')[0].replace(" ", "_") + '.csv' if self.label is not None else 'MultipleSeries.csv' 

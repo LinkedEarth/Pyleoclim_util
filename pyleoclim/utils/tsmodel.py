@@ -161,7 +161,7 @@ def ar1_sim(y, p, t=None):
 def gen_ar1_evenly(t, g, scale=1, burnin=50):
     ''' Generate AR(1) series samples
 
-    Wrapper for the function [statsmodels.tsa.arima_process.arma_generate_sample](https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_process.arma_generate_sample.html)
+    Wrapper for the function `statsmodels.tsa.arima_process.arma_generate_sample <https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_process.arma_generate_sample.html>`_.
     used to generate an ARMA
 
     Parameters
@@ -199,7 +199,7 @@ def gen_ar1_evenly(t, g, scale=1, burnin=50):
 def ar1_fit_evenly(y):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
-    Uses [statsmodels.tsa.arima.model.ARIMA](https://www.statsmodels.org/devel/generated/statsmodels.tsa.arima.model.ARIMA.html) to
+    Uses `statsmodels.tsa.arima.model.ARIMA <https://www.statsmodels.org/devel/generated/statsmodels.tsa.arima.model.ARIMA.html>`_. to
     calculate lag-1 autocorrelation
 
     Parameters
@@ -231,7 +231,7 @@ def tau_estimation(y, t):
     ''' Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     Esimtates the temporal decay scale of an (un)evenly spaced time series. 
-    Uses [scipy.optimize.minimize_scalar](https://docs.scipy.org/doc/scipy/reference/optimize.minimize_scalar-bounded.html)
+    Uses `scipy.optimize.minimize_scalar <https://docs.scipy.org/doc/scipy/reference/optimize.minimize_scalar-bounded.html>`_.
 
     Parameters
     ----------
@@ -301,8 +301,7 @@ def colored_noise(alpha, t, f0=None, m=None, seed=None):
     References
     ----------
 
-    Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
-        Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+    Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
 
     '''
     n = np.size(t)  # number of time points
@@ -359,8 +358,7 @@ def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=Non
     References
     ----------
 
-     Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
-         Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+     Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
     '''
     n = np.size(t)  # number of time points
     y = np.zeros(n)
@@ -400,7 +398,9 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
     ----------
 
     model : str, {'colored_noise', 'colored_noise_2regimes', 'ar1'}
+
         the timeseries model to use
+        
         - colored_noise : colored noise with one scaling slope
         - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
         - ar1 : AR(1) series

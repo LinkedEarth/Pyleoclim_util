@@ -204,7 +204,7 @@ def json_to_PyleoObj(filename,objname):
     --------
     pyleoclim.utils.jsonutils.open_json : open a json file from a local source or URL
     
-    pyleoclim.utils.jsonutils.objename_to_obj : create a valid Pyleoclim object from a string   
+    pyleoclim.utils.jsonutils.objname_to_obj : create a valid Pyleoclim object from a string   
 
     '''
     

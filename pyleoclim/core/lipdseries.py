@@ -48,9 +48,7 @@ class LipdSeries(Series):
 
     First, let's look at the Lipd.to_tso option. This method is attractive because the object is a list of dictionaries that are easily explored in Python.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         import pyleoclim as pyleo
         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -65,9 +63,7 @@ class LipdSeries(Series):
     If you attempt to pass the full list of series, Pyleoclim will prompt you to choose a series by printing out something similar as above.
     If you already now the number of the timeseries object you're interested in, then you should use the following:
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         ts1 = data.to_LipdSeries(number=5)
 
@@ -75,9 +71,7 @@ class LipdSeries(Series):
 
     Sometimes, one may want to create a MultipleSeries object from a collection of LiPD files. In this case, we recommend using the following:
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+    .. jupyter-execute::
 
         ts_list = data.to_LipdSeriesList()
         # only keep the Mg/Ca and SST
@@ -375,17 +369,13 @@ class LipdSeries(Series):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
             ts = data.to_LipdSeries(number=5)
-            @savefig mapone.png
             fig, ax = ts.map()
-            pyleo.closefig(fig)
 
         '''
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
@@ -721,17 +711,13 @@ class LipdSeries(Series):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
             ts = data.to_LipdSeries(number=5)
-            @savefig ts_dashboard.png
             fig, ax = ts.dashboard()
-            pyleo.closefig(fig)
 
         '''
         if ensemble == True and D is None:
@@ -1345,15 +1331,11 @@ class LipdSeries(Series):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             D = pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=Crystal.McCabe-Glynn.2013')
             ts=D.to_LipdSeries(number=2)
-            @savefig lipdseries_age_depth.png
             fig, ax = ts.plot_age_depth()
-            pyleo.closefig(fig)
 
         '''
         if ensemble == True and D is None:

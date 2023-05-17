@@ -107,7 +107,7 @@ class SsaRes:
 
         ax : matplotlib.axis, optional
             the axis object from matplotlib
-            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+            See `matplotlib.axes <https://matplotlib.org/api/axes_api.html>`_. for details.
 
         xlim : list, optional
             x-axis limits. The default is None.
@@ -137,16 +137,14 @@ class SsaRes:
 
         Plot the SSA eigenvalue spectrum of the Southern Oscillation Index:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
 
             ts = pyleo.utils.load_dataset('SOI')
             ssa = ts.ssa()
             
-            @savefig ssa_screeplot.png
             fig, ax = ssa.screeplot()
-            pyleo.closefig(fig)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -228,26 +226,19 @@ class SsaRes:
 
         Plot the first SSA mode of the Southern Oscillation Index:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
+            import pyleoclim as pyleo
             ts  = pyleo.utils.load_dataset('SOI')
             ssa = ts.ssa()
             
-            @savefig ssa_modeplot1.png
             fig, ax = ssa.modeplot()
-            pyleo.closefig(fig)
-            
+
         Plot the second mode (note 0-based indexing):
             
-         .. ipython:: python
-             :okwarning:
-             :okexcept:
+        .. jupyter-execute::
 
-             @savefig ssa_modeplot2.png
              fig, ax = ssa.modeplot(index=1)
-             pyleo.closefig(fig)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

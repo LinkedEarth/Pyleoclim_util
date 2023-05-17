@@ -152,7 +152,6 @@ class Coherence:
             x-axis limits. The default is None.
             
         in_scale : bool, optional
-        
             
             Plots scales instead of frequencies The default is True.
         
@@ -238,55 +237,39 @@ class Coherence:
         --------
 
         Calculate the wavelet coherence of NINO3 and All India Rainfall and plot it:
+        .. jupyter-execute::
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
 
             import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
             coh = ts_air.wavelet_coherence(ts_nino)
-            @savefig coh_plot.png
             coh.plot()
-            pyleo.closefig(fig)
 
         Establish significance against an AR(1) benchmark:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             coh_sig = coh.signif_test(number=20, qs=[.9,.95,.99])
-            @savefig coh_sig_plot.png
             coh_sig.plot()
-            pyleo.closefig(fig)
 
         Note that specifiying 3 significance thresholds does not take any more time as the quantiles are
         simply estimated from the same ensemble. By default, the plot function looks
         for the closest quantile to 0.95, but this is easy to adjust, e.g. for the 99th percentile:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig coh_sig_plot99.png
             coh_sig.plot(signif_thresh = 0.99)
-            pyleo.closefig(fig)
 
         By default, the function plots the wavelet transform coherency (WTC), which quantifies where
         two timeseries exhibit similar behavior in time-frequency space, regardless of whether this
         corresponds to regions of high common power. To visualize the latter, you want to plot the
         cross-wavelet transform (XWT) instead, like so:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig xwt_plot.png
             coh_sig.plot(var='xwt')
-            pyleo.closefig(fig)
 
         '''
         if ax is None:
@@ -529,9 +512,7 @@ class Coherence:
 
          Calculate the coherence of NINO3 and All India Rainfall and plot it as a dashboard:
 
-         .. ipython:: python
-             :okwarning:
-             :okexcept:
+         .. jupyter-execute::
 
              import pyleoclim as pyleo
              ts_air = pyleo.utils.load_dataset('AIR')
@@ -540,28 +521,19 @@ class Coherence:
              coh = ts_air.wavelet_coherence(ts_nino)
              coh_sig = coh.signif_test(number=10)
 
-             @savefig coh_dash.png
              coh_sig.dashboard()
-             pyleo.closefig(fig)
-             
+
          You may customize colors like so:
              
-         .. ipython:: python
-             :okwarning:
-             :okexcept:
+         .. jupyter-execute::
              
-             @savefig coh_dash1.png
              coh_sig.dashboard(line_colors=['teal','gold'])
-             pyleo.closefig(fig)
+
+         To export the figure, use `savefig_settings`:
              
-         To export the figure, use `savefig_settings`: 
-             
-         .. ipython:: python
-             :okwarning:
-             :okexcept:
+         .. jupyter-execute::
              
              coh_sig.dashboard(savefig_settings={'path':'./coh_dash.png','dpi':300})
-             pyleo.closefig(fig)
 
          '''
          # prepare options dictionaries
@@ -687,9 +659,7 @@ class Coherence:
 
         Calculate the coherence of NINO3 and All India Rainfall and assess significance:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
@@ -697,43 +667,31 @@ class Coherence:
 
             coh = ts_air.wavelet_coherence(ts_nino)
             coh_sig = coh.signif_test(number=20)
-            @savefig coh_sig_plot.png
             coh_sig.plot()
-            pyleo.closefig(fig)
 
         By default, significance is assessed against a 95% benchmark derived from
         an AR(1) process fit to the data, using 200 Monte Carlo simulations.
         To customize, one can increase the number of simulations
         (more reliable, but slower), and the quantile levels.
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             coh_sig2 = coh.signif_test(number=100, qs=[.9,.95,.99])
-            @savefig coh_sig2_plot.png
             coh_sig2.plot()
-            pyleo.closefig(fig)
 
         The plot() function will represent the 95% level as contours by default.
         If you need to show 99%, say, use the `signif_thresh` argument:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig coh_sig3_plot.png
             coh_sig2.plot(signif_thresh=0.99)
-            pyleo.closefig(fig)
 
         Note that if the 99% quantile is not present, the plot method will look
         for the closest match, but lines are always labeled appropriately.
         For reproducibility purposes, it may be good to specify the (pseudo)random number
         generator's seed, like so:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             coh_sig27 = coh.signif_test(number=20, seed=27)
 
@@ -899,9 +857,7 @@ class Coherence:
 
         Calculate the phase angle between NINO3 and All India Rainfall at 5y scales:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
@@ -911,9 +867,7 @@ class Coherence:
         
         One may also obtain phase angle statistics over an interval, like the 2-8y ENSO band: 
             
-         .. ipython:: python
-             :okwarning:
-             :okexcept:
+        .. jupyter-execute::
              
              phase = coh.phase_stats(scales=[2,8])
              print("The mean angle is {:4.2f}°".format(phase.mean_angle/np.pi*180))
@@ -922,7 +876,8 @@ class Coherence:
         From this example, one diagnoses a strong anti-phased relationship in the ENSO band,
         with high von Mises concentration (kappa ~ 3.35 >> kappa_hi) and low circular
         dispersion (sigma ~ 0.6 << sigma_lo). This would be strong evidence of a consistent
-        anti-phasing between NINO3 and AIR at those scales.       
+        anti-phasing between NINO3 and AIR at those scales.
+
         '''
         scales = np.array(scales)
         

@@ -51,13 +51,12 @@ class Lipd:
     Examples
     --------
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
+        .. jupyter-execute::
 
         import pyleoclim as pyleo
         url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
         d=pyleo.Lipd(usr_path=url)
+
     '''
 
     def __init__(self, usr_path=None, lipd_dict=None, validate=False, remove=False):
@@ -410,29 +409,21 @@ class Lipd:
 
         For speed, we are only using one LiPD file. But these functions can load and map multiple.
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
-            @savefig mapallarchive.png
             fig, ax = data.mapAllArchive()
-            pyleo.closefig(fig)
 
         Change the markersize
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
-            @savefig mapallarchive_marker.png
             fig, ax = data.mapAllArchive(markersize=100)
-            pyleo.closefig(fig)
 
 
         '''

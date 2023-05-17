@@ -22,7 +22,10 @@ import pyleoclim as pyleo
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 # sys.path.insert(0,'/Users/deborahkhider/Documents/Python/Pyleoclim_util/pyleoclim')
+package_path = os.path.abspath('../..')
+os.environ['PYTHONPATH']=':'.join(((package_path), os.environ.get('PYTHONPATH','')))
 sys.path.insert(0,os.path.abspath('../pyleoclim'))
+
 autodoc_mock_imports = ["_tkinter"]
 # -- General configuration ------------------------------------------------
 
@@ -46,7 +49,9 @@ extensions = [
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
-    'sphinx_search.extension'
+    'sphinx_search.extension',
+    'jupyter_sphinx',
+    'sphinx_copybutton'
 ]
 
 mathjax_config = {

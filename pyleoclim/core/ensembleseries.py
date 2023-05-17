@@ -98,11 +98,9 @@ class EnsembleSeries(MultipleSeries):
         Examples
         --------
 
-        slice the SOI from 1972 to 1998
+        Select part of an object
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             nn = 20 # number of noise realizations
             nt = 200
@@ -119,12 +117,9 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
             
-            @savefig ts_ens_plot_orig.png
             fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
-            
-            @savefig ts_ens_plot_trunc.png
             fig, ax = ts_ens.slice([100, 199]).plot_envelope(curve_lw=1.5)
-            pyleo.closefig(fig) 
+
         '''
         new = self.copy()
         
@@ -158,9 +153,7 @@ class EnsembleSeries(MultipleSeries):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             nn = 30 # number of noise realizations
             nt = 500
@@ -177,6 +170,7 @@ class EnsembleSeries(MultipleSeries):
             ts_ens = pyleo.EnsembleSeries(series_list)
 
             ens_qs = ts_ens.quantiles()
+
         '''
         time = np.copy(self.series_list[0].time)
         vals = []
@@ -269,9 +263,7 @@ class EnsembleSeries(MultipleSeries):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             nn = 50 # number of noise realizations
             nt = 100
@@ -295,13 +287,9 @@ class EnsembleSeries(MultipleSeries):
         The `print` function tabulates the output, and conveys the p-value according
         to the correlation test applied ("isospec", by default). To plot the result:
         
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
             
-            @savefig ens_corrplot.png
             corr_res.plot()
-            pyleo.closefig(fig) 
 
         '''
         if target is None:
@@ -444,9 +432,7 @@ class EnsembleSeries(MultipleSeries):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             nn = 30 # number of noise realizations
             nt = 500
@@ -462,9 +448,7 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
 
-            @savefig ens_plot_traces.png
             fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8)
-            pyleo.closefig(fig) #Optional close fig after plotting
 
             '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -610,9 +594,8 @@ class EnsembleSeries(MultipleSeries):
 
         Examples
         --------
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+
+        .. jupyter-execute::
 
             nn = 30 # number of noise realizations
             nt = 500
@@ -628,9 +611,8 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
 
-            @savefig ens_plot_envelope.png
             fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
-            pyleo.closefig(fig) #Optional close fig after plotting
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -778,9 +760,7 @@ class EnsembleSeries(MultipleSeries):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             nn = 10 # number of noise realizations
             nt = 200
@@ -796,9 +776,8 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
 
-            @savefig ens_stackplot.png
             fig, ax = ts_ens.stackplot()
-            pyleo.closefig(fig) #Optional close fig after plotting
+
         '''
         current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
@@ -969,9 +948,7 @@ class EnsembleSeries(MultipleSeries):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             nn = 30 # number of noise realizations
             nt = 500
@@ -988,9 +965,7 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
 
-            @savefig ens_histplot.png
             fig, ax = ts_ens.histplot()
-            pyleo.closefig(fig) 
 
         """
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

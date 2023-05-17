@@ -70,9 +70,11 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('EDC-dD')
-        >>> resolution = ts.resolution()
-        >>> resolution.describe()
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD')
+            resolution = ts.resolution()
+            resolution.describe()
         
         '''
         
@@ -183,9 +185,11 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('EDC-dD')
-        >>> resolution = ts.resolution()
-        >>> resolution.plot()
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD')
+            resolution = ts.resolution()
+            resolution.plot()
 
         '''
 
@@ -239,79 +243,87 @@ class Resolution:
     
     def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                     ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
-            ''' Plot the distribution of the resolution values
+        ''' Plot the distribution of the resolution values
 
-            Parameters
-            ----------
+        Parameters
+        ----------
 
-            figsize : list
-                a list of two integers indicating the figure size
+        figsize : list
+            a list of two integers indicating the figure size
 
-            title : str
-                the title for the figure
+        title : str
 
-            savefig_settings : dict
-                the dictionary of arguments for plt.savefig(); some notes below:
-                - "path" must be specified; it can be any existed or non-existed path,
-                    with or without a suffix; if the suffix is not given in "path", it will follow "format"
-                - "format" can be one of {"pdf", "eps", "png", "ps"}
+            the title for the figure
 
-            ax : matplotlib.axis, optional
-                A matplotlib axis
+        savefig_settings : dict
 
-            ylabel : str
-                Label for the count axis
+            the dictionary of arguments for plt.savefig(); some notes below:
 
-            vertical : {True,False}
-                Whether to flip the plot vertically
+            - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
 
-            edgecolor : matplotlib.color
-                The color of the edges of the bar
+        ax : matplotlib.axis, optional
 
-            plot_kwargs : dict
-                Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
+            A matplotlib axis
 
-            See also
-            --------
+        ylabel : str
 
-            pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+            Label for the count axis
 
-            Examples
-            --------
+        vertical : {True,False}
 
-            Distribution of the EDC-dD record
+            Whether to flip the plot vertically
 
-            >>> ts = pyleo.utils.load_dataset('EDC-dD')
-            >>> res = ts.resolution()
-            >>> res.histplot()
+        edgecolor : matplotlib.color
 
-            '''
-            savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-            if ax is None:
-                fig, ax = plt.subplots(figsize=figsize)
+            The color of the edges of the bar
 
-            #make the data into a dataframe so we can flip the figure
-            _,value_label = self.make_labels()
-            
-            if vertical == True:
-                data=pd.DataFrame({'value':self.resolution})
-                ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
-                ax.set_ylabel(value_label)
-                ax.set_xlabel(ylabel)
-            else:
-                ax = sns.histplot(self.resolution, ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
-                ax.set_xlabel(value_label)
-                ax.set_ylabel(ylabel)
+        plot_kwargs : dict
 
-            if title is not None:
-                ax.set_title(title)
+            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
 
-            if 'fig' in locals():
-                if 'path' in savefig_settings:
-                    plotting.savefig(fig, settings=savefig_settings)
-                return fig, ax
-            else:
-                return ax
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD')
+            res = ts.resolution()
+            res.histplot()
+
+        '''
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        #make the data into a dataframe so we can flip the figure
+        _,value_label = self.make_labels()
+        
+        if vertical == True:
+            data=pd.DataFrame({'value':self.resolution})
+            ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+            ax.set_ylabel(value_label)
+            ax.set_xlabel(ylabel)
+        else:
+            ax = sns.histplot(self.resolution, ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+            ax.set_xlabel(value_label)
+            ax.set_ylabel(ylabel)
+
+        if title is not None:
+            ax.set_title(title)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax
             
     def dashboard(self, figsize=[11, 8], title=None, plot_kwargs=None, histplot_kwargs=None, savefig_settings=None):
         '''Resolution plot dashboard
@@ -320,22 +332,29 @@ class Resolution:
         ----------
         
         figsize : list or tuple, optional
+
             Figure size. The default is [11,8].
 
         title : str
+
             Figure title
 
         plot_kwargs : dict
+
             the dictionary of keyword arguments for ax.plot()
 
         histplot_kwargs : dict, optional
+
             The dictionary of keyword arguments for ax.histplot()
 
         savefig_settings : dict, optional
+
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}.
+
             The default is None.
 
         Returns
@@ -356,9 +375,11 @@ class Resolution:
         Examples
         --------
 
-        >>> ts = pyleo.utils.load_dataset('EDC-dD')
-        >>> resolution = ts.resolution()
-        >>> resolution.dashboard()
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD')
+            resolution = ts.resolution()
+            resolution.dashboard()
 
         '''
 

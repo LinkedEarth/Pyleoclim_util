@@ -59,9 +59,14 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
 
     Examples
     --------
-    >>> from pyleoclim.utils.tsbase import time_unit_to_datum_exp_dir
-    >>> (datum, exponent, direction) = time_unit_to_datum_exp_dir(time_unit)
-    (1950, 3, 'retrograde')
+
+    .. jupyter-execute::
+
+        from pyleoclim.utils.tsbase import time_unit_to_datum_exp_dir
+
+        (datum, exponent, direction) = time_unit_to_datum_exp_dir(time_unit)
+        (datum, exponent, direction)
+
     """
 
     tu = time_unit.lower().split()
@@ -141,17 +146,23 @@ def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
 
     Examples
     --------
-    >>> from pyleoclim.utils.tsbase import convert_datetime_index_to_time
-    >>> time_unit = 'ga'
-    >>> time_name = None
-    >>> dti = pd.date_range("2018-01-01", periods=5, freq="Y", unit='s')
-    >>> df = pd.DataFrame(np.array(range(5)), index=dti)
-    >>> time = convert_datetime_index_to_time(
-        df.index, 
-        time_unit, 
-        time_name=time_name,
-        )
-    np.array([-6.89965777e-08, -6.99965777e-08, -7.09993155e-08, -7.19965777e-08, -7.29965777e-08])
+
+    .. jupyter-execute::
+
+        from pyleoclim.utils.tsbase import convert_datetime_index_to_time
+        import pandas as pd
+        import numpy as np
+
+        time_unit = 'ga'
+        time_name = None
+        dti = pd.date_range("2018-01-01", periods=5, freq="Y", unit='s')
+        df = pd.DataFrame(np.array(range(5)), index=dti)
+        time = convert_datetime_index_to_time(
+                    df.index,
+                    time_unit,
+                    time_name=time_name,
+                    )
+        print(np.array(time))
 
     """
     datum, exponent, direction = time_unit_to_datum_exp_dir(time_unit, time_name)

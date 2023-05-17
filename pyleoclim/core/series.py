@@ -125,11 +125,13 @@ class Series:
 
     Examples
     --------
-
     Import the Southern Oscillation Index (SOI) and display a quick synopsis:
 
-    >>> soi = pyleo.utils.load_dataset('SOI')
-    >>> soi.view()
+    .. jupyter-execute::
+
+        import pyleoclim as pyleo
+        soi = pyleo.utils.load_dataset('SOI')
+        soi.view()
           
     '''
 
@@ -253,17 +255,18 @@ class Series:
 
         Examples
         --------
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             import numpy as np
+
             ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
             ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
             ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
             # Combine ts1, ts2, and ts3 into a multiple series:
             ms = ts1 & ts2 & ts3
+
         """
         if not isinstance(other, Series):
             raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
@@ -357,12 +360,15 @@ class Series:
         
         Examples
         --------
-        >>> import pyleoclim as pyleo
-        >>> LR04 = pyleo.utils.load_dataset('LR04')
-        >>> LR04.to_csv()
-        >>> lr04 = pyleo.Series.from_csv('LR04_benthic_stack.csv')
-        >>> LR04.equals(lr04) 
-        
+
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+
+            LR04 = pyleo.utils.load_dataset('LR04')
+            LR04.to_csv()
+            lr04 = pyleo.Series.from_csv('LR04_benthic_stack.csv')
+            LR04.equals(lr04)
 
         '''
         if path is None:
@@ -434,7 +440,7 @@ class Series:
         # export to Series 
         return cls(time=df.iloc[:,0],value=df.iloc[:,1], **metadata)
     
-    def to_json(self, path =None):
+    def to_json(self, path=None):
         """
         Export the pyleoclim.Series object to a json file
 
@@ -450,14 +456,12 @@ class Series:
         Examples
         --------
 
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
                 
             import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')        
             ts.to_json('soi.json')
+
         """
         
         if path is None:        
@@ -522,10 +526,14 @@ class Series:
             
         Examples
         --------
-        >>> import pyleoclim as pyleo
-        >>> soi = pyleo.utils.load_dataset('SOI')
-        >>> NINO3 = pyleo.utils.load_dataset('NINO3')
-        >>> soi.equals(NINO3)
+
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+
+            soi = pyleo.utils.load_dataset('SOI')
+            NINO3 = pyleo.utils.load_dataset('NINO3')
+            soi.equals(NINO3)
                     
         '''
         left = self.to_pandas()
@@ -575,13 +583,13 @@ class Series:
         
         Plot the HadCRUT5 Global Mean Surface Temperature
 
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
+        .. jupyter-execute::
 
-                import pyleoclim as pyleo
-                ts = pyleo.utils.load_dataset('HadCRUT5')
-                ts.view()
+            import pyleoclim as pyleo
+
+            ts = pyleo.utils.load_dataset('HadCRUT5')
+            ts.view()
+
         '''
         return self.to_pandas(paleo_style=True).to_frame()
     
@@ -606,11 +614,11 @@ class Series:
 
         Examples
         --------
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
+
             ts = pyleo.utils.load_dataset('SOI')
             new_ts = ts.convert_time_unit(time_unit='yrs BP')
             print('Original timeseries:')
@@ -620,6 +628,7 @@ class Series:
             print('Converted timeseries:')
             print('time unit:', new_ts.time_unit)
             print('time:', new_ts.time[:10])
+
         '''
 
         new_ts = self.copy()
@@ -714,13 +723,13 @@ class Series:
 
         Compute basic statistics for the SOI series
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
+
             ts = pyleo.utils.load_dataset('SOI') 
             ts.stats()
+
         """
         # TODO: replace with pd.describe()
         mean, median, min_, max_, std, IQR = tsutils.simple_stats(self.value)
@@ -754,17 +763,16 @@ class Series:
         Examples
         --------
 
-         .. ipython:: python
-             :okwarning:
-             :okexcept:
+        .. jupyter-execute::
 
              import pyleoclim as pyleo
+
              ts = pyleo.utils.load_dataset('SOI')
              tsf = ts.flip(keep_log=True)
-             @savefig ts_flipped.png
+
              fig, ax = tsf.plot()
              tsf.log
-             pyleo.closefig(fig)
+
         '''
         if self.log is not None:
             methods = [self.log[idx][idx] for idx in range(len(self.log))]
@@ -891,36 +899,28 @@ class Series:
 
         Plot the SOI record
 
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
+        .. jupyter-execute::
 
-                import pyleoclim as pyleo
-                ts = pyleo.utils.load_dataset('SOI')
-                @savefig ts_plot.png
-                fig, ax = ts.plot()
-                pyleo.closefig(fig)
+            import pyleoclim as pyleo
+
+            ts = pyleo.utils.load_dataset('SOI')
+            fig, ax = ts.plot()
 
         Change the line color
 
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
+        .. jupyter-execute::
 
-                @savefig ts_plot2.png
-                fig, ax = ts.plot(color='r')
-                pyleo.closefig(fig)
+            fig, ax = ts.plot(color='r')
 
         Save the figure. Two options available, only one is needed:
             * Within the plotting command
             * After the figure has been generated
 
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
+        .. jupyter-execute::
 
-                fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'}); pyleo.closefig(fig)
-                pyleo.savefig(fig,path='ts_plot3.png')
+            fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'}); pyleo.closefig(fig)
+            pyleo.savefig(fig,path='ts_plot3.png')
+
         '''
         # generate default axis labels
         time_label, value_label = self.make_labels()
@@ -1049,18 +1049,30 @@ class Series:
         --------
 
         Plot the HadCRUT5 Global Mean Surface Temperature
-        >>> gmst = pyleo.utils.load_dataset('HadCRUT5')
-        >>> fig, ax = gmst.stripes(ref_period=(1971,2000))
+
+        .. jupyter-execute::
+
+            gmst = pyleo.utils.load_dataset('HadCRUT5')
+            fig, ax = gmst.stripes(ref_period=(1971,2000))
         
         For a more pastel tone, dial down saturation:
-        >>>  fig, ax = gmst.stripes(ref_period=(1971,2000), sat = 0.8)
 
-        To change the colormap:    
-        >>> fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='Spectral_r')
-        >>> fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='magma_r')
+        .. jupyter-execute::
+
+            fig, ax = gmst.stripes(ref_period=(1971,2000), sat = 0.8)
+
+        To change the colormap:
+
+        .. jupyter-execute::
+
+            fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='Spectral_r')
+            fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='magma_r')
         
-        To show the time axis: 
-        >>> fig, ax = gmst.stripes(ref_period=(1971,2000), show_xaxis=True)
+        To show the time axis:
+
+        .. jupyter-execute::
+
+            fig, ax = gmst.stripes(ref_period=(1971,2000), show_xaxis=True)
 
         '''
 
@@ -1179,27 +1191,20 @@ class Series:
 
         SSA with SOI
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
+
             ts = pyleo.utils.load_dataset('SOI')
-            @savefig ts_plot4.png
             fig, ax = ts.plot()
-            pyleo.closefig(fig)
+
             nino_ssa = ts.ssa(M=60)
 
         Let us now see how to make use of all these arrays. The first step is to inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig ts_eigen.png
             fig, ax = nino_ssa.screeplot()
-            pyleo.closefig(fig)
-
 
         This highlights a few common phenomena with SSA:
             * the eigenvalues are in descending order
@@ -1209,25 +1214,18 @@ class Series:
 
         So, summing the variance of the first 15 modes, we get:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             print(nino_ssa.pctvar[:14].sum())
 
         That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
-            @savefig ssa_recon.png
             fig, ax = ts.plot(title='SOI')
             ax.plot(nino_ssa.time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
-            pyleo.closefig(fig)
-
 
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 14 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
@@ -1238,33 +1236,24 @@ class Series:
 
         Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identify SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here let's use MC = 1000. The result will be stored in the eigval_q array, which has the same length as eigval, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             nino_mcssa = ts.ssa(M = 60, nMC=1000)
 
         Now let's look at the result:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig scree_mc.png
+
             fig, ax = nino_mcssa.screeplot()
-            pyleo.closefig(fig)
 
             print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
         This suggests that modes 1-5 fall above the red noise benchmark. To inspect mode 1 (index 0), just type:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig ssa_mode0plot.png
             fig, ax = nino_mcssa.modeplot(index=0)
-            pyleo.closefig(fig)
 
         '''
 
@@ -1364,9 +1353,7 @@ class Series:
 
         - Generating the test data
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             import numpy as np
@@ -1378,7 +1365,7 @@ class Series:
             ts1 = pyleo.Series(time=t, value=sig1)
             ts2 = pyleo.Series(time=t, value=sig2)
             ts = pyleo.Series(time=t, value=sig)
-            @savefig ts_filter1.png
+
             fig, ax = ts.plot(label='mix')
             ts1.plot(ax=ax, label='10 Hz')
             ts2.plot(ax=ax, label='20 Hz')
@@ -1386,52 +1373,39 @@ class Series:
 
         - Applying a low-pass filter
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
-            @savefig ts_filter2.png
             ts1.plot(ax=ax, label='10 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
 
         - Applying a band-pass filter
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
-            @savefig ts_filter3.png
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
 
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
+        .. jupyter-execute::
 
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
-            @savefig ts_filter4.png
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
 
         - Applying a high-pass filter
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             fig, ax = ts.plot(label='mix')
             ts_low  = ts.filter(cutoff_freq=15)
             ts_high = ts.copy()
             ts_high.value = ts.value - ts_low.value # subtract low-pass filtered series from original one
-            @savefig ts_filter5.png
             ts_high.plot(label='High-pass filter @ 15Hz',ax=ax)
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
 
@@ -1543,19 +1517,13 @@ class Series:
 
         Distribution of the SOI record
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
-            @savefig ts_plot5.png
             fig, ax = ts.plot()
-            pyleo.closefig(fig)
 
-            @savefig ts_hist.png
             fig, ax = ts.histplot()
-            pyleo.closefig(fig)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -1640,13 +1608,9 @@ class Series:
     #         value=data.iloc[:,2]
     #         ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
 
-    #         @savefig ts_plot5.png
     #         fig, ax = ts.plot()
-    #         pyleo.closefig(fig)
 
-    #         @savefig ts_dist.png
     #         fig, ax = ts.distplot()
-    #         pyleo.closefig(fig)
 
     #     '''
     #     warnings.warn(
@@ -1733,7 +1697,8 @@ class Series:
                 - slot [4] contains the scalogram color bar
                 - slot [5] is empty
                 
-            It is possible to tune the size and spacing of the various slots
+            It is possible to tune the size and spacing of the various slots:
+
                 - 'width_ratios': list of two values describing the relative widths of the column containig the timeseries/scalogram/colorbar and the column containig the PSD plot (default: [6, 1])
                 - 'height_ratios': list of three values describing the relative heights of the three timeseries, scalogram and colorbar (default: [2, 7, .35])
                 - 'hspace': vertical space between timeseries and scalogram (default: 0, however if either the scalogram xlabel or the PSD xlabel contain '\\n', .05)
@@ -1767,34 +1732,27 @@ class Series:
 
         Summary_plot with pre-generated psd and scalogram objects. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             series = pyleo.utils.load_dataset('SOI')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
 
-            @savefig ts_summary_plot1.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
-            pyleo.closefig(fig)
 
 
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             series = pyleo.utils.load_dataset('SOI')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
 
-            @savefig ts_summary_plot2.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
-            pyleo.closefig(fig)
+
         '''
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -2605,9 +2563,7 @@ class Series:
 
         slice the SOI from 1972 to 1998
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
@@ -2715,10 +2671,13 @@ class Series:
 
         Examples
         --------
-        >>> lr04 = pyleo.utils.load_dataset('LR04')
-        >>> fig, ax = lr04.plot(invert_yaxis=True)
-        >>> ts_emd = lr04.detrend(method='emd',preserve_mean=True)
-        >>> ts_emd.plot(label=lr04.label+', EMD detrend',ax=ax)
+
+        .. jupyter-execute::
+
+            lr04 = pyleo.utils.load_dataset('LR04')
+            fig, ax = lr04.plot(invert_yaxis=True)
+            ts_emd = lr04.detrend(method='emd',preserve_mean=True)
+            ts_emd.plot(label=lr04.label+', EMD detrend',ax=ax)
        
         '''
         new = self.copy()
@@ -2794,9 +2753,7 @@ class Series:
 
         Calculate the spectrum of SOI using the various methods and compute significance
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
@@ -2804,35 +2761,27 @@ class Series:
 
         - Lomb-Scargle
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             psd_ls = ts_std.spectral(method='lomb_scargle')
             psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations
-            @savefig spec_ls.png
             fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
-            pyleo.closefig(fig)
 
         We may pass in method-specific arguments via "settings", which is a dictionary.
         For instance, to adjust the number of overlapping segment for Lomb-Scargle, we may specify the method-specific argument "n50";
         to adjust the frequency vector, we may modify the "freq_method" or modify the method-specific argument "freq".
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import numpy as np
             psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
             psd_LS_freq = ts_std.spectral(method='lomb_scargle', settings={'freq': np.linspace(1/20, 1/0.2, 51)})
             psd_LS_LS = ts_std.spectral(method='lomb_scargle', freq_method='lomb_scargle')  # with frequency vector generated using REDFIT method
-            @savefig spec_ls_n50.png
             fig, ax = psd_LS_n50.plot(
                 title='PSD using Lomb-Scargle method with 4 overlapping segments',
                 label='settings={"n50": 4}')
             psd_ls.plot(ax=ax, label='settings={"n50": 3}', marker='o')
 
-            @savefig spec_ls_freq.png
             fig, ax = psd_LS_freq.plot(
                 title='PSD using Lomb-Scargle method with different frequency vectors',
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
@@ -2844,90 +2793,67 @@ class Series:
 
         - WWZ
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             psd_wwz = ts_std.spectral(method='wwz')  # wwz is the default method
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
-            @savefig spec_wwz.png
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
-            pyleo.closefig(fig)
 
         We may take advantage of a pre-calculated scalogram using WWZ to accelerate the spectral analysis
         (although note that the default parameters for spectral and wavelet analysis using WWZ are different):
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             scal_wwz = ts_std.wavelet(method='wwz')  # wwz is the default method
             psd_wwz_fast = ts_std.spectral(method='wwz', scalogram=scal_wwz)
-            @savefig spec_wwz_fast.png
             fig, ax = psd_wwz_fast.plot(title='PSD using WWZ method w/ pre-calculated scalogram')
-            pyleo.closefig(fig)
 
         - Periodogram
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
             psd_perio_signif = psd_perio.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
-            @savefig spec_perio.png
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
-            pyleo.closefig(fig)
+
 
         - Welch
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             psd_welch = ts_interp.spectral(method='welch')
             psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
-            @savefig spec_welch.png
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
-            pyleo.closefig(fig)
+
 
         - MTM
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             psd_mtm = ts_interp.spectral(method='mtm', label='MTM, NW=4')
             psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
-            @savefig spec_mtm.png
             fig, ax = psd_mtm_signif.plot(title='PSD using the multitaper method')
-            pyleo.closefig(fig)
+
 
         By default, MTM uses a half-bandwidth of 4 times the fundamental (Rayleigh) frequency, i.e. NW = 4, which is the most conservative choice.
         NW runs from 2 to 4 in multiples of 1/2, and can be adjusted like so (note the sharper peaks and higher overall variance, which may not be desirable):
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             psd_mtm2 = ts_interp.spectral(method='mtm', settings={'NW':2}, label='MTM, NW=2')
-            @savefig spec_mtm2.png
-            psd_mtm2.plot(title='PSD using the multi-taper method', ax=ax)
-            pyleo.closefig(fig)
+            fig, ax = psd_mtm2.plot(title='MTM with NW=2')
+
 
         - Continuous Wavelet Transform
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             ts_interp = ts_std.interp()
             psd_cwt = ts_interp.spectral(method='cwt')
             psd_cwt_signif = psd_cwt.signif_test(number=20)
-            @savefig spec_cwt.png
-            fig, ax = psd_cwt_signif.plot(title='PSD using CWT method')
-            pyleo.closefig(fig)
+            fig, ax = psd_cwt_signif.plot(title='PSD using the CWT method')
+
 
         '''
         if not verbose:
@@ -3062,42 +2988,30 @@ class Series:
 
         Wavelet analysis on the evenly-spaced SOI record. The CWT method will be applied by default.
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
 
             scal1 = ts.wavelet()
             scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
-            @savefig scal_cwt.png
             fig, ax = scal_signif.plot()
-            pyleo.closefig(fig)
 
         If you wanted to invoke the WWZ method instead (here with no significance testing, to lower computational cost):
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             scal2 = ts.wavelet(method='wwz')
-            @savefig scal_wwz.png
             fig, ax = scal2.plot()
-            pyleo.closefig(fig)
 
         Notice that the two scalograms have different amplitudes, which are relative.  Method-specific arguments
         may be passed via `settings`.  For instance, if you wanted to change the default mother wavelet
         ('MORLET') to a derivative of a Gaussian (DOG), with degree 2 by default ("Mexican Hat wavelet"):
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             scal3 = ts.wavelet(settings = {'mother':'DOG'})
-            @savefig scal_dog.png
             fig, ax = scal3.plot(title='CWT scalogram with DOG mother wavelet')
-            pyleo.closefig(fig)
 
         As for WWZ, note that, for computational efficiency, the time axis is coarse-grained
         by default to 50 time points, which explains in part the difference with the CWT scalogram.
@@ -3105,15 +3019,11 @@ class Series:
         If you need a custom axis, it (and other method-specific  parameters) can also be passed
         via the `settings` dictionary:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             tau = np.linspace(np.min(ts.time), np.max(ts.time), 60)
             scal4 = ts.wavelet(method='wwz', settings={'tau':tau})
-            @savefig scal_tau.png
             fig, ax = scal4.plot(title='WWZ scalogram with finer time axis')
-            pyleo.closefig(fig)
 
         '''
         if not verbose:
@@ -3237,16 +3147,14 @@ class Series:
 
         Calculate the wavelet coherence of NINO3 and All India Rainfall with default arguments:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
+
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
             coh = ts_air.wavelet_coherence(ts_nino)
-            @savefig coh.png
             coh.plot()
 
         Note that in this example both timeseries area already on a common,
@@ -3257,23 +3165,17 @@ class Series:
         can use the Weighted Wavelet Z-transform (WWZ) instead, as it is designed for
         unevenly-spaced data. However, it is usually far slower:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
              coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz')
-             @savefig coh_wwz.png
              coh_wwz.plot()
 
         As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
         Significance is assessed similarly as with PSD or Scalogram objects:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             cwt_sig = coh.signif_test(number=20, qs=[.9,.95]) # specifiying 2 significance thresholds does not take any more time.
-            @savefig cwt_sig.png
             # by default, the plot function will look for the closest quantile to 0.95, but it is easy to adjust:
             cwt_sig.plot(signif_thresh = 0.9)
 
@@ -3282,11 +3184,8 @@ class Series:
         two timeseries exhibit similar behavior in time-frequency space, and the cross-wavelet
         transform (XWT), which indicates regions of high common power.
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
-            @savefig cwt_sig_dash.png
             cwt_sig.dashboard()
 
         Note: this design balances many considerations, and is not easily customizable.
@@ -3428,9 +3327,7 @@ class Series:
 
         Correlation between the Nino3.4 index and the Deasonalized All Indian Rainfall Index
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
@@ -3450,6 +3347,7 @@ class Series:
             # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'}, seed=2333)
             print(corr_res)
+
         '''
 
         settings = {} if settings is None else settings.copy()
@@ -3520,9 +3418,7 @@ class Series:
 
         Liang causality
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts_nino=pyleo.utils.load_dataset('NINO3')
@@ -3530,9 +3426,7 @@ class Series:
 
         We use the specific params below to lighten computations; you may drop `settings` for real work
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             liang_N2A = ts_air.causality(ts_nino, settings={'nsim': 20, 'signif_test': 'isopersist'})
             print(liang_N2A)
@@ -3545,9 +3439,7 @@ class Series:
 
         To implement Granger causality, simply specfiy the method:
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             granger_A2N = ts_nino.causality(ts_air, method='granger')
             granger_N2A = ts_air.causality(ts_nino, method='granger')
@@ -3700,17 +3592,23 @@ class Series:
         Examples
         --------
     
-        >>> import pyleoclim as pyleo
-        >>> LR04 = pyleo.utils.load_dataset('LR04')
-        >>> LR_out = LR4.detrend().standardize().outliers(method='kmeans')
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+            LR04 = pyleo.utils.load_dataset('LR04')
+            LR_out = LR04.detrend().standardize().outliers(method='kmeans')
         
         To set the number of clusters:
-            
-        >>> LR_out = LR4.detrend().standardize().outliers(method='kmeans', settings={'nbr_clusters':2}) 
+
+        .. jupyter-execute::
+
+            LR_out = LR04.detrend().standardize().outliers(method='kmeans', settings={'nbr_clusters':2})
         
         The log contains diagnostic information, to access it, set the keep_log parameter to True:
-            
-        >>> LR_out = LR4.detrend().standardize().outliers(method='kmeans', settings={'nbr_clusters':2}, keep_log=True)
+
+        .. jupyter-execute::
+
+            LR_out = LR04.detrend().standardize().outliers(method='kmeans', settings={'nbr_clusters':2}, keep_log=True)
         
         """
         if method not in ['kmeans','DBSCAN']:
@@ -4033,10 +3931,13 @@ class Series:
         
         Examples
         --------
-        >>> ts = pyleo.utils.load_dataset('LR04')
-        >>> ts5k = ts.resample('5ka').mean()
-        >>> fig, ax = ts.plot(invert_yaxis='True',xlim=[0, 1000])
-        >>> ts5k.plot(ax=ax,color='C1')
+
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('LR04')
+            ts5k = ts.resample('5ka').mean()
+            fig, ax = ts.plot(invert_yaxis='True',xlim=[0, 1000])
+            ts5k.plot(ax=ax,color='C1')
                 
         """
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
@@ -4083,26 +3984,38 @@ class Series:
 
         To create a resolution object, apply the .resolution() method to a Series object
 
-        >>> ts = pyleo.utils.load_dataset('EDC-dD')
-        >>> resolution = ts.resolution()
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD')
+            resolution = ts.resolution()
 
         Several methods are then available:
 
         Summary statistics can be obtained via .describe()
 
-        >>> resolution.describe()
+        .. jupyter-execute::
+
+            resolution.describe()
 
         A simple plot can be created using .plot()
 
-        >>> resolution.plot()
+        .. jupyter-execute::
+
+            resolution.plot()
 
         The distribution of resolution 
 
-        >>> resolution.histplot()
+        .. jupyter-execute::
+
+            resolution.histplot()
         
         Or a dashboard combining plot() and histplot() side by side:
-        
-        >>> resolution.dashboard()"""
+
+        .. jupyter-execute::
+
+            resolution.dashboard()
+
+        """
         
         res,_,_ = tsbase.resolution(self.time)
 

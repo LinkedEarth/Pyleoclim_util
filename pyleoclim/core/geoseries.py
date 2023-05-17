@@ -288,15 +288,13 @@ class GeoSeries(Series):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-            @savefig mapone.png
+            #@savefig mapone.png
             fig, ax = ts.map()
-            pyleo.closefig(fig)
+            #pyleo.closefig(fig)
 
         '''
         
@@ -467,16 +465,14 @@ class GeoSeries(Series):
         Examples
         --------
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+        .. jupyter-execute::
 
             import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
             ts_interp =ts.convert_time_unit('kyr BP').interp(step=.5)
-            @savefig ts_dashboard.png
+            #@savefig ts_dashboard.png
             fig, ax = ts_interp.dashboard()
-            pyleo.closefig(fig)
+            #pyleo.closefig(fig)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
