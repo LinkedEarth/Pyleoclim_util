@@ -98,7 +98,7 @@ class EnsembleSeries(MultipleSeries):
         Examples
         --------
 
-        slice the SOI from 1972 to 1998
+        Select part of an object
 
         .. jupyter-execute::
 

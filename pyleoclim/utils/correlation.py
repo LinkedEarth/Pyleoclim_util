@@ -819,7 +819,7 @@ def cov_shrink_rblw(S, n):
     Notes
     -----
 
-    See the `covar documentation <https://pythonhosted.org/covar/generated/covar.cov_shrink_rblw.html>`_. for 
+    See the `covar documentation <https://pythonhosted.org/covar/generated/covar.cov_shrink_rblw.html>`_ for 
     math details.
 
 

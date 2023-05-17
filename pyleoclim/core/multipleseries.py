@@ -421,7 +421,6 @@ class MultipleSeries:
         axis : str, optional
             The axis along which the Series will be flipped. The default is 'value'.
             Other acceptable options are 'time' or 'both'.
-            TODO: enable time flipping after paleopandas is released
             
         Returns
         -------
@@ -433,15 +432,13 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-             import pyleoclim as pyleo
-             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-             data = pyleo.Lipd(usr_path = url)
-             tslist = data.to_LipdSeriesList()
-             tslist = tslist[2:] # drop the first two series which only concerns age and depth
-             ms = pyleo.MultipleSeries(tslist)
-
-             fig, ax = ms.flip().stackplot()
-            
+            import pyleoclim as pyleo        
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
+            ms.name = 'ENSO'
+            fig, ax = ms.flip().stackplot()
+        
         
         Note that labels have been updated to reflect the flip
         '''

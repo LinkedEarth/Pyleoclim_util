@@ -2797,7 +2797,6 @@ class Series:
 
             psd_wwz = ts_std.spectral(method='wwz')  # wwz is the default method
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
-
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
 
         We may take advantage of a pre-calculated scalogram using WWZ to accelerate the spectral analysis
@@ -2807,7 +2806,6 @@ class Series:
 
             scal_wwz = ts_std.wavelet(method='wwz')  # wwz is the default method
             psd_wwz_fast = ts_std.spectral(method='wwz', scalogram=scal_wwz)
-
             fig, ax = psd_wwz_fast.plot(title='PSD using WWZ method w/ pre-calculated scalogram')
 
         - Periodogram
@@ -2817,7 +2815,6 @@ class Series:
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
             psd_perio_signif = psd_perio.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
-
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
 
 
@@ -2827,7 +2824,6 @@ class Series:
 
             psd_welch = ts_interp.spectral(method='welch')
             psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
-
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
 
 
@@ -2837,7 +2833,6 @@ class Series:
 
             psd_mtm = ts_interp.spectral(method='mtm', label='MTM, NW=4')
             psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
-
             fig, ax = psd_mtm_signif.plot(title='PSD using the multitaper method')
 
 
@@ -2847,8 +2842,7 @@ class Series:
         .. jupyter-execute::
 
             psd_mtm2 = ts_interp.spectral(method='mtm', settings={'NW':2}, label='MTM, NW=2')
-
-            psd_mtm2.plot(title='PSD using the multi-taper method', ax=ax)
+            fig, ax = psd_mtm2.plot(title='MTM with NW=2')
 
 
         - Continuous Wavelet Transform
@@ -2858,8 +2852,7 @@ class Series:
             ts_interp = ts_std.interp()
             psd_cwt = ts_interp.spectral(method='cwt')
             psd_cwt_signif = psd_cwt.signif_test(number=20)
-
-            fig, ax = psd_cwt_signif.plot(title='PSD using CWT method')
+            fig, ax = psd_cwt_signif.plot(title='PSD using the CWT method')
 
 
         '''
