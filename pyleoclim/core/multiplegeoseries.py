@@ -70,10 +70,10 @@ class MultipleGeoSeries(MultipleSeries):
 
     # ============ MAP goes here ================
     def map(self, marker='archiveType', hue=None, size=None,
-                color_pal=None, legend_attribute=None, projection='Robinson', proj_default=True,
-                background=True, borders=False, rivers=False, lakes=False,
-                figsize=None, ax=None, scatter_kwargs=None, legend=True,
-                lgd_kwargs=None, savefig_settings=None, **kwargs):
+            color_pal=None, legend_attribute=None, projection='Robinson', proj_default=True,
+            background=True, borders=False, rivers=False, lakes=False,
+            figsize=None, ax=None, scatter_kwargs=None, legend=True,
+            lgd_kwargs=None, savefig_settings=None, **kwargs):
         '''
         
 
@@ -152,7 +152,7 @@ class MultipleGeoSeries(MultipleSeries):
                 mappings[key] = kwargs[key]
 
         missing_d = {'hue': kwargs['missing_val_hue'] if 'missing_val_hue' in kwargs else 'k',
-                     'marker': kwargs['missing_val_marker'] if 'missing_val_marker' in kwargs else 'x',
+                     'marker': kwargs['missing_val_marker'] if 'missing_val_marker' in kwargs else 'X',
                      'size': kwargs['missing_val_size'] if 'missing_val_size' in kwargs else 10,
                      }
 
@@ -174,6 +174,7 @@ class MultipleGeoSeries(MultipleSeries):
                     color_pal = 'turbo'
                 hue_mappable = make_scalar_mappable(color_pal, lims=None, n=len(trait_unique))
                 hue_mapping = {trait_val: hue_mappable.cmap.colors[ik] for ik, trait_val in enumerate(trait_unique)}
+                hue_mapping['unknown'] =missing_d['hue']
 
             leg_d = {'handles': [], 'labels': []}
             for key in hue_mapping:
@@ -183,8 +184,8 @@ class MultipleGeoSeries(MultipleSeries):
             return dict(f=lambda x: hue_mapping[x], mapping=hue_mapping, leg=leg_d)  # 'mappable': hue_mappable,
 
         def make_cont_size(trait_vals, mappings):
-            lims = lims = [min([val for val in trait_vals if val != None]),
-                           max([val for val in trait_vals if val != None])]
+            lims = [min([val for val in trait_vals if val != None]),
+                    max([val for val in trait_vals if val != None])]
             szes = np.linspace(lims[0], lims[1], 4)
             size_f = lambda x: x * 10 / (lims[1] - lims[0])
             leg_d = {'handles': [], 'labels': []}
@@ -197,8 +198,10 @@ class MultipleGeoSeries(MultipleSeries):
             if 'marker_mapping' in mappings:
                 marker_mapping = mappings['marker_mapping']
             else:
-                m = cycle(mlines.Line2D.filled_markers)
+                # the dot and the filled circle look to much alike to be considered different markers
+                m = cycle(mlines.Line2D.filled_markers[1:])
                 marker_mapping = {trait_val: next(m) for ik, trait_val in enumerate(trait_unique)}
+                marker_mapping['unknown'] =missing_d['marker']
             leg_d = {'handles': [], 'labels': []}
             for key in marker_mapping:
                 leg_d['handles'].append(f(marker_mapping[key], "k", 8))
@@ -220,9 +223,12 @@ class MultipleGeoSeries(MultipleSeries):
 
         for trait_key in trait_d.keys():
             trait = trait_d[trait_key]
-            if trait_d[trait_key] == None:
+            if trait is None:
                 trait_vals = [None for ik in range(len(self.series_list))]
-                attrib_vals = [missing_d[trait_key] for ik in trait_vals]
+                if trait_key == 'hue':
+                    attrib_vals = [missing_d[trait_key] for ik in trait_vals]
+                else:
+                    attrib_vals = None
                 d = {'attrib_vals': attrib_vals}
             else:
                 trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
@@ -237,7 +243,7 @@ class MultipleGeoSeries(MultipleSeries):
                         d = categorical_d[trait_key](trait_unique, mappings)
                         d['attrib_vals'] = [d['mapping'][val] if val != None else missing_d[trait_key] for val in
                                             trait_vals]
-                        legend = True
+                        # legend = True
                         if legend_attribute is None:
                             legend_attribute = trait_key
                     else:
@@ -250,50 +256,56 @@ class MultipleGeoSeries(MultipleSeries):
                         d = continuous_d[trait_key](trait_vals, mappings)
                         trait_vals = [int(val) if np.isnan(val) == False else None for val in trait_vals]
                         d['attrib_vals'] = [d['f'](val) if val != None else missing_d[trait_key] for val in trait_vals]
-                        legend = False
+                        # legend = False
                     else:
                         attrib_vals = [missing_d[trait_key] for ik in trait_vals]
                         d = {'attrib_vals': None}
-                        legend = False
+                        # legend = False
 
-                trait_vals = [val if val != None else 'unknown' for val in trait_vals]
+                trait_vals = [val if val is not None else 'unknown' for val in trait_vals]
                 legend_d[trait_key] = trait_vals
             trait_d[trait_key] = d
 
         if type(scatter_kwargs) == dict:
             scatter_kwargs['s'] = trait_d['size']['attrib_vals']
         elif scatter_kwargs is None:
-            scatter_kwargs = {'s': trait_d['size']['attrib_vals']}
+            scatter_kwargs = {'s': trait_d['size']['attrib_vals'], 'edgecolors':'w'}
 
-        if type(lgd_kwargs) == dict:
-            lgd_kwargs['bbox_to_anchor'] = (1.3, 1)
-        else:
-            lgd_kwargs = {'bbox_to_anchor': (1.3, 1)}
+        if type(lgd_kwargs) != dict:
+        #     lgd_kwargs['bbox_to_anchor'] = (1.3, 1)
+        # else:
+            lgd_kwargs = {'loc': 'upper left', 'bbox_to_anchor': (1.3, 1)}
 
         lats = [geos.lat for geos in self.series_list]
         lons = [geos.lon for geos in self.series_list]
         if legend_attribute is None:
-            legend = False
+            ptlabels = [None for ik in lats]
         else:
-            legend = True
+            ptlabels = legend_d[legend_attribute]
 
-        res = mp.map(lats, lons, legend_d[legend_attribute], marker=trait_d['marker']['attrib_vals'],
+        res = mp.map(lats, lons, ptlabels, marker=trait_d['marker']['attrib_vals'],
                      color=trait_d['hue']['attrib_vals'],
                      projection=projection, proj_default=proj_default,
                      background=background, borders=borders, rivers=rivers, lakes=lakes,
                      figsize=figsize, ax=ax, scatter_kwargs=scatter_kwargs, legend=legend,
                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
 
-        if legend ==True:
+        if legend == True:
             handles = []
             labels = []
             for key in trait_d:
                 if 'leg' in trait_d[key]:
-                    handles +=trait_d[key]['leg']['handles']
+                    handles += trait_d[key]['leg']['handles']
                     labels += trait_d[key]['leg']['labels']
                     handles.append(copy.copy(handles[0]))
                     handles[-1].set_alpha(0)
                     labels.append('')
-            res[1].legend(handles, labels,  bbox_to_anchor=(1,1), loc="upper left")
+            res[1].legend(handles, labels,  **lgd_kwargs)#bbox_to_anchor=(1, 1),loc="upper left")
+
+            # if hue is not None:
+            #     if 'mapping' not in trait_d['hue']:
+            #         if 'mappable' in trait_d['hue']:
+            #             cb2 = plt.colorbar(trait_d['hue']['mappable'], ax=ax, shrink=0.55, aspect=20 * 0.7,
+            #                                orientation='vertical', label=hue)
 
         return res
