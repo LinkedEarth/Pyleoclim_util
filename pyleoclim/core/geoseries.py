@@ -292,9 +292,7 @@ class GeoSeries(Series):
 
             import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-            #@savefig mapone.png
-            fig, ax = ts.map()
-            #pyleo.closefig(fig)
+            fig, ax = ts.map(lgd_kwargs={'bbox_to_anchor':(1.5, 1)})
 
         '''
         
@@ -469,10 +467,8 @@ class GeoSeries(Series):
 
             import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-            ts_interp =ts.convert_time_unit('kyr BP').interp(step=.5)
-            #@savefig ts_dashboard.png
+            ts_interp = ts.convert_time_unit('kyr BP').interp(step=.5) # interpolate for a faster result
             fig, ax = ts_interp.dashboard()
-            #pyleo.closefig(fig)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
