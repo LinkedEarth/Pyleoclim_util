@@ -372,7 +372,8 @@ def map(lat, lon, criteria, marker=None, color =None,
                     marker = color_data['marker'].iloc[index],
                     color = color_data['color'].iloc[index],
                     s = color_data['s'].iloc[index],
-                    edgecolors= color_data['edgecolors'].iloc[index], 
+                    edgecolors = 'white',
+                    #edgecolors= color_data['edgecolors'].iloc[index], 
                     **scatter_kwargs)
     
 

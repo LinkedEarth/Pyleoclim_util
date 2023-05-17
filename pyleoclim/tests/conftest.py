@@ -87,11 +87,11 @@ def pinkgeoseries(geometadata):
 @pytest.fixture
 def multiple_pinkgeoseries():
     """Pyleoclim geoseries with """
-    nrecs = 10
+    nrecs = 20
     seed = 101
     nt = 200
-    lats = np.random.default_rng(seed=seed).uniform(30.0,60.0,nrecs)
-    lons = np.random.default_rng(seed=seed).uniform(-20.0,60.0,nrecs)
+    lats = np.random.default_rng(seed=seed).uniform(-85.0,85.0,nrecs)
+    lons = np.random.default_rng(seed=seed).uniform(0,360.0,nrecs)
     elevs = np.random.default_rng(seed=seed).uniform(0,4000,nrecs)
     
     archives = np.random.default_rng(seed=seed).choice(list(pyleo.utils.PLOT_DEFAULT.keys()),size=nrecs)
