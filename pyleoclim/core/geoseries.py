@@ -69,7 +69,8 @@ class GeoSeries(Series):
 
     archiveType : string
         climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'                                                                                     
-    
+        Reference: https://lipdverse.org/vocabulary/archivetype/
+        
     sensorType : string
         sensor, e.g. a paleoclimate proxy sensor, defined in https://wiki.linked.earth/Category:ProxySensor_(L)
         
@@ -127,7 +128,7 @@ class GeoSeries(Series):
             else:
                 ValueError('Latitude must be a number in [-90; 90]')
         else:
-            self.lat = None # assign a default value to prevent bugs ?
+            self.lat = None 
             
         # assign longitude
         if lon is not None:
@@ -139,7 +140,7 @@ class GeoSeries(Series):
             else:
                 ValueError('Longitude must be a number in [-180,360]')
         else:
-            self.lon = None # assign a default value to prevent bugs ?
+            self.lon = None 
             
         # elevation
         self.elevation = elevation

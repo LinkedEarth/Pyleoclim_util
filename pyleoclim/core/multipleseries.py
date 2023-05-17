@@ -65,6 +65,9 @@ class MultipleSeries:
                 
     '''
     def __init__(self, series_list, time_unit=None, label=None, name=None):
+        from ..core.series import Series
+        from ..core.geoseries import GeoSeries
+        
         self.series_list = series_list
         self.time_unit = time_unit
         self.label = label
@@ -72,6 +75,9 @@ class MultipleSeries:
         if name is not None:
             warnings.warn("`name` is a deprecated property, which will be removed in future releases. Please use `label` instead.",
                           DeprecationWarning, stacklevel=2)
+        # check that all components are Series
+        if not all([isinstance(ts, (Series, GeoSeries)) for ts in self.series_list]):
+            raise ValueError('All components must be Series or GeoSeries objects')
 
         if self.time_unit is not None:
             new_ts_list = []
