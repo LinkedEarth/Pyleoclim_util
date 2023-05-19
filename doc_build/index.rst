@@ -6,20 +6,16 @@
 Introduction
 ============
 
-Pyleoclim is a Python package designed for the analysis of paleoclimate data.
-Pyleoclim leverages various data science libraries (numpy, pandas, scikit-learn) for time series analysis, as well as and Matplotlib and Cartopy for the creation of publication-quality figures. The package is designed around object-oriented :ref:`Series <core_ui>`, which can be directly manipulated for plotting, spectral and wavelet analysis, and other time series-appropriate operations. Basic familiarity with Python is essential, and many good tutorials exist on the topic.
+Pyleoclim is a Python package designed for, but not limited to, the analysis of paleoclimate data.
+Pyleoclim leverages various data science libraries (numpy, pandas, scikit-learn) for time series analysis, as well as Matplotlib and Cartopy for the creation of publication-quality graphics. Basic familiarity with Python is essential, and many good tutorials exist on the topic.
 
-.. image:: LiPD1p3.png
-   :width: 191px
-   :height: 248px
-   :scale: 100 %
-   :alt: The LiPD data model, version 1.3. Credit: Nick McKay
-   :align: right
+The package is designed around object-oriented :ref:`Series <core_api>`, which can be directly manipulated for plotting, spectral and wavelet analysis, and other time series-appropriate operations.
+The main Series class is very flexible, applicable to virtually any timeseries, including instrumental or model-generated data. The package distinguishes itself by its handling of unevenly-spaced observations, which may come from Excel spreadsheets (csv), NumPy arrays, netCDF files, or pandas dataframes.
+The GeoSeries class takes this one step further, enabling geolocation and associated functionalities (e.g. mapping).
+These classes allow Pyleoclim to readily analyze datasets stored in the Linked Paleo Data (`LiPD <http://lipd.net>`_) format, through the `PyLiPD <https://pylipd.readthedocs.io/en/latest/>`_ package.
+In particular, the package can make use of age ensembles and uses them for time-uncertain analysis. The age ensembles must however be generated externally, e.g. through the `GeoChronR <http://nickmckay.github.io/GeoChronR/>`_ package, which natively stores them as ensemble tables in LiPD.
 
-Pyleoclim natively "speaks" the language of Linked Paleo Data  (`LiPD <http://lipd.net>`_), which enables it to handle most of the data transformations internally, taking a good chunk of the pain out of analyzing paleoclimate data.
-The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analysis. Age ensembles can be generated through the `GeoChronR <http://nickmckay.github.io/GeoChronR/>`_ package, which natively stores them as ensemble tables in LiPD.
-
-While convenient for the representation of paleoclimate observations, LiPD is not the only point of entry into Pyleoclim. The :ref:`Series <core_api>` class is very flexible, and allows to apply Pyleoclim functionality to virtually any timeseries, including instrumental or model-generated data, as Excel spreadsheets, numpy arrays or pandas dataframes. Indeed, Pyleoclim is the workhorse supporting more general `machine-learning functionalities <https://github.com/KnowledgeCaptureAndDiscovery/autoTS>`_ for all manner of timeseries.
+Pyleoclim is by no means limited to LiPD-formatted data, and has been used in astronomy, finance, and robotics. Indeed, Pyleoclim is the workhorse supporting more general `machine-learning functionalities <https://github.com/KnowledgeCaptureAndDiscovery/autoTS>`_ for all manner of timeseries.
 
 Getting Started
 ===============
@@ -51,8 +47,7 @@ Getting Involved
    citation.rst
    contribution_guide.rst
 
-Pyleoclim was originally developed to allow scientists to analyze paleoclimate datasets, including visualization, mapping, and time series analysis. Pyleoclim has been made freely available under the terms of the `GNU Public License <https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license>`_.
-
+Pyleoclim has been made freely available under the terms of the `GNU Public License <https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license>`_, and follows an open development model.
 There are many ways to get :ref:`involved in the development of Pyleoclim <contributing_to_pyleoclim>`:
 
   * If you write a paper making use of Pyleoclim, please cite it :ref:`thus <citing_pyleoclim>`.

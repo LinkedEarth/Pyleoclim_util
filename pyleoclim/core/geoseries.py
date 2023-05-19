@@ -106,9 +106,12 @@ class GeoSeries(Series):
 
     Import the EPICA Dome C deuterium record and display a quick synopsis:
 
-    >>> edc = pyleo.utils.load_dataset('EDC-dD')
-    >>> edc.metadata
-    >>> edc.view()
+     .. jupyter-execute::
+
+         import pyleoclim as pyleo
+         ts = pyleo.utils.datasets.load_dataset('EDC-dD')
+         ts_interp = ts.convert_time_unit('kyr BP').interp(step=.5) # interpolate for a faster result
+         fig, ax = ts_interp.dashboard()
           
     '''
 
