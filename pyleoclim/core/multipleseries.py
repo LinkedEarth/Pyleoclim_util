@@ -10,7 +10,7 @@ from ..utils import correlation as corrutils
 from ..core.correns import CorrEns
 from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
-from ..core.spatialdecomp import SpatialDecomp
+from ..core.multivardecomp import MVDecomp
 
 import warnings
 import numpy as np
@@ -951,16 +951,16 @@ class MultipleSeries:
         Returns
         -------
 
-        res: SpatialDecomp
+        res: MVDecomp
 
-            Resulting pyleoclim.SpatialDecomp object
+            Resulting pyleoclim.MVDecomp object
         
         See also
         --------
         
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
-        pyleoclim.core.spatialdecomp.SpatialDecomp : The spatial decomposition object
+        pyleoclim.core.multivardecomp.MVDecomp : The spatial decomposition object
         
         Examples
         --------
@@ -1004,7 +1004,7 @@ class MultipleSeries:
 
         # assign result to SpatiamDecomp class
         # Note: need to grab coordinates from Series or LiPDSeries
-        res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+        res = MVDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,
                             eigvals = out.eigenvals, eigvecs = out.eigenvecs)
         return res

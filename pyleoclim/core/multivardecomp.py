@@ -1,13 +1,14 @@
 import numpy as np
-from matplotlib import pyplot as plt, gridspec
+from matplotlib import pyplot as plt, gridspec, cm, colors
 from matplotlib.ticker import MaxNLocator
 
 from ..core import series
 from ..utils import plotting
+from ..utils import mapping as mp
 
 
-class SpatialDecomp:
-    ''' Class to hold the results of spatial decompositions
+class MVDecomp:
+    ''' Class to hold the results of multivariate decompositions
         applies to : `pca()`, `mcpca()`, `mssa()`
 
         Parameters
@@ -16,10 +17,6 @@ class SpatialDecomp:
         time: float
         
             the common time axis
-
-        locs: float (p, 2)
-        
-            a p x 2 array of coordinates (latitude, longitude) for mapping the spatial patterns ("EOFs")
 
         name: str
         
@@ -36,22 +33,33 @@ class SpatialDecomp:
         pctvar: float
         
             array of pct variance accounted for by each mode
+            
+        orig : MultipleSeries, or MultipleGeoSeries object
+        
+            original data, on a common time axis 
+            
+        locs: float (p, 2)
+        
+            a p x 2 array of coordinates (latitude, longitude) for mapping spatial patterns. Defaults to None 
 
         neff: float
         
             scalar representing the effective sample size of the leading mode
+            
+            
 
     '''
 
-    def __init__(self, time, locs, name, eigvals, eigvecs, pctvar, pcs, neff):
+    def __init__(self, time, name, eigvals, eigvecs, pctvar, pcs, neff, orig, locs = None):
         self.time = time
         self.name = name
-        self.locs = locs
         self.eigvals = eigvals
         self.eigvecs = eigvecs
         self.pctvar = pctvar
         self.pcs = pcs
         self.neff = neff
+        self.orig = orig
+        self.locs = locs
 
     def screeplot(self, figsize=[6, 4], uq='N82', title='scree plot', ax=None, savefig_settings=None,
                   title_kwargs=None, xlim=[0, 10], clr_eig='C0'):
@@ -163,7 +171,8 @@ class SpatialDecomp:
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
-                 title_kwargs=None, spec_method='mtm'):
+                 title_kwargs=None, spec_method='mtm', cmap='coolwarm',
+                 lgd_kwargs=None, map_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -203,6 +212,9 @@ class SpatialDecomp:
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
             'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow.
+            
+       cmap: str
+           colormap name for the loadings plot (https://matplotlib.org/stable/tutorials/colors/colormaps.html)     
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -231,7 +243,28 @@ class SpatialDecomp:
         # plot T-EOF
         ax3 = fig.add_subplot(gs[1, 1])
         # EOF = self.eigvecs[:,mode]
-        ax3.set_title('Spatial loadings \n (under construction)', weight='bold')
+        if self.locs is not None:
+            ax3.set_title('Spatial loadings', weight='bold')
+            arch = [ts.archiveType for ts in self.orig.series_list]
+            lats = self.locs[:,0]
+            lons = self.locs[:,1]
+            lims = np.abs(self.eigvecs).max()
+            
+            ax_norm = colors.Normalize(vmin=min(lims), vmax=max(lims), clip=False)
+            ax_cmap = plt.get_cmap(cmap)
+            ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
+            cols = [ax.cmap.colors[i] for i in range(len(self.eigvecs))]
+            # plot map
+            res = mp.map(lats, lons, list(self.eigvecs), marker=arch,
+                         color=cols, lgd_kwargs=lgd_kwargs, ax = ax3,
+                         savefig_settings=savefig_settings, **map_kwargs)
+            # make colorbar
+            plt.colorbar(mappable=ax_sm,cax=ax3)
+            
+        else: # plot the original data
+            ax3.set_title('Original Data', weight='bold')
+            self.orig.standardize().plot(ax=ax3)
+            
 
         # if title is not None:
         #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
