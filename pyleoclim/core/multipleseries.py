@@ -991,7 +991,7 @@ class MultipleSeries:
             for j in range(p):
                 ys[:,j] = self.series_list[j].value  # fill in data matrix
 
-        nc = min(ys.shape) # number of components to return
+        #nc = min(ys.shape) # number of components to return
 
         out  = PCA(ys,weights=weights,missing=missing,tol_em=tol_em, max_em_iter=max_em_iter,**pca_kwargs)
 
@@ -1002,11 +1002,10 @@ class MultipleSeries:
         # compute percent variance
         pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
 
-        # assign result to SpatiamDecomp class
-        # Note: need to grab coordinates from Series or LiPDSeries
+        # assign result to MVDecomp class
         res = MVDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,
-                            eigvals = out.eigenvals, eigvecs = out.eigenvecs)
+                            eigvals = out.eigenvals, eigvecs = out.eigenvecs, orig=self)
         return res
 
     # def mcpca(self,nMC=200,**pca_kwargs):

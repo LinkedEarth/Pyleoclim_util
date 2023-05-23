@@ -309,3 +309,87 @@ class MultipleGeoSeries(MultipleSeries):
             #                                orientation='vertical', label=hue)
 
         return res
+
+
+    def pca(self, weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
+        '''Principal Component Analysis (Empirical Orthogonal Functions)
+
+        Decomposition of dataset ys in terms of orthogonal basis functions.
+        Tolerant to missing values, infilled by an EM algorithm.
+
+        Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
+
+        Algorithm from statsmodels: https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html
+
+        Parameters
+        ----------
+
+        weights : ndarray, optional
+        
+            Series weights to use after transforming data according to standardize
+            or demean when computing the principal components.
+
+        missing : {str, None}
+        
+            Method for missing data.  Choices are:
+
+            * 'drop-row' - drop rows with missing values.
+            * 'drop-col' - drop columns with missing values.
+            * 'drop-min' - drop either rows or columns, choosing by data retention.
+            * 'fill-em' - use EM algorithm to fill missing value.  ncomp should be
+              set to the number of factors required.
+            * `None` raises if data contains NaN values.
+
+        tol_em : float
+        
+            Tolerance to use when checking for convergence of the EM algorithm.
+            
+        max_em_iter : int
+        
+            Maximum iterations for the EM algorithm.
+
+        Returns
+        -------
+
+        res: MVDecomp
+
+            Resulting pyleoclim.MVDecomp object
+        
+        See also
+        --------
+        
+        pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
+
+        pyleoclim.core.multivardecomp.MVDecomp : The spatial decomposition object
+        
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist).common_time()
+
+            res = ms.pca() # carry out PCA
+
+            fig1, ax1 = res.screeplot() # plot the eigenvalue spectrum
+            fig2, ax2 = res.modeplot() # plot the first mode
+
+        '''
+        # extract geographical coordinate
+        lats = np.array([ts.lat for ts in self.series_list])
+        lons = np.array([ts.lon for ts in self.series_list])
+        locs = np.column_stack([lats,lons])
+        
+        # apply PCA fom parent class
+        pca_res = self.super().pca(weights=weights,missing=missing,tol_em=tol_em, 
+                           max_em_iter=max_em_iter,**pca_kwargs)
+        # add geographical information
+        pca_res.locs = locs 
+        
+        return pca_res
+        

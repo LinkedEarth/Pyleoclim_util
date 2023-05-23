@@ -171,7 +171,7 @@ class MVDecomp:
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
-                 title_kwargs=None, spec_method='mtm', cmap='coolwarm',
+                 title_kwargs=None, spec_method='mtm', cmap='RdBu_r',
                  lgd_kwargs=None, map_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
@@ -253,7 +253,7 @@ class MVDecomp:
             ax_norm = colors.Normalize(vmin=min(lims), vmax=max(lims), clip=False)
             ax_cmap = plt.get_cmap(cmap)
             ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
-            cols = [ax.cmap.colors[i] for i in range(len(self.eigvecs))]
+            cols = [ax_sm.cmap.colors[i] for i in range(len(self.eigvecs))]
             # plot map
             res = mp.map(lats, lons, list(self.eigvecs), marker=arch,
                          color=cols, lgd_kwargs=lgd_kwargs, ax = ax3,
