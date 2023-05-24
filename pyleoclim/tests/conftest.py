@@ -97,7 +97,6 @@ def multiple_pinkgeoseries():
     archives = np.random.default_rng(seed=seed).choice(list(pyleo.utils.PLOT_DEFAULT.keys()),size=nrecs)
     obsTypes = np.random.default_rng(seed=seed).choice(['MXD', 'd18O', 'Sr/Ca'],size=nrecs)
     
-    
     ts_list = []
     for i in range(nrecs):
         t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=nt)

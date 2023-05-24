@@ -311,7 +311,7 @@ def map(lat, lon, criteria, marker=None, color =None,
     scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
     lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
     
-    if marker!=None:
+    if marker is not None:
         if 'marker' in scatter_kwargs.keys(): 
             print('marker has been set as a parameter to the map_all function, overriding scatter_kwargs')
             del scatter_kwargs['marker']
@@ -319,7 +319,7 @@ def map(lat, lon, criteria, marker=None, color =None,
             raise ValueError('The marker vector should have the same length as the lat/lon/criteria vector')
     
     
-    if color!=None:
+    if color is not None:
         if 'facecolor' in scatter_kwargs.keys(): 
             print('facecolor has been set as a parameter to the map_all function, overriding scatter_kwargs')
             del scatter_kwargs['facecolor']
@@ -379,7 +379,8 @@ def map(lat, lon, criteria, marker=None, color =None,
                     marker = color_data['marker'].iloc[index],
                     color = color_data['color'].iloc[index],
                     s = color_data['s'].iloc[index],
-                    edgecolors= color_data['edgecolors'].iloc[index], 
+                    edgecolors = 'white',
+                    #edgecolors= color_data['edgecolors'].iloc[index], 
                     **scatter_kwargs)
         
     else:

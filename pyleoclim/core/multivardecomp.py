@@ -1,13 +1,16 @@
 import numpy as np
-from matplotlib import pyplot as plt, gridspec, cm, colors
+from matplotlib import pyplot as plt, gridspec
+import matplotlib as mpl
 from matplotlib.ticker import MaxNLocator
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 from ..core import series
-from ..utils import plotting
+from ..utils import plotting, lipdutils
 from ..utils import mapping as mp
 
 
-class MVDecomp:
+class MultivariateDecomp:
     ''' Class to hold the results of multivariate decompositions
         applies to : `pca()`, `mcpca()`, `mssa()`
 
@@ -170,9 +173,9 @@ class MVDecomp:
 
         return fig, ax
 
-    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
+    def modeplot(self, index=0, figsize=[10, 8], ax=None, savefig_settings=None,
                  title_kwargs=None, spec_method='mtm', cmap='RdBu_r',
-                 lgd_kwargs=None, map_kwargs=None):
+                 lgd_kwargs=None, map_kwargs=None, scatter_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -218,53 +221,150 @@ class MVDecomp:
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
         PC = self.pcs[:, index]
-        ts = series.Series(time=self.time, value=PC)  # define timeseries object for the PC
+        EOF = self.eigvecs[:, index]
 
-        fig = plt.figure(tight_layout=True, figsize=figsize)
-        gs = gridspec.GridSpec(2, 2)  # define grid for subplots
-        ax1 = fig.add_subplot(gs[0, :])
-        ts.plot(ax=ax1)
-        ax1.set_ylabel('PC ' + str(index + 1))
-        ax1.set_title('Mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',
+        fig = plt.figure(figsize=figsize)
+        gs = gridspec.GridSpec(2, 2, wspace=0)
+        gs.update(left=0, right=1.1)
+        
+        ax = {}
+        # plot the PC
+        ax['pc'] = fig.add_subplot(gs[0, :])
+        label = 'PC ' + str(index + 1)
+        ts = series.Series(time=self.time, value=PC,
+                           verbose=False, label=label)  # define timeseries object for the PC
+        ts.plot(ax=ax['pc'])
+        ax['pc'].set_ylabel(label)
+        ax['pc'].set_title('Mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',
                       weight='bold')
+        
+        #ax1 = fig.add_subplot(gs[0, :])
+       
+        # plot its PSD
+        ax['psd'] = fig.add_subplot(gs[1, 0])
+        psd = ts.interp().spectral(method=spec_method)
+        _ = psd.plot(ax=ax['psd'])
+        ax['psd'].set_title( spec_method + ' spectrum', weight='bold')
 
-        # plot spectrum
-        ax2 = fig.add_subplot(gs[1, 0])
-        psd_mtm_rc = ts.interp().spectral(method=spec_method)
-        _ = psd_mtm_rc.plot(ax=ax2)
-        ax2.set_xlabel('Period')
-        ax2.set_title('Power spectrum (' + spec_method + ')', weight='bold')
-
-        # plot T-EOF
-        ax3 = fig.add_subplot(gs[1, 1])
-        # EOF = self.eigvecs[:,mode]
+        # plot spatial pattern or spaghetti
+       
         if self.locs is not None:
-            ax3.set_title('Spatial loadings', weight='bold')
-            arch = [ts.archiveType for ts in self.orig.series_list]
+            # make the map - brute force since projection is not being returned properly
             lats = self.locs[:,0]
             lons = self.locs[:,1]
-            lims = np.abs(self.eigvecs).max()
+            arch = [ts.archiveType for ts in self.orig.series_list]
             
-            ax_norm = colors.Normalize(vmin=min(lims), vmax=max(lims), clip=False)
-            ax_cmap = plt.get_cmap(cmap)
-            ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
-            cols = [ax_sm.cmap.colors[i] for i in range(len(self.eigvecs))]
+            map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
+            if 'projection' in map_kwargs.keys():
+                projection = map_kwargs['projection']
+            else:
+                projection = 'Orthographic'
+            if 'proj_default' in map_kwargs.keys():
+                proj_default = map_kwargs['proj_default']
+            else:
+                proj_default = True
+            if proj_default == True:
+                proj1 = {'central_latitude': lats.mean(),
+                         'central_longitude': lons.mean()}
+                proj2 = {'central_latitude': lats.mean()}
+                proj3 = {'central_longitude': lons.mean()}
+                try:
+                    proj = mp.set_proj(projection=projection, proj_default=proj1)
+                except:
+                    try:
+                        proj = mp.set_proj(projection=projection, proj_default=proj3)
+                    except:
+                        proj = mp.set_proj(projection=projection, proj_default=proj2)
+            if 'marker' in map_kwargs.keys():
+                marker = map_kwargs['marker']
+            else:
+                marker = 'o' # re-use Jordan's make_cat_marker? 
+                #marker = lipdutils.PLOT_DEFAULT[arch][1]  
+            if 'background' in map_kwargs.keys():
+                background = map_kwargs['background']
+            else:
+                background = True
+            if 'borders' in map_kwargs.keys():
+                borders = map_kwargs['borders']
+            else:
+                borders = False
+            if 'rivers' in map_kwargs.keys():
+                rivers = map_kwargs['rivers']
+            else:
+                rivers = False
+            if 'lakes' in map_kwargs.keys():
+                lakes = map_kwargs['lakes']
+            else:
+                lakes = False
+            if 'scatter_kwargs' in map_kwargs.keys():
+                scatter_kwargs = map_kwargs['scatter_kwargs']
+            else:
+                scatter_kwargs = {}
+            if 'markersize' in map_kwargs.keys():
+                scatter_kwargs.update({'s': map_kwargs['markersize']})
+            else:
+                pass
+            if 'lgd_kwargs' in map_kwargs.keys():
+                lgd_kwargs = map_kwargs['lgd_kwargs']
+            else:
+                lgd_kwargs = {}
+            if 'legend' in map_kwargs.keys():
+                legend = map_kwargs['legend']
+            else:
+                legend = False
+            # prepare the map
+            data_crs = ccrs.PlateCarree() 
+            ax['map'] = fig.add_subplot(gs[1, 1], projection=proj)
+            ax['map'].coastlines()
+            if background is True:
+                ax['map'].stock_img()
+            # Additional information
+            if borders is True:
+                ax['map'].add_feature(cfeature.BORDERS)
+            if lakes is True:
+                ax['map'].add_feature(cfeature.LAKES)
+            if rivers is True:
+                ax['map'].add_feature(cfeature.RIVERS)
+                
+            # Define color mapping
+            lims = np.abs(EOF).max()
+            cmap = plt.get_cmap(cmap)
+            norm = mpl.colors.Normalize(vmin=-lims, vmax=lims)
+            sm   = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
+            cols = sm.to_rgba(EOF).tolist() # export colors
+            
+            ax['map'].scatter(lons, lats, zorder=10, label=marker, 
+                              facecolor=cols, edgecolors='white',
+                              transform=data_crs, **scatter_kwargs)
+            ax['map'].set_title('EOF ' + str(index + 1), weight='bold')
+
+            
+            if legend == True:
+                ax.legend(**lgd_kwargs)
+         
             # plot map
-            res = mp.map(lats, lons, list(self.eigvecs), marker=arch,
-                         color=cols, lgd_kwargs=lgd_kwargs, ax = ax3,
-                         savefig_settings=savefig_settings, **map_kwargs)
+            # ax3.scatter(lons,lats,
+            #         zorder = 10,
+            #         label = legend_title,
+            #         transform=data_crs,
+            #         marker = color_data['marker'].iloc[index],
+            #         color = color_data['color'].iloc[index],
+            #         s = color_data['s'].iloc[index],
+            #         edgecolors = 'white',
+            #         #edgecolors= color_data['edgecolors'].iloc[index], 
+            #         **scatter_kwargs)
+            # mp.map(lats, lons, criteria=list(EOF), marker=arch,
+            #        color=cols, lgd_kwargs=lgd_kwargs, ax = ax3,
+            #        projection='Robinson', proj_default=True,
+            #        lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)  #**map_kwargs
             # make colorbar
-            plt.colorbar(mappable=ax_sm,cax=ax3)
+            fig.colorbar(sm, cax=ax['map'], orientation='horizontal')
             
         else: # plot the original data
-            ax3.set_title('Original Data', weight='bold')
-            self.orig.standardize().plot(ax=ax3)
-            
+            ax['map'] = fig.add_subplot(gs[1, 1])
+            ax['map'].set_title('Original Data (standardized)', weight='bold')
+            self.orig.standardize().plot(ax=ax['map'])   
 
         # if title is not None:
         #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()

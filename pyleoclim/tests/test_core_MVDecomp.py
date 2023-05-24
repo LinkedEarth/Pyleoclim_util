@@ -30,12 +30,12 @@ def gen_ts(model, nt, alpha):
     return ts
 
 
-class TestUiMVDecompScreeplot:
-    ''' Tests for MVDecomp.screeplot()
+class TestUiMultivariateDecompScreeplot:
+    ''' Tests for MultivariateDecomp.screeplot()
     '''
 
     def test_plot_t0(self):
-        ''' Test MVDecomp.screeplot() with default parameters
+        ''' Test MultivariateDecomp.screeplot() with default parameters
 
         '''
         p = 10; n = 100
@@ -55,7 +55,7 @@ class TestUiMVDecompScreeplot:
         plt.close()
         
         
-class TestUiMVDecompModeplot:
+class TestUiMultivariateDecompModeplot:
     ''' Tests for SSARes.modeplot()
     '''
     @pytest.mark.parametrize('spec_method', ['mtm', 'welch', 'periodogram','cwt', 'wwz'])

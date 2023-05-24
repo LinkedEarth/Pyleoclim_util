@@ -348,7 +348,7 @@ class GeoSeries(Series):
                                   rivers=rivers, lakes=lakes,
                                   figsize=figsize, ax=ax,
                                   scatter_kwargs=scatter_kwargs, legend=legend, legend_title=legend_title,
-                                  lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings, )
+                                  lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
 
             except:
                 try:

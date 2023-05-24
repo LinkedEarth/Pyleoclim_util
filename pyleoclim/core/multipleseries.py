@@ -10,7 +10,7 @@ from ..utils import correlation as corrutils
 from ..core.correns import CorrEns
 from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
-from ..core.multivardecomp import MVDecomp
+from ..core.multivardecomp import MultivariateDecomp
 
 import warnings
 import numpy as np
@@ -951,16 +951,16 @@ class MultipleSeries:
         Returns
         -------
 
-        res: MVDecomp
+        res: MultivariateDecomp
 
-            Resulting pyleoclim.MVDecomp object
+            Resulting pyleoclim.MultivariateDecomp object
         
         See also
         --------
         
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
-        pyleoclim.core.multivardecomp.MVDecomp : The spatial decomposition object
+        pyleoclim.core.multivardecomp.MultivariateDecomp : The spatial decomposition object
         
         Examples
         --------
@@ -1002,8 +1002,8 @@ class MultipleSeries:
         # compute percent variance
         pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
 
-        # assign result to MVDecomp class
-        res = MVDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+        # assign result to MultivariateDecomp class
+        res = MultivariateDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,
                             eigvals = out.eigenvals, eigvecs = out.eigenvecs, orig=self)
         return res

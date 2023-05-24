@@ -48,25 +48,13 @@ class MultipleGeoSeries(MultipleSeries):
     '''
 
     def __init__(self, series_list, time_unit=None, label=None):
-        from ..core.geoseries import GeoSeries
-
-        self.series_list = series_list
-        self.time_unit = time_unit
-        self.label = label
-
         # check that all components are GeoSeries
-        if not all([isinstance(ts, GeoSeries) for ts in self.series_list]):
+        self.series_list = series_list
+        from ..core.geoseries import GeoSeries
+        if not all([isinstance(ts, GeoSeries) for ts in series_list]):
             raise ValueError('All components must be GeoSeries objects')
-
-        # check that they all have lat/lon (do we need this?)
-
-        if self.time_unit is not None:
-            new_ts_list = []
-            for ts in self.series_list:
-                new_ts = ts.convert_time_unit(time_unit=self.time_unit)
-                new_ts_list.append(new_ts)
-
-            self.series_list = new_ts_list
+        
+        super().__init__(series_list, time_unit, label)
 
     # ============ MAP goes here ================
     def map(self, marker='archiveType', hue=None, size=None,
@@ -351,16 +339,16 @@ class MultipleGeoSeries(MultipleSeries):
         Returns
         -------
 
-        res: MVDecomp
+        res: MultivariateDecomp
 
-            Resulting pyleoclim.MVDecomp object
+            Resulting pyleoclim.MultivariateDecomp object
         
         See also
         --------
         
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
-        pyleoclim.core.multivardecomp.MVDecomp : The spatial decomposition object
+        pyleoclim.core.multivardecomp.MultivariateDecomp : The spatial decomposition object
         
         Examples
         --------
@@ -386,7 +374,7 @@ class MultipleGeoSeries(MultipleSeries):
         locs = np.column_stack([lats,lons])
         
         # apply PCA fom parent class
-        pca_res = self.super().pca(weights=weights,missing=missing,tol_em=tol_em, 
+        pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em, 
                            max_em_iter=max_em_iter,**pca_kwargs)
         # add geographical information
         pca_res.locs = locs 

@@ -263,7 +263,7 @@ class SsaRes:
         ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])
-        ts_rc = series.Series(time=self.time, value=RC) # define timeseries object for the RC
+        ts_rc = series.Series(time=self.time, value=RC, verbose=False) # define timeseries object for the RC
         psd_mtm_rc = ts_rc.interp().spectral(method=spec_method)
         psd_mtm_rc.plot(ax=ax)
         ax.set_xlabel('Period')
