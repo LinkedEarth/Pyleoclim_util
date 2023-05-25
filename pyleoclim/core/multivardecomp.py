@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt, gridspec
-import matplotlib as mpl
+from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 from matplotlib.ticker import MaxNLocator
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -173,13 +173,13 @@ class MultivariateDecomp:
 
         return fig, ax
 
-    def modeplot(self, index=0, figsize=[10, 8], ax=None, savefig_settings=None,
-                 title_kwargs=None, spec_method='mtm', cmap='RdBu_r',
-                 lgd_kwargs=None, map_kwargs=None, scatter_kwargs=None):
+    def modeplot(self, index=0, figsize=[8, 8], ax=None, savefig_settings=None,
+                 title_kwargs=None, spec_method='mtm', cmap='RdBu_r', cb_scale = 0.8,
+                 map_kwargs=None, scatter_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
-            3. The spatial loadings (EOF or similar)
+            3. The loadings (EOF or similar), possibly geolocated.
 
         Parameters
         ----------
@@ -191,7 +191,7 @@ class MultivariateDecomp:
 
         figsize : list, optional
         
-            The figure size. The default is [10, 5].
+            The figure size. The default is [8, 8].
 
         savefig_settings : dict
         
@@ -216,8 +216,13 @@ class MultivariateDecomp:
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
             'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow.
             
-       cmap: str
-           colormap name for the loadings plot (https://matplotlib.org/stable/tutorials/colors/colormaps.html)     
+        cmap: str
+           colormap name for the loadings (https://matplotlib.org/stable/tutorials/colors/colormaps.html)  
+           
+        cb_scale : float in [0, 1) 
+                             
+           scale of the colorbar, called "shrink" in https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.colorbar.html
+           default is 0.8, which works well with default size. Change at your own risk. 
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -225,27 +230,23 @@ class MultivariateDecomp:
         EOF = self.eigvecs[:, index]
 
         fig = plt.figure(figsize=figsize)
-        gs = gridspec.GridSpec(2, 3, wspace=0.2)
+        gs = gridspec.GridSpec(4, 3, wspace=0.3, hspace=0.3)
         gs.update(left=0, right=1.1)
         
         ax = {}
         # plot the PC
-        ax['pc'] = fig.add_subplot(gs[0, :])
-        label = 'PC ' + str(index + 1)
-        ts = series.Series(time=self.time, value=PC,
-                           verbose=False, label=label)  # define timeseries object for the PC
+        ax['pc'] = fig.add_subplot(gs[0, :2])
+        label = rf'$PC_{index + 1}$' # + str(index + 1)
+        ts = series.Series(time=self.time, value=PC, verbose=False)  # define timeseries object for the PC
         ts.plot(ax=ax['pc'])
         ax['pc'].set_ylabel(label)
-        ax['pc'].set_title('Mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',
-                      weight='bold')
-        
-        #ax1 = fig.add_subplot(gs[0, :])
-       
+        #ax['pc'].set_title('Mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained', weight='bold')
+               
         # plot its PSD
-        ax['psd'] = fig.add_subplot(gs[1, 0])
+        ax['psd'] = fig.add_subplot(gs[0, 2])
         psd = ts.interp().spectral(method=spec_method)
-        _ = psd.plot(ax=ax['psd'])
-        ax['psd'].set_title( spec_method + ' spectrum', weight='bold')
+        _ = psd.plot(ax=ax['psd'], label=label)
+        #ax['psd'].set_title( spec_method + ' spectrum', weight='bold')
 
         # plot spatial pattern or spaghetti
        
@@ -253,7 +254,6 @@ class MultivariateDecomp:
             # make the map - brute force since projection is not being returned properly
             lats = self.locs[:,0]
             lons = self.locs[:,1]
-            arch = [ts.archiveType for ts in self.orig.series_list]
             
             map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
             if 'projection' in map_kwargs.keys():
@@ -279,9 +279,8 @@ class MultivariateDecomp:
             if 'marker' in map_kwargs.keys():
                 marker = map_kwargs['marker']
             else:
-                #marker = 'o' # re-use Jordan's make_cat_marker? 
-                #marker = []
-                marker = [lipdutils.PLOT_DEFAULT[archiveType][1] for archiveType in arch] 
+                marker = 'o'
+                #marker = [lipdutils.PLOT_DEFAULT[ts.archiveType][1] for ts in self.orig.series_list] 
         
             if 'background' in map_kwargs.keys():
                 background = map_kwargs['background']
@@ -307,17 +306,17 @@ class MultivariateDecomp:
                 scatter_kwargs.update({'s': map_kwargs['markersize']})
             else:
                 pass
-            if 'lgd_kwargs' in map_kwargs.keys():
-                lgd_kwargs = map_kwargs['lgd_kwargs']
-            else:
-                lgd_kwargs = {}
-            if 'legend' in map_kwargs.keys():
-                legend = map_kwargs['legend']
-            else:
-                legend = False
+            # if 'lgd_kwargs' in map_kwargs.keys():
+            #     lgd_kwargs = map_kwargs['lgd_kwargs']
+            # else:
+            #     lgd_kwargs = {}
+            # if 'legend' in map_kwargs.keys():
+            #     legend = map_kwargs['legend']
+            # else:
+            #     legend = False
             # prepare the map
             data_crs = ccrs.PlateCarree() 
-            ax['map'] = fig.add_subplot(gs[1, 1:], projection=proj)
+            ax['map'] = fig.add_subplot(gs[1:, :], projection=proj)
             ax['map'].coastlines()
             if background is True:
                 ax['map'].stock_img()
@@ -329,19 +328,19 @@ class MultivariateDecomp:
             if rivers is True:
                 ax['map'].add_feature(cfeature.RIVERS)
                 
-            # h/t to this solution: https://stackoverflow.com/a/66578339            
-            sc = ax['map'].scatter(lons, lats, label=marker, 
+            # h/t to this solution: https://stackoverflow.com/a/66578339  
+            # right now, marker is ignored ; need to loop over values but then the colors get messed up
+            
+            sc = ax['map'].scatter(lons, lats, marker=marker, 
                               c=EOF, cmap=cmap, s=100, edgecolors='white',
                               transform=data_crs, **scatter_kwargs)
-            ax['map'].set_title('EOF ' + str(index + 1), weight='bold')
-
-            
-            if legend == True:
-                ax.legend(**lgd_kwargs)
+            # if legend == True:
+            #     ax.legend(**lgd_kwargs)
          
-            # make colorbar
-            plt.colorbar(sc, orientation='vertical')
-            
+            # make colorbar, h/t https://stackoverflow.com/a/73061877
+            fig.colorbar(sc, ax=ax['map'], label='EOF ' + str(index + 1), 
+                         shrink=cb_scale, orientation="vertical")
+                             
         else: # plot the original data
             ax['map'] = fig.add_subplot(gs[1, 1])
             ax['map'].set_title('Original Data (standardized)', weight='bold')
@@ -351,8 +350,12 @@ class MultivariateDecomp:
         #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
         #     t_args = {'y': 1.1, 'weight': 'bold'}
         #     t_args.update(title_kwargs)
-        #     ax.set_title(title, **t_args)
-
+        #     fig.suptitle(title, **t_args)
+        fig.suptitle('Mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',
+                      weight='bold', y=0.92)
+        
+        fig.tight_layout()
+        
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
 
