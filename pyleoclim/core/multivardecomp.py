@@ -225,7 +225,7 @@ class MultivariateDecomp:
         EOF = self.eigvecs[:, index]
 
         fig = plt.figure(figsize=figsize)
-        gs = gridspec.GridSpec(2, 2, wspace=0)
+        gs = gridspec.GridSpec(2, 3, wspace=0.2)
         gs.update(left=0, right=1.1)
         
         ax = {}
@@ -259,7 +259,7 @@ class MultivariateDecomp:
             if 'projection' in map_kwargs.keys():
                 projection = map_kwargs['projection']
             else:
-                projection = 'Orthographic'
+                projection = 'Robinson'
             if 'proj_default' in map_kwargs.keys():
                 proj_default = map_kwargs['proj_default']
             else:
@@ -279,8 +279,10 @@ class MultivariateDecomp:
             if 'marker' in map_kwargs.keys():
                 marker = map_kwargs['marker']
             else:
-                marker = 'o' # re-use Jordan's make_cat_marker? 
-                #marker = lipdutils.PLOT_DEFAULT[arch][1]  
+                #marker = 'o' # re-use Jordan's make_cat_marker? 
+                #marker = []
+                marker = [lipdutils.PLOT_DEFAULT[archiveType][1] for archiveType in arch] 
+        
             if 'background' in map_kwargs.keys():
                 background = map_kwargs['background']
             else:
@@ -315,7 +317,7 @@ class MultivariateDecomp:
                 legend = False
             # prepare the map
             data_crs = ccrs.PlateCarree() 
-            ax['map'] = fig.add_subplot(gs[1, 1], projection=proj)
+            ax['map'] = fig.add_subplot(gs[1, 1:], projection=proj)
             ax['map'].coastlines()
             if background is True:
                 ax['map'].stock_img()
@@ -327,15 +329,9 @@ class MultivariateDecomp:
             if rivers is True:
                 ax['map'].add_feature(cfeature.RIVERS)
                 
-            # Define color mapping
-            lims = np.abs(EOF).max()
-            cmap = plt.get_cmap(cmap)
-            norm = mpl.colors.Normalize(vmin=-lims, vmax=lims)
-            sm   = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
-            cols = sm.to_rgba(EOF).tolist() # export colors
-            
-            ax['map'].scatter(lons, lats, zorder=10, label=marker, 
-                              facecolor=cols, edgecolors='white',
+            # h/t to this solution: https://stackoverflow.com/a/66578339            
+            sc = ax['map'].scatter(lons, lats, label=marker, 
+                              c=EOF, cmap=cmap, s=100, edgecolors='white',
                               transform=data_crs, **scatter_kwargs)
             ax['map'].set_title('EOF ' + str(index + 1), weight='bold')
 
@@ -343,23 +339,8 @@ class MultivariateDecomp:
             if legend == True:
                 ax.legend(**lgd_kwargs)
          
-            # plot map
-            # ax3.scatter(lons,lats,
-            #         zorder = 10,
-            #         label = legend_title,
-            #         transform=data_crs,
-            #         marker = color_data['marker'].iloc[index],
-            #         color = color_data['color'].iloc[index],
-            #         s = color_data['s'].iloc[index],
-            #         edgecolors = 'white',
-            #         #edgecolors= color_data['edgecolors'].iloc[index], 
-            #         **scatter_kwargs)
-            # mp.map(lats, lons, criteria=list(EOF), marker=arch,
-            #        color=cols, lgd_kwargs=lgd_kwargs, ax = ax3,
-            #        projection='Robinson', proj_default=True,
-            #        lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)  #**map_kwargs
             # make colorbar
-            fig.colorbar(sm, cax=ax['map'], orientation='horizontal')
+            plt.colorbar(sc, orientation='vertical')
             
         else: # plot the original data
             ax['map'] = fig.add_subplot(gs[1, 1])

@@ -270,7 +270,7 @@ class MultipleGeoSeries(MultipleSeries):
             ptlabels = [None for ik in lats]
         else:
             ptlabels = legend_d[legend_attribute]
-
+            
         res = mp.map(lats, lons, ptlabels, marker=trait_d['marker']['attrib_vals'],
                      color=trait_d['hue']['attrib_vals'],
                      projection=projection, proj_default=proj_default,

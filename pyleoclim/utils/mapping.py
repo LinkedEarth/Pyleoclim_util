@@ -341,7 +341,7 @@ def map(lat, lon, criteria, marker=None, color =None,
         scatter_kwargs['edgecolors'] = None
 
         
-    color_data=pd.DataFrame({'criteria':criteria,'color':color,'marker':marker,
+    symbols=pd.DataFrame({'criteria':criteria,'color':color,'marker':marker,
                              's': scatter_kwargs['s'], 'edgecolors': scatter_kwargs['edgecolors']})
     
     #delete extra scatter_kwargs
@@ -349,7 +349,20 @@ def map(lat, lon, criteria, marker=None, color =None,
     del scatter_kwargs['edgecolors']
     
     # get the projection:
-    proj = set_proj(projection=projection, proj_default=proj_default) 
+    #proj = set_proj(projection=projection, proj_default=proj_default) 
+    if proj_default == True:
+        proj1 = {'central_latitude': np.mean(lat),
+                 'central_longitude': np.mean(lon)}
+        proj2 = {'central_latitude': np.mean(lat)}
+        proj3 = {'central_longitude': np.mean(lon)}
+        try:
+            proj = set_proj(projection=projection, proj_default=proj1)
+        except:
+            try:
+                proj = set_proj(projection=projection, proj_default=proj3)
+            except:
+                proj = set_proj(projection=projection, proj_default=proj2)
+    
     data_crs = ccrs.PlateCarree()       
     # Make the figure        
     if ax is None:
@@ -367,20 +380,18 @@ def map(lat, lon, criteria, marker=None, color =None,
     if rivers is True:
         ax.add_feature(cfeature.RIVERS)
         
-    
     # Get the indexes by criteria
-    
     if legend_title is not None:
         for index, crit in enumerate(criteria):
             ax.scatter(np.array(lon)[index],np.array(lat)[index],
                     zorder = 10,
                     label = legend_title,
                     transform=data_crs,
-                    marker = color_data['marker'].iloc[index],
-                    color = color_data['color'].iloc[index],
-                    s = color_data['s'].iloc[index],
+                    marker = symbols['marker'].iloc[index],
+                    color = symbols['color'].iloc[index],
+                    s = symbols['s'].iloc[index],
                     edgecolors = 'white',
-                    #edgecolors= color_data['edgecolors'].iloc[index], 
+                    #edgecolors= symbols['edgecolors'].iloc[index], 
                     **scatter_kwargs)
         
     else:
@@ -389,11 +400,11 @@ def map(lat, lon, criteria, marker=None, color =None,
                     zorder = 10,
                     label = crit,
                     transform=data_crs,
-                    marker = color_data['marker'].iloc[index],
-                    color = color_data['color'].iloc[index],
-                    s = color_data['s'].iloc[index],
+                    marker = symbols['marker'].iloc[index],
+                    color = symbols['color'].iloc[index],
+                    s = symbols['s'].iloc[index],
                     edgecolors = 'white',
-                    #edgecolors= color_data['edgecolors'].iloc[index], 
+                    #edgecolors= symbols['edgecolors'].iloc[index], 
                     **scatter_kwargs)
     
 
@@ -413,7 +424,8 @@ def map(lat, lon, criteria, marker=None, color =None,
   
         
 def dist_sphere(lat1,lon1,lat2,lon2):
-    """Uses the harversine formula to calculate distance on a sphere
+    """Uses the haversine formula to calculate distance on a sphere
+    https://en.wikipedia.org/wiki/Haversine_formula
     
     Parameters
     ----------
