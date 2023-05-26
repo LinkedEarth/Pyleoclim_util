@@ -223,7 +223,19 @@ class MultivariateDecomp:
                              
            scale of the colorbar, called "shrink" in https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.colorbar.html
            default is 0.8, which works well with default size. Change at your own risk. 
+           
+        map_kwargs : dict, optional
 
+            Optional arguments for the map. See GeoSeries.map(). The default is None.
+            
+        scatter_kwargs : dict, optional
+            
+            Optional arguments for the scatterplot. See https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter
+            
+        See Also
+        --------
+        pyleoclim.core.MultipleGeoSeries.map()
+        
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         PC = self.pcs[:, index]
@@ -258,8 +270,10 @@ class MultivariateDecomp:
             map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
             if 'projection' in map_kwargs.keys():
                 projection = map_kwargs['projection']
+                force_global = False
             else:
                 projection = 'Robinson'
+                force_global = True
             if 'proj_default' in map_kwargs.keys():
                 proj_default = map_kwargs['proj_default']
             else:
@@ -285,11 +299,15 @@ class MultivariateDecomp:
             if 'background' in map_kwargs.keys():
                 background = map_kwargs['background']
             else:
-                background = True
+                background = False
+            if 'land' in map_kwargs.keys():
+                land = map_kwargs['land']
+            else:
+                land = True
             if 'borders' in map_kwargs.keys():
                 borders = map_kwargs['borders']
             else:
-                borders = False
+                borders = True
             if 'rivers' in map_kwargs.keys():
                 rivers = map_kwargs['rivers']
             else:
@@ -306,25 +324,24 @@ class MultivariateDecomp:
                 scatter_kwargs.update({'s': map_kwargs['markersize']})
             else:
                 pass
-            # if 'lgd_kwargs' in map_kwargs.keys():
-            #     lgd_kwargs = map_kwargs['lgd_kwargs']
-            # else:
-            #     lgd_kwargs = {}
-            # if 'legend' in map_kwargs.keys():
-            #     legend = map_kwargs['legend']
-            # else:
-            #     legend = False
+            
             # prepare the map
             data_crs = ccrs.PlateCarree() 
             ax['map'] = fig.add_subplot(gs[1:, :], projection=proj)
+            if force_global:
+                ax['map'].set_global()
             ax['map'].coastlines()
             if background is True:
                 ax['map'].stock_img()
             # Additional information
+            if land is True:
+                ax['map'].add_feature(cfeature.LAND)
+                #ax['map'].add_feature(cfeature.OCEAN, alpha=0.5)
+                
             if borders is True:
-                ax['map'].add_feature(cfeature.BORDERS)
+                ax['map'].add_feature(cfeature.BORDERS, alpha=0.5)
             if lakes is True:
-                ax['map'].add_feature(cfeature.LAKES)
+                ax['map'].add_feature(cfeature.LAKES, alpha=0.5)
             if rivers is True:
                 ax['map'].add_feature(cfeature.RIVERS)
                 
