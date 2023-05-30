@@ -914,7 +914,7 @@ class MultipleSeries:
 
         return flag, lengths
 
-    def pca(self,weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
+    def pca(self,weights=None, name=None, missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
         '''Principal Component Analysis (Empirical Orthogonal Functions)
 
         Decomposition of dataset ys in terms of orthogonal basis functions.
@@ -1005,8 +1005,14 @@ class MultipleSeries:
         # compute percent variance
         pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
 
+
+        # assign name
+        if name is not None:
+            name_str = name + ' PCA'
+        else:
+            name_str = self.label + ' PCA'
         # assign result to MultivariateDecomp class
-        res = MultivariateDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+        res = MultivariateDecomp(name=name_str, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,
                             eigvals = out.eigenvals, eigvecs = out.eigenvecs, orig=self)
         return res

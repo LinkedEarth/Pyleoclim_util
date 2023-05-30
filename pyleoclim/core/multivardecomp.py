@@ -67,7 +67,7 @@ class MultivariateDecomp:
         self.orig = orig
         self.locs = locs
 
-    def screeplot(self, figsize=[6, 4], uq='N82', title='scree plot', ax=None, savefig_settings=None,
+    def screeplot(self, figsize=[6, 4], uq='N82', title=None, ax=None, savefig_settings=None,
                   title_kwargs=None, xlim=[0, 10], clr_eig='C0'):
         ''' Plot the eigenvalue spectrum with uncertainties
 
@@ -158,7 +158,8 @@ class MultivariateDecomp:
 
         ax.errorbar(x=idx, y=Lc, yerr=Lerr, color=clr_eig, marker='o', ls='',
                     alpha=1.0, label=eb_lbl)
-
+        if title is None:
+            title = self.name + ' eigenvalues'
         ax.set_title(title, fontweight='bold');
         ax.legend();
         ax.set_xlabel(r'Mode index $i$');
@@ -181,7 +182,7 @@ class MultivariateDecomp:
 
     def modeplot(self, index=0, figsize=[8, 8], ax=None, savefig_settings=None,
                  title_kwargs=None, spec_method='mtm', cmap='RdBu_r', cb_scale = 0.8,
-                 flip_pc = False, map_kwargs=None, scatter_kwargs=None):
+                 flip = False, map_kwargs=None, scatter_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -242,11 +243,18 @@ class MultivariateDecomp:
         --------
         pyleoclim.core.MultipleSeries.pca : Principal Component Analysis
         
+        pyleoclim.utils.tsutils.eff_sample_size : Effective sample size
+        
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        PC = self.pcs[:, index]
-        EOF = self.eigvecs[:, index]
-
+        
+        if flip:
+            PC = -self.pcs[:, index]
+            EOF = -self.eigvecs[:, index]
+        else:
+            PC = self.pcs[:, index]
+            EOF = self.eigvecs[:, index]
+            
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(4, 3, wspace=0.3, hspace=0.3)
         gs.update(left=0, right=1.1)
@@ -257,7 +265,7 @@ class MultivariateDecomp:
         label = rf'$PC_{index + 1}$' 
         t = self.orig.series_list[0].time
         ts = series.Series(time=t, value=PC, verbose=False)  # define timeseries object for the PC
-        ts.plot(ax=ax['pc'], invert_yaxis=flip_pc)
+        ts.plot(ax=ax['pc'])
         ax['pc'].set_ylabel(label)
                
         # plot its PSD
@@ -330,7 +338,12 @@ class MultivariateDecomp:
             if 'markersize' in map_kwargs.keys():
                 scatter_kwargs.update({'s': map_kwargs['markersize']})
             else:
-                pass
+                scatter_kwargs.update({'s': 100})
+                
+            if 'edgecolors' in map_kwargs.keys():
+                scatter_kwargs.update({'edgecolors': map_kwargs['edgecolors']})
+            else:
+                scatter_kwargs.update({'edgecolors':'white'})
             
             # prepare the map
             data_crs = ccrs.PlateCarree() 
@@ -354,15 +367,16 @@ class MultivariateDecomp:
                 
             # h/t to this solution: https://stackoverflow.com/a/66578339  
             # right now, marker is ignored ; need to loop over values but then the colors get messed up
+            vext = np.abs(EOF).max()
             
             sc = ax['map'].scatter(lons, lats, marker=marker, 
-                              c=EOF, cmap=cmap, s=100, edgecolors='white',
+                              c=EOF, cmap=cmap, vmin = -vext, vmax = vext,
                               transform=data_crs, **scatter_kwargs)
             # if legend == True:
             #     ax.legend(**lgd_kwargs)
          
             # make colorbar, h/t https://stackoverflow.com/a/73061877
-            fig.colorbar(sc, ax=ax['map'], label='EOF ' + str(index + 1), 
+            fig.colorbar(sc, ax=ax['map'], label=rf'$EOF_{index + 1}$' , 
                          shrink=cb_scale, orientation="vertical")
                              
         else: # plot the original data
@@ -375,7 +389,7 @@ class MultivariateDecomp:
         #     t_args = {'y': 1.1, 'weight': 'bold'}
         #     t_args.update(title_kwargs)
         #     fig.suptitle(title, **t_args)
-        fig.suptitle('Mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',
+        fig.suptitle(self.name + ' mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',
                       weight='bold', y=0.92)
         
         fig.tight_layout()
