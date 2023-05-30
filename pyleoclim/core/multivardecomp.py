@@ -25,13 +25,17 @@ class MultivariateDecomp:
         
             name of the dataset/analysis to use in plots
 
-        eigvals: float
+        eigvals: 1d array
         
             vector of eigenvalues from the decomposition
 
-        eigvecs: float
+        eigvecs: 2d array
         
-            array of eigenvectors from the decomposition
+            array of eigenvectors from the decomposition (e.g. EOFs)
+            
+        pcs : 1d array
+        
+            array containing the temporal expansion coefficients (e.g. "principal components" in the climate lore)
 
         pctvar: float
         
@@ -53,8 +57,7 @@ class MultivariateDecomp:
 
     '''
 
-    def __init__(self, time, name, eigvals, eigvecs, pctvar, pcs, neff, orig, locs = None):
-        self.time = time
+    def __init__(self, name, eigvals, eigvecs, pctvar, pcs, neff, orig, locs = None):
         self.name = name
         self.eigvals = eigvals
         self.eigvecs = eigvecs
@@ -109,7 +112,10 @@ class MultivariateDecomp:
         clr_eig : str, optional
         
             color to be used for plotting eigenvalues
-
+            
+        See Also
+        --------
+        pyleoclim.core.MultipleSeries.pca : Principal Component Analysis
 
         References
         ----------
@@ -175,7 +181,7 @@ class MultivariateDecomp:
 
     def modeplot(self, index=0, figsize=[8, 8], ax=None, savefig_settings=None,
                  title_kwargs=None, spec_method='mtm', cmap='RdBu_r', cb_scale = 0.8,
-                 map_kwargs=None, scatter_kwargs=None):
+                 flip_pc = False, map_kwargs=None, scatter_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -234,7 +240,7 @@ class MultivariateDecomp:
             
         See Also
         --------
-        pyleoclim.core.MultipleGeoSeries.map()
+        pyleoclim.core.MultipleSeries.pca : Principal Component Analysis
         
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -248,17 +254,16 @@ class MultivariateDecomp:
         ax = {}
         # plot the PC
         ax['pc'] = fig.add_subplot(gs[0, :2])
-        label = rf'$PC_{index + 1}$' # + str(index + 1)
-        ts = series.Series(time=self.time, value=PC, verbose=False)  # define timeseries object for the PC
-        ts.plot(ax=ax['pc'])
+        label = rf'$PC_{index + 1}$' 
+        t = self.orig.series_list[0].time
+        ts = series.Series(time=t, value=PC, verbose=False)  # define timeseries object for the PC
+        ts.plot(ax=ax['pc'], invert_yaxis=flip_pc)
         ax['pc'].set_ylabel(label)
-        #ax['pc'].set_title('Mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained', weight='bold')
                
         # plot its PSD
         ax['psd'] = fig.add_subplot(gs[0, 2])
         psd = ts.interp().spectral(method=spec_method)
         _ = psd.plot(ax=ax['psd'], label=label)
-        #ax['psd'].set_title( spec_method + ' spectrum', weight='bold')
 
         # plot spatial pattern or spaghetti
        
@@ -270,10 +275,8 @@ class MultivariateDecomp:
             map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
             if 'projection' in map_kwargs.keys():
                 projection = map_kwargs['projection']
-                force_global = False
             else:
                 projection = 'Robinson'
-                force_global = True
             if 'proj_default' in map_kwargs.keys():
                 proj_default = map_kwargs['proj_default']
             else:
@@ -300,6 +303,10 @@ class MultivariateDecomp:
                 background = map_kwargs['background']
             else:
                 background = False
+            if 'force_global' in map_kwargs.keys():
+                force_global = map_kwargs['force_global']
+            else:
+                force_global = True
             if 'land' in map_kwargs.keys():
                 land = map_kwargs['land']
             else:

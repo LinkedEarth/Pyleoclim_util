@@ -227,13 +227,15 @@ class Series:
         self.clean_ts = clean_ts
         self.importedFrom = importedFrom
         self.archiveType = archiveType
-        if self.archiveType is not None:
-            if self.archiveType.lower().replace(" ", "") not in lipdutils.PLOT_DEFAULT.keys():
+        if archiveType is not None:
+            archiveType = lipdutils.LipdToOntology(archiveType)
+            self.archiveType = archiveType.lower().replace(" ", "") #remove spaces
+            if self.archiveType not in lipdutils.PLOT_DEFAULT.keys():
                 str_archive = list(lipdutils.PLOT_DEFAULT.keys())[0:-1]
                 mystring = ""
                 for item in str_archive:
                     mystring += str(item) + ', '
-                warnings.warn('archiveType should be one of the following: ' + mystring)
+                warnings.warn('archiveType should be one of the following: ' + mystring)                
                 
     
     def __repr__(self):

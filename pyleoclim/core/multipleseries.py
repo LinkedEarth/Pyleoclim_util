@@ -89,6 +89,9 @@ class MultipleSeries:
     def __repr__(self):
         return repr(self.to_pandas()) 
     
+    def __len__(self):
+        return self.series_list.__len__()
+    
     def view(self):
         '''
         Generates a DataFrame version of the MultipleSeries object, suitable for viewing in a Jupyter Notebook
