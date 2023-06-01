@@ -361,7 +361,7 @@ class MultipleGeoSeries(MultipleSeries):
             * 'drop-row' - drop rows with missing values.
             * 'drop-col' - drop columns with missing values.
             * 'drop-min' - drop either rows or columns, choosing by data retention.
-            * 'fill-em' - use EM algorithm to fill missing value.  ncomp should be
+            * 'fill-em' - use EM algorithm to fill missing value [ default].  ncomp should be
               set to the number of factors required.
             * `None` raises if data contains NaN values.
 

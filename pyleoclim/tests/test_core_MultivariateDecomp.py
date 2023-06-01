@@ -52,8 +52,6 @@ class TestUiMultivariateDecompScreeplot:
         
         fig, ax = res.screeplot()
         pyleo.closefig(fig)
-        plt.close()
-        
         
 class TestUiMultivariateDecompModeplot:
     ''' Tests for SSARes.modeplot()
