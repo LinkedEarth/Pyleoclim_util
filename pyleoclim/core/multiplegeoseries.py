@@ -43,8 +43,24 @@ class MultipleGeoSeries(MultipleSeries):
 
     Examples
     --------
-    TODO: Euro2k example?
-                
+    .. jupyter-execute::
+        
+        from pylipd.utils.dataset import load_dir
+        lipd = load_dir(name='Euro2k')
+        df = lipd.get_timeseries_essentials()
+        dfs = df.query("archiveType in ('tree')") 
+        # place in a MultipleGeoSeries object
+        ts_list = []
+        for _, row in dfs.iterrows():
+            ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                           time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                           time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                           lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                           archiveType = row['archiveType'], verbose = False, 
+                                           label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+    
+        Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+        Euro2k.map(projection='Orthographic') 
     '''
 
     def __init__(self, series_list, time_unit=None, label=None):
@@ -108,7 +124,28 @@ class MultipleGeoSeries(MultipleSeries):
         -------
         TYPE
             DESCRIPTION.
-
+            
+        Examples
+        --------
+        .. jupyter-execute::
+            
+            from pylipd.utils.dataset import load_dir
+            lipd = load_dir(name='Euro2k')
+            df = lipd.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree')") 
+            # place in a MultipleGeoSeries object
+            ts_list = []
+            for _, row in dfs.iterrows():
+                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               archiveType = row['archiveType'], verbose = False, 
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+    
+            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+            
+            Euro2k.map(projection='Orthographic')  # By default, this will employ a Robinson projection
         '''
 
         def make_scalar_mappable(cmap, lims=None, n=None):
@@ -302,7 +339,7 @@ class MultipleGeoSeries(MultipleSeries):
     def pca(self, weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
         '''Principal Component Analysis (Empirical Orthogonal Functions)
 
-        Decomposition of dataset ys in terms of orthogonal basis functions.
+        Decomposition of MultipleGeoSeries object in terms of orthogonal basis functions.
         Tolerant to missing values, infilled by an EM algorithm.
 
         Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
@@ -348,25 +385,37 @@ class MultipleGeoSeries(MultipleSeries):
         
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
-        pyleoclim.core.multivardecomp.MultivariateDecomp : The spatial decomposition object
+        pyleoclim.core.multivardecomp.MultivariateDecomp : The multivariate decomposition object
         
+        pyleoclim.core.mulitpleseries.MulitpleSeries.common_time : align time axes
+
         Examples
         --------
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist).common_time()
+            from pylipd.utils.dataset import load_dir
+            lipd = load_dir(name='Euro2k')
+            df = lipd.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree')") 
+            # place in a MultipleGeoSeries object
+            ts_list = []
+            for _, row in dfs.iterrows():
+                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               archiveType = row['archiveType'], verbose = False, 
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+        
+            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+            
+            res = Euro2k.pca() # carry out PCA
+            type(res) # the result is a MultivariateDecomp object
 
-            res = ms.pca() # carry out PCA
-
-            fig1, ax1 = res.screeplot() # plot the eigenvalue spectrum
-            fig2, ax2 = res.modeplot() # plot the first mode
-
+            res.screeplot() # plot the eigenvalue spectrum
+            res.modeplot() # plot the first mode, equivalent to res.modeplot(index=0)
+            res.modeplot(index=1) # plot the second mode (note the zero-based indexing)
         '''
         # extract geographical coordinate
         lats = np.array([ts.lat for ts in self.series_list])

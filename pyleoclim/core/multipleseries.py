@@ -917,7 +917,7 @@ class MultipleSeries:
     def pca(self,weights=None, name=None, missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
         '''Principal Component Analysis (Empirical Orthogonal Functions)
 
-        Decomposition of dataset ys in terms of orthogonal basis functions.
+        Decomposition of MultipleSeries in terms of orthogonal basis functions.
         Tolerant to missing values, infilled by an EM algorithm.
 
         Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
@@ -964,6 +964,8 @@ class MultipleSeries:
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
         pyleoclim.core.multivardecomp.MultivariateDecomp : The spatial decomposition object
+        
+        pyleoclim.core.mulitpleseries.MulitpleSeries.common_time : align time axes
         
         Examples
         --------
