@@ -1261,8 +1261,7 @@ class Series:
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh, online=online)
 
-
-        resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
+        resc = SsaRes(label=self.label, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
                         pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'],
                         RCseries=res['RCseries'], mode_idx=res['mode_idx'])
         if nMC >= 0:

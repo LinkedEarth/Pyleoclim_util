@@ -197,10 +197,10 @@ def set_proj(projection='Robinson', proj_default = True):
     return proj
 
 def map(lat, lon, criteria, marker=None, color =None,
-            projection = 'Robinson', proj_default = True,
-           background = True,borders = False, rivers = False, lakes = False,
-           figsize = None, ax = None, scatter_kwargs=None, legend=True, legend_title=None,
-           lgd_kwargs=None,savefig_settings=None):
+        projection = 'Robinson', proj_default = True,
+        background = True,borders = False, rivers = False, lakes = False,
+        figsize = None, ax = None, scatter_kwargs=None, legend=True, legend_title=None,
+        lgd_kwargs=None,savefig_settings=None):
     """ Map the location of all lat/lon according to some criteria
     
     Map the location of all lat/lon according to some criteria. Based on functions defined in the Cartopy package. 
@@ -349,7 +349,7 @@ def map(lat, lon, criteria, marker=None, color =None,
     del scatter_kwargs['edgecolors']
     
     # get the projection:
-    #proj = set_proj(projection=projection, proj_default=proj_default) 
+    proj = set_proj(projection=projection, proj_default=proj_default) 
     if proj_default == True:
         proj1 = {'central_latitude': np.mean(lat),
                  'central_longitude': np.mean(lon)}
