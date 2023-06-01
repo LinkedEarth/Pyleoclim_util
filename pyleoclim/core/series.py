@@ -227,13 +227,15 @@ class Series:
         self.clean_ts = clean_ts
         self.importedFrom = importedFrom
         self.archiveType = archiveType
-        if self.archiveType is not None:
-            if self.archiveType.lower().replace(" ", "") not in lipdutils.PLOT_DEFAULT.keys():
+        if archiveType is not None:
+            archiveType = lipdutils.LipdToOntology(archiveType)
+            self.archiveType = archiveType.lower().replace(" ", "") #remove spaces
+            if self.archiveType not in lipdutils.PLOT_DEFAULT.keys():
                 str_archive = list(lipdutils.PLOT_DEFAULT.keys())[0:-1]
                 mystring = ""
                 for item in str_archive:
                     mystring += str(item) + ', '
-                warnings.warn('archiveType should be one of the following: ' + mystring)
+                warnings.warn('archiveType should be one of the following: ' + mystring)                
                 
     
     def __repr__(self):
@@ -1259,8 +1261,7 @@ class Series:
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh, online=online)
 
-
-        resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
+        resc = SsaRes(label=self.label, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
                         pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'],
                         RCseries=res['RCseries'], mode_idx=res['mode_idx'])
         if nMC >= 0:

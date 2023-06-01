@@ -5,7 +5,7 @@ Created on Mon Feb  8 13:28:24 2021
 
 @author: deborahkhider
 
-Tests for pyleoclim.core.ui.LipdSeries
+Tests for pyleoclim.core.geoseries.GeoSeries
 
 Naming rules:
 1. class: Test{filename}{Class}{method} with appropriate camel case

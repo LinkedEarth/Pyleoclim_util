@@ -38,6 +38,32 @@ class TestUIMultipleGeoSeriesMap:
         fig, ax = mgs.map(hue = 'elevation')
         pyleo.closefig(fig)
         # assert something?
+        
+class TestUIMultipleGeoSeriesPCA:
+    def test_pca_t0(self, multiple_pinkgeoseries):
+        '''
+        test PCA output
+        '''
+        mgs = multiple_pinkgeoseries
+        pca = mgs.pca()
+        assert pca.name == 'Multiple Pink GeoSeries PCA'
+        
+    def test_pca_t1(self, multiple_pinkgeoseries):
+        '''
+        test PCA screeplot
+        '''
+        mgs = multiple_pinkgeoseries
+        pca = mgs.pca()
+        fig, ax = pca.screeplot()
+        
+    def test_pca_t2(self, multiple_pinkgeoseries):
+        '''
+        test PCA modeplot
+        '''
+        mgs = multiple_pinkgeoseries
+        pca = mgs.pca()
+        fig, ax = pca.modeplot(index=1)
+        
 
 # def create_Euro2k():
 #     '''

@@ -43,30 +43,34 @@ class MultipleGeoSeries(MultipleSeries):
 
     Examples
     --------
-    TODO: Euro2k example?
-                
+    .. jupyter-execute::
+        
+        from pylipd.utils.dataset import load_dir
+        lipd = load_dir(name='Euro2k')
+        df = lipd.get_timeseries_essentials()
+        dfs = df.query("archiveType in ('tree')") 
+        # place in a MultipleGeoSeries object
+        ts_list = []
+        for _, row in dfs.iterrows():
+            ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                           time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                           time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                           lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                           archiveType = row['archiveType'], verbose = False, 
+                                           label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+    
+        Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+        Euro2k.map(projection='Orthographic') 
     '''
 
     def __init__(self, series_list, time_unit=None, label=None):
-        from ..core.geoseries import GeoSeries
-
-        self.series_list = series_list
-        self.time_unit = time_unit
-        self.label = label
-
         # check that all components are GeoSeries
-        if not all([isinstance(ts, GeoSeries) for ts in self.series_list]):
+        self.series_list = series_list
+        from ..core.geoseries import GeoSeries
+        if not all([isinstance(ts, GeoSeries) for ts in series_list]):
             raise ValueError('All components must be GeoSeries objects')
-
-        # check that they all have lat/lon (do we need this?)
-
-        if self.time_unit is not None:
-            new_ts_list = []
-            for ts in self.series_list:
-                new_ts = ts.convert_time_unit(time_unit=self.time_unit)
-                new_ts_list.append(new_ts)
-
-            self.series_list = new_ts_list
+        
+        super().__init__(series_list, time_unit, label)
 
     # ============ MAP goes here ================
     def map(self, marker='archiveType', hue=None, size=None,
@@ -120,7 +124,28 @@ class MultipleGeoSeries(MultipleSeries):
         -------
         TYPE
             DESCRIPTION.
-
+            
+        Examples
+        --------
+        .. jupyter-execute::
+            
+            from pylipd.utils.dataset import load_dir
+            lipd = load_dir(name='Euro2k')
+            df = lipd.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree')") 
+            # place in a MultipleGeoSeries object
+            ts_list = []
+            for _, row in dfs.iterrows():
+                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               archiveType = row['archiveType'], verbose = False, 
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+    
+            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+            
+            Euro2k.map(projection='Orthographic')  # By default, this will employ a Robinson projection
         '''
 
         def make_scalar_mappable(cmap, lims=None, n=None):
@@ -282,7 +307,7 @@ class MultipleGeoSeries(MultipleSeries):
             ptlabels = [None for ik in lats]
         else:
             ptlabels = legend_d[legend_attribute]
-
+            
         res = mp.map(lats, lons, ptlabels, marker=trait_d['marker']['attrib_vals'],
                      color=trait_d['hue']['attrib_vals'],
                      projection=projection, proj_default=proj_default,
@@ -309,3 +334,99 @@ class MultipleGeoSeries(MultipleSeries):
             #                                orientation='vertical', label=hue)
 
         return res
+
+
+    def pca(self, weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
+        '''Principal Component Analysis (Empirical Orthogonal Functions)
+
+        Decomposition of MultipleGeoSeries object in terms of orthogonal basis functions.
+        Tolerant to missing values, infilled by an EM algorithm.
+
+        Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
+
+        Algorithm from statsmodels: https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html
+
+        Parameters
+        ----------
+
+        weights : ndarray, optional
+        
+            Series weights to use after transforming data according to standardize
+            or demean when computing the principal components.
+
+        missing : {str, None}
+        
+            Method for missing data.  Choices are:
+
+            * 'drop-row' - drop rows with missing values.
+            * 'drop-col' - drop columns with missing values.
+            * 'drop-min' - drop either rows or columns, choosing by data retention.
+            * 'fill-em' - use EM algorithm to fill missing value [ default].  ncomp should be
+              set to the number of factors required.
+            * `None` raises if data contains NaN values.
+
+        tol_em : float
+        
+            Tolerance to use when checking for convergence of the EM algorithm.
+            
+        max_em_iter : int
+        
+            Maximum iterations for the EM algorithm.
+
+        Returns
+        -------
+
+        res: MultivariateDecomp
+
+            Resulting pyleoclim.MultivariateDecomp object
+        
+        See also
+        --------
+        
+        pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
+
+        pyleoclim.core.multivardecomp.MultivariateDecomp : The multivariate decomposition object
+        
+        pyleoclim.core.mulitpleseries.MulitpleSeries.common_time : align time axes
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            from pylipd.utils.dataset import load_dir
+            lipd = load_dir(name='Euro2k')
+            df = lipd.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree')") 
+            # place in a MultipleGeoSeries object
+            ts_list = []
+            for _, row in dfs.iterrows():
+                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               archiveType = row['archiveType'], verbose = False, 
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+        
+            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+            
+            res = Euro2k.pca() # carry out PCA
+            type(res) # the result is a MultivariateDecomp object
+
+            res.screeplot() # plot the eigenvalue spectrum
+            res.modeplot() # plot the first mode, equivalent to res.modeplot(index=0)
+            res.modeplot(index=1) # plot the second mode (note the zero-based indexing)
+        '''
+        # extract geographical coordinate
+        lats = np.array([ts.lat for ts in self.series_list])
+        lons = np.array([ts.lon for ts in self.series_list])
+        locs = np.column_stack([lats,lons])
+        
+        # apply PCA fom parent class
+        pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em, 
+                           max_em_iter=max_em_iter,**pca_kwargs)
+        # add geographical information
+        pca_res.locs = locs 
+        
+        return pca_res
+        

@@ -171,7 +171,7 @@ def objname_to_obj(objname):
                       'MultipleScalogram':pyleo.core.MultipleScalogram,
                       'Corr':pyleo.core.Corr,
                       'CorrEns':pyleo.core.CorrEns,
-                      'SpatialDecomp':pyleo.core.SpatialDecomp,
+                      'MultivariateDecomp':pyleo.core.MultivariateDecomp,
                       'SsaRes':pyleo.core.SsaRes,
                       'Lipd':pyleo.core.Lipd,
                       'LipdSeries':pyleo.core.LipdSeries,

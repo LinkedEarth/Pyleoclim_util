@@ -295,7 +295,7 @@ class GeoSeries(Series):
 
             import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-            fig, ax = ts.map(lgd_kwargs={'bbox_to_anchor':(1.5, 1)})
+            fig, ax = ts.map(lgd_kwargs={'bbox_to_anchor':(1.5, 1)}) # by default, the legend conflicts with the map, but it's easy to push it outside with this keyword argument'
 
         '''
         
@@ -348,7 +348,7 @@ class GeoSeries(Series):
                                   rivers=rivers, lakes=lakes,
                                   figsize=figsize, ax=ax,
                                   scatter_kwargs=scatter_kwargs, legend=legend, legend_title=legend_title,
-                                  lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings, )
+                                  lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
 
             except:
                 try:

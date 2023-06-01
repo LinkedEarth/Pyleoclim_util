@@ -105,10 +105,10 @@ CorrEns (pyleoclim.CorrEns)
 .. autoclass:: pyleoclim.core.correns.CorrEns
    :members:
 
-SpatialDecomp (pyleoclim.SpatialDecomp)
+MultivarDecomp (pyleoclim.MultivariateDecomp)
 """""""""""""""""""""""""""""""""""""""
 
-.. autoclass:: pyleoclim.core.spatialdecomp.SpatialDecomp
+.. autoclass:: pyleoclim.core.multivardecomp.MultivariateDecomp
   :members:
 
 SsaRes (pyleoclim.SsaRes)

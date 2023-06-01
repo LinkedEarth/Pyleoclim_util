@@ -10,7 +10,7 @@ from ..utils import correlation as corrutils
 from ..core.correns import CorrEns
 from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
-from ..core.spatialdecomp import SpatialDecomp
+from ..core.multivardecomp import MultivariateDecomp
 
 import warnings
 import numpy as np
@@ -66,6 +66,7 @@ class MultipleSeries:
     def __init__(self, series_list, time_unit=None, label=None, name=None):
         from ..core.series import Series
         from ..core.geoseries import GeoSeries
+        from ..core.lipdseries import LipdSeries
         
         self.series_list = series_list
         self.time_unit = time_unit
@@ -75,7 +76,7 @@ class MultipleSeries:
             warnings.warn("`name` is a deprecated property, which will be removed in future releases. Please use `label` instead.",
                           DeprecationWarning, stacklevel=2)
         # check that all components are Series
-        if not all([isinstance(ts, (Series, GeoSeries)) for ts in self.series_list]):
+        if not all([isinstance(ts, (Series, GeoSeries, LipdSeries)) for ts in self.series_list]):
             raise ValueError('All components must be Series or GeoSeries objects')
 
         if self.time_unit is not None:
@@ -88,6 +89,9 @@ class MultipleSeries:
             
     def __repr__(self):
         return repr(self.to_pandas()) 
+    
+    def __len__(self):
+        return self.series_list.__len__()
     
     def view(self):
         '''
@@ -911,10 +915,10 @@ class MultipleSeries:
 
         return flag, lengths
 
-    def pca(self,weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
+    def pca(self,weights=None, name=None, missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
         '''Principal Component Analysis (Empirical Orthogonal Functions)
 
-        Decomposition of dataset ys in terms of orthogonal basis functions.
+        Decomposition of MultipleSeries in terms of orthogonal basis functions.
         Tolerant to missing values, infilled by an EM algorithm.
 
         Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
@@ -951,16 +955,18 @@ class MultipleSeries:
         Returns
         -------
 
-        res: SpatialDecomp
+        res: MultivariateDecomp
 
-            Resulting pyleoclim.SpatialDecomp object
+            Resulting pyleoclim.MultivariateDecomp object
         
         See also
         --------
         
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
-        pyleoclim.core.spatialdecomp.SpatialDecomp : The spatial decomposition object
+        pyleoclim.core.multivardecomp.MultivariateDecomp : The spatial decomposition object
+        
+        pyleoclim.core.mulitpleseries.MulitpleSeries.common_time : align time axes
         
         Examples
         --------
@@ -973,7 +979,7 @@ class MultipleSeries:
             tslist = data.to_LipdSeriesList()
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist).common_time()
-
+            ms.label = ms.series_list[0].label
             res = ms.pca() # carry out PCA
 
             fig1, ax1 = res.screeplot() # plot the eigenvalue spectrum
@@ -991,7 +997,7 @@ class MultipleSeries:
             for j in range(p):
                 ys[:,j] = self.series_list[j].value  # fill in data matrix
 
-        nc = min(ys.shape) # number of components to return
+        #nc = min(ys.shape) # number of components to return
 
         out  = PCA(ys,weights=weights,missing=missing,tol_em=tol_em, max_em_iter=max_em_iter,**pca_kwargs)
 
@@ -1002,11 +1008,17 @@ class MultipleSeries:
         # compute percent variance
         pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
 
-        # assign result to SpatiamDecomp class
-        # Note: need to grab coordinates from Series or LiPDSeries
-        res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+        # assign name
+        if name is not None:
+            name_str = name + ' PCA'
+        elif self.label is not None:
+            name_str = self.label + ' PCA'
+        else:
+            name_str = 'PCA of unlabelled object'
+        # assign result to MultivariateDecomp class
+        res = MultivariateDecomp(name=name_str, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,
-                            eigvals = out.eigenvals, eigvecs = out.eigenvecs)
+                            eigvals = out.eigenvals, eigvecs = out.eigenvecs, orig=self)
         return res
 
     # def mcpca(self,nMC=200,**pca_kwargs):

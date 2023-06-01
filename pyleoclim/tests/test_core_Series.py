@@ -1163,7 +1163,7 @@ class TestResample:
             'value_unit': 'mb',
             'value_name': 'SOI',
             'label': f'Southern Oscillation Index ({rule} resampling)',
-            'archiveType': 'Instrumental',
+            'archiveType': 'instrumental',
             'importedFrom': None,
             'log': (
                     {0: 'dropna', 'applied': True, 'verbose': True},
@@ -1205,7 +1205,7 @@ class TestResample:
             'value_unit': 'mb',
             'value_name': 'SOI',
             'label': f'Southern Oscillation Index ({rule} resampling)',
-            'archiveType': 'Instrumental',
+            'archiveType': 'instrumental',
             'importedFrom': None,
             'log': (
                     {0: 'dropna', 'applied': True, 'verbose': True},

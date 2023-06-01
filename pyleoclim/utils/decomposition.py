@@ -121,7 +121,7 @@ import warnings
 
 #     # assign result to SpatiamDecomp class
 #     # Note: need to grab coordinates from Series or LiPDSeries
-#     res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+#     res = MultivariateDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
 #                         pcs = out.scores, pctvar = pctvar,  locs = None,
 #                         eigvals = out.eigenvals, eigvecs = out.eigenvecs)
 

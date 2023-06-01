@@ -19,13 +19,17 @@ class SsaRes:
     '''This class is meant to hold the output of the Singular Spectrum Analysis (SSA) method,
     which applies to Series objets. Two functions are enabled by this class:
         
-    * `screeplot`, which plots the eigenvalue spectrum to help determine what modes to keep
-    
+    * `screeplot`, which plots the eigenvalue spectrum to help determine what modes to keep  
     * `modeplot`, which plots the individual mode temporal EOF and temporal PC
 
     Parameters
     ----------
-
+    time : array
+        time axis 
+        
+    original : array 
+        timeseries on which SSA was performed
+        
     eigvals: float (M, 1)
         a vector of real eigenvalues derived from the signal
 
@@ -50,16 +54,15 @@ class SsaRes:
     RCseries : float (N, 1)
         reconstructed series based on the RCs of mode_idx (scaled to original series; mean must be added after the fact)
 
-
     See also
     --------
 
     pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis
     '''
-    def __init__(self, time, original, name, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
+    def __init__(self, time, original, label, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
         self.time       = time
         self.original   = original
-        self.name       = name
+        self.label      = label
         self.eigvals    = eigvals
         self.eigvals_q  = eigvals_q
         self.eigvecs    = eigvecs
@@ -159,7 +162,7 @@ class SsaRes:
         if self.eigvals_q is not None:
             ax.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles')
 
-        ax.errorbar(x=idx,y=v,yerr = dv, color=clr_eig,marker='o',ls='',alpha=1.0,label=self.name)
+        ax.errorbar(x=idx,y=v,yerr = dv, color=clr_eig,marker='o',ls='',alpha=1.0,label=self.label)
         ax.plot(idx[self.mode_idx],v[self.mode_idx],color=clr_signif,marker='o',ls='',
                  markersize=4, label='modes retained',zorder=10)
         ax.set_title(title,fontweight='bold'); ax.legend()
@@ -263,7 +266,7 @@ class SsaRes:
         ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])
-        ts_rc = series.Series(time=self.time, value=RC) # define timeseries object for the RC
+        ts_rc = series.Series(time=self.time, value=RC, verbose=False) # define timeseries object for the RC
         psd_mtm_rc = ts_rc.interp().spectral(method=spec_method)
         psd_mtm_rc.plot(ax=ax)
         ax.set_xlabel('Period')
