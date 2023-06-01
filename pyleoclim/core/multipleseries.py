@@ -66,6 +66,7 @@ class MultipleSeries:
     def __init__(self, series_list, time_unit=None, label=None, name=None):
         from ..core.series import Series
         from ..core.geoseries import GeoSeries
+        from ..core.lipdseries import LipdSeries
         
         self.series_list = series_list
         self.time_unit = time_unit
@@ -75,7 +76,7 @@ class MultipleSeries:
             warnings.warn("`name` is a deprecated property, which will be removed in future releases. Please use `label` instead.",
                           DeprecationWarning, stacklevel=2)
         # check that all components are Series
-        if not all([isinstance(ts, (Series, GeoSeries)) for ts in self.series_list]):
+        if not all([isinstance(ts, (Series, GeoSeries, LipdSeries)) for ts in self.series_list]):
             raise ValueError('All components must be Series or GeoSeries objects')
 
         if self.time_unit is not None:
@@ -978,7 +979,7 @@ class MultipleSeries:
             tslist = data.to_LipdSeriesList()
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist).common_time()
-
+            ms.label = ms.series_list[0].label
             res = ms.pca() # carry out PCA
 
             fig1, ax1 = res.screeplot() # plot the eigenvalue spectrum
@@ -1007,12 +1008,13 @@ class MultipleSeries:
         # compute percent variance
         pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
 
-
         # assign name
         if name is not None:
             name_str = name + ' PCA'
-        else:
+        elif self.label is not None:
             name_str = self.label + ' PCA'
+        else:
+            name_str = 'PCA of unlabelled object'
         # assign result to MultivariateDecomp class
         res = MultivariateDecomp(name=name_str, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,

@@ -380,9 +380,9 @@ class MultivariateDecomp:
                          shrink=cb_scale, orientation="vertical")
                              
         else: # plot the original data
-            ax['map'] = fig.add_subplot(gs[1, 1])
-            ax['map'].set_title('Original Data (standardized)', weight='bold')
-            self.orig.standardize().plot(ax=ax['map'])   
+            ax['map'] = fig.add_subplot(gs[1:, :])
+            self.orig.standardize().plot(ax=ax['map'], title='',
+                                         ylabel = 'Original Data (standardized)')   
 
         # if title is not None:
         #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
