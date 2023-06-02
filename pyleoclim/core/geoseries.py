@@ -306,7 +306,7 @@ class GeoSeries(Series):
                     ocean=ocean,
                     land=land,
                     figsize=figsize, scatter_kwargs=scatter_kwargs,
-                    legend_kwargs=lgd_kwargs, legend=legend,
+                    lgd_kwargs=lgd_kwargs, legend=legend,
                     cmap=cmap,edgecolor=edgecolor,
                     fig=fig, gs_slot=gridspec_slot)
 
@@ -595,7 +595,7 @@ class GeoSeries(Series):
 
         ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
-                    figsize=None, scatter_kwargs=scatter_kwargs, legend_kwargs=lgd_kwargs, legend=legend, cmap='viridis',
+                    figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs, legend=legend, cmap='viridis',
                     fig=fig, gs_slot=gs[1, 0:2])
 
         # make the map - brute force since projection is not being returned properly

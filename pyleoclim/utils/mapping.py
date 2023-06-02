@@ -465,7 +465,7 @@ def map(lat, lon, criteria, marker=None, color=None,
 
 def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='w', projection='Robinson', proj_default=True,
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
-                figsize=None, scatter_kwargs=None, legend_kwargs=None, legend=True, cmap='viridis',
+                figsize=None, scatter_kwargs=None, lgd_kwargs=None, legend=True, cmap='viridis',
                 fig=None, gs_slot=None):
 
     def make_df(geo_ms, hue=None, marker=None, size=None):
@@ -488,12 +488,14 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         return geos_df
 
     def plot_scatter(df=None, x=None, y=None, hue_var=None, size_var=None, marker_var=None, edgecolor='w',
-                     ax=None, proj=None, scatter_kwargs=None, legend=True, legend_kwargs=None,
+                     ax=None, proj=None, scatter_kwargs=None, legend=True, lgd_kwargs=None,
                      # fig=None, gs_slot=None,
                      cmap='viridis', **kwargs):
 
         if type(scatter_kwargs) != dict:
             scatter_kwargs = {}
+        if type(lgd_kwargs) != dict:
+            lgd_kwargs = {}
         print(scatter_kwargs)
 
         plot_defaults = copy.copy(PLOT_DEFAULT)
@@ -680,10 +682,17 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
             # Finally rebuild legend in single list with formatted section headers
             handles, labels = [], []
+            headers = True
+            if ((len(d_leg) == 1) and ('label' in d_leg.keys())):
+                headers = False
+            if 'headers' in lgd_kwargs:
+                headers = lgd_kwargs['headers']
+                del lgd_kwargs['headers']
+
             for key in d_leg:
                 han = copy.copy(h[0])
                 han.set_alpha(0)
-                if ((len(d_leg)==1) and ('label' in d_leg.keys()))==False:
+                if headers==True:
                     handles.append(han)
                     labels.append('$\\bf{}$'.format('{' + key + '}'))
 
@@ -705,13 +714,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
                 handles.append(han)
                 labels.append('')
-            if type(legend_kwargs) != dict:
-                legend_kwargs = {}
-            if 'loc' not in legend_kwargs:
-                legend_kwargs['loc'] = 'upper left'
-            if 'bbox_to_anchor' not in legend_kwargs:
-                legend_kwargs['bbox_to_anchor'] = (1, 1)
-            ax.legend(handles, labels, **legend_kwargs)  # loc="upper left", bbox_to_anchor=(1, 1))
+
+            if 'loc' not in lgd_kwargs:
+                lgd_kwargs['loc'] = 'upper left'
+            if 'bbox_to_anchor' not in lgd_kwargs:
+                lgd_kwargs['bbox_to_anchor'] = (1, 1)
+            ax.legend(handles, labels, **lgd_kwargs)  # loc="upper left", bbox_to_anchor=(1, 1))
         else:
             ax.legend().remove()
 
@@ -790,8 +798,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     # if 'edgecolor' not in scatter_kwargs:
     #     scatter_kwargs['edgecolor'] = edgecolor
 
-    plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax=ax, proj=None,edgecolor=edgecolor,
-                 cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, legend_kwargs=legend_kwargs)  # , **kwargs)
+    plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax=ax, proj=None, edgecolor=edgecolor,
+                 cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, lgd_kwargs=lgd_kwargs)  # , **kwargs)
     return ax
 
 

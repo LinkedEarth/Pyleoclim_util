@@ -165,7 +165,7 @@ class MultipleGeoSeries(MultipleSeries):
                                         ocean=ocean,
                                         land=land,
                                         figsize=figsize, scatter_kwargs=scatter_kwargs,
-                                        legend_kwargs=lgd_kwargs, legend=legend,
+                                        lgd_kwargs=lgd_kwargs, legend=legend,
                                         cmap=cmap,
                                         fig=fig, gs_slot=gridspec_slot)
         # def make_scalar_mappable(cmap, lims=None, n=None):
