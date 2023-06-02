@@ -77,7 +77,7 @@ class MultipleGeoSeries(MultipleSeries):
 
 
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap='viridis',
-            color_pal=None, legend_attribute=None, projection='Robinson', proj_default=True,
+            edgecolor='w', color_pal=None, legend_attribute=None, projection='Robinson', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, ax=None, scatter_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
@@ -158,7 +158,8 @@ class MultipleGeoSeries(MultipleSeries):
             
         '''
 
-        scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
+        scatter_map(self, hue=hue, size=size, marker=marker,
+                    edgecolor=edgecolor, projection=projection,
                                         proj_default=proj_default,
                                         background=background, borders=borders, rivers=rivers, lakes=lakes,
                                         ocean=ocean,

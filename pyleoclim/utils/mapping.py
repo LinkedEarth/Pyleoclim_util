@@ -463,10 +463,11 @@ def map(lat, lon, criteria, marker=None, color=None,
         return ax
 
 
-def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projection='Robinson', proj_default=True,
+def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='w', projection='Robinson', proj_default=True,
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, legend_kwargs=None, legend=True, cmap='viridis',
                 fig=None, gs_slot=None):
+
     def make_df(geo_ms, hue=None, marker=None, size=None):
         try:
             geo_series_list = geo_ms.series_list
@@ -486,12 +487,18 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projec
         geos_df = pd.DataFrame(value_d)
         return geos_df
 
-    def plot_scatter(df=None, x=None, y=None, hue_var=None, size_var=None, marker_var=None,
+    def plot_scatter(df=None, x=None, y=None, hue_var=None, size_var=None, marker_var=None, edgecolor='w',
                      ax=None, proj=None, scatter_kwargs=None, legend=True, legend_kwargs=None,
                      # fig=None, gs_slot=None,
                      cmap='viridis', **kwargs):
 
+        if type(scatter_kwargs) != dict:
+            scatter_kwargs = {}
+        print(scatter_kwargs)
+
         plot_defaults = copy.copy(PLOT_DEFAULT)
+        palette = None
+
         _df = df
         if len(_df) == 1:
             _df = _df.reindex()
@@ -502,17 +509,20 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projec
 
         elif type(ax) == cartopy.mpl.geoaxes.GeoAxes:
             if proj is not None:
-                kwargs['transform'] = proj
+                scatter_kwargs['transform'] = proj
             else:
-                kwargs['transform'] = ccrs.PlateCarree()
+                scatter_kwargs['transform'] = ccrs.PlateCarree()
 
         missing_d = {'hue': kwargs['missing_val_hue'] if 'missing_val_hue' in kwargs else 'k',
                      'marker': kwargs['missing_val_marker'] if 'missing_val_marker' in kwargs else r'$?$',
                      'size': kwargs['missing_val_size'] if 'missing_val_size' in kwargs else 200,
                      'label': kwargs['missing_val_label'] if 'missing_val_label' in kwargs else 'missing',
                      }
-
         missing_val = missing_d['label']
+
+        if 'edgecolor' not in scatter_kwargs:
+                scatter_kwargs['edgecolor'] = edgecolor
+
         for trait_var in [hue_var, marker_var, size_var]:
             if trait_var not in _df.columns:
                 trait_var = None
@@ -528,15 +538,15 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projec
                     _df[trait_var] = missing_val
 
         if size_var == None:
-            kwargs['s'] = missing_d['size']
+            scatter_kwargs['s'] = missing_d['size']
         else:
             if len(set(_df[size_var]) - set([missing_val])) < 2:
-                kwargs['s'] = missing_d['size']
+                scatter_kwargs['s'] = missing_d['size']
                 size_var = None
             else:
                 # if size does vary, filter out missing values; at present no strategy to depict missing size values
                 _df = _df[_df[size_var] != missing_val]
-                kwargs['sizes'] = (20, 200)
+                scatter_kwargs['sizes'] = (20, 200)
         trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if trait_var != None]
 
         # mapping between marker styles and marker values
@@ -578,15 +588,17 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projec
                                 in enumerate(_df[marker_var].unique())}
 
         if ((type(marker_var) == str) and (type(trait2marker) == dict)):
-            residual = set(_df[marker_var].unique()) - set(trait2marker.keys())
+            # residual = set(_df[marker_var].unique()) - set(trait2marker.keys())
             # with missing values assigned '?'
             trait2marker['missing'] = missing_d['marker']
-            kwargs['markers'] = trait2marker
-            if len(residual) > 0:
-                print(residual)
+            scatter_kwargs['markers'] = trait2marker
+            residual_traits = [trait for trait in _df[marker_var].unique() if
+                               trait not in trait2marker.keys()]
+            if len(residual_traits) > 0:
+                print(residual_traits)
 
                 # palette
-        palette = None
+
         # use hue mapping if supplied
         if 'hue_mapping' in kwargs:
             palette = kwargs['hue_mapping']
@@ -596,9 +608,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projec
             palette = cmap
 
         if ((type(hue_var) == str) and (type(palette) == dict)):
-            residual = set(_df[hue_var].unique()) - set(palette.keys())
-            if len(residual) > 0:
-                print(residual)
+            residual_traits = [trait for trait in _df[hue_var].unique() if
+                               trait not in palette.keys()]
+            # residual = set(_df[hue_var].unique()) - set(palette.keys())
+            if len(residual_traits) > 0:
+                print(residual_traits)
 
                 # to get missing hue values to be missing value color (contrary to palette for available values)
         # yet be sized correctly, we plot all data with missing color, collect legend information,
@@ -606,17 +620,17 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projec
 
         if type(hue_var) == str:
             sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var,
-                            style=marker_var, palette=cycle([missing_d['hue']]), ax=ax, **kwargs)
+                            style=marker_var, palette=cycle([missing_d['hue']]), ax=ax, **scatter_kwargs)
             missing_handles, missing_labels = ax.get_legend_handles_labels()
 
             print(hue_var)
             hue_data = _df[_df[hue_var] != missing_val]
             sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,
-                            style=marker_var, palette=palette, ax=ax, **kwargs)
+                            style=marker_var, palette=palette, ax=ax, **scatter_kwargs)
         else:
-            kwargs['c'] = missing_d['hue']
+            scatter_kwargs['c'] = missing_d['hue']
             sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var,
-                            style=marker_var, ax=ax, **kwargs)
+                            style=marker_var, ax=ax, **scatter_kwargs)
             missing_handles, missing_labels = ax.get_legend_handles_labels()
 
         h, l = ax.get_legend_handles_labels()
@@ -772,10 +786,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projec
 
     if type(scatter_kwargs) != dict:
         scatter_kwargs = {}
-    if 'edgecolor' not in scatter_kwargs:
-        scatter_kwargs['edgecolor'] = 'w'
+    # print(edgecolor)
+    # if 'edgecolor' not in scatter_kwargs:
+    #     scatter_kwargs['edgecolor'] = edgecolor
 
-    plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax=ax, proj=None,
+    plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax=ax, proj=None,edgecolor=edgecolor,
                  cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, legend_kwargs=legend_kwargs)  # , **kwargs)
     return ax
 

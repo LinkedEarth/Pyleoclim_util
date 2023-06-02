@@ -207,7 +207,7 @@ class GeoSeries(Series):
     def map(self, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None,
-            figsize=None, ax=None, marker=None, hue='label', size=None,
+            figsize=None, ax=None, marker=None, hue='label', size=None, edgecolor='w',
             markersize=None, scatter_kwargs=None, cmap='viridis',
             legend=True, lgd_kwargs=None, savefig_settings=None):
         
@@ -307,7 +307,7 @@ class GeoSeries(Series):
                     land=land,
                     figsize=figsize, scatter_kwargs=scatter_kwargs,
                     legend_kwargs=lgd_kwargs, legend=legend,
-                    cmap=cmap,
+                    cmap=cmap,edgecolor=edgecolor,
                     fig=fig, gs_slot=gridspec_slot)
 
         # scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
@@ -527,9 +527,75 @@ class GeoSeries(Series):
         ax['dts'].set_ylabel('')
         ax['dts'].set_yticks([])
 
-        ax['map'] =mapping.scatter_map(self, hue='archiveType', size=None, marker=None, projection='Orthographic', proj_default=True,
-                    background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
-                    figsize=None, scatter_kwargs=None, legend_kwargs=None, legend=True, cmap='viridis',
+        map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
+        if 'projection' in map_kwargs.keys():
+            projection = map_kwargs['projection']
+        else:
+            projection = 'Orthographic'
+
+        if 'proj_default' in map_kwargs.keys():
+            proj_default = map_kwargs['proj_default']
+        else:
+            proj_default = True
+
+        if 'marker' in map_kwargs.keys():
+            marker = map_kwargs['marker']
+        else:
+            marker = 'archiveType' #lipdutils.PLOT_DEFAULT[archiveType][1]
+        if 'hue' in map_kwargs.keys():
+            hue = map_kwargs['color']
+        else:
+            hue = 'archiveType' #lipdutils.PLOT_DEFAULT[archiveType][0]
+        if 'size' in map_kwargs.keys():
+            size = map_kwargs['size']
+        else:
+            size = None
+
+        if 'background' in map_kwargs.keys():
+            background = map_kwargs['background']
+        else:
+            background = True
+        if 'borders' in map_kwargs.keys():
+            borders = map_kwargs['borders']
+        else:
+            borders = False
+        if 'rivers' in map_kwargs.keys():
+            rivers = map_kwargs['rivers']
+        else:
+            rivers = False
+        if 'ocean' in map_kwargs.keys():
+            ocean = map_kwargs['ocean']
+        else:
+            ocean = False
+        if 'land' in map_kwargs.keys():
+            land = map_kwargs['land']
+        else:
+            land = False
+        if 'lakes' in map_kwargs.keys():
+            lakes = map_kwargs['lakes']
+        else:
+            lakes = False
+
+        if 'scatter_kwargs' in map_kwargs.keys():
+            scatter_kwargs = map_kwargs['scatter_kwargs']
+        else:
+            scatter_kwargs = {}
+        if 'edgecolor' in map_kwargs.keys():
+            scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
+        # else:
+        #     pass
+        if 'lgd_kwargs' in map_kwargs.keys():
+            lgd_kwargs = map_kwargs['lgd_kwargs']
+        else:
+            lgd_kwargs = {}
+        if 'legend' in map_kwargs.keys():
+            legend = map_kwargs['legend']
+        else:
+            legend = False
+
+        ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
+                    background=background, borders=borders, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
+                    figsize=None, scatter_kwargs=scatter_kwargs, legend_kwargs=lgd_kwargs, legend=legend, cmap='viridis',
                     fig=fig, gs_slot=gs[1, 0:2])
 
         # make the map - brute force since projection is not being returned properly
