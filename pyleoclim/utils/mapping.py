@@ -683,9 +683,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             for key in d_leg:
                 han = copy.copy(h[0])
                 han.set_alpha(0)
-                handles.append(han)
-
-                labels.append('$\\bf{}$'.format('{' + key + '}'))
+                if ((len(d_leg)==1) and ('label' in d_leg.keys()))==False:
+                    handles.append(han)
+                    labels.append('$\\bf{}$'.format('{' + key + '}'))
 
                 tmp_labels, tmp_handles = [], []
                 tmp_labels_missing, tmp_handles_missing = [], []
