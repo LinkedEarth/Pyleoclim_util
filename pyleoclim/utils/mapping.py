@@ -4,14 +4,21 @@
 Mapping utilities for geolocated objects, leveraging Cartopy.
 """
 __all__=['map', 'compute_dist']
-
+import cartopy
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import copy
+from itertools import cycle
+from matplotlib.lines import Line2D
+import matplotlib as mpl
+import matplotlib.gridspec as gridspec
 
 from .plotting import savefig
+from .lipdutils import PLOT_DEFAULT, LipdToOntology
 
 def set_proj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
@@ -421,7 +428,297 @@ def map(lat, lon, criteria, marker=None, color =None,
         return fig, ax
     else:
         return ax
-  
+
+
+def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'Robinson',proj_default=True,
+             background = True, borders = False, rivers = False, lakes = False,ocean=True, land=True,
+            figsize = None, scatter_kwargs=None, legend_kwargs =None, legend=True, cmap='viridis',
+             fig=None, gs_slot=None):
+
+    def make_df(geo_ms, hue=None, marker=None, size=None):
+        try:
+            geo_series_list = geo_ms.series_list
+        except:
+            geo_series_list = [geo_ms]
+        lats = [geos.lat for geos in geo_series_list]
+        lons = [geos.lon for geos in geo_series_list]
+
+        trait_d = {'hue': hue, 'marker': marker, 'size': size}
+        value_d = {'lat': lats, 'lon': lons}
+        for trait_key in trait_d.keys():
+            trait = trait_d[trait_key]
+            if trait != None:
+                trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
+                              geo_series_list]
+                value_d[trait] = [trait_val if trait_val != 'None' else None for trait_val in trait_vals]
+        geos_df = pd.DataFrame(value_d)
+        return geos_df
+
+    def plot_scatter(df=None, x=None, y=None, hue_var=None, size_var=None, marker_var=None,
+                     ax=None, proj=None, scatter_kwargs=None, legend=True, legend_kwargs=None,  # fig=None, gs_slot=None,
+                     cmap='viridis', **kwargs):
+
+        plot_defaults = copy.copy(PLOT_DEFAULT)
+        _df = df
+        if len(_df) == 1:
+            _df = _df.reindex()
+
+        if ax is None:
+            fig = plt.figure(figsize=(20, 10))
+            ax = fig.add_subplot()
+
+        elif type(ax) == cartopy.mpl.geoaxes.GeoAxes:
+            if proj is not None:
+                kwargs['transform'] = proj
+            else:
+                kwargs['transform'] = ccrs.PlateCarree()
+
+        missing_d = {'hue': kwargs['missing_val_hue'] if 'missing_val_hue' in kwargs else 'k',
+                     'marker': kwargs['missing_val_marker'] if 'missing_val_marker' in kwargs else r'$?$',
+                     'size': kwargs['missing_val_size'] if 'missing_val_size' in kwargs else 200,
+                     'label': kwargs['missing_val_label'] if 'missing_val_label' in kwargs else 'missing',
+                     }
+
+        missing_val = missing_d['label']
+        trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if trait_var != None]
+
+        for trait_var in trait_vars:
+            if type(_df[trait_var]) == pd.Series:
+                _df[trait_var] = _df[trait_var].fillna(missing_val)
+            else:
+                if _df[trait_var] in [None, 'None']:
+                    _df[trait_var] = missing_val
+
+        if size_var == None:
+            kwargs['s'] = missing_d['size']
+        else:
+            if len(set(_df[size_var]) - set([missing_val])) < 2:
+                kwargs['s'] = missing_d['size']
+                size_var = None
+            else:
+                # if size does vary, filter out missing values; at present no strategy to depict missing size values
+                _df = _df[_df[size_var] != missing_val]
+                kwargs['sizes'] = (20, 200)
+        trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if trait_var != None]
+
+        # mapping between marker styles and marker values
+        # the difference between '.' and 'o' is a matter of size, so can't use both when size is a variable
+        if size_var != None:
+            marker_selection = [marker for marker in Line2D.filled_markers if
+                                marker not in ['.', 'o', '', ' ', 'none', 'None']]
+        else:
+            marker_selection = [marker for marker in Line2D.filled_markers if
+                                marker not in ['.', '', ' ', 'none', 'None']]
+
+        # check if a mapping has been prescribed
+        trait2marker = None
+        if 'marker_mapping' in kwargs:
+            trait2marker = kwargs['marker_mapping']
+        elif marker_var == 'archiveType':
+            trait2marker = {key: value[1] for key, value in plot_defaults.items()}
+
+        if type(trait2marker) == dict:
+            residual_traits = [trait for trait in _df[marker_var].unique() if
+                               trait not in trait2marker.keys()]  # +set(['missing'])
+            residual_markers = [marker for marker in marker_selection if marker not in trait2marker.values()]
+            for trait in residual_traits:
+                trait2marker[trait] = residual_markers.pop()
+
+            for key in trait2marker:
+                if type(trait2marker[key]) == str:
+                    if trait2marker[key] == missing_d['marker']:
+                        print('default symbol for missing values used in mapping')
+                    try:
+                        trait2marker[key] = mpl.markers.MarkerStyle(trait2marker[key], fillstyle=None)
+                    except:
+                        pass
+
+        m_cycle = cycle(marker_selection)
+        if ((marker_var != None) and (type(trait2marker) != dict)):
+            if len(_df[marker_var].unique()) > 1:
+                trait2marker = {trait_val: next(m_cycle) for ik, trait_val
+                                in enumerate(_df[marker_var].unique())}
+
+        if ((type(marker_var) == str) and (type(trait2marker) == dict)):
+            residual = set(_df[marker_var].unique()) - set(trait2marker.keys())
+            # with missing values assigned '?'
+            trait2marker['missing'] = missing_d['marker']
+            kwargs['markers'] = trait2marker
+            if len(residual) > 0:
+                print(residual)
+
+                # palette
+        palette = None
+        # use hue mapping if supplied
+        if 'hue_mapping' in kwargs:
+            palette = kwargs['hue_mapping']
+        elif hue_var == 'archiveType':
+            palette = {key: value[0] for key, value in plot_defaults.items()}
+        elif type(hue_var) == str:
+            palette = cmap
+
+        if ((type(hue_var) == str) and (type(palette) == dict)):
+            residual = set(_df[hue_var].unique()) - set(palette.keys())
+            if len(residual) > 0:
+                print(residual)
+
+                # to get missing hue values to be missing value color (contrary to palette for available values)
+        # yet be sized correctly, we plot all data with missing color, collect legend information,
+        # then plot data with available hue over it, collect the legend information again and recompose the legend
+        sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var,
+                        style=marker_var, palette=cycle([missing_d['hue']]), ax=ax, **kwargs)
+        missing_handles, missing_labels = ax.get_legend_handles_labels()
+
+        if type(hue_var) == str:
+            hue_data = _df[_df[hue_var] != missing_val]
+            sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,
+                            style=marker_var, palette=palette, ax=ax, **kwargs)
+
+        if legend == True:
+            h, l = ax.get_legend_handles_labels()
+
+            han = copy.copy(h[0])
+            han.set_alpha(0)
+            blank_handle = han
+
+            # find breakpoint between first plotting and overplotting
+            breakpoint = len(missing_labels)
+            available_handles = h[breakpoint:]
+            available_labels = l[breakpoint:]
+
+            for pair in [(available_handles, available_labels), (missing_handles, missing_labels)]:
+                pair_h, pair_l = pair[0], pair[1]
+                if len(pair_l) > 0:
+                    if pair_l[0] not in trait_vars:
+                        pair_l.insert(0, [trait_var for trait_var in set(trait_vars) if trait_var != None][0])
+                        pair_h.insert(0, blank_handle)
+            # legend has one section for each trait but ax.get_legend_handles_labels() yields straight lists
+            # This code reorganizes legend information hierarchically starting with available and adding values
+            # from missing as needed
+            d_leg = {}
+
+            for pair in [(available_handles, available_labels), (missing_handles, missing_labels)]:
+                pair_h, pair_l = pair[0], pair[1]
+                for ik, label in enumerate(pair_l):
+                    if label in trait_vars:
+                        key = label
+                        if label not in d_leg.keys():
+                            d_leg[key] = {'labels': [], 'handles': []}
+                    else:
+                        try:
+                            # first pass at sig figs approach to number formatting
+                            _label = np.format_float_positional(np.float16(pair_l[ik]), unique=True, precision=3)
+                        except:
+                            try:
+                                _label = LipdToOntology(pair_l[ik])
+                            except:
+                                _label = pair_l[ik]
+                        if _label not in d_leg[key]['labels']:
+                            d_leg[key]['labels'].append(_label)
+                            d_leg[key]['handles'].append(pair_h[ik])
+
+            # Finally rebuild legend in single list with formatted section headers
+            handles, labels = [], []
+            for key in d_leg:
+                han = copy.copy(h[0])
+                han.set_alpha(0)
+                handles.append(han)
+
+                labels.append('$\\bf{}$'.format('{' + key + '}'))
+
+                tmp_labels, tmp_handles = [], []
+                tmp_labels_missing, tmp_handles_missing = [], []
+                for ik, label in enumerate(d_leg[key]['labels']):
+                    if label == 'missing':
+                        tmp_labels_missing.append(label)
+                        tmp_handles_missing.append(d_leg[key]['handles'][ik])
+                    else:
+                        tmp_labels.append(label)
+                        tmp_handles.append(d_leg[key]['handles'][ik])
+
+                tmp_labels += tmp_labels_missing
+                tmp_handles += tmp_handles_missing
+
+                handles += tmp_handles
+                labels += tmp_labels
+
+                handles.append(han)
+                labels.append('')
+            if type(legend_kwargs) != dict:
+                legend_kwargs = {}
+            if 'loc' not in legend_kwargs:
+                legend_kwargs['loc'] = 'upper left'
+            if 'bbox_to_anchor' not in legend_kwargs:
+                legend_kwargs['bbox_to_anchor'] = (1,1)
+            ax.legend(handles, labels, **legend_kwargs)#loc="upper left", bbox_to_anchor=(1, 1))
+        else:
+            ax.legend().remove()
+
+    if type(geos) != pd.DataFrame:
+        df = make_df(geos, hue=hue, marker=marker, size=size)
+    else:
+        df = geos
+
+    # newCrs = ccrs.Robinson()
+    if proj_default is not True and type(proj_default) is not dict:
+        raise TypeError('The default for the projections should either be provided'+
+                 ' as a dictionary or set to True')
+
+    # get the projection:
+    proj = set_proj(projection=projection, proj_default=proj_default)
+    if proj_default == True:
+        proj1 = {'central_latitude': np.mean(df['lat']),
+                 'central_longitude': np.mean(df['lon'])}
+        proj2 = {'central_latitude': np.mean(df['lat'])}
+        proj3 = {'central_longitude': np.mean(df['lon'])}
+        try:
+            proj = set_proj(projection=projection, proj_default=proj1)
+        except:
+            try:
+                proj = set_proj(projection=projection, proj_default=proj3)
+            except:
+                proj = set_proj(projection=projection, proj_default=proj2)
+
+    if fig ==None:
+        if figsize == None:
+            figsize = (20, 7)
+        fig = plt.figure(figsize=figsize)
+
+    if gs_slot == None:
+        ax = fig.add_subplot(projection = proj)
+    else:
+        ax = fig.add_subplot(gs_slot, projection = proj)
+
+    # draw the coastlines
+    ax.add_feature(cfeature.COASTLINE, linewidths=(1,))
+    # Background
+    if background is True:
+        ax.stock_img()
+    #Other extra information
+    if borders is True:
+        ax.add_feature(cfeature.BORDERS, alpha = .5)
+    if lakes is True:
+        ax.add_feature(cfeature.LAKES, alpha=0.25)
+    if rivers is True:
+        ax.add_feature(cfeature.RIVERS)
+    if ocean is True:
+        ax.add_feature(cfeature.OCEAN, alpha = .25)
+    if land is True:
+        ax.add_feature(cfeature.LAND, alpha = .5)
+
+    # ax.set_global()
+
+    x = 'lon'
+    y = 'lat'
+
+    if type(scatter_kwargs) != dict:
+        scatter_kwargs = {}
+    if 'edgecolor' not in scatter_kwargs:
+        scatter_kwargs['edgecolor'] = 'w'
+
+    plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax=ax, proj=None,
+                 cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, legend_kwargs=legend_kwargs)#, **kwargs)
+    return ax
         
 def dist_sphere(lat1,lon1,lat2,lon2):
     """Uses the haversine formula to calculate distance on a sphere
