@@ -207,7 +207,7 @@ class GeoSeries(Series):
     def map(self, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None,
-            figsize=None, ax=None, marker=None, hue='label', size=None, edgecolor='w',
+            figsize=None, ax=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
             markersize=None, scatter_kwargs=None, cmap='viridis',
             legend=True, lgd_kwargs=None, savefig_settings=None):
         
