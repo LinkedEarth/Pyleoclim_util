@@ -149,12 +149,17 @@ The order above is somewhat loose, but goes from least complex (time*consuming) 
 
 
 Stylistic considerations
-"""""""""""""""""""""""""
+""""""""""""""""""""""""
 Guido van Rossum’s great insight is that code is read far more often than it is written, so it is important for the code to be of a somewhat uniform style, so that people can read and understand it with relative ease. Pyleoclim strives to use fairly consistent notation, including:
 
   * capital letters for matrices, lowercase for vectors
   * Independent variable is called ys, the dependent variable  (the time axis) ts.
   * Function names use CamelCase convention
+
+Conventions
+"""""""""""
+- Pyleoclim functions generally assume that time values are provided in increasing order. If that is not the case, they are sorted upon object creation by default. You can override this behavior, but this might create issues down the line.
+- For mapping purposes, longitude is assume to be in the interval (-180; 180]
 
 Contributing your changes to Pyleoclim
 ======================================
