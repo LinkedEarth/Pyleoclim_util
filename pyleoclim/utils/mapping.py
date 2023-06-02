@@ -667,10 +667,23 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
     # get the projection:
     proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
+        converted = False
+        if len(df[df['lon']>180])>0:
+            converted = True
+            mean_lon = np.mean(df['lon'].apply(lambda x: (x + 180) % 360 - 180))
+        else:
+            mean_lon = np.mean(df['lon'])
+
+
         proj1 = {'central_latitude': np.mean(df['lat']),
-                 'central_longitude': np.mean(df['lon'])}
+                 'central_longitude': mean_lon}
         proj2 = {'central_latitude': np.mean(df['lat'])}
-        proj3 = {'central_longitude': np.mean(df['lon'])}
+        proj3 = {'central_longitude': mean_lon}
+
+        # proj1 = {'central_latitude': np.mean(df['lat']),
+        #          'central_longitude': np.mean(df['lon'])}
+        # proj2 = {'central_latitude': np.mean(df['lat'])}
+        # proj3 = {'central_longitude': np.mean(df['lon'])}
         try:
             proj = set_proj(projection=projection, proj_default=proj1)
         except:
@@ -678,6 +691,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
                 proj = set_proj(projection=projection, proj_default=proj3)
             except:
                 proj = set_proj(projection=projection, proj_default=proj2)
+        
 
     if fig ==None:
         if figsize == None:
