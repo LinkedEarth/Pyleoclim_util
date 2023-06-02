@@ -133,9 +133,10 @@ class MultipleGeoSeries(MultipleSeries):
         .. jupyter-execute::
             
             from pylipd.utils.dataset import load_dir
-            lipd = load_dir(name='Euro2k')
-            df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree')") 
+            lipd = load_dir(name='Pages2k')
+            lipd_euro = lipd.filter_by_geo_bbox(-20,25,80,140)
+            df = lipd_euro.get_timeseries_essentials()
+            dfs = df.query("paleoData_variableName in ('temperature','d18O', 'Uk37', 'MXD', 'trsgi')")  # select series that could 
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -143,12 +144,18 @@ class MultipleGeoSeries(MultipleSeries):
                                                time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
                                                time_unit=row['time_units'], value_unit=row['paleoData_units'],
                                                lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               elevation = row['geo_meanElev'], observationType = row['paleoData_proxy'],
                                                archiveType = row['archiveType'], verbose = False, 
                                                label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
-    
+
             Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+
+            Euro2k.map() # By default, this will employ a Robinson projection
+            Euro2k.map(projection='Orthographic',size='elevation')  # tweak the projection and represent elevation by size
+            Euro2k.map(projection='Orthographic',hue='elevation')  # tweak the projection and represent elevation by hue
+
+
             
-            Euro2k.map(projection='Orthographic')  # By default, this will employ a Robinson projection
         '''
 
         scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
