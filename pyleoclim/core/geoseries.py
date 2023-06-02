@@ -205,9 +205,10 @@ class GeoSeries(Series):
         return cls(**b)
     
     def map(self, projection='Orthographic', proj_default=True,
-            background=True, borders=False, rivers=False, lakes=False,
-            figsize=None, ax=None, marker=None, color=None,
-            markersize=None, scatter_kwargs=None,
+            background=True, borders=False, rivers=False, lakes=False, ocean=True,
+            land=True, fig=None, gridspec_slot=None,
+            figsize=None, ax=None, marker=None, hue='label', size=None,
+            markersize=None, scatter_kwargs=None, cmap='viridis',
             legend=True, lgd_kwargs=None, savefig_settings=None):
         
         '''Map the location of the record
@@ -298,90 +299,100 @@ class GeoSeries(Series):
             fig, ax = ts.map(lgd_kwargs={'bbox_to_anchor':(1.5, 1)}) # by default, the legend conflicts with the map, but it's easy to push it outside with this keyword argument'
 
         '''
-        
-        scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
-        # get the information from the timeseries
-        lat = [self.lat]
-        lon = [self.lon]
-        
-        if self.archiveType is not None:
-            archiveType = lipdutils.LipdToOntology(self.archiveType).lower().replace(" ", "")
-        else: 
-            archiveType = 'other'
 
-        # make sure criteria is in the plot_default list
-        if archiveType not in lipdutils.PLOT_DEFAULT.keys():
-            archiveType = 'other'
+        mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
+                    proj_default=proj_default,
+                    background=background, borders=borders, rivers=rivers, lakes=lakes,
+                    ocean=ocean,
+                    land=land,
+                    figsize=figsize, scatter_kwargs=scatter_kwargs,
+                    legend_kwargs=lgd_kwargs, legend=legend,
+                    cmap=cmap,
+                    fig=fig, gs_slot=gridspec_slot)
 
-        if markersize is not None:
-            scatter_kwargs.update({'s': markersize})
-
-        if marker == None:
-            marker = lipdutils.PLOT_DEFAULT[archiveType][1]
-
-        if color == None:
-            color = lipdutils.PLOT_DEFAULT[archiveType][0]
-
-        if proj_default == True:
-            proj1 = {'central_latitude': lat[0],
-                     'central_longitude': lon[0]}
-            proj2 = {'central_latitude': lat[0]}
-            proj3 = {'central_longitude': lon[0]}
-
-        archiveType = [archiveType]  # list so it will work with map
-        marker = [marker]
-        color = [color]
-        
-        if self.label is not None:
-            legend_title = self.label
-        else:
-            legend_title = None
-            
-
-        if proj_default == True:
-
-            try:
-                res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-                                  marker=marker, color=color,
-                                  projection=projection, proj_default=proj1,
-                                  background=background, borders=borders,
-                                  rivers=rivers, lakes=lakes,
-                                  figsize=figsize, ax=ax,
-                                  scatter_kwargs=scatter_kwargs, legend=legend, legend_title=legend_title,
-                                  lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-
-            except:
-                try:
-                    res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-                                      marker=marker, color=color,
-                                      projection=projection, proj_default=proj3,
-                                      background=background, borders=borders,
-                                      rivers=rivers, lakes=lakes,
-                                      figsize=figsize, ax=ax,
-                                      scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
-                                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-                except:
-                    res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-                                      marker=marker, color=color,
-                                      projection=projection, proj_default=proj2,
-                                      background=background, borders=borders,
-                                      rivers=rivers, lakes=lakes,
-                                      figsize=figsize, ax=ax,
-                                      scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
-                                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-
-        else:
-            res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-                              marker=marker, color=color,
-                              projection=projection, proj_default=proj_default,
-                              background=background, borders=borders,
-                              rivers=rivers, lakes=lakes,
-                              figsize=figsize, ax=ax,
-                              scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
-                              lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-        
-        
-        return res
+        # scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
+        # # get the information from the timeseries
+        # lat = [self.lat]
+        # lon = [self.lon]
+        #
+        # if self.archiveType is not None:
+        #     archiveType = lipdutils.LipdToOntology(self.archiveType).lower().replace(" ", "")
+        # else:
+        #     archiveType = 'other'
+        #
+        # # make sure criteria is in the plot_default list
+        # if archiveType not in lipdutils.PLOT_DEFAULT.keys():
+        #     archiveType = 'other'
+        #
+        # if markersize is not None:
+        #     scatter_kwargs.update({'s': markersize})
+        #
+        # if marker == None:
+        #     marker = lipdutils.PLOT_DEFAULT[archiveType][1]
+        #
+        # if color == None:
+        #     color = lipdutils.PLOT_DEFAULT[archiveType][0]
+        #
+        # if proj_default == True:
+        #     proj1 = {'central_latitude': lat[0],
+        #              'central_longitude': lon[0]}
+        #     proj2 = {'central_latitude': lat[0]}
+        #     proj3 = {'central_longitude': lon[0]}
+        #
+        # archiveType = [archiveType]  # list so it will work with map
+        # marker = [marker]
+        # color = [color]
+        #
+        # if self.label is not None:
+        #     legend_title = self.label
+        # else:
+        #     legend_title = None
+        #
+        #
+        # if proj_default == True:
+        #
+        #     try:
+        #         res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+        #                           marker=marker, color=color,
+        #                           projection=projection, proj_default=proj1,
+        #                           background=background, borders=borders,
+        #                           rivers=rivers, lakes=lakes,
+        #                           figsize=figsize, ax=ax,
+        #                           scatter_kwargs=scatter_kwargs, legend=legend, legend_title=legend_title,
+        #                           lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+        #
+        #     except:
+        #         try:
+        #             res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+        #                               marker=marker, color=color,
+        #                               projection=projection, proj_default=proj3,
+        #                               background=background, borders=borders,
+        #                               rivers=rivers, lakes=lakes,
+        #                               figsize=figsize, ax=ax,
+        #                               scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
+        #                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+        #         except:
+        #             res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+        #                               marker=marker, color=color,
+        #                               projection=projection, proj_default=proj2,
+        #                               background=background, borders=borders,
+        #                               rivers=rivers, lakes=lakes,
+        #                               figsize=figsize, ax=ax,
+        #                               scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
+        #                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+        #
+        # else:
+        #     res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+        #                       marker=marker, color=color,
+        #                       projection=projection, proj_default=proj_default,
+        #                       background=background, borders=borders,
+        #                       rivers=rivers, lakes=lakes,
+        #                       figsize=figsize, ax=ax,
+        #                       scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
+        #                       lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+        #
+        #
+        # return res
     
     def dashboard(self, figsize=[11, 8], plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,
@@ -516,88 +527,93 @@ class GeoSeries(Series):
         ax['dts'].set_ylabel('')
         ax['dts'].set_yticks([])
 
+        ax['map'] =mapping.scatter_map(self, hue='archiveType', size=None, marker=None, projection='Orthographic', proj_default=True,
+                    background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
+                    figsize=None, scatter_kwargs=None, legend_kwargs=None, legend=True, cmap='viridis',
+                    fig=fig, gs_slot=gs[1, 0:2])
+
         # make the map - brute force since projection is not being returned properly
-        lat = [self.lat]
-        lon = [self.lon]
-
-        map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
-        if 'projection' in map_kwargs.keys():
-            projection = map_kwargs['projection']
-        else:
-            projection = 'Orthographic'
-        if 'proj_default' in map_kwargs.keys():
-            proj_default = map_kwargs['proj_default']
-        else:
-            proj_default = True
-        if proj_default == True:
-            proj1 = {'central_latitude': lat[0],
-                     'central_longitude': lon[0]}
-            proj2 = {'central_latitude': lat[0]}
-            proj3 = {'central_longitude': lon[0]}
-            try:
-                proj = mapping.set_proj(projection=projection, proj_default=proj1)
-            except:
-                try:
-                    proj = mapping.set_proj(projection=projection, proj_default=proj3)
-                except:
-                    proj = mapping.set_proj(projection=projection, proj_default=proj2)
-        if 'marker' in map_kwargs.keys():
-            marker = map_kwargs['marker']
-        else:
-            marker = lipdutils.PLOT_DEFAULT[archiveType][1]
-        if 'color' in map_kwargs.keys():
-            color = map_kwargs['color']
-        else:
-            color = lipdutils.PLOT_DEFAULT[archiveType][0]
-        if 'background' in map_kwargs.keys():
-            background = map_kwargs['background']
-        else:
-            background = True
-        if 'borders' in map_kwargs.keys():
-            borders = map_kwargs['borders']
-        else:
-            borders = False
-        if 'rivers' in map_kwargs.keys():
-            rivers = map_kwargs['rivers']
-        else:
-            rivers = False
-        if 'lakes' in map_kwargs.keys():
-            lakes = map_kwargs['lakes']
-        else:
-            lakes = False
-        if 'scatter_kwargs' in map_kwargs.keys():
-            scatter_kwargs = map_kwargs['scatter_kwargs']
-        else:
-            scatter_kwargs = {}
-        if 'markersize' in map_kwargs.keys():
-            scatter_kwargs.update({'s': map_kwargs['markersize']})
-        else:
-            pass
-        if 'lgd_kwargs' in map_kwargs.keys():
-            lgd_kwargs = map_kwargs['lgd_kwargs']
-        else:
-            lgd_kwargs = {}
-        if 'legend' in map_kwargs.keys():
-            legend = map_kwargs['legend']
-        else:
-            legend = False
-        # make the plot map
-
-        data_crs = ccrs.PlateCarree()
-        ax['map'] = fig.add_subplot(gs[1, 0:2], projection=proj)
-        ax['map'].coastlines()
-        if background is True:
-            ax['map'].stock_img()
-        # Other extra information
-        if borders is True:
-            ax['map'].add_feature(cfeature.BORDERS)
-        if lakes is True:
-            ax['map'].add_feature(cfeature.LAKES)
-        if rivers is True:
-            ax['map'].add_feature(cfeature.RIVERS)
-        ax['map'].scatter(lon, lat, zorder=10, label=marker, facecolor=color, transform=data_crs, **scatter_kwargs)
-        if legend == True:
-            ax.legend(**lgd_kwargs)
+        # lat = [self.lat]
+        # lon = [self.lon]
+        #
+        # map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
+        # if 'projection' in map_kwargs.keys():
+        #     projection = map_kwargs['projection']
+        # else:
+        #     projection = 'Orthographic'
+        # if 'proj_default' in map_kwargs.keys():
+        #     proj_default = map_kwargs['proj_default']
+        # else:
+        #     proj_default = True
+        # if proj_default == True:
+        #     proj1 = {'central_latitude': lat[0],
+        #              'central_longitude': lon[0]}
+        #     proj2 = {'central_latitude': lat[0]}
+        #     proj3 = {'central_longitude': lon[0]}
+        #     try:
+        #         proj = mapping.set_proj(projection=projection, proj_default=proj1)
+        #     except:
+        #         try:
+        #             proj = mapping.set_proj(projection=projection, proj_default=proj3)
+        #         except:
+        #             proj = mapping.set_proj(projection=projection, proj_default=proj2)
+        # if 'marker' in map_kwargs.keys():
+        #     marker = map_kwargs['marker']
+        # else:
+        #     marker = lipdutils.PLOT_DEFAULT[archiveType][1]
+        # if 'color' in map_kwargs.keys():
+        #     color = map_kwargs['color']
+        # else:
+        #     color = lipdutils.PLOT_DEFAULT[archiveType][0]
+        # if 'background' in map_kwargs.keys():
+        #     background = map_kwargs['background']
+        # else:
+        #     background = True
+        # if 'borders' in map_kwargs.keys():
+        #     borders = map_kwargs['borders']
+        # else:
+        #     borders = False
+        # if 'rivers' in map_kwargs.keys():
+        #     rivers = map_kwargs['rivers']
+        # else:
+        #     rivers = False
+        # if 'lakes' in map_kwargs.keys():
+        #     lakes = map_kwargs['lakes']
+        # else:
+        #     lakes = False
+        # if 'scatter_kwargs' in map_kwargs.keys():
+        #     scatter_kwargs = map_kwargs['scatter_kwargs']
+        # else:
+        #     scatter_kwargs = {}
+        # if 'markersize' in map_kwargs.keys():
+        #     scatter_kwargs.update({'s': map_kwargs['markersize']})
+        # else:
+        #     pass
+        # if 'lgd_kwargs' in map_kwargs.keys():
+        #     lgd_kwargs = map_kwargs['lgd_kwargs']
+        # else:
+        #     lgd_kwargs = {}
+        # if 'legend' in map_kwargs.keys():
+        #     legend = map_kwargs['legend']
+        # else:
+        #     legend = False
+        # # make the plot map
+        #
+        # data_crs = ccrs.PlateCarree()
+        # ax['map'] = fig.add_subplot(gs[1, 0:2], projection=proj)
+        # ax['map'].coastlines()
+        # if background is True:
+        #     ax['map'].stock_img()
+        # # Other extra information
+        # if borders is True:
+        #     ax['map'].add_feature(cfeature.BORDERS)
+        # if lakes is True:
+        #     ax['map'].add_feature(cfeature.LAKES)
+        # if rivers is True:
+        #     ax['map'].add_feature(cfeature.RIVERS)
+        # ax['map'].scatter(lon, lat, zorder=10, label=marker, facecolor=color, transform=data_crs, **scatter_kwargs)
+        # if legend == True:
+        #     ax.legend(**lgd_kwargs)
 
         # spectral analysis
         spectral_kwargs = {} if spectral_kwargs is None else spectral_kwargs.copy()
