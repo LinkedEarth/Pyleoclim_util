@@ -3,7 +3,8 @@
 """
 Mapping utilities for geolocated objects, leveraging Cartopy.
 """
-__all__=['map', 'compute_dist']
+__all__ = ['map', 'compute_dist']
+
 import cartopy
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -20,7 +21,8 @@ import matplotlib.gridspec as gridspec
 from .plotting import savefig
 from .lipdutils import PLOT_DEFAULT, LipdToOntology
 
-def set_proj(projection='Robinson', proj_default = True): 
+
+def set_proj(projection='Robinson', proj_default=True):
     """ Set the projection for Cartopy.
     
     Parameters
@@ -54,160 +56,196 @@ def set_proj(projection='Robinson', proj_default = True):
     
     """
     if proj_default is not True and type(proj_default) is not dict:
-        raise TypeError('The default for the projections should either be provided'+
-                 ' as a dictionary or set to True')
-    
+        raise TypeError('The default for the projections should either be provided' +
+                        ' as a dictionary or set to True')
+
     # Set the projection
     if projection == 'Robinson':
         if proj_default is True:
-            proj = ccrs.Robinson() 
-        else: proj = ccrs.Robinson(**proj_default) 
+            proj = ccrs.Robinson()
+        else:
+            proj = ccrs.Robinson(**proj_default)
     elif projection == 'PlateCarree':
         if proj_default is True:
-            proj = ccrs.PlateCarree() 
-        else: proj = ccrs.PlateCarree(**proj_default) 
+            proj = ccrs.PlateCarree()
+        else:
+            proj = ccrs.PlateCarree(**proj_default)
     elif projection == 'AlbersEqualArea':
         if proj_default is True:
-            proj = ccrs.AlbersEqualArea() 
-        else: proj = ccrs.AlbersEqualArea(**proj_default) 
+            proj = ccrs.AlbersEqualArea()
+        else:
+            proj = ccrs.AlbersEqualArea(**proj_default)
     elif projection == 'AzimuthalEquidistant':
         if proj_default is True:
-            proj = ccrs.AzimuthalEquidistant() 
-        else: proj = ccrs.AzimuthalEquidistant(**proj_default)
+            proj = ccrs.AzimuthalEquidistant()
+        else:
+            proj = ccrs.AzimuthalEquidistant(**proj_default)
     elif projection == 'EquidistantConic':
         if proj_default is True:
-            proj = ccrs.EquidistantConic() 
-        else: proj = ccrs.EquidistantConic(**proj_default)
+            proj = ccrs.EquidistantConic()
+        else:
+            proj = ccrs.EquidistantConic(**proj_default)
     elif projection == 'LambertConformal':
         if proj_default is True:
-            proj = ccrs.LambertConformal() 
-        else: proj = ccrs.LambertConformal(**proj_default)
+            proj = ccrs.LambertConformal()
+        else:
+            proj = ccrs.LambertConformal(**proj_default)
     elif projection == 'LambertCylindrical':
         if proj_default is True:
-            proj = ccrs.LambertCylindrical() 
-        else: proj = ccrs.LambertCylindrical(**proj_default)
+            proj = ccrs.LambertCylindrical()
+        else:
+            proj = ccrs.LambertCylindrical(**proj_default)
     elif projection == 'Mercator':
         if proj_default is True:
-            proj = ccrs.Mercator() 
-        else: proj = ccrs.Mercator(**proj_default)
+            proj = ccrs.Mercator()
+        else:
+            proj = ccrs.Mercator(**proj_default)
     elif projection == 'Miller':
         if proj_default is True:
-            proj = ccrs.Miller() 
-        else: proj = ccrs.Miller(**proj_default)
+            proj = ccrs.Miller()
+        else:
+            proj = ccrs.Miller(**proj_default)
     elif projection == 'Mollweide':
         if proj_default is True:
-            proj = ccrs.Mollweide() 
-        else: proj = ccrs.Mollweide(**proj_default)
+            proj = ccrs.Mollweide()
+        else:
+            proj = ccrs.Mollweide(**proj_default)
     elif projection == 'Orthographic':
         if proj_default is True:
-            proj = ccrs.Orthographic() 
-        else: proj = ccrs.Orthographic(**proj_default)
+            proj = ccrs.Orthographic()
+        else:
+            proj = ccrs.Orthographic(**proj_default)
     elif projection == 'Sinusoidal':
         if proj_default is True:
-            proj = ccrs.Sinusoidal() 
-        else: proj = ccrs.Sinusoidal(**proj_default)
+            proj = ccrs.Sinusoidal()
+        else:
+            proj = ccrs.Sinusoidal(**proj_default)
     elif projection == 'Stereographic':
         if proj_default is True:
-            proj = ccrs.Stereographic() 
-        else: proj = ccrs.Stereographic(**proj_default)
+            proj = ccrs.Stereographic()
+        else:
+            proj = ccrs.Stereographic(**proj_default)
     elif projection == 'TransverseMercator':
         if proj_default is True:
-            proj = ccrs.TransverseMercator() 
-        else: proj = ccrs.TransverseMercator(**proj_default)
+            proj = ccrs.TransverseMercator()
+        else:
+            proj = ccrs.TransverseMercator(**proj_default)
     elif projection == 'TransverseMercator':
         if proj_default is True:
-            proj = ccrs.TransverseMercator() 
-        else: proj = ccrs.TransverseMercator(**proj_default)
+            proj = ccrs.TransverseMercator()
+        else:
+            proj = ccrs.TransverseMercator(**proj_default)
     elif projection == 'UTM':
         if proj_default is True:
-            proj = ccrs.UTM() 
-        else: proj = ccrs.UTM(**proj_default)
+            proj = ccrs.UTM()
+        else:
+            proj = ccrs.UTM(**proj_default)
     elif projection == 'UTM':
         if proj_default is True:
-            proj = ccrs.UTM() 
-        else: proj = ccrs.UTM(**proj_default)
+            proj = ccrs.UTM()
+        else:
+            proj = ccrs.UTM(**proj_default)
     elif projection == 'InterruptedGoodeHomolosine':
         if proj_default is True:
-            proj = ccrs.InterruptedGoodeHomolosine() 
-        else: proj = ccrs.InterruptedGoodeHomolosine(**proj_default)
+            proj = ccrs.InterruptedGoodeHomolosine()
+        else:
+            proj = ccrs.InterruptedGoodeHomolosine(**proj_default)
     elif projection == 'RotatedPole':
         if proj_default is True:
-            proj = ccrs.RotatedPole() 
-        else: proj = ccrs.RotatedPole(**proj_default)
+            proj = ccrs.RotatedPole()
+        else:
+            proj = ccrs.RotatedPole(**proj_default)
     elif projection == 'OSGB':
         if proj_default is True:
-            proj = ccrs.OSGB() 
-        else: proj = ccrs.OSGB(**proj_default)
+            proj = ccrs.OSGB()
+        else:
+            proj = ccrs.OSGB(**proj_default)
     elif projection == 'EuroPP':
         if proj_default is True:
-            proj = ccrs.EuroPP() 
-        else: proj = ccrs.EuroPP(**proj_default)
+            proj = ccrs.EuroPP()
+        else:
+            proj = ccrs.EuroPP(**proj_default)
     elif projection == 'Geostationary':
         if proj_default is True:
-            proj = ccrs.Geostationary() 
-        else: proj = ccrs.Geostationary(**proj_default)
+            proj = ccrs.Geostationary()
+        else:
+            proj = ccrs.Geostationary(**proj_default)
     elif projection == 'NearsidePerspective':
         if proj_default is True:
-            proj = ccrs.NearsidePerspective() 
-        else: proj = ccrs.NearsidePerspective(**proj_default)
+            proj = ccrs.NearsidePerspective()
+        else:
+            proj = ccrs.NearsidePerspective(**proj_default)
     elif projection == 'EckertI':
         if proj_default is True:
-            proj = ccrs.EckertI() 
-        else: proj = ccrs.EckertI(**proj_default)
+            proj = ccrs.EckertI()
+        else:
+            proj = ccrs.EckertI(**proj_default)
     elif projection == 'EckertII':
         if proj_default is True:
-            proj = ccrs.EckertII() 
-        else: proj = ccrs.EckertII(**proj_default)
+            proj = ccrs.EckertII()
+        else:
+            proj = ccrs.EckertII(**proj_default)
     elif projection == 'EckertIII':
         if proj_default is True:
-            proj = ccrs.EckertIII() 
-        else: proj = ccrs.EckertIII(**proj_default)
+            proj = ccrs.EckertIII()
+        else:
+            proj = ccrs.EckertIII(**proj_default)
     elif projection == 'EckertIV':
         if proj_default is True:
-            proj = ccrs.EckertIV() 
-        else: proj = ccrs.EckertIV(**proj_default)
+            proj = ccrs.EckertIV()
+        else:
+            proj = ccrs.EckertIV(**proj_default)
     elif projection == 'EckertV':
         if proj_default is True:
-            proj = ccrs.EckertV() 
-        else: proj = ccrs.EckertV(**proj_default)
+            proj = ccrs.EckertV()
+        else:
+            proj = ccrs.EckertV(**proj_default)
     elif projection == 'EckertVI':
         if proj_default is True:
-            proj = ccrs.EckertVI() 
-        else: proj = ccrs.EckertVI(**proj_default)
+            proj = ccrs.EckertVI()
+        else:
+            proj = ccrs.EckertVI(**proj_default)
     elif projection == 'EqualEarth':
         if proj_default is True:
-            proj = ccrs.EqualEarth() 
-        else: proj = ccrs.EqualEarth(**proj_default)
+            proj = ccrs.EqualEarth()
+        else:
+            proj = ccrs.EqualEarth(**proj_default)
     elif projection == 'Gnomonic':
         if proj_default is True:
-            proj = ccrs.Gnomonic() 
-        else: proj = ccrs.Gnomonic(**proj_default)
+            proj = ccrs.Gnomonic()
+        else:
+            proj = ccrs.Gnomonic(**proj_default)
     elif projection == 'LambertAzimuthalEqualArea':
         if proj_default is True:
-            proj = ccrs.LambertAzimuthalEqualArea() 
-        else: proj = ccrs.LambertAzimuthalEqualArea(**proj_default)
+            proj = ccrs.LambertAzimuthalEqualArea()
+        else:
+            proj = ccrs.LambertAzimuthalEqualArea(**proj_default)
     elif projection == 'NorthPolarStereo':
         if proj_default is True:
-            proj = ccrs.NorthPolarStereo() 
-        else: proj = ccrs.NorthPolarStereo(**proj_default)
+            proj = ccrs.NorthPolarStereo()
+        else:
+            proj = ccrs.NorthPolarStereo(**proj_default)
     elif projection == 'OSNI':
         if proj_default is True:
-            proj = ccrs.OSNI() 
-        else: proj = ccrs.OSNI(**proj_default)
+            proj = ccrs.OSNI()
+        else:
+            proj = ccrs.OSNI(**proj_default)
     elif projection == 'SouthPolarStereo':
         if proj_default is True:
-            proj = ccrs.SouthPolarStereo() 
-        else: proj = ccrs.SouthPolarStereo(**proj_default)
+            proj = ccrs.SouthPolarStereo()
+        else:
+            proj = ccrs.SouthPolarStereo(**proj_default)
     else:
         raise ValueError('Invalid projection type')
-    
+
     return proj
 
-def map(lat, lon, criteria, marker=None, color =None,
-        projection = 'Robinson', proj_default = True,
-        background = True,borders = False, rivers = False, lakes = False,
-        figsize = None, ax = None, scatter_kwargs=None, legend=True, legend_title=None,
-        lgd_kwargs=None,savefig_settings=None):
+
+def map(lat, lon, criteria, marker=None, color=None,
+        projection='Robinson', proj_default=True,
+        background=True, borders=False, rivers=False, lakes=False,
+        figsize=None, ax=None, scatter_kwargs=None, legend=True, legend_title=None,
+        lgd_kwargs=None, savefig_settings=None):
     """ Map the location of all lat/lon according to some criteria
     
     Map the location of all lat/lon according to some criteria. Based on functions defined in the Cartopy package. 
@@ -296,67 +334,64 @@ def map(lat, lon, criteria, marker=None, color =None,
     --------
     pyleoclim.utils.mapping.set_proj : Set the projection for Cartopy-based maps
     """
-    
-    #Take care of duplicate legends
+
+    # Take care of duplicate legends
     def legend_without_duplicate_labels(ax):
         handles, labels = ax.get_legend_handles_labels()
         unique = [(h, l) for i, (h, l) in enumerate(zip(handles, labels)) if l not in labels[:i]]
-        ax.legend(*zip(*unique),**lgd_kwargs)
-    
-    #Check that the lists have the same length and convert to numpy arrays
-    if len(lat)!=len(lon) or len(lat)!=len(criteria) or len(lon)!=len(criteria):
-        raise ValueError("Latitude, Longitude, and criteria list must be the same" +\
-                 "length")
-        
+        ax.legend(*zip(*unique), **lgd_kwargs)
+
+    # Check that the lists have the same length and convert to numpy arrays
+    if len(lat) != len(lon) or len(lat) != len(criteria) or len(lon) != len(criteria):
+        raise ValueError("Latitude, Longitude, and criteria list must be the same" + \
+                         "length")
+
     # Check that the default is set to True or in dictionary format
     if proj_default is not True and type(proj_default) is not dict:
-        raise TypeError('The default for the projections should either be provided'+
-                 ' as a dictionary or set to True')
-    
+        raise TypeError('The default for the projections should either be provided' +
+                        ' as a dictionary or set to True')
+
     # handle dict defaults
-    savefig_settings={} if savefig_settings is None else savefig_settings.copy()
+    savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
     scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
     lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
-    
+
     if marker is not None:
-        if 'marker' in scatter_kwargs.keys(): 
+        if 'marker' in scatter_kwargs.keys():
             print('marker has been set as a parameter to the map_all function, overriding scatter_kwargs')
             del scatter_kwargs['marker']
-        if type(marker) == list and len(marker)!=len(criteria):
+        if type(marker) == list and len(marker) != len(criteria):
             raise ValueError('The marker vector should have the same length as the lat/lon/criteria vector')
-    
-    
+
     if color is not None:
-        if 'facecolor' in scatter_kwargs.keys(): 
+        if 'facecolor' in scatter_kwargs.keys():
             print('facecolor has been set as a parameter to the map_all function, overriding scatter_kwargs')
             del scatter_kwargs['facecolor']
-        if type(color) == list and len(color)!=len(criteria):
+        if type(color) == list and len(color) != len(criteria):
             raise ValueError('The color vector should have the same length as the lon/lat/criteria vector')
-    
 
     # Prepare scatter information
     if 's' in scatter_kwargs.keys():
-        if type(scatter_kwargs['s']) == list and len(scatter_kwargs['s']) !=len(criteria):
+        if type(scatter_kwargs['s']) == list and len(scatter_kwargs['s']) != len(criteria):
             raise ValueError('If s is a list, it should have the same length as lon/lat/criteria')
     else:
-        scatter_kwargs['s'] = None        
-    
+        scatter_kwargs['s'] = None
+
     if 'edgecolors' in scatter_kwargs.keys():
-        if type(scatter_kwargs['edgecolors']) == list and len(scatter_kwargs['edgecolors']) !=len(criteria):
+        if type(scatter_kwargs['edgecolors']) == list and len(scatter_kwargs['edgecolors']) != len(criteria):
             raise ValueError('If edgecolors is a list, it should have the same length as lon/lat/criteria')
     else:
         scatter_kwargs['edgecolors'] = None
 
-        
-    symbols=pd.DataFrame({'criteria':criteria,'color':color,'marker':marker,
-                             's': scatter_kwargs['s'], 'edgecolors': scatter_kwargs['edgecolors']})
-    
-    #delete extra scatter_kwargs
+    symbols = pd.DataFrame({'criteria': criteria, 'color': color, 'marker': marker,
+                            's': scatter_kwargs['s'], 'edgecolors': scatter_kwargs['edgecolors']})
+
+    # delete extra scatter_kwargs
     del scatter_kwargs['s']
     del scatter_kwargs['edgecolors']
-    
+
     # get the projection:
-    proj = set_proj(projection=projection, proj_default=proj_default) 
+    proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
         proj1 = {'central_latitude': np.mean(lat),
                  'central_longitude': np.mean(lon)}
@@ -369,59 +404,57 @@ def map(lat, lon, criteria, marker=None, color =None,
                 proj = set_proj(projection=projection, proj_default=proj3)
             except:
                 proj = set_proj(projection=projection, proj_default=proj2)
-    
-    data_crs = ccrs.PlateCarree()       
+
+    data_crs = ccrs.PlateCarree()
     # Make the figure        
     if ax is None:
-        fig, ax = plt.subplots(figsize=figsize,subplot_kw=dict(projection=proj))     
-    # draw the coastlines    
+        fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=proj))
+        # draw the coastlines
     ax.add_feature(cfeature.COASTLINE)
     # Background
     if background is True:
-        ax.stock_img()     
-    #Other extra information
+        ax.stock_img()
+        # Other extra information
     if borders is True:
         ax.add_feature(cfeature.BORDERS)
     if lakes is True:
         ax.add_feature(cfeature.LAKES)
     if rivers is True:
         ax.add_feature(cfeature.RIVERS)
-        
+
     # Get the indexes by criteria
     if legend_title is not None:
         for index, crit in enumerate(criteria):
-            ax.scatter(np.array(lon)[index],np.array(lat)[index],
-                    zorder = 10,
-                    label = legend_title,
-                    transform=data_crs,
-                    marker = symbols['marker'].iloc[index],
-                    color = symbols['color'].iloc[index],
-                    s = symbols['s'].iloc[index],
-                    edgecolors = 'white',
-                    #edgecolors= symbols['edgecolors'].iloc[index], 
-                    **scatter_kwargs)
-        
+            ax.scatter(np.array(lon)[index], np.array(lat)[index],
+                       zorder=10,
+                       label=legend_title,
+                       transform=data_crs,
+                       marker=symbols['marker'].iloc[index],
+                       color=symbols['color'].iloc[index],
+                       s=symbols['s'].iloc[index],
+                       edgecolors='white',
+                       # edgecolors= symbols['edgecolors'].iloc[index],
+                       **scatter_kwargs)
+
     else:
-        for index, crit in enumerate(criteria): 
-            ax.scatter(np.array(lon)[index],np.array(lat)[index],
-                    zorder = 10,
-                    label = crit,
-                    transform=data_crs,
-                    marker = symbols['marker'].iloc[index],
-                    color = symbols['color'].iloc[index],
-                    s = symbols['s'].iloc[index],
-                    edgecolors = 'white',
-                    #edgecolors= symbols['edgecolors'].iloc[index], 
-                    **scatter_kwargs)
-    
+        for index, crit in enumerate(criteria):
+            ax.scatter(np.array(lon)[index], np.array(lat)[index],
+                       zorder=10,
+                       label=crit,
+                       transform=data_crs,
+                       marker=symbols['marker'].iloc[index],
+                       color=symbols['color'].iloc[index],
+                       s=symbols['s'].iloc[index],
+                       edgecolors='white',
+                       # edgecolors= symbols['edgecolors'].iloc[index],
+                       **scatter_kwargs)
 
     if legend == True:
-        #ax.legend(**lgd_kwargs)
+        # ax.legend(**lgd_kwargs)
         legend_without_duplicate_labels(ax)
     else:
         ax.legend().remove()
-        
-    
+
     if 'fig' in locals():
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
@@ -430,11 +463,10 @@ def map(lat, lon, criteria, marker=None, color =None,
         return ax
 
 
-def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'Robinson',proj_default=True,
-             background = True, borders = False, rivers = False, lakes = False,ocean=True, land=True,
-            figsize = None, scatter_kwargs=None, legend_kwargs =None, legend=True, cmap='viridis',
-             fig=None, gs_slot=None):
-
+def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', projection='Robinson', proj_default=True,
+                background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
+                figsize=None, scatter_kwargs=None, legend_kwargs=None, legend=True, cmap='viridis',
+                fig=None, gs_slot=None):
     def make_df(geo_ms, hue=None, marker=None, size=None):
         try:
             geo_series_list = geo_ms.series_list
@@ -455,7 +487,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
         return geos_df
 
     def plot_scatter(df=None, x=None, y=None, hue_var=None, size_var=None, marker_var=None,
-                     ax=None, proj=None, scatter_kwargs=None, legend=True, legend_kwargs=None,  # fig=None, gs_slot=None,
+                     ax=None, proj=None, scatter_kwargs=None, legend=True, legend_kwargs=None,
+                     # fig=None, gs_slot=None,
                      cmap='viridis', **kwargs):
 
         plot_defaults = copy.copy(PLOT_DEFAULT)
@@ -480,7 +513,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
                      }
 
         missing_val = missing_d['label']
-        trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if trait_var != None]
+        for trait_var in [hue_var, marker_var, size_var]:
+            if trait_var not in _df.columns:
+                trait_var = None
+
+        trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if
+                      ((trait_var != None) and (trait_var in _df.columns))]
 
         for trait_var in trait_vars:
             if type(_df[trait_var]) == pd.Series:
@@ -565,18 +603,27 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
                 # to get missing hue values to be missing value color (contrary to palette for available values)
         # yet be sized correctly, we plot all data with missing color, collect legend information,
         # then plot data with available hue over it, collect the legend information again and recompose the legend
-        sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var,
-                        style=marker_var, palette=cycle([missing_d['hue']]), ax=ax, **kwargs)
-        missing_handles, missing_labels = ax.get_legend_handles_labels()
 
         if type(hue_var) == str:
+            sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var,
+                            style=marker_var, palette=cycle([missing_d['hue']]), ax=ax, **kwargs)
+            missing_handles, missing_labels = ax.get_legend_handles_labels()
+
+            print(hue_var)
             hue_data = _df[_df[hue_var] != missing_val]
             sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,
                             style=marker_var, palette=palette, ax=ax, **kwargs)
+        else:
+            kwargs['c'] = missing_d['hue']
+            sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var,
+                            style=marker_var, ax=ax, **kwargs)
+            missing_handles, missing_labels = ax.get_legend_handles_labels()
+
+        h, l = ax.get_legend_handles_labels()
+        if len(l) == 0:
+            legend = False
 
         if legend == True:
-            h, l = ax.get_legend_handles_labels()
-
             han = copy.copy(h[0])
             han.set_alpha(0)
             blank_handle = han
@@ -649,8 +696,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
             if 'loc' not in legend_kwargs:
                 legend_kwargs['loc'] = 'upper left'
             if 'bbox_to_anchor' not in legend_kwargs:
-                legend_kwargs['bbox_to_anchor'] = (1,1)
-            ax.legend(handles, labels, **legend_kwargs)#loc="upper left", bbox_to_anchor=(1, 1))
+                legend_kwargs['bbox_to_anchor'] = (1, 1)
+            ax.legend(handles, labels, **legend_kwargs)  # loc="upper left", bbox_to_anchor=(1, 1))
         else:
             ax.legend().remove()
 
@@ -661,19 +708,18 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
 
     # newCrs = ccrs.Robinson()
     if proj_default is not True and type(proj_default) is not dict:
-        raise TypeError('The default for the projections should either be provided'+
-                 ' as a dictionary or set to True')
+        raise TypeError('The default for the projections should either be provided' +
+                        ' as a dictionary or set to True')
 
     # get the projection:
     proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
         converted = False
-        if len(df[df['lon']>180])>0:
+        if len(df[df['lon'] > 180]) > 0:
             converted = True
             mean_lon = np.mean(df['lon'].apply(lambda x: (x + 180) % 360 - 180))
         else:
             mean_lon = np.mean(df['lon'])
-
 
         proj1 = {'central_latitude': np.mean(df['lat']),
                  'central_longitude': mean_lon}
@@ -691,34 +737,33 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
                 proj = set_proj(projection=projection, proj_default=proj3)
             except:
                 proj = set_proj(projection=projection, proj_default=proj2)
-        
 
-    if fig ==None:
+    if fig == None:
         if figsize == None:
             figsize = (20, 7)
         fig = plt.figure(figsize=figsize)
 
     if gs_slot == None:
-        ax = fig.add_subplot(projection = proj)
+        ax = fig.add_subplot(projection=proj)
     else:
-        ax = fig.add_subplot(gs_slot, projection = proj)
+        ax = fig.add_subplot(gs_slot, projection=proj)
 
     # draw the coastlines
     ax.add_feature(cfeature.COASTLINE, linewidths=(1,))
     # Background
     if background is True:
         ax.stock_img()
-    #Other extra information
+    # Other extra information
     if borders is True:
-        ax.add_feature(cfeature.BORDERS, alpha = .5)
+        ax.add_feature(cfeature.BORDERS, alpha=.5)
     if lakes is True:
         ax.add_feature(cfeature.LAKES, alpha=0.25)
     if rivers is True:
         ax.add_feature(cfeature.RIVERS)
     if ocean is True:
-        ax.add_feature(cfeature.OCEAN, alpha = .25)
+        ax.add_feature(cfeature.OCEAN, alpha=.25)
     if land is True:
-        ax.add_feature(cfeature.LAND, alpha = .5)
+        ax.add_feature(cfeature.LAND, alpha=.5)
 
     # ax.set_global()
 
@@ -731,10 +776,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker=None, projection = 'R
         scatter_kwargs['edgecolor'] = 'w'
 
     plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax=ax, proj=None,
-                 cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, legend_kwargs=legend_kwargs)#, **kwargs)
+                 cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, legend_kwargs=legend_kwargs)  # , **kwargs)
     return ax
-        
-def dist_sphere(lat1,lon1,lat2,lon2):
+
+
+def dist_sphere(lat1, lon1, lat2, lon2):
     """Uses the haversine formula to calculate distance on a sphere
     https://en.wikipedia.org/wiki/Haversine_formula
     
@@ -754,15 +800,16 @@ def dist_sphere(lat1,lon1,lat2,lon2):
     dist: float
         The distance between the two point in km
     """
-    R = 6371  #km. Earth's radius
-    dlat = lat2-lat1
-    dlon = lon2-lon1
+    R = 6371  # km. Earth's radius
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
 
-    a = np.sin(dlat/2)**2+np.cos(lat1)*np.cos(lat2)*np.sin(dlon/2)**2
-    c = 2*np.arctan2(np.sqrt(a),np.sqrt(1-a))
-    dist =R*c
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+    dist = R * c
 
     return float(dist)
+
 
 def compute_dist(lat_r, lon_r, lat_c, lon_c):
     """ Computes the distance in (km) between a reference point and an array
@@ -792,14 +839,15 @@ def compute_dist(lat_r, lon_r, lat_c, lon_c):
     """
     dist = []
 
-    for idx, val in enumerate (lat_c):
+    for idx, val in enumerate(lat_c):
         lat1 = np.radians(lat_r)
         lon1 = np.radians(lon_r)
         lat2 = np.radians(val)
         lon2 = np.radians(lon_c[idx])
-        dist.append(dist_sphere(lat1,lon1,lat2,lon2))
+        dist.append(dist_sphere(lat1, lon1, lat2, lon2))
 
     return dist
+
 
 def within_distance(distance, radius):
     """ Returns the index of the records that are within a certain distance
@@ -819,6 +867,6 @@ def within_distance(distance, radius):
     idx: list
         a list of index
     """
-    idx = [idx for idx,val in enumerate(distance) if val <= radius]
+    idx = [idx for idx, val in enumerate(distance) if val <= radius]
 
     return idx
