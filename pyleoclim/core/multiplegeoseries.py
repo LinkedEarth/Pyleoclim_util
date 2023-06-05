@@ -72,6 +72,7 @@ class MultipleGeoSeries(MultipleSeries):
             raise ValueError('All components must be GeoSeries objects')
         
         super().__init__(series_list, time_unit, label)
+        # self.pca = super().pca
 
     # ============ MAP goes here ================
 
@@ -370,12 +371,12 @@ class MultipleGeoSeries(MultipleSeries):
         ----------
 
         weights : ndarray, optional
-        
+
             Series weights to use after transforming data according to standardize
             or demean when computing the principal components.
 
         missing : {str, None}
-        
+
             Method for missing data.  Choices are:
 
             * 'drop-row' - drop rows with missing values.
@@ -386,11 +387,11 @@ class MultipleGeoSeries(MultipleSeries):
             * `None` raises if data contains NaN values.
 
         tol_em : float
-        
+
             Tolerance to use when checking for convergence of the EM algorithm.
-            
+
         max_em_iter : int
-        
+
             Maximum iterations for the EM algorithm.
 
         Returns
@@ -399,14 +400,14 @@ class MultipleGeoSeries(MultipleSeries):
         res: MultivariateDecomp
 
             Resulting pyleoclim.MultivariateDecomp object
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
         pyleoclim.core.multivardecomp.MultivariateDecomp : The multivariate decomposition object
-        
+
         pyleoclim.core.mulitpleseries.MulitpleSeries.common_time : align time axes
 
         Examples
@@ -417,7 +418,7 @@ class MultipleGeoSeries(MultipleSeries):
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Euro2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree')") 
+            dfs = df.query("archiveType in ('tree')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -425,11 +426,11 @@ class MultipleGeoSeries(MultipleSeries):
                                                time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
                                                time_unit=row['time_units'], value_unit=row['paleoData_units'],
                                                lat = row['geo_meanLat'], lon = row['geo_meanLon'],
-                                               archiveType = row['archiveType'], verbose = False, 
-                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
-        
-            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
-            
+                                               archiveType = row['archiveType'], verbose = False,
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName']))
+
+            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')
+
             res = Euro2k.pca() # carry out PCA
             type(res) # the result is a MultivariateDecomp object
 
@@ -441,12 +442,13 @@ class MultipleGeoSeries(MultipleSeries):
         lats = np.array([ts.lat for ts in self.series_list])
         lons = np.array([ts.lon for ts in self.series_list])
         locs = np.column_stack([lats,lons])
-        
+
         # apply PCA fom parent class
-        pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em, 
+        pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em,
                            max_em_iter=max_em_iter,**pca_kwargs)
         # add geographical information
-        pca_res.locs = locs 
-        
+        # pca_res.locs = None
+        pca_res.orig = self
+
         return pca_res
         
