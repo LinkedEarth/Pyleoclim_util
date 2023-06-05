@@ -208,7 +208,7 @@ class GeoSeries(Series):
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None,
             figsize=None, ax=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
-            markersize=None, scatter_kwargs=None, cmap='viridis',
+            markersize=None, scatter_kwargs=None, cmap=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
         
         '''Map the location of the record
@@ -582,6 +582,10 @@ class GeoSeries(Series):
             scatter_kwargs = {}
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
+        if 'cmap' in map_kwargs.keys():
+            cmap= map_kwargs['cmap']
+        else:
+            cmap=None
         # else:
         #     pass
         if 'lgd_kwargs' in map_kwargs.keys():
@@ -595,7 +599,7 @@ class GeoSeries(Series):
 
         ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
-                    figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs, legend=legend, cmap='viridis',
+                    figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap,
                     fig=fig, gs_slot=gs[1, 0:2])
 
         # make the map - brute force since projection is not being returned properly

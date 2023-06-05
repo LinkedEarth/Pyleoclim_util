@@ -76,7 +76,7 @@ class MultipleGeoSeries(MultipleSeries):
     # ============ MAP goes here ================
 
 
-    def map(self, marker='archiveType', hue='archiveType', size=None, cmap='viridis',
+    def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
             edgecolor='w', color_pal=None, legend_attribute=None, projection='Robinson', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, ax=None, scatter_kwargs=None, legend=True, gridspec_slot=None,
