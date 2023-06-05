@@ -16,6 +16,9 @@ import copy
 from itertools import cycle
 from matplotlib.lines import Line2D
 import matplotlib as mpl
+from matplotlib import cm
+from matplotlib.colors import TwoSlopeNorm
+
 import matplotlib.gridspec as gridspec
 
 from .plotting import savefig
@@ -463,29 +466,116 @@ def map(lat, lon, criteria, marker=None, color=None,
         return ax
 
 
+def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
+
+    try:
+        geo_series_list = geo_ms.series_list
+    except:
+        geo_series_list = [geo_ms]
+
+    lats = [geos.lat for geos in geo_series_list]
+    lons = [geos.lon for geos in geo_series_list]
+
+    trait_d = {'hue': hue, 'marker': marker, 'size': size}
+    traits = [hue, marker, size]
+    if type(cols) == list:
+        traits += cols
+    value_d = {'lat': lats, 'lon': lons}
+    for trait in traits:#trait_d.keys():
+        # trait = trait_d[trait_key]
+        if trait != None:
+            trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
+                          geo_series_list]
+            value_d[trait] = [trait_val if trait_val != 'None' else None for trait_val in trait_vals]
+
+    geos_df = pd.DataFrame(value_d)
+    if type(d) == dict:
+        for trait in d.keys():
+            if type(d[trait]) in [list, np.ndarray]:
+                if len(d[trait]) == len(geos_df):
+                    geos_df[trait] = d[trait]
+
+    return geos_df
+
+
+
 def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='w', projection='Robinson', proj_default=True,
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, extent='global', lgd_kwargs=None, legend=True, cmap=None,
                 fig=None, gs_slot=None):
 
-    def make_df(geo_ms, hue=None, marker=None, size=None):
-        try:
-            geo_series_list = geo_ms.series_list
-        except:
-            geo_series_list = [geo_ms]
-        lats = [geos.lat for geos in geo_series_list]
-        lons = [geos.lon for geos in geo_series_list]
+    def keep_center_colormap(cmap, vmin, vmax, center=0):
 
-        trait_d = {'hue': hue, 'marker': marker, 'size': size}
-        value_d = {'lat': lats, 'lon': lons}
-        for trait_key in trait_d.keys():
-            trait = trait_d[trait_key]
-            if trait != None:
-                trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
-                              geo_series_list]
-                value_d[trait] = [trait_val if trait_val != 'None' else None for trait_val in trait_vals]
-        geos_df = pd.DataFrame(value_d)
-        return geos_df
+        vmin = vmin - center
+        vmax = vmax - center
+
+        vdelta = max([.2 * abs(vmin),.2* abs(vmax)])
+        vmax = vmax+ .2* vdelta
+        vmin = vmin - .2 * vdelta
+
+        dv = max(-vmin, vmax) * 2
+        N = int(256 * dv / (vmax - vmin))
+        cont_map = cm.get_cmap(cmap, N)
+        newcolors = cont_map(np.linspace(0, 1, N))
+        beg = int((dv / 2 + vmin) * N / dv)
+        end = N - int((dv / 2 - vmax) * N / dv)
+        newmap = mpl.colors.ListedColormap(newcolors[beg:end])
+
+        return newmap
+
+    def make_scalar_mappable(cmap=None, hue_vect=None, n=None):
+
+        if type(hue_vect) in [np.ndarray, pd.Series, list]:
+            ax_cmap = None
+            ax_norm = None
+            if np.any((0 < max(hue_vect)) | (0 > min(hue_vect))) == True:
+                if cmap is None:
+                    cmap = 'vlag'
+                ax_cmap = keep_center_colormap(cmap, min(hue_vect), max(hue_vect), center=0)
+                # mpl.colors.CenteredNorm(vcenter=0, clip=True)#TwoSlopeNorm(0, vmin=min(hue_vect), vmax=max(hue_vect)) #
+            else:
+                ax_norm = mpl.colors.Normalize(vmin=min(hue_vect), vmax=max(hue_vect), clip=False)
+                if cmap is None:
+                    cmap='viridis'
+
+        if ax_cmap is None:
+            if type(cmap) == list:
+                if n is None:
+                    ax_cmap = mpl.colors.LinearSegmentedColormap.from_list("MyCmapName", cmap)
+                else:
+                    ax_cmap = mpl.colors.LinearSegmentedColormap.from_list("MyCmapName", cmap, N=n)
+            elif type(cmap) == str:
+                if n is None:
+                    ax_cmap = plt.get_cmap(cmap)
+                else:
+                    ax_cmap = plt.get_cmap(cmap, n)
+            else:
+                print('what madness is this?')
+        ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
+
+        return ax_sm
+
+    # def make_df(geo_ms, hue=None, marker=None, size=None, cols=None):
+    #     try:
+    #         geo_series_list = geo_ms.series_list
+    #     except:
+    #         geo_series_list = [geo_ms]
+    #     lats = [geos.lat for geos in geo_series_list]
+    #     lons = [geos.lon for geos in geo_series_list]
+    #
+    #     trait_d = {'hue': hue, 'marker': marker, 'size': size}
+    #     traits = [hue, marker, size]
+    #     if type(cols) == list:
+    #         traits += cols
+    #     value_d = {'lat': lats, 'lon': lons}
+    #     for trait in traits:#trait_d.keys():
+    #         # trait = trait_d[trait_key]
+    #         if trait != None:
+    #             trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
+    #                           geo_series_list]
+    #             value_d[trait] = [trait_val if trait_val != 'None' else None for trait_val in trait_vals]
+    #     geos_df = pd.DataFrame(value_d)
+    #     return geos_df
 
     def plot_scatter(df=None, x=None, y=None, hue_var=None, size_var=None, marker_var=None, edgecolor='w',
                      ax=None, proj=None, scatter_kwargs=None, legend=True, lgd_kwargs=None,
@@ -500,6 +590,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
         plot_defaults = copy.copy(PLOT_DEFAULT)
         palette = None
+        hue_norm = None
+        ax_sm = None
 
         _df = df
         if len(_df) == 1:
@@ -612,15 +704,21 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             hue_data = _df[_df[hue_var] != missing_val]
             if cmap !=None:
                 palette = cmap
-            else:
-                trait_val_types = [True if type(val) in (np.str_, str) else False for val in hue_data[hue_var]]
-                palette = 'viridis'
-                if True in trait_val_types:
-                    if len(hue_data[hue_var].unique()) < 20:
-                        palette = 'tab20'
+
+            trait_val_types = [True if type(val) in (np.str_, str) else False for val in hue_data[hue_var]]
+            if True in trait_val_types:
+                if len(hue_data[hue_var].unique()) < 20:
+                    palette = 'tab20'
                 else:
-                    if np.any((0 < hue_data[hue_var].max())|(0 > hue_data[hue_var].min() )) == True:
-                        palette = 'vlag'
+                    # n= len(hue_data[hue_var].unique())
+                    if palette is None:
+                        palette = 'viridis'
+                    ax_sm = make_scalar_mappable(cmap=palette, hue_vect=None, n=len(hue_data[hue_var].unique()))
+                    palette = ax_sm.cmap
+            else:
+                ax_sm = make_scalar_mappable(cmap=palette, hue_vect=hue_data[hue_var])
+                palette = ax_sm.cmap
+                hue_norm = ax_sm.norm#.autoscale(hue_data[hue_var])
 
 
         if ((type(hue_var) == str) and (type(palette) == dict)):
@@ -635,7 +733,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         # then plot data with available hue over it, collect the legend information again and recompose the legend
 
         if type(hue_var) == str:
-            scatter_kwargs['zorder'] = 10
+            scatter_kwargs['zorder'] = 13
             hue_data = _df[_df[hue_var] == missing_val]
             sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,
                             style=marker_var,
@@ -643,13 +741,15 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                             ax=ax, **scatter_kwargs)
             missing_handles, missing_labels = ax.get_legend_handles_labels()
 
-            scatter_kwargs['zorder'] = 11
+            scatter_kwargs['zorder'] = 14
             hue_data = _df[_df[hue_var] != missing_val]
+            if hue_norm is not None:
+                scatter_kwargs['hue_norm'] = hue_norm
             sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,
                             style=marker_var, palette=palette, ax=ax, **scatter_kwargs)
 
         else:
-            scatter_kwargs['zorder'] = 10
+            scatter_kwargs['zorder'] = 13
             scatter_kwargs['c'] = missing_d['hue']
             sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var,
                             style=marker_var, ax=ax, **scatter_kwargs)
@@ -699,47 +799,57 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                         if _label not in d_leg[key]['labels']:
                             d_leg[key]['labels'].append(_label)
                             d_leg[key]['handles'].append(pair_h[ik])
+            # gssub = gs0[2].subgridspec(1, 3)
+            if ax_sm is not None:
+                if ((len(d_leg.keys()) == 1) and (hue_var in d_leg.keys())):
+                    try:
+                        cbar = plt.colorbar(ax_sm, ax=ax, orientation='vertical', label=hue_var,shrink=.6,
+                                           )#, ticks=ticks)
+                        cbar.minorticks_off()
+                        ax.legend().remove()
+                    except:
+                        pass
+            else:
+                # Finally rebuild legend in single list with formatted section headers
+                handles, labels = [], []
+                headers = True
+                if ((len(d_leg) == 1) and ('label' in d_leg.keys())):
+                    headers = False
+                if 'headers' in lgd_kwargs:
+                    headers = lgd_kwargs['headers']
+                    del lgd_kwargs['headers']
 
-            # Finally rebuild legend in single list with formatted section headers
-            handles, labels = [], []
-            headers = True
-            if ((len(d_leg) == 1) and ('label' in d_leg.keys())):
-                headers = False
-            if 'headers' in lgd_kwargs:
-                headers = lgd_kwargs['headers']
-                del lgd_kwargs['headers']
+                for key in d_leg:
+                    han = copy.copy(h[0])
+                    han.set_alpha(0)
+                    if headers==True:
+                        handles.append(han)
+                        labels.append('$\\bf{}$'.format('{' + key + '}'))
 
-            for key in d_leg:
-                han = copy.copy(h[0])
-                han.set_alpha(0)
-                if headers==True:
+                    tmp_labels, tmp_handles = [], []
+                    tmp_labels_missing, tmp_handles_missing = [], []
+                    for ik, label in enumerate(d_leg[key]['labels']):
+                        if label == 'missing':
+                            tmp_labels_missing.append(label)
+                            tmp_handles_missing.append(d_leg[key]['handles'][ik])
+                        else:
+                            tmp_labels.append(label)
+                            tmp_handles.append(d_leg[key]['handles'][ik])
+
+                    tmp_labels += tmp_labels_missing
+                    tmp_handles += tmp_handles_missing
+
+                    handles += tmp_handles
+                    labels += tmp_labels
+
                     handles.append(han)
-                    labels.append('$\\bf{}$'.format('{' + key + '}'))
+                    labels.append('')
 
-                tmp_labels, tmp_handles = [], []
-                tmp_labels_missing, tmp_handles_missing = [], []
-                for ik, label in enumerate(d_leg[key]['labels']):
-                    if label == 'missing':
-                        tmp_labels_missing.append(label)
-                        tmp_handles_missing.append(d_leg[key]['handles'][ik])
-                    else:
-                        tmp_labels.append(label)
-                        tmp_handles.append(d_leg[key]['handles'][ik])
-
-                tmp_labels += tmp_labels_missing
-                tmp_handles += tmp_handles_missing
-
-                handles += tmp_handles
-                labels += tmp_labels
-
-                handles.append(han)
-                labels.append('')
-
-            if 'loc' not in lgd_kwargs:
-                lgd_kwargs['loc'] = 'upper left'
-            if 'bbox_to_anchor' not in lgd_kwargs:
-                lgd_kwargs['bbox_to_anchor'] = (1, 1)
-            ax.legend(handles, labels, **lgd_kwargs)  # loc="upper left", bbox_to_anchor=(1, 1))
+                if 'loc' not in lgd_kwargs:
+                    lgd_kwargs['loc'] = 'upper left'
+                if 'bbox_to_anchor' not in lgd_kwargs:
+                    lgd_kwargs['bbox_to_anchor'] = (1, 1)
+                ax.legend(handles, labels, **lgd_kwargs)  # loc="upper left", bbox_to_anchor=(1, 1))
         else:
             ax.legend().remove()
 
