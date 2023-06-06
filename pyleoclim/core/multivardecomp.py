@@ -257,12 +257,12 @@ class MultivariateDecomp:
             EOF = self.eigvecs[:, index]
             
         fig = plt.figure(figsize=figsize)
-        gs = gridspec.GridSpec(4, 3, wspace=0.3, hspace=0.3)
+        gs = gridspec.GridSpec(4, 8, wspace=0.051, hspace=0.3)
         gs.update(left=0, right=1.1)
         
         ax = {}
         # plot the PC
-        ax['pc'] = fig.add_subplot(gs[0, :2])
+        ax['pc'] = fig.add_subplot(gs[0, :5])
         label = rf'$PC_{index + 1}$' 
         t = self.orig.series_list[0].time
         ts = series.Series(time=t, value=PC, verbose=False)  # define timeseries object for the PC
@@ -270,27 +270,11 @@ class MultivariateDecomp:
         ax['pc'].set_ylabel(label)
                
         # plot its PSD
-        ax['psd'] = fig.add_subplot(gs[0, 2])
+        ax['psd'] = fig.add_subplot(gs[0, 6:])
         psd = ts.interp().spectral(method=spec_method)
         _ = psd.plot(ax=ax['psd'], label=label)
 
         # plot spatial pattern or spaghetti
-
-        # if type(self) == pyleo.MultipleGeoSeries:
-        # if self.locs is not None:
-        #     lats = self.locs[:,0]
-        #     lons = self.locs[:,1]
-        #     df = pd.DataFrame({'lat': lats, 'lon':lons})
-        # elif
-        if self.locs is None:
-            # This makes a bare bones dataframe from a MultipleGeoSeries object
-            df = mapping.make_df(self.orig)
-            # additional columns are added manually
-            df['EOF'] = EOF
-        else:
-            df = pd.DataFrame({'lat': self.locs[:,0], 'lon':self.locs[:,1], 'EOF': EOF})
-
-        # try:
         map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
         if 'projection' in map_kwargs.keys():
             projection = map_kwargs['projection']
@@ -360,14 +344,23 @@ class MultivariateDecomp:
             legend = map_kwargs['legend']
         else:
             legend = True
-        print(hue)
+
+        if self.locs is None:
+            # This makes a bare bones dataframe from a MultipleGeoSeries object
+            df = mapping.make_df(self.orig, hue=hue, marker=marker, size=size)
+            # additional columns are added manually
+            df['EOF'] = EOF
+        else:
+            df = pd.DataFrame({'lat': self.locs[:,0], 'lon':self.locs[:,1], 'EOF': EOF})
+
+
         ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
                                         proj_default=proj_default,
                                         background=background, borders=borders, rivers=rivers, lakes=lakes,
                                         ocean=ocean, land=land,
                                         figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
                                         legend=legend, cmap=cmap,
-                                        fig=fig, gs_slot=gs[1:, :])
+                                        fig=fig, gs_slot=gs[1:, :6])
         # except:
         #     ax['map'] = fig.add_subplot(gs[1:, :])
         #     self.orig.standardize().plot(ax=ax['map'], title='',
