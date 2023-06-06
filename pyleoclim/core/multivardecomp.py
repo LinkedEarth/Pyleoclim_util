@@ -354,7 +354,7 @@ class MultivariateDecomp:
             df = pd.DataFrame({'lat': self.locs[:,0], 'lon':self.locs[:,1], 'EOF': EOF})
 
 
-        ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
+        _, ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
                                         proj_default=proj_default,
                                         background=background, borders=borders, rivers=rivers, lakes=lakes,
                                         ocean=ocean, land=land,

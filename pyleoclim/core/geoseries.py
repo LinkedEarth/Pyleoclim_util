@@ -300,7 +300,7 @@ class GeoSeries(Series):
 
         '''
 
-        mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
+        fig, ax = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
                     proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes,
                     ocean=ocean,
@@ -309,6 +309,7 @@ class GeoSeries(Series):
                     lgd_kwargs=lgd_kwargs, legend=legend,
                     cmap=cmap,edgecolor=edgecolor,
                     fig=fig, gs_slot=gridspec_slot)
+        return fig, ax
 
         # scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
         # # get the information from the timeseries
@@ -597,7 +598,7 @@ class GeoSeries(Series):
         else:
             legend = False
 
-        ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
+        _, ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
                     figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap,
                     fig=fig, gs_slot=gs[1, 0:2])
