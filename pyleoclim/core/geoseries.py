@@ -218,7 +218,7 @@ class GeoSeries(Series):
         
         projection : str, optional
 
-            The projection to use. The default is 'Robinson'.
+            The projection to use. The default is 'Orthographic'.
 
         proj_default : bool; {True, False}, optional
 
