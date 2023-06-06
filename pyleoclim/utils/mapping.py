@@ -586,7 +586,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             scatter_kwargs = {}
         if type(lgd_kwargs) != dict:
             lgd_kwargs = {}
-        print(scatter_kwargs)
 
         plot_defaults = copy.copy(PLOT_DEFAULT)
         palette = None
@@ -758,7 +757,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         h, l = ax.get_legend_handles_labels()
         if len(l) == 0:
             legend = False
-        print(l)
 
         if legend == True:
             han = copy.copy(h[0])
@@ -783,7 +781,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
             for pair in [(available_handles, available_labels), (missing_handles, missing_labels)]:
                 pair_h, pair_l = pair[0], pair[1]
-                print(pair_l)
                 for ik, label in enumerate(pair_l):
                     if label in trait_vars:
                         key = label
@@ -798,7 +795,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                                 _label = LipdToOntology(pair_l[ik])
                             except:
                                 _label = pair_l[ik]
-                        print(_label)
                         if _label not in d_leg[key]['labels']:
                             d_leg[key]['labels'].append(_label)
                             d_leg[key]['handles'].append(pair_h[ik])
@@ -825,7 +821,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 for key in d_leg:
                     han = copy.copy(h[0])
                     han.set_alpha(0)
-                    print(key)
                     if headers==True:
                         handles.append(han)
                         labels.append('$\\bf{}$'.format('{' + key + '}'))
