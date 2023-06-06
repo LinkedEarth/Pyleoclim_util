@@ -522,16 +522,25 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
         return newmap
 
-    def make_scalar_mappable(cmap=None, hue_vect=None, n=None):
+    def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
 
         if type(hue_vect) in [np.ndarray, pd.Series, list]:
             ax_cmap = None
             ax_norm = None
-            if np.any((0 < max(hue_vect)) | (0 > min(hue_vect))) == True:
+
+            if type(norm_kwargs) != dict:
+                norm_kwargs = {}
+            if 'vcenter' not in norm_kwargs.keys():
+                norm_kwargs['vcenter'] = 0
+            if 'clip' not in norm_kwargs.keys():
+                norm_kwargs['clip'] = False
+
+            if np.any((norm_kwargs['vcenter'] < max(hue_vect)) | (norm_kwargs['vcenter'] > min(hue_vect))) == True:
                 if cmap is None:
                     cmap = 'vlag'
                 # ax_cmap = keep_center_colormap(cmap, min(hue_vect), max(hue_vect), center=0)
-                ax_norm = mpl.colors.CenteredNorm(vcenter=0, clip=False)#TwoSlopeNorm(0, vmin=min(hue_vect), vmax=max(hue_vect)) #
+                ax_norm = mpl.colors.CenteredNorm(
+                    **norm_kwargs)  # vcenter=0, clip=False)#TwoSlopeNorm(0, vmin=min(hue_vect), vmax=max(hue_vect)) #
             else:
                 ax_norm = mpl.colors.Normalize(vmin=min(hue_vect), vmax=max(hue_vect), clip=False)
                 if cmap is None:
@@ -585,6 +594,10 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             scatter_kwargs = {}
         if type(lgd_kwargs) != dict:
             lgd_kwargs = {}
+        if 'norm_kwargs' in kwargs.keys():
+            norm_kwargs = kwargs['norm_kwargs']
+        else:
+            norm_kwargs = {}
 
         plot_defaults = copy.copy(PLOT_DEFAULT)
         palette = None
@@ -633,7 +646,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             scatter_kwargs['s'] = missing_d['size']
         else:
             sizes = [size_val for size_val in _df[size_var].values if size_val != missing_val]
-            if len(sizes)<2:#set(_df[size_var]) - set([missing_val])) < 2:
+            if len(sizes) < 2:  # set(_df[size_var]) - set([missing_val])) < 2:
                 scatter_kwargs['s'] = missing_d['size']
                 size_var = None
             else:
@@ -800,11 +813,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             # gssub = gs0[2].subgridspec(1, 3)
 
             if ((len(d_leg.keys()) == 1) and (hue_var in d_leg.keys()) and (ax_sm is not None)):
-                    # if ax_sm is not None:
-                    cbar = plt.colorbar(ax_sm, ax=ax, orientation='vertical', label=hue_var, shrink=.6,
-                                        )  # , ticks=ticks)
-                    cbar.minorticks_off()
-                    ax.legend().remove()
+                # if ax_sm is not None:
+                cbar = plt.colorbar(ax_sm, ax=ax, orientation='vertical', label=hue_var, shrink=.6,
+                                    )  # , ticks=ticks)
+                cbar.minorticks_off()
+                ax.legend().remove()
             else:
                 print(d_leg)
                 # Finally rebuild legend in single list with formatted section headers
