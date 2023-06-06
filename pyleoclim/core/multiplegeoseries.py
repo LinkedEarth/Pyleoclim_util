@@ -159,7 +159,7 @@ class MultipleGeoSeries(MultipleSeries):
             
         '''
 
-        scatter_map(self, hue=hue, size=size, marker=marker,
+        fig, ax = scatter_map(self, hue=hue, size=size, marker=marker,
                     edgecolor=edgecolor, projection=projection,
                                         proj_default=proj_default,
                                         background=background, borders=borders, rivers=rivers, lakes=lakes,
@@ -169,6 +169,7 @@ class MultipleGeoSeries(MultipleSeries):
                                         lgd_kwargs=lgd_kwargs, legend=legend,
                                         cmap=cmap,
                                         fig=fig, gs_slot=gridspec_slot)
+        return fig, ax
         # def make_scalar_mappable(cmap, lims=None, n=None):
         #     if type(cmap) == list:
         #         if n is None:

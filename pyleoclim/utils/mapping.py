@@ -942,7 +942,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax=ax, proj=None, edgecolor=edgecolor,
                  cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, lgd_kwargs=lgd_kwargs)  # , **kwargs)
-    return ax
+    return fig, ax
 
 
 def dist_sphere(lat1, lon1, lat2, lon2):
