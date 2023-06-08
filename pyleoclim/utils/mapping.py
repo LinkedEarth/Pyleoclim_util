@@ -1161,8 +1161,8 @@ def compute_dist(lat_r, lon_r, lat_c, lon_c):
         A list of distances in km.
     """
     dist = []
-    lon_c = lon_360_to_180(lon_c) 
-    lon_r = lon_360_to_180(lon_r)
+    lon_c = lon_360_to_180(np.array(lon_c)) 
+    lon_r = lon_360_to_180(np.array(lon_r))
     for idx, val in enumerate(lat_c):
         lat1 = np.radians(lat_r)
         lon1 = np.radians(lon_r)

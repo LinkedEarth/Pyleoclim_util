@@ -316,12 +316,11 @@ class TestMultipleSeriesPca:
         Test with real data, same time axis
     
         ''' 
-        d=load_data()
-        tslist = d.to_LipdSeriesList()
-        tslist = tslist[2:]
-        ms = pyleo.MultipleSeries(tslist)
+        soi = pyleo.utils.load_dataset('SOI')
+        nino = pyleo.utils.load_dataset('NINO3')
+        ms = soi & nino
+        ms.name = 'ENSO' 
         msl = ms.common_time()  # put on common time
-    
         res = msl.pca()
         
         fig, ax = res.screeplot()

@@ -422,7 +422,7 @@ class MultipleGeoSeries(MultipleSeries):
         .. jupyter-execute::
 
             from pylipd.utils.dataset import load_dir
-            lipd = load_dir(name='Euro2k')
+            lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
             dfs = df.query("archiveType in ('tree')")
             # place in a MultipleGeoSeries object
@@ -437,7 +437,7 @@ class MultipleGeoSeries(MultipleSeries):
 
             Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')
 
-            res = Euro2k.pca() # carry out PCA
+            res = Euro2k.common_time().pca() # carry out PCA
             type(res) # the result is a MultivariateDecomp object
 
             res.screeplot() # plot the eigenvalue spectrum

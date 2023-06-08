@@ -187,7 +187,9 @@ class MultivariateDecomp:
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
-            3. The loadings (EOF or similar), possibly geolocated.
+            3. The loadings (EOF or similar), possibly geolocated. If the object
+                does not have geolocation information, a spaghetti plot of the standardized
+                series is displayed.
 
         Parameters
         ----------
@@ -247,6 +249,9 @@ class MultivariateDecomp:
         pyleoclim.utils.tsutils.eff_sample_size : Effective sample size
         
         '''
+        from ..core.multiplegeoseries import MultipleGeoSeries
+        from ..core.multipleseries import MultipleSeries
+        
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         
         if flip:
@@ -279,7 +284,7 @@ class MultivariateDecomp:
         if 'projection' in map_kwargs.keys():
             projection = map_kwargs['projection']
         else:
-            projection = 'Robinson'
+            projection = 'auto'
 
         if 'proj_default' in map_kwargs.keys():
             proj_default = map_kwargs['proj_default']
@@ -289,7 +294,7 @@ class MultivariateDecomp:
         if 'marker' in map_kwargs.keys():
             marker = map_kwargs['marker']
         else:
-            marker = None
+            marker = 'archiveType'
         if 'hue' in map_kwargs.keys():
             hue = map_kwargs['color']
         else:
@@ -344,23 +349,29 @@ class MultivariateDecomp:
             legend = map_kwargs['legend']
         else:
             legend = True
-
-        if self.locs is None:
+        if isinstance(self.orig, MultipleGeoSeries):
+        #if self.locs is None:
             # This makes a bare bones dataframe from a MultipleGeoSeries object
             df = mapping.make_df(self.orig, hue=hue, marker=marker, size=size)
             # additional columns are added manually
             df['EOF'] = EOF
-        else:
-            df = pd.DataFrame({'lat': self.locs[:,0], 'lon':self.locs[:,1], 'EOF': EOF})
+        # else:
+        #     df = pd.DataFrame({'lat': self.locs[:,0], 'lon':self.locs[:,1], 'EOF': EOF})
 
-
-        _, ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
-                                        proj_default=proj_default,
-                                        background=background, borders=borders, rivers=rivers, lakes=lakes,
-                                        ocean=ocean, land=land,
-                                        figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
-                                        legend=legend, cmap=cmap,
-                                        fig=fig, gs_slot=gs[1:, :6])
+            _, ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
+                                               proj_default=proj_default,
+                                               background=background, borders=borders, rivers=rivers, lakes=lakes,
+                                               ocean=ocean, land=land,
+                                               figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
+                                               legend=legend, cmap=cmap,
+                                               fig=fig, gs_slot=gs[1:, :6])
+            
+        elif isinstance(self.orig, MultipleSeries):
+            # spaghetti plot with the standardizes series
+            ax['map'] = fig.add_subplot(gs[1:, :])
+            self.orig.standardize().plot(ax=ax['map'], title='',
+                                         ylabel = 'Original Data (standardized)')
+            
         # except:
         #     ax['map'] = fig.add_subplot(gs[1:, :])
         #     self.orig.standardize().plot(ax=ax['map'], title='',
@@ -470,10 +481,7 @@ class MultivariateDecomp:
             # fig.colorbar(sc, ax=ax['map'], label=rf'$EOF_{index + 1}$' ,
             #              shrink=cb_scale, orientation="vertical")
                              
-        # else: # plot the original data
-        #     ax['map'] = fig.add_subplot(gs[1:, :])
-        #     self.orig.standardize().plot(ax=ax['map'], title='',
-        #                                  ylabel = 'Original Data (standardized)')
+        
 
         # if title is not None:
         #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
