@@ -25,6 +25,40 @@ import matplotlib.gridspec as gridspec
 from .plotting import savefig
 from .lipdutils import PLOT_DEFAULT, LipdToOntology
 
+def pick_proj(lat, lon, crit_dist=5000):
+    '''
+    Pick projection based on the degree of clustering of coordinates.
+    At the moment, returns only one of two options:
+        - 'Robinson' for R > crit_dist
+        - 'Orthographic' for R <= crit_dist
+
+    Parameters
+    ----------
+    lat : 1d array
+        latitudes in [-90, 90]
+    lon : 1d array
+        longitudes in (-180, 180]
+    crit_dist : float                   
+        critical radius. Default: 5000 km
+
+    Returns
+    -------
+    proj: str
+        'Orthographic' or 'Robinson'
+
+    '''
+    lon = lon_360_to_180(lon) # convert longitudes to [-180, 180]
+    
+    lat_c, lon_c = centroid_coords(lat,lon) # find coordinates of centroid 
+    
+    d = compute_dist(lat_c, lon_c, lat, lon) # computes distances to centroid
+    dmax = np.array(d).max()  # find maximum distance 
+    if dmax > crit_dist:
+        proj = 'Robinson'
+    else:
+        proj = 'Orthographic'
+    
+    return proj
 
 def set_proj(projection='Robinson', proj_default=True):
     """ Set the projection for Cartopy.
@@ -246,7 +280,7 @@ def set_proj(projection='Robinson', proj_default=True):
 
 
 def map(lat, lon, criteria, marker=None, color=None,
-        projection='Robinson', proj_default=True,
+        projection='auto', proj_default=True, crit_dist = 5000,
         background=True, borders=False, rivers=False, lakes=False,
         figsize=None, ax=None, scatter_kwargs=None, legend=True, legend_title=None,
         lgd_kwargs=None, savefig_settings=None):
@@ -284,12 +318,18 @@ def map(lat, lon, criteria, marker=None, color=None,
         'Geostationary','NearsidePerspective','EckertI','EckertII',
         'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
         'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        By default, projection == 'auto', so the projection will be picked 
+        based on the degree of clustering of the sites. 
         
     proj_default : bool
         If True, uses the standard projection attributes.
         Enter new attributes in a dictionary to change them. Lists of attributes
         can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_. 
-            
+    
+    crit_dist : float                   
+        critical radius for projection choice. Default: 5000 km
+        Only active if projection == 'auto'
+        
     background : bool
         If True, uses a shaded relief background (only one available in Cartopy)
         
@@ -337,6 +377,7 @@ def map(lat, lon, criteria, marker=None, color=None,
     See Also
     --------
     pyleoclim.utils.mapping.set_proj : Set the projection for Cartopy-based maps
+    pyleoclim.utils.mapping.pick_proj : pick the projection type based on the degree of clustering of coordinates
     """
 
     # Take care of duplicate legends
@@ -395,6 +436,9 @@ def map(lat, lon, criteria, marker=None, color=None,
     del scatter_kwargs['edgecolors']
 
     # get the projection:
+    if projection == 'auto':
+        projection = pick_proj(lat, lon, crit_dist=crit_dist)
+        
     proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
         proj1 = {'central_latitude': np.mean(lat),
@@ -499,10 +543,112 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
 
 
 def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='w', 
-                proj_default=True, projection='Robinson', 
+                proj_default=True, projection='auto', crit_dist=5000, 
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, extent='global', lgd_kwargs=None, legend=True, cmap=None,
                 fig=None, gs_slot=None):
+    '''
+    
+
+    Parameters
+    ----------
+    geos : TYPE
+        DESCRIPTION.
+    hue : TYPE, optional
+        DESCRIPTION. The default is 'archiveType'.
+    size : TYPE, optional
+        DESCRIPTION. The default is None.
+    marker : TYPE, optional
+        DESCRIPTION. The default is 'archiveType'.
+    edgecolor : TYPE, optional
+        DESCRIPTION. The default is 'w'.
+    proj_default : TYPE, optional
+        DESCRIPTION. The default is True.
+    projection : string
+        the map projection. Available projections:
+        'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
+        'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+        'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic',
+        'Sinusoidal','Stereographic','TransverseMercator','UTM',
+        'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+        'Geostationary','NearsidePerspective','EckertI','EckertII',
+        'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+        'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        By default, projection == 'auto', so the projection will be picked 
+        based on the degree of clustering of the sites. 
+        
+     proj_default : bool
+         If True, uses the standard projection attributes.
+         Enter new attributes in a dictionary to change them. Lists of attributes
+         can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_. 
+     
+     crit_dist : float                   
+         critical radius for projection choice. Default: 5000 km
+         Only active if projection == 'auto'
+         
+     background : bool
+         If True, uses a shaded relief background (only one available in Cartopy)
+         
+     borders : bool
+         Draws the countries border. Defaults is off (False).
+         
+     rivers : bool
+         Draws major rivers. Default is off (False).
+         
+     lakes : bool
+         Draws major lakes. 
+         Default is off (False).  
+         
+     figsize : list
+         the size for the figure
+         
+     ax: axis,optional
+         Return as axis instead of figure (useful to integrate plot into a subplot) 
+         
+     scatter_kwargs : dict
+         Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.     
+     
+     legend : bool
+         Whether the draw a legend on the figure
+     
+     legend_title : str
+         Use this instead of a dynamic range for legend
+     
+     lgd_kwargs : dict
+         Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
+     
+     savefig_settings : dict
+
+         Dictionary of arguments for matplotlib.pyplot.saveFig.
+
+         - "path" must be specified; it can be any existed or non-existed path,
+           with or without a suffix; if the suffix is not given in "path", it will follow "format"
+         - "format" can be one of {"pdf", "eps", "png", "ps"}
+         
+    extent : TYPE, optional
+        DESCRIPTION. The default is 'global'.
+    lgd_kwargs : TYPE, optional
+        DESCRIPTION. The default is None.
+    legend : TYPE, optional
+        DESCRIPTION. The default is True.
+    cmap : TYPE, optional
+        DESCRIPTION. The default is None.
+    fig : TYPE, optional
+        DESCRIPTION. The default is None.
+    gs_slot : TYPE, optional
+        DESCRIPTION. The default is None.
+
+    Raises
+    ------
+    TypeError
+        DESCRIPTION.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    '''
 
     def keep_center_colormap(cmap, vmin, vmax, center=0):
 
@@ -889,6 +1035,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                         ' as a dictionary or set to True')
 
     # get the projection:
+    if projection == 'auto':
+        projection = pick_proj(df['lat'], df['lon'], crit_dist=crit_dist)
+        
     proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
         mean_lon = np.mean(df['lon'].apply(lambda x: lon_360_to_180(x)))
@@ -1065,38 +1214,4 @@ def centroid_coords(lat,lon):
     p = Polygon([(x, y) for (x,y) in zip(lon,lat)])
     return p.centroid().y, p.centroid().x
 
-def pick_proj(lat, lon, crit_dist=7000):
-    '''
-    Pick projection based on the degree of clustering among sites.
-    At the moment, returns only one of two options:
-        - 'Robinson' for R > crit_dist
-        - 'Orthographic' for R <= crit_dist
-
-    Parameters
-    ----------
-    lat : 1d array
-        latitudes in [-90, 90]
-    lon : 1d array
-        longitudes in (-180, 180]
-    crit_dist : float                   
-        critical radius. Default: 5000 km
-
-    Returns
-    -------
-    proj: str
-        'Orthographic' or 'Robinson'
-
-    '''
-    lon = lon_360_to_180(lon) # convert longitudes to [-180, 180]
-    
-    lat_c, lon_c = centroid_coords(lat,lon) # find coordinates of centroid 
-    
-    d = compute_dist(lat_c, lon_c, lat, lon) # computes distances to centroid
-    dmax = np.array(d).max()  # find maximum distance 
-    if dmax > crit_dist:
-        proj = 'Robinson'
-    else:
-        proj = 'Orthographic'
-    
-    return proj
 

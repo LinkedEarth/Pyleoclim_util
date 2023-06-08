@@ -78,7 +78,7 @@ class MultipleGeoSeries(MultipleSeries):
 
 
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
-            edgecolor='w', color_pal=None, legend_attribute=None, projection='Robinson', proj_default=True,
+            edgecolor='w', color_pal=None, legend_attribute=None, projection='auto', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, ax=None, scatter_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
@@ -129,6 +129,10 @@ class MultipleGeoSeries(MultipleSeries):
         TYPE
             DESCRIPTION.
             
+        See also
+        --------
+        pyleoclim.utils.mapping.scatter_map: information-rich scatterplot on Cartopy map
+            
         Examples
         --------
         .. jupyter-execute::
@@ -155,8 +159,6 @@ class MultipleGeoSeries(MultipleSeries):
             Euro2k.map(projection='Orthographic',size='elevation')  # tweak the projection and represent elevation by size
             Euro2k.map(projection='Orthographic',hue='elevation')  # tweak the projection and represent elevation by hue
 
-
-            
         '''
 
         fig, ax = scatter_map(self, hue=hue, size=size, marker=marker,
