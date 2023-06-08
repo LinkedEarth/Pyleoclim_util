@@ -8,17 +8,18 @@ __all__ = ['map', 'compute_dist']
 import cartopy
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import matplotlib.pyplot as plt
+from shapely.geometry import Polygon
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import copy
 from itertools import cycle
+# matplotlib imports
+import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import matplotlib as mpl
 from matplotlib import cm
 from matplotlib.colors import TwoSlopeNorm
-
 import matplotlib.gridspec as gridspec
 
 from .plotting import savefig
@@ -497,8 +498,8 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
     return geos_df
 
 
-def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='w', projection='Robinson',
-                proj_default=True,
+def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='w', 
+                proj_default=True, projection='Robinson', 
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, extent='global', lgd_kwargs=None, legend=True, cmap=None,
                 fig=None, gs_slot=None):
@@ -1003,7 +1004,8 @@ def compute_dist(lat_r, lon_r, lat_c, lon_c):
         A list of distances in km.
     """
     dist = []
-
+    lon_c = lon_360_to_180(lon_c) 
+    lon_r = lon_360_to_180(lon_r)
     for idx, val in enumerate(lat_c):
         lat1 = np.radians(lat_r)
         lon1 = np.radians(lon_r)
@@ -1040,6 +1042,61 @@ def within_distance(distance, radius):
 def lon_360_to_180(x):
     return (x + 180) % 360 - 180
 
-
 def lon_180_to_360(x):
     return x % 360
+
+def centroid_coords(lat,lon):
+    '''
+    Computes the centroid of the geographic coordinates via Shapely
+    h/t Tim Roberts, via StackOverflow: https://stackoverflow.com/a/72737621
+
+    Parameters
+    ----------
+    lat : 1d array
+       latitudes in [-90, 90]
+    lon : 1d array
+       longitudes in (-180, 180]
+
+    Returns
+    -------
+    lat_c, lon_c : coordinates of the centroid
+
+    '''
+    p = Polygon([(x, y) for (x,y) in zip(lon,lat)])
+    return p.centroid().y, p.centroid().x
+
+def pick_proj(lat, lon, crit_dist=7000):
+    '''
+    Pick projection based on the degree of clustering among sites.
+    At the moment, returns only one of two options:
+        - 'Robinson' for R > crit_dist
+        - 'Orthographic' for R <= crit_dist
+
+    Parameters
+    ----------
+    lat : 1d array
+        latitudes in [-90, 90]
+    lon : 1d array
+        longitudes in (-180, 180]
+    crit_dist : float                   
+        critical radius. Default: 5000 km
+
+    Returns
+    -------
+    proj: str
+        'Orthographic' or 'Robinson'
+
+    '''
+    lon = lon_360_to_180(lon) # convert longitudes to [-180, 180]
+    
+    lat_c, lon_c = centroid_coords(lat,lon) # find coordinates of centroid 
+    
+    d = compute_dist(lat_c, lon_c, lat, lon) # computes distances to centroid
+    dmax = np.array(d).max()  # find maximum distance 
+    if dmax > crit_dist:
+        proj = 'Robinson'
+    else:
+        proj = 'Orthographic'
+    
+    return proj
+
