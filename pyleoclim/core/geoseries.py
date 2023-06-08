@@ -30,10 +30,11 @@ class GeoSeries(Series):
         values of the dependent variable (y)
         
     lat : float
-        latitude N in decimal degrees.
+        latitude N in decimal degrees. Must be in the range [-90;+90]
         
     lon : float
-        longitude East in decimal degrees. Negative values will be converted to an angle in [0 , 360)
+        longitude East in decimal degrees. Must be in the range [-180;+360]
+        No conversion is applied as mapping utilities convert to [-180,+180] internally
        
     elevation : float
         elevation of the sample, in meters above sea level. Negative numbers indicate depth below global mean sea level, therefore.                                                                                          
@@ -136,10 +137,12 @@ class GeoSeries(Series):
         # assign longitude
         if lon is not None:
             lon = float(lon)
-            if 0 <= lon < 360:     
+            if -180 < lon <= 360:     
                 self.lon = lon
-            elif -180 <= lon < 0:
-                self.lon = 360 + lon
+            # elif 180 < lon <= 360:
+            #     self.lon = mapping.lon_360_to_180(lon)
+            #     if verbose:
+            #         print('Longitude has been converted to the [-180,+180] range')
             else:
                 ValueError('Longitude must be a number in [-180,360]')
         else:

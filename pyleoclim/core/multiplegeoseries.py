@@ -78,7 +78,8 @@ class MultipleGeoSeries(MultipleSeries):
 
 
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
-            edgecolor='w', color_pal=None, legend_attribute=None, projection='auto', proj_default=True,
+            edgecolor='k', color_pal=None, legend_attribute=None, projection='auto', 
+            proj_default=True, crit_dist=5000,
             background=True, borders=False, rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, ax=None, scatter_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
@@ -155,7 +156,8 @@ class MultipleGeoSeries(MultipleSeries):
 
             Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
 
-            Euro2k.map() # By default, this will employ a Robinson projection
+            Euro2k.map(crit_dist) # By default, this will pick projection based on the degree of geographic clustering of the sites
+            
             Euro2k.map(projection='Orthographic',size='elevation')  # tweak the projection and represent elevation by size
             Euro2k.map(projection='Orthographic',hue='elevation')  # tweak the projection and represent elevation by hue
 
@@ -164,6 +166,7 @@ class MultipleGeoSeries(MultipleSeries):
         fig, ax = scatter_map(self, hue=hue, size=size, marker=marker,
                     edgecolor=edgecolor, projection=projection,
                                         proj_default=proj_default,
+                                        crit_dist=crit_dist,
                                         background=background, borders=borders, rivers=rivers, lakes=lakes,
                                         ocean=ocean,
                                         land=land,

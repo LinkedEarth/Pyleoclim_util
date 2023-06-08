@@ -286,6 +286,8 @@ def map(lat, lon, criteria, marker=None, color=None,
         lgd_kwargs=None, savefig_settings=None):
     """ Map the location of all lat/lon according to some criteria
     
+    DEPRECATED: use scatter_map() instead
+    
     Map the location of all lat/lon according to some criteria. Based on functions defined in the Cartopy package. 
     
     Parameters
@@ -441,10 +443,11 @@ def map(lat, lon, criteria, marker=None, color=None,
         
     proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
-        proj1 = {'central_latitude': np.mean(lat),
-                 'central_longitude': np.mean(lon)}
-        proj2 = {'central_latitude': np.mean(lat)}
-        proj3 = {'central_longitude': np.mean(lon)}
+        clat, clon = centroid_coords(lat, lon)
+        proj1 = {'central_latitude': clat,
+                 'central_longitude': clon}
+        proj2 = {'central_latitude': clat}
+        proj3 = {'central_longitude': clon}
         try:
             proj = set_proj(projection=projection, proj_default=proj1)
         except:
@@ -542,7 +545,7 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
     return geos_df
 
 
-def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='w', 
+def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='k', 
                 proj_default=True, projection='auto', crit_dist=5000, 
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, extent='global', lgd_kwargs=None, legend=True, cmap=None,
@@ -647,6 +650,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     -------
     TYPE
         DESCRIPTION.
+        
+    See Also
+    --------
+    pyleoclim.utils.mapping.set_proj : Set the projection for Cartopy-based maps
+    pyleoclim.utils.mapping.pick_proj : pick the projection type based on the degree of clustering of coordinates
 
     '''
 
@@ -1034,18 +1042,18 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         raise TypeError('The default for the projections should either be provided' +
                         ' as a dictionary or set to True')
 
-    # get the projection:
+    # get the projection
     if projection == 'auto':
-        projection = pick_proj(df['lat'], df['lon'], crit_dist=crit_dist)
-        
+        projection = pick_proj(df['lat'].values, 
+                               df['lon'].values, crit_dist=crit_dist)
+    # set the projection    
     proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
-        mean_lon = np.mean(df['lon'].apply(lambda x: lon_360_to_180(x)))
-
-        proj1 = {'central_latitude': np.mean(df['lat']),
-                 'central_longitude': mean_lon}
-        proj2 = {'central_latitude': np.mean(df['lat'])}
-        proj3 = {'central_longitude': mean_lon}
+        clat, clon = centroid_coords(df['lat'].values, df['lon'].values)
+        proj1 = {'central_latitude': clat,
+                 'central_longitude': clon}
+        proj2 = {'central_latitude': clat}
+        proj3 = {'central_longitude': clon}
 
         try:
             proj = set_proj(projection=projection, proj_default=proj1)
@@ -1211,7 +1219,9 @@ def centroid_coords(lat,lon):
     lat_c, lon_c : coordinates of the centroid
 
     '''
+    lon = lon_360_to_180(np.array(lon)) 
+    lat = np.array(lat)
     p = Polygon([(x, y) for (x,y) in zip(lon,lat)])
-    return p.centroid().y, p.centroid().x
+    return p.centroid.y, p.centroid.x
 
 

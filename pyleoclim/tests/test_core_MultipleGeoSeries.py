@@ -6,61 +6,118 @@ Created on Thu May 11 09:47:08 2023
 @author: julieneg
 """
 import pyleoclim as pyleo
+import numpy as np
 # from bs4 import BeautifulSoup
 # import requests
 import pytest
 
+# here's the "fixture". Can't figure out how to make an actual pytest fixture take arguments
+def multiple_pinkgeoseries(nrecs = 20, seed = 108, geobox=[-85.0,85.0,-180,180]):
+    """Set of Multiple geoseries with 1/f (pink) temporal structure """
+    nt = 200
+    lats = np.random.default_rng(seed=seed).uniform(geobox[0],geobox[1],nrecs)
+    lons = np.random.default_rng(seed=seed+1).uniform(geobox[2],geobox[3],nrecs)
+    elevs = np.random.default_rng(seed=seed+2).uniform(0,4000,nrecs)
+    
+    archives = np.random.default_rng(seed=seed).choice(list(pyleo.utils.PLOT_DEFAULT.keys()),size=nrecs)
+    obsTypes = np.random.default_rng(seed=seed).choice(['MXD', 'd18O', 'Sr/Ca'],size=nrecs)
+    
+    ts_list = []
+    for i in range(nrecs):
+        t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=nt)
+        ts = pyleo.GeoSeries(t,v, verbose=False, label = f'pink series {i}',
+                             archiveType=archives[i], observationType=obsTypes[i],
+                             lat=lats[i], lon = lons[i], elevation=elevs[i]).standardize()
+        ts_list.append(ts)
+        
+    return pyleo.MultipleGeoSeries(ts_list, label='Multiple Pink GeoSeries')
+
+
 
 class TestUIMultipleGeoSeriesMap:
-    def test_map_archives(self, multiple_pinkgeoseries):
+    def test_map_archives(self):
         '''
         test mapping semantics
         '''
-        mgs = multiple_pinkgeoseries
+        mgs = multiple_pinkgeoseries()
         fig, ax = mgs.map(marker = 'archiveType')
         pyleo.closefig(fig)
         # assert something?
 
-    def test_map_obs(self, multiple_pinkgeoseries):
+    def test_map_obs(self):
         '''
         test mapping semantics
         '''
-        mgs = multiple_pinkgeoseries
+        mgs = multiple_pinkgeoseries()
         fig, ax = mgs.map(hue = 'observationType')
         pyleo.closefig(fig)
         # assert something?
 
-    def test_map_elevation(self, multiple_pinkgeoseries):
+    def test_map_elevation(self):
         '''
         test mapping semantics
         '''
-        mgs = multiple_pinkgeoseries
+        mgs = multiple_pinkgeoseries()
         fig, ax = mgs.map(hue = 'elevation')
         pyleo.closefig(fig)
         # assert something?
+    
+    @pytest.mark.parametrize('crit_dist',[5000,30000])
+    def test_map_proj_pick_global(self, crit_dist):
+        '''
+        test automated projection picker
+        '''
+        mgs = multiple_pinkgeoseries()
+        lat = np.array([ts.lat for ts in mgs.series_list])
+        lon = np.array([ts.lon for ts in mgs.series_list])
+        clat, clon = pyleo.utils.mapping.centroid_coords(lat, lon)
+        #d =  pyleo.utils.mapping.compute_dist(clat, clon, lat, lon) # computes distances to centroid
+
+        fig, ax = mgs.map(crit_dist=crit_dist)
+        if crit_dist == 30000:
+            assert ax.projection.proj4_params['proj'] == 'ortho'
+            assert ax.projection.proj4_params['lon_0'] == clon
+            assert ax.projection.proj4_params['lat_0'] == clat
+        else:
+            assert ax.projection.proj4_params['proj'] == 'robin'
+            assert ax.projection.proj4_params['lon_0'] == clon   
+        
+    def test_map_proj_pick_regional(self):
+        '''
+        test automated projection picker
+        '''
+        mgs = multiple_pinkgeoseries(geobox=[20, 70, -10, 40])
+        lat = [ts.lat for ts in mgs.series_list]
+        lon = [ts.lon for ts in mgs.series_list]
+        clat, clon = pyleo.utils.mapping.centroid_coords(lat, lon)
+        fig, ax = mgs.map()
+        assert ax.projection.proj4_params['proj'] == 'ortho'
+        assert ax.projection.proj4_params['lon_0'] == clon
+        assert ax.projection.proj4_params['lat_0'] == clat
+            
         
 class TestUIMultipleGeoSeriesPCA:
-    def test_pca_t0(self, multiple_pinkgeoseries):
+    def test_pca_t0(self):
         '''
         test PCA output
         '''
-        mgs = multiple_pinkgeoseries
+        mgs = multiple_pinkgeoseries()
         pca = mgs.pca()
         assert pca.name == 'Multiple Pink GeoSeries PCA'
         
-    def test_pca_t1(self, multiple_pinkgeoseries):
+    def test_pca_t1(self):
         '''
         test PCA screeplot
         '''
-        mgs = multiple_pinkgeoseries
+        mgs = multiple_pinkgeoseries()
         pca = mgs.pca()
         fig, ax = pca.screeplot()
         
-    def test_pca_t2(self, multiple_pinkgeoseries):
+    def test_pca_t2(self):
         '''
         test PCA modeplot
         '''
-        mgs = multiple_pinkgeoseries
+        mgs = multiple_pinkgeoseries()
         pca = mgs.pca()
         fig, ax = pca.modeplot(index=1)
         
