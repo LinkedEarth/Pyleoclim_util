@@ -219,6 +219,9 @@ class MultivariateDecomp:
             the axis object from matplotlib
             See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
 
+        gridspec_kwargs : dict, optional
+
+
         spec_method: str, optional
         
             The name of the spectral method to be applied on the PC. Default: MTM
@@ -241,7 +244,8 @@ class MultivariateDecomp:
         scatter_kwargs : dict, optional
             
             Optional arguments for the scatterplot. See https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter
-            
+
+
         See Also
         --------
         pyleoclim.core.MultipleSeries.pca : Principal Component Analysis
@@ -263,12 +267,13 @@ class MultivariateDecomp:
             EOF = self.eigvecs[:, index]
             
         fig = plt.figure(figsize=figsize)
-        gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
-        gridspec_defaults = dict(wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
-                               height_ratios=[2,1,5])
+        if gs == None:
+            gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
+            gridspec_defaults = dict(wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
+                                   height_ratios=[2,1,5])
 
-        gridspec_defaults.update(gridspec_kwargs)
-        gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
+            gridspec_defaults.update(gridspec_kwargs)
+            gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
 
         gs.update(left=0, right=1.1)
         

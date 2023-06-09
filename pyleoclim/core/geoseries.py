@@ -210,7 +210,7 @@ class GeoSeries(Series):
     def map(self, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None,
-            figsize=None, ax=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
+            figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
         
@@ -220,63 +220,47 @@ class GeoSeries(Series):
         ----------
         
         projection : str, optional
-
             The projection to use. The default is 'Orthographic'.
 
         proj_default : bool; {True, False}, optional
-
             Whether to use the Pyleoclim defaults for each projection type. The default is True.
 
         background :  bool; {True, False}, optional
-
             Whether to use a background. The default is True.
 
         borders :  bool; {True, False}, optional
-
             Draw borders. The default is False.
 
         rivers :  bool; {True, False}, optional
-
             Draw rivers. The default is False.
 
         lakes :  bool; {True, False}, optional
-
             Draw lakes. The default is False.
 
         figsize : list or tuple, optional
-
             The size of the figure. The default is None.
 
-        ax : matplotlib.ax, optional
-
-            The matplotlib axis onto which to return the map. The default is None.
-
         marker : str, optional
+            The marker type for each archive.
+            The default is None. Uses plot_default
 
-            The marker type for each archive. The default is None. Uses plot_default
-
-        color : str, optional
-
-            Color for each archive. The default is None. Uses plot_default
+        hue : str, optional
+            Variable associated with color coding.
+            The default is None. Uses plot_default.
 
         markersize : float, optional
-
             Size of the marker. The default is None.
 
         scatter_kwargs : dict, optional
-
             Parameters for the scatter plot. The default is None.
 
         legend :  bool; {True, False}, optional
-
             Whether to plot the legend. The default is True.
 
         lgd_kwargs : dict, optional
-
             Arguments for the legend. The default is None.
 
         savefig_settings : dict, optional
-
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
@@ -409,35 +393,34 @@ class GeoSeries(Series):
         ----------
         
         figsize : list or tuple, optional
-
             Figure size. The default is [11,8].
 
         plt_kwargs : dict, optional
-
             Optional arguments for the timeseries plot. See Series.plot() or EnsembleSeries.plot_envelope(). The default is None.
 
         histplt_kwargs : dict, optional
-
             Optional arguments for the distribution plot. See Series.histplot() or EnsembleSeries.plot_distplot(). The default is None.
 
         spectral_kwargs : dict, optional
-
             Optional arguments for the spectral method. Default is to use Lomb-Scargle method. See Series.spectral() or EnsembleSeries.spectral(). The default is None.
 
         spectralsignif_kwargs : dict, optional
-
             Optional arguments to estimate the significance of the power spectrum. See PSD.signif_test. Note that we currently do not support significance testing for ensembles. The default is None.
 
         spectralfig_kwargs : dict, optional
-
             Optional arguments for the power spectrum figure. See PSD.plot() or MultiplePSD.plot_envelope(). The default is None.
 
         map_kwargs : dict, optional
+            Optional arguments for the map and point plotted on map.
+            - scatter_kwargs: dict of values for configuring how data are plotted on a map
+            - gridspec_kwargs: dict of values for how the map gridspec is configured
+            The default is None.
 
-            Optional arguments for the map and point plotted on map. See LipdSeries.map(). The default is None.
+        gridspec_kwargs : dict, optional
+            Optional dictionary for configuring dashboard layout using gridspec
+            For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>_. The default is None.
 
         savefig_settings : dict, optional
-
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
@@ -448,11 +431,9 @@ class GeoSeries(Series):
         -------
         
         fig : matplotlib.figure
-
             The figure
 
         ax : matplolib.axis
-
             The axis
 
         See also
@@ -497,13 +478,13 @@ class GeoSeries(Series):
 
         gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
         gridspec_defaults = dict(wspace=0, width_ratios=[1,1,1,.25,1,1,1],
-                               height_ratios=[1,.1,1])
+                               height_ratios=[1,.1,1], left=0, right=1.1)
 
         gridspec_defaults.update(gridspec_kwargs)
         gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
 
         # gs = gridspec.GridSpec(2, 6, wspace=0)
-        gs.update(left=0, right=1.1)
+        # gs.update(left=0, right=1.1)
 
 
         ax = {}
@@ -688,8 +669,6 @@ class GeoSeries(Series):
         if 'signif_clr' not in spectralfig_kwargs.keys():
             spectralfig_kwargs.update({'signif_clr': 'grey'})
         ax['spec'] = psd_signif.plot(**spectralfig_kwargs)
-        
-        #gs.tight_layout(fig)
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
