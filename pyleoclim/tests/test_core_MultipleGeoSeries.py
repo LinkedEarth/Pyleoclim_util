@@ -18,9 +18,12 @@ def multiple_pinkgeoseries(nrecs = 20, seed = 108, geobox=[-85.0,85.0,-180,180])
     lats = np.random.default_rng(seed=seed).uniform(geobox[0],geobox[1],nrecs)
     lons = np.random.default_rng(seed=seed+1).uniform(geobox[2],geobox[3],nrecs)
     elevs = np.random.default_rng(seed=seed+2).uniform(0,4000,nrecs)
+    unknowns = np.random.randint(0,len(elevs)-1, size=2)
+    for ik in unknowns:
+        elevs[ik]=None
     
-    archives = np.random.default_rng(seed=seed).choice(list(pyleo.utils.PLOT_DEFAULT.keys()),size=nrecs)
-    obsTypes = np.random.default_rng(seed=seed).choice(['MXD', 'd18O', 'Sr/Ca'],size=nrecs)
+    archives = np.random.default_rng(seed=seed).choice(list(pyleo.utils.PLOT_DEFAULT.keys())+[None],size=nrecs)
+    obsTypes = np.random.default_rng(seed=seed).choice(['MXD', 'd18O', 'Sr/Ca', None],size=nrecs)
     
     ts_list = []
     for i in range(nrecs):
