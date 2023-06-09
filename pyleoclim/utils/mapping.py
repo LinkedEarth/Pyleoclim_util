@@ -21,9 +21,13 @@ import matplotlib as mpl
 from matplotlib import cm
 from matplotlib.colors import TwoSlopeNorm
 import matplotlib.gridspec as gridspec
+from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
 from .plotting import savefig
 from .lipdutils import PLOT_DEFAULT, LipdToOntology
+from ..core.multiplegeoseries import MultipleGeoSeries
+from ..core.geoseries import GeoSeries
+
 
 def pick_proj(lat, lon, crit_dist=5000):
     '''
@@ -523,7 +527,6 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
     lats = [geos.lat for geos in geo_series_list]
     lons = [geos.lon for geos in geo_series_list]
 
-    trait_d = {'hue': hue, 'marker': marker, 'size': size}
     traits = [hue, marker, size]
     if type(cols) == list:
         traits += cols
@@ -549,25 +552,28 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 proj_default=True, projection='auto', crit_dist=5000, 
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, gridspec_kwargs=None, extent='global',
-                lgd_kwargs=None, legend=True, cmap=None,
-                fig=None, gs_slot=None):
+                lgd_kwargs=None, legend=True, colorbar=True, cmap=None,
+                fig=None, gs_slot=None, **kwargs):
     '''
     
 
     Parameters
     ----------
-    geos : TYPE
-        DESCRIPTION.
-    hue : TYPE, optional
-        DESCRIPTION. The default is 'archiveType'.
-    size : TYPE, optional
-        DESCRIPTION. The default is None.
+    geos : Pandas DataFrame, GeoSeries, MultipleGeoSeries
+        if a Pandas DataFrame, expects 'lat' and 'lon' columns
+
+    hue : string, optional
+        Grouping variable that will produce points with different colors. Can be either categorical or numeric, although color mapping will behave differently in latter case. The default is 'archiveType'.
+
+    size : string, optional
+        Grouping variable that will produce points with different sizes. Expects to be numeric. Any data without a value for the size variable will be filtered out. The default is None.
+
     marker : TYPE, optional
-        DESCRIPTION. The default is 'archiveType'.
-    edgecolor : TYPE, optional
-        DESCRIPTION. The default is 'w'.
-    proj_default : TYPE, optional
-        DESCRIPTION. The default is True.
+        Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical. The default is 'archiveType'.
+
+    edgecolor : color (string) or list of rgba tuples, optional
+        Color of marker edge. The default is 'w'.
+
     projection : string
         the map projection. Available projections:
         'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
@@ -581,49 +587,46 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         By default, projection == 'auto', so the projection will be picked 
         based on the degree of clustering of the sites. 
         
-     proj_default : bool
-         If True, uses the standard projection attributes.
-         Enter new attributes in a dictionary to change them. Lists of attributes
-         can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_. 
+    proj_default : bool, optional
+        The default is True
+        If True, uses the standard projection attributes.
+        Enter new attributes in a dictionary to change them. Lists of attributes
+        can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
      
-     crit_dist : float                   
-         critical radius for projection choice. Default: 5000 km
-         Only active if projection == 'auto'
+    crit_dist : float
+        critical radius for projection choice. Default: 5000 km
+        Only active if projection == 'auto'
          
-     background : bool
-         If True, uses a shaded relief background (only one available in Cartopy)
+    background : bool
+        If True, uses a shaded relief background (only one available in Cartopy)
          
-     borders : bool
-         Draws the countries border. Defaults is off (False).
+    borders : bool
+        Draws the countries border. Defaults is off (False).
          
-     rivers : bool
-         Draws major rivers. Default is off (False).
+    rivers : bool
+        Draws major rivers. Default is off (False).
          
-     lakes : bool
-         Draws major lakes. 
-         Default is off (False).  
+    lakes : bool
+        Draws major lakes. Default is off (False).
          
-     figsize : list
-         the size for the figure
-         
-     ax: axis,optional
-         Return as axis instead of figure (useful to integrate plot into a subplot) 
-         
-     scatter_kwargs : dict
-         Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.     
-     
-     legend : bool
-         Whether the draw a legend on the figure
-     
-     legend_title : str
-         Use this instead of a dynamic range for legend
-     
-     lgd_kwargs : dict
-         Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
-     
-     savefig_settings : dict
+    figsize : list or tuple
+        Size for the figure
 
-         Dictionary of arguments for matplotlib.pyplot.saveFig.
+    scatter_kwargs : dict
+        Dict of arguments available in `seaborn.scatterplot <https://seaborn.pydata.org/generated/seaborn.scatterplot.html>`_.
+        Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.
+     
+    legend : bool
+        Whether the draw a legend on the figure. Default is True.
+
+    colorbar : bool
+        Whether the draw a colorbar on the figure if the data associated with hue are numeric. Default is True.
+
+    lgd_kwargs : dict
+        Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
+     
+    savefig_settings : dict
+        Dictionary of arguments for matplotlib.pyplot.saveFig.
 
          - "path" must be specified; it can be any existed or non-existed path,
            with or without a suffix; if the suffix is not given in "path", it will follow "format"
@@ -631,16 +634,26 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
          
     extent : TYPE, optional
         DESCRIPTION. The default is 'global'.
-    lgd_kwargs : TYPE, optional
-        DESCRIPTION. The default is None.
-    legend : TYPE, optional
-        DESCRIPTION. The default is True.
-    cmap : TYPE, optional
-        DESCRIPTION. The default is None.
-    fig : TYPE, optional
-        DESCRIPTION. The default is None.
-    gs_slot : TYPE, optional
-        DESCRIPTION. The default is None.
+
+    cmap : string or list, optional
+        Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_. The default is None.
+
+    fig : matplotlib.pyplot.figure, optional
+        See matplotlib.pyplot.figure <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib-pyplot-figure>_. The default is None.
+
+    gs_slot : Gridspec slot, optional
+        If generating a map for a multi-plot, pass a gridspec slot. The default is None.
+
+    gridspec_kwargs : dict, optional
+        Function assumes the possibility of a colorbar, map, and legend. A list of floats associated with the keyword `width_ratios` will assume the first (index=0) is the relative width of the colorbar, the second to last (index = -2) is the relative width of the map, and the last (index = -1) is the relative width of the area for the legend.
+        For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>_. The default is None.
+
+    scatter_kwargs : dict, optional
+        -
+
+    kwargs: dict, optional
+        - 'missing_val_hue', 'missing_val_marker', 'missing_val_label' can all be used to change the way missing values are represented ('k', '?',  are default hue and marker values will be associated with the label: 'missing').
+        - 'hue_mapping' and 'marker_mapping' can be used to submit dictionaries mapping hue values to colors and marker values to markers. Does not replace passing a string value for hue or marker.
 
     Raises
     ------
@@ -748,12 +761,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
         scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
         lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
-        norm_kwargs = kwargs['norm_kwargs'] if 'norm_kwargs' in kwargs else {}
-
-        # if 'norm_kwargs' in kwargs.keys():
-        #     norm_kwargs = kwargs['norm_kwargs']
-        # else:
-        #     norm_kwargs = {}
+        norm_kwargs = kwargs.pop('norm_kwargs', {})
 
         plot_defaults = copy.copy(PLOT_DEFAULT)
         palette = None
@@ -764,8 +772,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if len(_df) == 1:
             _df = _df.reindex()
 
-        ax_leg = None
-        ax_cb = None
+        ax_leg, ax_cb = None, None
         if type(ax_d) == dict:
             if 'map' in ax_d.keys():
                 ax = ax_d['map']
@@ -795,9 +802,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if 'edgecolor' not in scatter_kwargs:
             scatter_kwargs['edgecolor'] = edgecolor
 
-        for trait_var in [hue_var, marker_var, size_var]:
-            if trait_var not in _df.columns:
-                trait_var = None
+        hue_var = hue_var if hue_var in _df.columns else None
+        marker_var = marker_var if marker_var in _df.columns else None
+        size_var = size_var if size_var in _df.columns else None
 
         trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if
                       ((trait_var != None) and (trait_var in _df.columns))]
@@ -810,18 +817,17 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                     _df[trait_var] = missing_val
 
         if size_var == None:
-            scatter_kwargs['s'] = missing_d['size']
+            scatter_kwargs['s'] = scatter_kwargs['s'] if 's' in scatter_kwargs else missing_d['size']
         else:
             sizes = [size_val for size_val in _df[size_var].values if size_val != missing_val]
             if len(sizes) < 2:
-                scatter_kwargs['s'] = missing_d['size']
+                scatter_kwargs['s'] = scatter_kwargs['s'] if 's' in scatter_kwargs else missing_d['size']
                 size_var = None
             else:
                 # if size does vary, filter out missing values; at present no strategy to depict missing size values
                 _df = _df[_df[size_var] != missing_val]
                 scatter_kwargs['sizes'] = (20, 200) if 'sizes' not in scatter_kwargs else scatter_kwargs['sizes']
-                size_norm = (_df[size_var].min(), _df[size_var].max())
-                scatter_kwargs['size_norm'] = size_norm
+                scatter_kwargs['size_norm'] = scatter_kwargs['size_norm'] if 'size_norm' in scatter_kwargs else (_df[size_var].min(), _df[size_var].max())
         trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if trait_var != None]
 
         # mapping between marker styles and marker values
@@ -863,7 +869,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                                 in enumerate(_df[marker_var].unique())}
 
         if ((type(marker_var) == str) and (type(trait2marker) == dict)):
-            # residual = set(_df[marker_var].unique()) - set(trait2marker.keys())
             # with missing values assigned '?'
             trait2marker['missing'] = missing_d['marker']
             scatter_kwargs['markers'] = trait2marker
@@ -871,8 +876,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                                trait not in trait2marker.keys()]
             if len(residual_traits) > 0:
                 print(residual_traits)
-
-                # palette
 
         # use hue mapping if supplied
         if 'hue_mapping' in kwargs:
@@ -897,9 +900,10 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                                                      norm_kwargs = norm_kwargs)
                         palette = ax_sm.cmap
                 else:
-                    ax_sm = make_scalar_mappable(cmap=palette, hue_vect=hue_data[hue_var], norm_kwargs = norm_kwargs)
-                    palette = ax_sm.cmap
-                    hue_norm = ax_sm.norm  # .autoscale(hue_data[hue_var])
+                    if type(palette) in [str, list]:
+                        ax_sm = make_scalar_mappable(cmap=palette, hue_vect=hue_data[hue_var], norm_kwargs = norm_kwargs)
+                        palette = ax_sm.cmap
+                        hue_norm = ax_sm.norm  # .autoscale(hue_data[hue_var])
 
         if ((type(hue_var) == str) and (type(palette) == dict)):
             residual_traits = [trait for trait in _df[hue_var].unique() if
@@ -985,35 +989,30 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
             if ((colorbar==True) and (hue_var in d_leg.keys()) and (ax_sm is not None)):
                 if ax_cb != None:
+
                     plt.colorbar(ax_sm, cax=ax_cb, orientation='vertical', label=hue_var,
-                                 # anchor=(.5,.5),
-                                 # fraction = .5,
-                                 shrink=.4)  # ,label=colorbar_units,
-                    # ticks=ticks)
+                                 fraction=.6,
+                                 shrink=.4)
                     ax_cb.yaxis.set_label_position('left')
                     ax_cb.yaxis.set_ticks_position('left')
                 else:
                     plt.colorbar(ax_sm, ax=ax, orientation='vertical', label=hue_var,
-                                 # anchor=(.5,.5),
-                                 # fraction = .5,
                                  shrink=.6)  # ,label=colorbar_units,
                 if len(d_leg.keys()) == 1:
                     ax.legend().remove()
                     legend=False
                     ax_leg.remove()
-                    if 'leg' in ax_d.keys():
-                        del ax_d['leg']
+                    ax_d.pop('leg', None)
                 else:
-                    del d_leg[hue_var]
+                    d_leg.pop(hue_var, None)
+
             if legend == True:
                 # Finally rebuild legend in single list with formatted section headers
                 handles, labels = [], []
                 headers = True
                 if ((len(d_leg) == 1) and ('label' in d_leg.keys())):
                     headers = False
-                if 'headers' in lgd_kwargs:
-                    headers = lgd_kwargs['headers']
-                    del lgd_kwargs['headers']
+                headers = lgd_kwargs.pop('headers', headers)
 
                 for key in d_leg:
                     han = copy.copy(h[0])
@@ -1047,10 +1046,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 if 'bbox_to_anchor' not in lgd_kwargs:
                     lgd_kwargs['bbox_to_anchor'] = (-.1,1)#(1, 1)
 
-                # with mpl.rc_context():
-                #     # will be reset
-                #     mpl.rcParams["ps.distiller.res"] = 8000
-
                 built_legend = ax_leg.legend(handles, labels, **lgd_kwargs)
                 if headers == True:
                     for _text in built_legend.get_texts():
@@ -1063,17 +1058,18 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 ax.legend().remove()
                 if colorbar == False:
                     ax_cb.remove()
-                    if 'cb' in ax_d.keys():
-                        del ax_d['cb']
+                    ax_d.pop('cb', None)
 
         else:
             ax.legend().remove()
-            del ax_d['cb'], ax_d['leg']
+            ax_d.pop('cb', None)
+            ax_d.pop('leg', None)
             for _ax in [ax_cb, ax_leg]:
                 if type(_ax) != None:
                     _ax.remove()
 
-        if type(ax_d) == dict:
+        # a little squirrely that this function might return different types
+        if len(ax_d) >0:#== dict:
             if 'map' in ax_d.keys():
                 ax_d['map'] = ax
             if 'cb' in ax_d.keys():
@@ -1084,9 +1080,10 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         else:
             return fig, ax
 
-    if type(geos) != pd.DataFrame:
+    # if geos is not
+    if type(geos) in [MultipleGeoSeries, GeoSeries]:
         df = make_df(geos, hue=hue, marker=marker, size=size)
-    else:
+    elif type(geos) == pd.DataFrame:
         df = geos
         if hue not in df.columns:
             hue = None
@@ -1109,7 +1106,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             if projection == 'Robinson':
                 figsize = (20,6)
             if projection == 'Orthographic':
-                figsize = (12,7)
+                figsize = (16,6)
 
     # set the projection
     proj = set_proj(projection=projection, proj_default=proj_default)
@@ -1136,39 +1133,43 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     ax_d = {}
 
     # use subgridspecs to encourage the slot for the map to have an aspect ratio closer to that of the projection
-    gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs else [.7,.05,16, 5]
-    print('gridspec_kwargs',gridspec_kwargs)
     if gs_slot == None:
         _gs = gridspec.GridSpec(1, 1)#, **gridspec_kwargs)
         gs_slot = _gs[0]
-
+    print('gs_slot',gs_slot.__dict__)
     if projection == 'Robinson':
-        gs_sub = gs_slot.subgridspec(1, 3)#len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
+        gs_sub = gs_slot.subgridspec(1, 3)
         gs_subslot = gs_sub[0,:]
     elif projection == 'Orthographic':
-        gs_sub = gs_slot.subgridspec(2, 5)  # len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
-        gs_subslot = gs_sub[:, 1:4]
+        gs_sub = gs_slot.subgridspec(3, 6)
+        gs_subslot = gs_sub[:, 1:5]
     else:
         gs_subslot = gs_slot
 
-    gs = gs_subslot.subgridspec(1, len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
+    num_subplots = 1+legend+colorbar
+    if 'width_ratios' in gridspec_kwargs:
+        if len(gridspec_kwargs['width_ratios']) < num_subplots:
+            print('Please respecify gridspec width_ratios. Reverting to defaults.')
+            gridspec_kwargs['width_ratios'] = [.7, .05, 16, 6]
+    else:
+        gridspec_kwargs['width_ratios'] = [.7, .05, 16, 6]
 
-    # if gs_slot == None:
-    #     gs = gridspec.GridSpec(1, len(gridspec_kwargs['width_ratios']), **gridspec_kwargs)
-    # else:
-    #     gs = gs_slot.subgridspec(1, len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
+    gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs else [.7,.05,16, 5]
+    gs = gs_subslot.subgridspec(1, len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
+    print('gridspec_kwargs', gridspec_kwargs)
     ax_d['cb'] = fig.add_subplot(gs[0])
     ax_d['map'] = fig.add_subplot(gs[-2], projection=proj)
     ax_d['leg'] = fig.add_subplot(gs[-1])
 
     # draw the coastlines
-    ax_d['map'].add_feature(cfeature.COASTLINE, linewidths=(1,))
+    ax_d['map'].add_feature(cfeature.COASTLINE, linewidths=(.5,))
     # Background
     if background is True:
         ax_d['map'].stock_img()
+
     # Other extra information
     if borders is True:
-        ax_d['map'].add_feature(cfeature.BORDERS, alpha=.5)
+        ax_d['map'].add_feature(cfeature.BORDERS, alpha=.5,  linewidths=(.5,))
     if lakes is True:
         ax_d['map'].add_feature(cfeature.LAKES, alpha=0.25)
     if rivers is True:
@@ -1180,30 +1181,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     if extent == 'global':
         ax_d['map'].set_global()
 
-        # # draw the coastlines
-        # ax.add_feature(cfeature.COASTLINE, linewidths=(1,))
-        # # Background
-        # if background is True:
-        #     ax.stock_img()
-        # # Other extra information
-        # if borders is True:
-        #     ax.add_feature(cfeature.BORDERS, alpha=.5)
-        # if lakes is True:
-        #     ax.add_feature(cfeature.LAKES, alpha=0.25)
-        # if rivers is True:
-        #     ax.add_feature(cfeature.RIVERS)
-        # if ocean is True:
-        #     ax.add_feature(cfeature.OCEAN, alpha=.25)
-        # if land is True:
-        #     ax.add_feature(cfeature.LAND, alpha=.5)
-        # if extent == 'global':
-        #     ax.set_global()
-
     x = 'lon'
     y = 'lat'
 
     _, ax_d = plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax_d=ax_d, proj=None, edgecolor=edgecolor,
-                 cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, lgd_kwargs=lgd_kwargs)  # , **kwargs)
+                 cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, lgd_kwargs=lgd_kwargs, **kwargs)  # , **kwargs)
     return fig, ax_d
 
 
