@@ -671,7 +671,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     Returns
     -------
     TYPE
-        DESCRIPTION.
+        fig, dictionary of ax objects which includes the as many as three items: 'cb' (colorbar ax), 'map' (scatter map), and 'leg' (legend ax)
         
     See Also
     --------
@@ -922,7 +922,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         # to get missing hue values to be missing value color (contrary to palette for available values)
         # we plot all data with missing color, collect legend information,
         # then plot data with available hue over it, collect the legend information again and recompose the legend
-
         if type(hue_var) == str:
             scatter_kwargs['zorder'] = 13
             hue_data = _df[_df[hue_var] == missing_val]
@@ -1086,7 +1085,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 ax_d['leg'] = ax_leg
             return fig, ax_d
         else:
-            return fig, ax
+            return fig, {'map':ax}
 
     # if geos is not
     if type(geos) in [MultipleGeoSeries, GeoSeries]:
