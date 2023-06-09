@@ -907,7 +907,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                                                      norm_kwargs = norm_kwargs)
                         palette = ax_sm.cmap
                 else:
-                    if type(palette) in [str, list]:
+                    if ((type(palette) in [str, list]) or (palette == None)):
                         ax_sm = make_scalar_mappable(cmap=palette, hue_vect=hue_data[hue_var], norm_kwargs = norm_kwargs)
                         palette = ax_sm.cmap
                         hue_norm = ax_sm.norm  # .autoscale(hue_data[hue_var])
@@ -1113,9 +1113,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                                df['lon'].values, crit_dist=crit_dist)
         if figsize == None:
             if projection == 'Robinson':
-                figsize = (20,6)
-            if projection == 'Orthographic':
+                figsize = (18,6)
+            elif projection == 'Orthographic':
                 figsize = (16,6)
+            else:
+                figsize = (18, 6)
 
     # set the projection
     proj = set_proj(projection=projection, proj_default=proj_default)
@@ -1135,8 +1137,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 proj = set_proj(projection=projection, proj_default=proj2)
 
     if fig == None:
-        if figsize == None:
-            figsize = (20, 7)
+        # if figsize == None:
+        #     figsize = (18, 7)
         fig = plt.figure(figsize=figsize)
 
     ax_d = {}
@@ -1159,9 +1161,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     if 'width_ratios' in gridspec_kwargs:
         if len(gridspec_kwargs['width_ratios']) < num_subplots:
             print('Please respecify gridspec width_ratios. Reverting to defaults.')
-            gridspec_kwargs['width_ratios'] = [.7, .05, 16, 6]
+            gridspec_kwargs['width_ratios'] = [.7, 16, 6]
     else:
-        gridspec_kwargs['width_ratios'] = [.7, .05, 16, 6]
+        gridspec_kwargs['width_ratios'] = [.7, 16, 6]
 
     gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs else [.7,.05,16, 5]
     gs = gs_subslot.subgridspec(1, len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
