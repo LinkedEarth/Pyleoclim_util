@@ -548,7 +548,8 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
 def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='k', 
                 proj_default=True, projection='auto', crit_dist=5000, 
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
-                figsize=None, scatter_kwargs=None, extent='global', lgd_kwargs=None, legend=True, cmap=None,
+                figsize=None, scatter_kwargs=None, gridspec_kwargs=None, extent='global',
+                lgd_kwargs=None, legend=True, cmap=None,
                 fig=None, gs_slot=None):
     '''
     
@@ -742,7 +743,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     def plot_scatter(df=None, x=None, y=None, hue_var=None, size_var=None, marker_var=None, edgecolor='w',
                      ax=None, ax_d=None, proj=None, scatter_kwargs=None, legend=True, lgd_kwargs=None, colorbar=True,
-                     fig=None, #gs_slot=None,
+                     fig=None,  #gs_slot=None,
                      cmap=None, **kwargs):
 
         scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
@@ -1067,6 +1068,10 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
         else:
             ax.legend().remove()
+            del ax_d['cb'], ax_d['leg']
+            for _ax in [ax_cb, ax_leg]:
+                if type(_ax) != None:
+                    _ax.remove()
 
         if type(ax_d) == dict:
             if 'map' in ax_d.keys():
@@ -1088,7 +1093,10 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if marker not in df.columns:
             marker = None
 
-    # newCrs = ccrs.Robinson()
+    gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
+    scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
+    lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
+
     if proj_default is not True and type(proj_default) is not dict:
         raise TypeError('The default for the projections should either be provided' +
                         ' as a dictionary or set to True')
@@ -1097,7 +1105,13 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     if projection == 'auto':
         projection = pick_proj(df['lat'].values, 
                                df['lon'].values, crit_dist=crit_dist)
-    # set the projection    
+        if figsize == None:
+            if projection == 'Robinson':
+                figsize = (20,6)
+            if projection == 'Orthographic':
+                figsize = (12,7)
+
+    # set the projection
     proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
         clat, clon = centroid_coords(df['lat'].values, df['lon'].values)
@@ -1120,15 +1134,32 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         fig = plt.figure(figsize=figsize)
 
     ax_d = {}
+
+    # use subgridspecs to encourage the slot for the map to have an aspect ratio closer to that of the projection
+    gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs else [.7,.05,16, 5]
+    print('gridspec_kwargs',gridspec_kwargs)
     if gs_slot == None:
-        gs = gridspec.GridSpec(1, 5,  width_ratios=[.5,.7,.05,16, 5])
-        # ax = fig.add_subplot(projection=proj)
+        _gs = gridspec.GridSpec(1, 1)#, **gridspec_kwargs)
+        gs_slot = _gs[0]
+
+    if projection == 'Robinson':
+        gs_sub = gs_slot.subgridspec(1, 3)#len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
+        gs_subslot = gs_sub[0,:]
+    elif projection == 'Orthographic':
+        gs_sub = gs_slot.subgridspec(2, 5)  # len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
+        gs_subslot = gs_sub[:, 1:4]
     else:
-        gs = gs_slot.subgridspec(1, 5,  width_ratios=[.5,.7,.05,16,5])
-        # ax = fig.add_subplot(gs_slot, projection=proj)
-    ax_d['cb'] = fig.add_subplot(gs[1])
-    ax_d['map'] = fig.add_subplot(gs[3], projection=proj)
-    ax_d['leg'] = fig.add_subplot(gs[4])
+        gs_subslot = gs_slot
+
+    gs = gs_subslot.subgridspec(1, len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
+
+    # if gs_slot == None:
+    #     gs = gridspec.GridSpec(1, len(gridspec_kwargs['width_ratios']), **gridspec_kwargs)
+    # else:
+    #     gs = gs_slot.subgridspec(1, len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
+    ax_d['cb'] = fig.add_subplot(gs[0])
+    ax_d['map'] = fig.add_subplot(gs[-2], projection=proj)
+    ax_d['leg'] = fig.add_subplot(gs[-1])
 
     # draw the coastlines
     ax_d['map'].add_feature(cfeature.COASTLINE, linewidths=(1,))
@@ -1170,8 +1201,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     x = 'lon'
     y = 'lat'
-
-    scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
 
     _, ax_d = plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax_d=ax_d, proj=None, edgecolor=edgecolor,
                  cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, lgd_kwargs=lgd_kwargs)  # , **kwargs)
