@@ -5,7 +5,6 @@ to such a collection at once (e.g. process a bunch of series in a consistent fas
 Compared to its parent class MultipleSeries, MultipleGeoSeries opens new possibilites regarding mapping.
 """
 from ..core.multipleseries import MultipleSeries
-# from ..utils.mapping import scatter_map
 from ..utils import mapping as mp
 import warnings
 
@@ -15,7 +14,14 @@ from matplotlib import cm
 from itertools import cycle
 import matplotlib.lines as mlines
 import numpy as np
-import copy
+#import warnings
+
+#import matplotlib.pyplot as plt
+#import matplotlib as mpl
+#from matplotlib import cm
+#from itertools import cycle
+#import matplotlib.lines as mlines
+#import copy
 
 
 class MultipleGeoSeries(MultipleSeries):
@@ -496,9 +502,9 @@ class MultipleGeoSeries(MultipleSeries):
         .. jupyter-execute::
 
             from pylipd.utils.dataset import load_dir
-            lipd = load_dir(name='Pages2k')
-            df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree') | paleoData_variableName not in ('year')")
+            lipd_euro = lipd.filter_by_geo_bbox(0,90,-20,140)
+            df = lipd_euro.get_timeseries_essentials()
+            dfs = df.query("paleoData_variableName in ('temperature','d18O', 'Uk37', 'MXD', 'trsgi')") 
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():

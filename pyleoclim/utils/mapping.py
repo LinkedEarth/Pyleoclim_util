@@ -25,8 +25,7 @@ from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
 from .plotting import savefig
 from .lipdutils import PLOT_DEFAULT, LipdToOntology
-from ..core.multiplegeoseries import MultipleGeoSeries
-from ..core.geoseries import GeoSeries
+
 
 
 def pick_proj(lat, lon, crit_dist=5000):
@@ -766,7 +765,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                      ax=None, ax_d=None, proj=None, scatter_kwargs=None, legend=True, lgd_kwargs=None, colorbar=True,
                      fig=None,  #gs_slot=None,
                      cmap=None, **kwargs):
-
+        
         scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
         lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
         norm_kwargs = kwargs.pop('norm_kwargs', {})
@@ -1087,6 +1086,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         else:
             return fig, {'map':ax}
 
+    from ..core.multiplegeoseries import MultipleGeoSeries
+    from ..core.geoseries import GeoSeries
+    
     # if geos is not
     if type(geos) in [MultipleGeoSeries, GeoSeries]:
         df = make_df(geos, hue=hue, marker=marker, size=size)
