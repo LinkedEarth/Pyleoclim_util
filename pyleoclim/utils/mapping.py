@@ -1298,12 +1298,13 @@ def lon_360_to_180(x):
 def lon_180_to_360(x):
     return x % 360
 
+
 def centroid_coords(lat,lon):
     '''
     Computes the centroid of the geographic coordinates via Shapely
     h/t Tim Roberts, via StackOverflow: https://stackoverflow.com/a/72737621.
-    If there aren't enough vertices to form a polygon, then the arithmetic 
-    mean of the coordinates is returned. 
+    If there aren’t enough vertices to form a polygon, then the arithmetic
+    mean of the coordinates is returned.
 
     Parameters
     ----------
@@ -1317,14 +1318,15 @@ def centroid_coords(lat,lon):
     clat, clon : coordinates of the centroid
 
     '''
-    lon = lon_360_to_180(np.array(lon)) 
+    lon = lon_360_to_180(np.array(lon))
     lat = np.array(lat)
     if len(lon) >= 4:
         p = Polygon([(x, y) for (x,y) in zip(lon,lat)])
-        clat = p.centroid.y; clon = p.centroid.x
+        #clat = p.centroid.y; clon = p.centroid.x
+        clat = p.representative_point().y
+        clon = p.representative_point().x
     else:
         clat = lat.mean()
         clon = lon.mean()
+    print('clat', clat, 'clon', clon)
     return clat, clon
-
-
