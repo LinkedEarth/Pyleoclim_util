@@ -1086,11 +1086,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         else:
             return fig, {'map':ax}
 
-    from ..core.multiplegeoseries import MultipleGeoSeries
-    from ..core.geoseries import GeoSeries
+    # from ..core.multiplegeoseries import MultipleGeoSeries
+    # from ..core.geoseries import GeoSeries
     
     # if geos is not
-    if type(geos) in [MultipleGeoSeries, GeoSeries]:
+    if type(geos) != pd.DataFrame:#in [MultipleGeoSeries, GeoSeries]:
         df = make_df(geos, hue=hue, marker=marker, size=size)
     elif type(geos) == pd.DataFrame:
         df = geos
@@ -1114,10 +1114,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if figsize == None:
             if projection == 'Robinson':
                 figsize = (18,6)
-            elif projection == 'Orthographic':
+            if projection == 'Orthographic':
                 figsize = (16,6)
-            else:
-                figsize = (18, 6)
+        print(figsize)
 
     # set the projection
     proj = set_proj(projection=projection, proj_default=proj_default)
@@ -1137,8 +1136,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 proj = set_proj(projection=projection, proj_default=proj2)
 
     if fig == None:
-        # if figsize == None:
-        #     figsize = (18, 7)
+        if figsize == None:
+            figsize = (18, 7)
         fig = plt.figure(figsize=figsize)
 
     ax_d = {}
