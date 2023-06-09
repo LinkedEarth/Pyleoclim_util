@@ -211,7 +211,7 @@ class GeoSeries(Series):
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None,
             figsize=None, ax=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
-            markersize=None, scatter_kwargs=None, cmap=None,
+            markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
         
         '''Map the location of the record
@@ -302,15 +302,17 @@ class GeoSeries(Series):
             fig, ax = ts.map(lgd_kwargs={'bbox_to_anchor':(1, 1)}) # by default, the legend conflicts with the map, but it's easy to push it outside with this keyword argument'
 
         '''
+        if markersize != None:
+            scatter_kwargs['markersize'] = markersize
 
         fig, ax = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
                     proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes,
                     ocean=ocean,
                     land=land,
-                    figsize=figsize, scatter_kwargs=scatter_kwargs,
-                    lgd_kwargs=lgd_kwargs, legend=legend,
-                    cmap=cmap,edgecolor=edgecolor,
+                    figsize=figsize, scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
+                    lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
+                    cmap=cmap, edgecolor=edgecolor,
                     fig=fig, gs_slot=gridspec_slot)
         return fig, ax
 
@@ -399,7 +401,7 @@ class GeoSeries(Series):
         # return res
     
     def dashboard(self, figsize=[11, 8], plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
-                  spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,
+                  spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,gridspec_kwargs=None,
                   savefig_settings=None):
         '''
 
@@ -432,7 +434,7 @@ class GeoSeries(Series):
 
         map_kwargs : dict, optional
 
-            Optional arguments for the map. See LipdSeries.map(). The default is None.
+            Optional arguments for the map and point plotted on map. See LipdSeries.map(). The default is None.
 
         savefig_settings : dict, optional
 
@@ -492,7 +494,15 @@ class GeoSeries(Series):
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         # start plotting
         fig = plt.figure(figsize=figsize)
-        gs = gridspec.GridSpec(2, 6, wspace=0)
+
+        gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
+        gridspec_defaults = dict(wspace=0, width_ratios=[1,1,1,.25,1,1,1],
+                               height_ratios=[1,.1,1])
+
+        gridspec_defaults.update(gridspec_kwargs)
+        gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
+
+        # gs = gridspec.GridSpec(2, 6, wspace=0)
         gs.update(left=0, right=1.1)
 
 
@@ -531,86 +541,41 @@ class GeoSeries(Series):
         ax['dts'].set_ylabel('')
         ax['dts'].set_yticks([])
 
+        # plot map
         map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
-        if 'projection' in map_kwargs.keys():
-            projection = map_kwargs['projection']
-        else:
-            projection = 'Orthographic'
 
-        if 'proj_default' in map_kwargs.keys():
-            proj_default = map_kwargs['proj_default']
-        else:
-            proj_default = True
+        projection = map_kwargs.pop('projection', 'Orthographic')
+        proj_default = map_kwargs.pop('proj_default', True)
+        lakes = map_kwargs.pop('lakes', False)
+        land = map_kwargs.pop('land', False)
+        ocean = map_kwargs.pop('ocean', False)
+        rivers = map_kwargs.pop('rivers', False)
+        borders = map_kwargs.pop('borders', True)
+        background = map_kwargs.pop('background', True)
 
-        if 'marker' in map_kwargs.keys():
-            marker = map_kwargs['marker']
-        else:
-            marker = 'archiveType' #lipdutils.PLOT_DEFAULT[archiveType][1]
-        if 'hue' in map_kwargs.keys():
-            hue = map_kwargs['color']
-        else:
-            hue = 'archiveType' #lipdutils.PLOT_DEFAULT[archiveType][0]
-        if 'size' in map_kwargs.keys():
-            size = map_kwargs['size']
-        else:
-            size = None
+        gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
+        scatter_kwargs = map_kwargs.pop('scatter_kwargs', {})
+        lgd_kwargs = map_kwargs.pop('lgd_kwargs', {})
 
-        if 'background' in map_kwargs.keys():
-            background = map_kwargs['background']
-        else:
-            background = True
-        if 'borders' in map_kwargs.keys():
-            borders = map_kwargs['borders']
-        else:
-            borders = False
-        if 'rivers' in map_kwargs.keys():
-            rivers = map_kwargs['rivers']
-        else:
-            rivers = False
-        if 'ocean' in map_kwargs.keys():
-            ocean = map_kwargs['ocean']
-        else:
-            ocean = False
-        if 'land' in map_kwargs.keys():
-            land = map_kwargs['land']
-        else:
-            land = False
-        if 'lakes' in map_kwargs.keys():
-            lakes = map_kwargs['lakes']
-        else:
-            lakes = False
-
-        gridspec_kwargs = map_kwargs['gridspec_kwargs'] if 'gridspec_kwargs' in map_kwargs else {}
-        scatter_kwargs = map_kwargs['scatter_kwargs'] if 'scatter_kwargs' in map_kwargs else {}
-        lgd_kwargs = map_kwargs['lgd_kwargs'] if 'lgd_kwargs' in map_kwargs else {}
-
-        for key in ['gridspec_kwargs', 'scatter_kwargs']:
-            map_kwargs.pop(key, None)
+        marker = scatter_kwargs.pop('marker', 'archiveType')
+        hue = scatter_kwargs.pop('hue', 'archiveType')
+        size = scatter_kwargs.pop('size', None)
 
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
-        if 'cmap' in map_kwargs.keys():
-            cmap= map_kwargs['cmap']
-        else:
-            cmap=None
-        # else:
-        #     pass
-        # if 'lgd_kwargs' in map_kwargs.keys():
-        #     lgd_kwargs = map_kwargs['lgd_kwargs']
-        # else:
-        #     lgd_kwargs = {}
-        if 'legend' in map_kwargs.keys():
-            legend = map_kwargs['legend']
-        else:
-            legend = False
+
+        cmap = map_kwargs.pop('cmap', None)
+        legend = map_kwargs.pop('legend', False)
+        colorbar = map_kwargs.pop('colorbar', False)
 
         if legend == False:
-            gridspec_kwargs['width_ratios'] = [5,16, 0]
+            gridspec_kwargs['width_ratios'] = [.5,16, 1]
 
         _, ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
-                    figsize=None, scatter_kwargs=scatter_kwargs,gridspec_kwargs = gridspec_kwargs, lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap,
-                    fig=fig, gs_slot=gs[1, 0:2])
+                    figsize=None, scatter_kwargs=scatter_kwargs,gridspec_kwargs = gridspec_kwargs,
+                                          lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap, colorbar=colorbar,
+                    fig=fig, gs_slot=gs[-1, 0:-4])
 
         # make the map - brute force since projection is not being returned properly
         # lat = [self.lat]
@@ -706,7 +671,7 @@ class GeoSeries(Series):
         else:
             spectral_kwargs.update({'freq_method': 'lomb_scargle'})
 
-        ax['spec'] = fig.add_subplot(gs[1, -3:])
+        ax['spec'] = fig.add_subplot(gs[-1, -3:])
         spectralfig_kwargs = {} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
         spectralfig_kwargs.update({'ax': ax['spec']})
 
