@@ -253,7 +253,8 @@ class MultivariateDecomp:
         from ..core.multipleseries import MultipleSeries
         
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        
+
+
         if flip:
             PC = -self.pcs[:, index]
             EOF = -self.eigvecs[:, index]
@@ -262,12 +263,15 @@ class MultivariateDecomp:
             EOF = self.eigvecs[:, index]
             
         fig = plt.figure(figsize=figsize)
-        gs = gridspec.GridSpec(4, 8, wspace=0.051, hspace=0.3)
+        # gs = gridspec.GridSpec(4, 8, wspace=0.051, hspace=0.3)
+        gs = gridspec.GridSpec(3, 3, wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
+                               height_ratios=[2,1,5])
+
         gs.update(left=0, right=1.1)
         
         ax = {}
         # plot the PC
-        ax['pc'] = fig.add_subplot(gs[0, :5])
+        ax['pc'] = fig.add_subplot(gs[0, 0])
         label = rf'$PC_{index + 1}$' 
         t = self.orig.series_list[0].time
         ts = series.Series(time=t, value=PC, verbose=False)  # define timeseries object for the PC
@@ -275,34 +279,55 @@ class MultivariateDecomp:
         ax['pc'].set_ylabel(label)
                
         # plot its PSD
-        ax['psd'] = fig.add_subplot(gs[0, 6:])
+        # ax['psd'] = fig.add_subplot(gs[0, 6:])
+        ax['psd'] = fig.add_subplot(gs[0, 2])
+
         psd = ts.interp().spectral(method=spec_method)
         _ = psd.plot(ax=ax['psd'], label=label)
 
         # plot spatial pattern or spaghetti
         map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
-        if 'projection' in map_kwargs.keys():
-            projection = map_kwargs['projection']
-        else:
-            projection = 'auto'
+        # gridspec_kwargs = map_kwargs['gridspec_kwargs'] if 'gridspec_kwargs' in map_kwargs else {}
+        # scatter_kwargs = map_kwargs['scatter_kwargs'] if 'scatter_kwargs' in map_kwargs else {}
+        # lgd_kwargs = map_kwargs['lgd_kwargs'] if 'lgd_kwargs' in map_kwargs else {}
+        #
+        # for key in ['gridspec_kwargs', 'scatter_kwargs', 'lgd_kwargs']:
+        #     map_kwargs.pop(key, None)
+        gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
+        scatter_kwargs = map_kwargs.pop('scatter_kwargs', {})
+        lgd_kwargs = map_kwargs.pop('lgd_kwargs', {})
+        # if 'projection' in map_kwargs.keys():
+        #     projection = map_kwargs['projection']
+        # else:
+        #     projection = 'auto'
 
-        if 'proj_default' in map_kwargs.keys():
-            proj_default = map_kwargs['proj_default']
-        else:
-            proj_default = True
+        # if 'proj_default' in map_kwargs.keys():
+        #     proj_default = map_kwargs['proj_default']
+        # else:
+        #     proj_default = True
+        projection = map_kwargs.pop('projection', 'auto')
+        proj_default = map_kwargs.pop('proj_default', True)
 
-        if 'marker' in map_kwargs.keys():
-            marker = map_kwargs['marker']
-        else:
-            marker = 'archiveType'
-        if 'hue' in map_kwargs.keys():
-            hue = map_kwargs['color']
-        else:
-            hue = 'EOF'  # lipdutils.PLOT_DEFAULT[archiveType][0]
-        if 'size' in map_kwargs.keys():
-            size = map_kwargs['size']
-        else:
-            size = None
+        marker = scatter_kwargs.pop('marker', 'archiveType')
+        hue = scatter_kwargs.pop('hue', 'EOF')
+        size = scatter_kwargs.pop('size', 'None')
+
+        # if 'marker' in scatter_kwargs.keys():
+        #     marker = scatter_kwargs['marker']
+        #     scatter_kwargs.pop('marker', 'archiveType')
+        #     del scatter_kwargs['marker']
+        # else:
+        #     marker = 'archiveType'
+        # if 'hue' in scatter_kwargs.keys():
+        #     hue = scatter_kwargs['hue']
+        #     del scatter_kwargs['hue']
+        # else:
+        #     hue = 'EOF'  # lipdutils.PLOT_DEFAULT[archiveType][0]
+        # if 'size' in scatter_kwargs.keys():
+        #     size = scatter_kwargs['size']
+        #     del scatter_kwargs['size']
+        # else:
+        #     size = None
 
         if 'background' in map_kwargs.keys():
             background = map_kwargs['background']
@@ -329,26 +354,27 @@ class MultivariateDecomp:
         else:
             lakes = False
 
-        if 'scatter_kwargs' in map_kwargs.keys():
-            scatter_kwargs = map_kwargs['scatter_kwargs']
-        else:
-            scatter_kwargs = {}
+        # if 'scatter_kwargs' in map_kwargs.keys():
+        #     scatter_kwargs = map_kwargs['scatter_kwargs']
+        # else:
+        #     scatter_kwargs = {}
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
 
         if 'cmap' in map_kwargs.keys():
-                cmap = map_kwargs['cmap']
+            cmap = map_kwargs['cmap']
 
         # else:
         #     pass
-        if 'lgd_kwargs' in map_kwargs.keys():
-            lgd_kwargs = map_kwargs['lgd_kwargs']
-        else:
-            lgd_kwargs = {}
+        # if 'lgd_kwargs' in map_kwargs.keys():
+        #     lgd_kwargs = map_kwargs['lgd_kwargs']
+        # else:
+        #     lgd_kwargs = {}
         if 'legend' in map_kwargs.keys():
             legend = map_kwargs['legend']
         else:
             legend = True
+
         if isinstance(self.orig, MultipleGeoSeries):
         #if self.locs is None:
             # This makes a bare bones dataframe from a MultipleGeoSeries object
@@ -357,14 +383,20 @@ class MultivariateDecomp:
             df['EOF'] = EOF
         # else:
         #     df = pd.DataFrame({'lat': self.locs[:,0], 'lon':self.locs[:,1], 'EOF': EOF})
+            if legend == True:
+                gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs.keys() else [1, 10, 4]
+            # else:
+            #     gridspec_kwargs['width_ratios'] = gridspec_kwargs[
+            #     'width_ratios'] if 'width_ratios' in gridspec_kwargs.keys() else [4, 10, 4]
 
             _, ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
                                                proj_default=proj_default,
                                                background=background, borders=borders, rivers=rivers, lakes=lakes,
                                                ocean=ocean, land=land,
                                                figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
+                                                gridspec_kwargs=gridspec_kwargs,
                                                legend=legend, cmap=cmap,
-                                               fig=fig, gs_slot=gs[1:, :6])
+                                               fig=fig, gs_slot=gs[2, :])
             
         elif isinstance(self.orig, MultipleSeries):
             # spaghetti plot with the standardizes series
