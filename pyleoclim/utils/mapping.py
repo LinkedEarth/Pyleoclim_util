@@ -559,17 +559,20 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     Parameters
     ----------
-    geos : Pandas DataFrame, GeoSeries, MultipleGeoSeries
-        if a Pandas DataFrame, expects 'lat' and 'lon' columns
+    geos : Pandas DataFrame, GeoSeries, MultipleGeoSeries, required
+        If a Pandas DataFrame, expects 'lat' and 'lon' columns
 
     hue : string, optional
-        Grouping variable that will produce points with different colors. Can be either categorical or numeric, although color mapping will behave differently in latter case. The default is 'archiveType'.
+        Grouping variable that will produce points with different colors. Can be either categorical or numeric, although color mapping will behave differently in latter case.
+        The default is 'archiveType'.
 
     size : string, optional
-        Grouping variable that will produce points with different sizes. Expects to be numeric. Any data without a value for the size variable will be filtered out. The default is None.
+        Grouping variable that will produce points with different sizes. Expects to be numeric. Any data without a value for the size variable will be filtered out.
+        The default is None.
 
     marker : TYPE, optional
-        Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical. The default is 'archiveType'.
+        Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
+        The default is 'archiveType'.
 
     edgecolor : color (string) or list of rgba tuples, optional
         Color of marker edge. The default is 'w'.
@@ -588,44 +591,48 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         based on the degree of clustering of the sites. 
         
     proj_default : bool, optional
-        The default is True
         If True, uses the standard projection attributes.
-        Enter new attributes in a dictionary to change them. Lists of attributes
-        can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
-     
-    crit_dist : float
+        Enter new attributes in a dictionary to change them. Lists of attributes can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
+        The default is True.
+
+    crit_dist : float, optional
         critical radius for projection choice. Default: 5000 km
         Only active if projection == 'auto'
          
-    background : bool
+    background : bool, optional
         If True, uses a shaded relief background (only one available in Cartopy)
          
-    borders : bool
-        Draws the countries border. Defaults is off (False).
+    borders : bool, optional
+        Draws the countries border.
+        Defaults is off (False).
          
-    rivers : bool
-        Draws major rivers. Default is off (False).
+    rivers : bool, optional
+        Draws major rivers.
+        Default is off (False).
          
-    lakes : bool
-        Draws major lakes. Default is off (False).
+    lakes : bool, optional
+        Draws major lakes.
+        Default is off (False).
          
-    figsize : list or tuple
+    figsize : list or tuple, optional
         Size for the figure
 
-    scatter_kwargs : dict
+    scatter_kwargs : dict, optional
         Dict of arguments available in `seaborn.scatterplot <https://seaborn.pydata.org/generated/seaborn.scatterplot.html>`_.
         Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.
      
-    legend : bool
-        Whether the draw a legend on the figure. Default is True.
+    legend : bool, optional
+        Whether the draw a legend on the figure.
+        Default is True.
 
-    colorbar : bool
-        Whether the draw a colorbar on the figure if the data associated with hue are numeric. Default is True.
+    colorbar : bool, optional
+        Whether the draw a colorbar on the figure if the data associated with hue are numeric.
+        Default is True.
 
-    lgd_kwargs : dict
+    lgd_kwargs : dict, optional
         Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
      
-    savefig_settings : dict
+    savefig_settings : dict, optional
         Dictionary of arguments for matplotlib.pyplot.saveFig.
 
          - "path" must be specified; it can be any existed or non-existed path,
@@ -633,23 +640,24 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
          - "format" can be one of {"pdf", "eps", "png", "ps"}
          
     extent : TYPE, optional
-        DESCRIPTION. The default is 'global'.
+        DESCRIPTION.
+        The default is 'global'.
 
     cmap : string or list, optional
-        Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_. The default is None.
+        Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_.
+        The default is None.
 
     fig : matplotlib.pyplot.figure, optional
-        See matplotlib.pyplot.figure <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib-pyplot-figure>_. The default is None.
+        See matplotlib.pyplot.figure <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib-pyplot-figure>_.
+        The default is None.
 
     gs_slot : Gridspec slot, optional
-        If generating a map for a multi-plot, pass a gridspec slot. The default is None.
+        If generating a map for a multi-plot, pass a gridspec slot.
+        The default is None.
 
     gridspec_kwargs : dict, optional
         Function assumes the possibility of a colorbar, map, and legend. A list of floats associated with the keyword `width_ratios` will assume the first (index=0) is the relative width of the colorbar, the second to last (index = -2) is the relative width of the map, and the last (index = -1) is the relative width of the area for the legend.
         For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>_. The default is None.
-
-    scatter_kwargs : dict, optional
-        -
 
     kwargs: dict, optional
         - 'missing_val_hue', 'missing_val_marker', 'missing_val_label' can all be used to change the way missing values are represented ('k', '?',  are default hue and marker values will be associated with the label: 'missing').
