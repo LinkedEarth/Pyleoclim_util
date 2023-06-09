@@ -580,10 +580,13 @@ class GeoSeries(Series):
         else:
             lakes = False
 
-        if 'scatter_kwargs' in map_kwargs.keys():
-            scatter_kwargs = map_kwargs['scatter_kwargs']
-        else:
-            scatter_kwargs = {}
+        gridspec_kwargs = map_kwargs['gridspec_kwargs'] if 'gridspec_kwargs' in map_kwargs else {}
+        scatter_kwargs = map_kwargs['scatter_kwargs'] if 'scatter_kwargs' in map_kwargs else {}
+        lgd_kwargs = map_kwargs['lgd_kwargs'] if 'lgd_kwargs' in map_kwargs else {}
+
+        for key in ['gridspec_kwargs', 'scatter_kwargs']:
+            map_kwargs.pop(key, None)
+
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
         if 'cmap' in map_kwargs.keys():
@@ -592,18 +595,21 @@ class GeoSeries(Series):
             cmap=None
         # else:
         #     pass
-        if 'lgd_kwargs' in map_kwargs.keys():
-            lgd_kwargs = map_kwargs['lgd_kwargs']
-        else:
-            lgd_kwargs = {}
+        # if 'lgd_kwargs' in map_kwargs.keys():
+        #     lgd_kwargs = map_kwargs['lgd_kwargs']
+        # else:
+        #     lgd_kwargs = {}
         if 'legend' in map_kwargs.keys():
             legend = map_kwargs['legend']
         else:
             legend = False
 
+        if legend == False:
+            gridspec_kwargs['width_ratios'] = [5,16, 0]
+
         _, ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
-                    figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap,
+                    figsize=None, scatter_kwargs=scatter_kwargs,gridspec_kwargs = gridspec_kwargs, lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap,
                     fig=fig, gs_slot=gs[1, 0:2])
 
         # make the map - brute force since projection is not being returned properly
