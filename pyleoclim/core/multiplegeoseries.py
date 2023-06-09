@@ -424,7 +424,7 @@ class MultipleGeoSeries(MultipleSeries):
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree')")
+            dfs = df.query("archiveType in ('tree') | paleoData_variableName not in ('year')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
