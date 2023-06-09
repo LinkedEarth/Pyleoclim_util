@@ -183,7 +183,7 @@ class MultivariateDecomp:
 
     def modeplot(self, index=0, figsize=[8, 8], ax=None, savefig_settings=None,
                  title_kwargs=None, spec_method='mtm', cmap='RdBu_r', cb_scale = 0.8,
-                 flip = False, map_kwargs=None, scatter_kwargs=None):
+                 flip = False, map_kwargs=None, gridspec_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -263,9 +263,12 @@ class MultivariateDecomp:
             EOF = self.eigvecs[:, index]
             
         fig = plt.figure(figsize=figsize)
-        # gs = gridspec.GridSpec(4, 8, wspace=0.051, hspace=0.3)
-        gs = gridspec.GridSpec(3, 3, wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
+        gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
+        gridspec_defaults = dict(wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
                                height_ratios=[2,1,5])
+
+        gridspec_defaults.update(gridspec_kwargs)
+        gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
 
         gs.update(left=0, right=1.1)
         
@@ -287,116 +290,48 @@ class MultivariateDecomp:
 
         # plot spatial pattern or spaghetti
         map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
-        # gridspec_kwargs = map_kwargs['gridspec_kwargs'] if 'gridspec_kwargs' in map_kwargs else {}
-        # scatter_kwargs = map_kwargs['scatter_kwargs'] if 'scatter_kwargs' in map_kwargs else {}
-        # lgd_kwargs = map_kwargs['lgd_kwargs'] if 'lgd_kwargs' in map_kwargs else {}
-        #
-        # for key in ['gridspec_kwargs', 'scatter_kwargs', 'lgd_kwargs']:
-        #     map_kwargs.pop(key, None)
+
+        projection = map_kwargs.pop('projection', 'auto')
+        proj_default = map_kwargs.pop('proj_default', True)
+        lakes = map_kwargs.pop('lakes', False)
+        land = map_kwargs.pop('land', False)
+        ocean = map_kwargs.pop('ocean', False)
+        rivers = map_kwargs.pop('rivers', False)
+        borders = map_kwargs.pop('borders', True)
+        background = map_kwargs.pop('background', True)
+
         gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
         scatter_kwargs = map_kwargs.pop('scatter_kwargs', {})
         lgd_kwargs = map_kwargs.pop('lgd_kwargs', {})
-        # if 'projection' in map_kwargs.keys():
-        #     projection = map_kwargs['projection']
-        # else:
-        #     projection = 'auto'
-
-        # if 'proj_default' in map_kwargs.keys():
-        #     proj_default = map_kwargs['proj_default']
-        # else:
-        #     proj_default = True
-        projection = map_kwargs.pop('projection', 'auto')
-        proj_default = map_kwargs.pop('proj_default', True)
 
         marker = scatter_kwargs.pop('marker', 'archiveType')
         hue = scatter_kwargs.pop('hue', 'EOF')
         size = scatter_kwargs.pop('size', 'None')
 
-        # if 'marker' in scatter_kwargs.keys():
-        #     marker = scatter_kwargs['marker']
-        #     scatter_kwargs.pop('marker', 'archiveType')
-        #     del scatter_kwargs['marker']
-        # else:
-        #     marker = 'archiveType'
-        # if 'hue' in scatter_kwargs.keys():
-        #     hue = scatter_kwargs['hue']
-        #     del scatter_kwargs['hue']
-        # else:
-        #     hue = 'EOF'  # lipdutils.PLOT_DEFAULT[archiveType][0]
-        # if 'size' in scatter_kwargs.keys():
-        #     size = scatter_kwargs['size']
-        #     del scatter_kwargs['size']
-        # else:
-        #     size = None
-
-        if 'background' in map_kwargs.keys():
-            background = map_kwargs['background']
-        else:
-            background = True
-        if 'borders' in map_kwargs.keys():
-            borders = map_kwargs['borders']
-        else:
-            borders = False
-        if 'rivers' in map_kwargs.keys():
-            rivers = map_kwargs['rivers']
-        else:
-            rivers = False
-        if 'ocean' in map_kwargs.keys():
-            ocean = map_kwargs['ocean']
-        else:
-            ocean = False
-        if 'land' in map_kwargs.keys():
-            land = map_kwargs['land']
-        else:
-            land = False
-        if 'lakes' in map_kwargs.keys():
-            lakes = map_kwargs['lakes']
-        else:
-            lakes = False
-
-        # if 'scatter_kwargs' in map_kwargs.keys():
-        #     scatter_kwargs = map_kwargs['scatter_kwargs']
-        # else:
-        #     scatter_kwargs = {}
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
 
-        if 'cmap' in map_kwargs.keys():
-            cmap = map_kwargs['cmap']
-
-        # else:
-        #     pass
-        # if 'lgd_kwargs' in map_kwargs.keys():
-        #     lgd_kwargs = map_kwargs['lgd_kwargs']
-        # else:
-        #     lgd_kwargs = {}
-        if 'legend' in map_kwargs.keys():
-            legend = map_kwargs['legend']
-        else:
-            legend = True
+        cmap = map_kwargs.pop('cmap', None)
+        legend = map_kwargs.pop('legend', True)
+        colorbar = map_kwargs.pop('colorbar', True)
 
         if isinstance(self.orig, MultipleGeoSeries):
-        #if self.locs is None:
             # This makes a bare bones dataframe from a MultipleGeoSeries object
             df = mapping.make_df(self.orig, hue=hue, marker=marker, size=size)
             # additional columns are added manually
             df['EOF'] = EOF
-        # else:
-        #     df = pd.DataFrame({'lat': self.locs[:,0], 'lon':self.locs[:,1], 'EOF': EOF})
+
             if legend == True:
-                gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs.keys() else [1, 10, 4]
-            # else:
-            #     gridspec_kwargs['width_ratios'] = gridspec_kwargs[
-            #     'width_ratios'] if 'width_ratios' in gridspec_kwargs.keys() else [4, 10, 4]
+                gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs.keys() else [.7,.1, 12, 4]
 
             _, ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
                                                proj_default=proj_default,
                                                background=background, borders=borders, rivers=rivers, lakes=lakes,
                                                ocean=ocean, land=land,
                                                figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
-                                                gridspec_kwargs=gridspec_kwargs,
+                                                gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
                                                legend=legend, cmap=cmap,
-                                               fig=fig, gs_slot=gs[2, :])
+                                               fig=fig, gs_slot=gs[2, :]) #label rf'$EOF_{index + 1}$'
             
         else: # it must be a plain old MultipleSeries. No map for you! Just a spaghetti plot with the standardizes series
             ax['map'] = fig.add_subplot(gs[1:, :])
