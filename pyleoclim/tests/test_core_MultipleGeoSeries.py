@@ -73,14 +73,14 @@ class TestUIMultipleGeoSeriesMap:
         clat, clon = pyleo.utils.mapping.centroid_coords(lat, lon)
         #d =  pyleo.utils.mapping.compute_dist(clat, clon, lat, lon) # computes distances to centroid
 
-        fig, ax = mgs.map(crit_dist=crit_dist)
+        fig, ax_d = mgs.map(crit_dist=crit_dist)
         if crit_dist == 30000:
-            assert ax.projection.proj4_params['proj'] == 'ortho'
-            assert ax.projection.proj4_params['lon_0'] == clon
-            assert ax.projection.proj4_params['lat_0'] == clat
+            assert ax_d['map'].projection.proj4_params['proj'] == 'ortho'
+            assert ax_d['map'].projection.proj4_params['lon_0'] == clon
+            assert ax_d['map'].projection.proj4_params['lat_0'] == clat
         else:
-            assert ax.projection.proj4_params['proj'] == 'robin'
-            assert ax.projection.proj4_params['lon_0'] == clon   
+            assert ax_d['map'].projection.proj4_params['proj'] == 'robin'
+            assert ax_d['map'].projection.proj4_params['lon_0'] == clon
         
     def test_map_proj_pick_regional(self):
         '''
@@ -90,10 +90,10 @@ class TestUIMultipleGeoSeriesMap:
         lat = [ts.lat for ts in mgs.series_list]
         lon = [ts.lon for ts in mgs.series_list]
         clat, clon = pyleo.utils.mapping.centroid_coords(lat, lon)
-        fig, ax = mgs.map()
-        assert ax.projection.proj4_params['proj'] == 'ortho'
-        assert ax.projection.proj4_params['lon_0'] == clon
-        assert ax.projection.proj4_params['lat_0'] == clat
+        fig, ax_d = mgs.map()
+        assert ax_d['map'].projection.proj4_params['proj'] == 'ortho'
+        assert ax_d['map'].projection.proj4_params['lon_0'] == clon
+        assert ax_d['map'].projection.proj4_params['lat_0'] == clat
             
         
 class TestUIMultipleGeoSeriesPCA:
