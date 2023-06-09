@@ -398,8 +398,7 @@ class MultivariateDecomp:
                                                legend=legend, cmap=cmap,
                                                fig=fig, gs_slot=gs[2, :])
             
-        elif isinstance(self.orig, MultipleSeries):
-            # spaghetti plot with the standardizes series
+        else: # it must be a plain old MultipleSeries. No map for you! Just a spaghetti plot with the standardizes series
             ax['map'] = fig.add_subplot(gs[1:, :])
             self.orig.standardize().plot(ax=ax['map'], title='',
                                          ylabel = 'Original Data (standardized)')
