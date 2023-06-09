@@ -5,7 +5,7 @@ to such a collection at once (e.g. process a bunch of series in a consistent fas
 Compared to its parent class MultipleSeries, MultipleGeoSeries opens new possibilites regarding mapping.
 """
 from ..core.multipleseries import MultipleSeries
-from ..utils.mapping import scatter_map
+# from ..utils.mapping import scatter_map
 from ..utils import mapping as mp
 import warnings
 
@@ -78,57 +78,131 @@ class MultipleGeoSeries(MultipleSeries):
 
 
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
-            edgecolor='k', color_pal=None, legend_attribute=None, projection='auto', 
-            proj_default=True, crit_dist=5000,
+            edgecolor='k', projection='auto',
+            proj_default=True, crit_dist=5000,colorbar=True,
             background=True, borders=False, rivers=False, lakes=False, land=True,ocean=True,
-            figsize=None, fig=None, ax=None, scatter_kwargs=None, legend=True, gridspec_slot=None,
+            figsize=None, fig=None, scatter_kwargs=None, gridspec_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
         '''
         
 
         Parameters
         ----------
-        hue : TYPE, optional
-            DESCRIPTION. The default is 'archiveType'.
+        hue : string, optional
+            Grouping variable that will produce points with different colors. Can be either categorical or numeric, although color mapping will behave differently in latter case.
+            The default is 'archiveType'.
+
+        size : string, optional
+            Grouping variable that will produce points with different sizes. Expects to be numeric. Any data without a value for the size variable will be filtered out.
+            The default is None.
+
         marker : TYPE, optional
-            DESCRIPTION. The default is None.
-        size : TYPE, optional
-            DESCRIPTION. The default is None.
-        color_pal : TYPE, optional
-            DESCRIPTION. The default is None.
-        legend_attribute : TYPE, optional
-            DESCRIPTION. The default is None.
-        projection : TYPE, optional
-            DESCRIPTION. The default is 'Robinson'.
-        proj_default : TYPE, optional
-            DESCRIPTION. The default is True.
-        background : TYPE, optional
-            DESCRIPTION. The default is True.
-        borders : TYPE, optional
-            DESCRIPTION. The default is False.
-        rivers : TYPE, optional
-            DESCRIPTION. The default is False.
-        lakes : TYPE, optional
-            DESCRIPTION. The default is False.
-        figsize : TYPE, optional
-            DESCRIPTION. The default is None.
-        ax : TYPE, optional
-            DESCRIPTION. The default is None.
-        scatter_kwargs : TYPE, optional
-            DESCRIPTION. The default is None.
-        legend : TYPE, optional
-            DESCRIPTION. The default is True.
-        lgd_kwargs : TYPE, optional
-            DESCRIPTION. The default is None.
-        savefig_settings : TYPE, optional
-            DESCRIPTION. The default is None.
-        **kwargs : TYPE
+            Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
+            The default is 'archiveType'.
+
+        edgecolor : color (string) or list of rgba tuples, optional
+            Color of marker edge. The default is 'w'.
+
+        projection : string
+            the map projection. Available projections:
+            'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
+            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic',
+            'Sinusoidal','Stereographic','TransverseMercator','UTM',
+            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+            'Geostationary','NearsidePerspective','EckertI','EckertII',
+            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+            By default, projection == 'auto', so the projection will be picked
+            based on the degree of clustering of the sites.
+
+        proj_default : bool, optional
+            If True, uses the standard projection attributes.
+            Enter new attributes in a dictionary to change them. Lists of attributes can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
+            The default is True.
+
+        crit_dist : float, optional
+            critical radius for projection choice. Default: 5000 km
+            Only active if projection == 'auto'
+
+        background : bool, optional
+            If True, uses a shaded relief background (only one available in Cartopy)
+            Default is on (True).
+
+        borders : bool, optional
+            Draws the countries border.
+            Defaults is off (False).
+
+        land : bool, optional
+            Colors land masses.
+            Default is off (False).
+
+        ocean : bool, optional
+            Colors oceans.
+            Default is off (False).
+
+        rivers : bool, optional
+            Draws major rivers.
+            Default is off (False).
+
+        lakes : bool, optional
+            Draws major lakes.
+            Default is off (False).
+
+        figsize : list or tuple, optional
+            Size for the figure
+
+        scatter_kwargs : dict, optional
+            Dict of arguments available in `seaborn.scatterplot <https://seaborn.pydata.org/generated/seaborn.scatterplot.html>`_.
+            Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.
+
+        legend : bool, optional
+            Whether the draw a legend on the figure.
+            Default is True.
+
+        colorbar : bool, optional
+            Whether the draw a colorbar on the figure if the data associated with hue are numeric.
+            Default is True.
+
+        lgd_kwargs : dict, optional
+            Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
+
+        savefig_settings : dict, optional
+            Dictionary of arguments for matplotlib.pyplot.saveFig.
+
+             - "path" must be specified; it can be any existed or non-existed path,
+               with or without a suffix; if the suffix is not given in "path", it will follow "format"
+             - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        extent : TYPE, optional
             DESCRIPTION.
+            The default is 'global'.
+
+        cmap : string or list, optional
+            Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_.
+            The default is None.
+
+        fig : matplotlib.pyplot.figure, optional
+            See matplotlib.pyplot.figure <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib-pyplot-figure>_.
+            The default is None.
+
+        gs_slot : Gridspec slot, optional
+            If generating a map for a multi-plot, pass a gridspec slot.
+            The default is None.
+
+        gridspec_kwargs : dict, optional
+            Function assumes the possibility of a colorbar, map, and legend. A list of floats associated with the keyword `width_ratios` will assume the first (index=0) is the relative width of the colorbar, the second to last (index = -2) is the relative width of the map, and the last (index = -1) is the relative width of the area for the legend.
+            For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>_. The default is None.
+
+        kwargs: dict, optional
+            - 'missing_val_hue', 'missing_val_marker', 'missing_val_label' can all be used to change the way missing values are represented ('k', '?',  are default hue and marker values will be associated with the label: 'missing').
+            - 'hue_mapping' and 'marker_mapping' can be used to submit dictionaries mapping hue values to colors and marker values to markers. Does not replace passing a string value for hue or marker.
+
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
+        fig, ax_d
+            Matplotlib figure, dictionary of ax objects which includes the as many as three items: 'cb' (colorbar ax), 'map' (scatter map), and 'leg' (legend ax)
             
         See also
         --------
@@ -156,25 +230,25 @@ class MultipleGeoSeries(MultipleSeries):
 
             Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
 
-            Euro2k.map(crit_dist) # By default, this will pick projection based on the degree of geographic clustering of the sites
+            Euro2k.map(crit_dist=2000) # By default, this will pick projection based on the degree of geographic clustering of the sites
             
             Euro2k.map(projection='Orthographic',size='elevation')  # tweak the projection and represent elevation by size
             Euro2k.map(projection='Orthographic',hue='elevation')  # tweak the projection and represent elevation by hue
 
         '''
 
-        fig, ax = scatter_map(self, hue=hue, size=size, marker=marker,
+        fig, ax_d = mp.scatter_map(self, hue=hue, size=size, marker=marker,
                     edgecolor=edgecolor, projection=projection,
                                         proj_default=proj_default,
                                         crit_dist=crit_dist,
                                         background=background, borders=borders, rivers=rivers, lakes=lakes,
                                         ocean=ocean,
-                                        land=land,
+                                        land=land, gridspec_kwargs=gridspec_kwargs,
                                         figsize=figsize, scatter_kwargs=scatter_kwargs,
-                                        lgd_kwargs=lgd_kwargs, legend=legend,
+                                        lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
                                         cmap=cmap,
-                                        fig=fig, gs_slot=gridspec_slot)
-        return fig, ax
+                                        fig=fig, gs_slot=gridspec_slot, **kwargs)
+        return fig, ax_d
         # def make_scalar_mappable(cmap, lims=None, n=None):
         #     if type(cmap) == list:
         #         if n is None:
