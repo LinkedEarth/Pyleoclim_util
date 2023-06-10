@@ -181,7 +181,7 @@ class MultivariateDecomp:
 
         return fig, ax
 
-    def modeplot(self, index=0, figsize=[8, 8], ax=None, savefig_settings=None,
+    def modeplot(self, index=0, figsize=[8, 8], ax=None, savefig_settings=None,gs=None,
                  title_kwargs=None, spec_method='mtm', cmap='RdBu_r', cb_scale = 0.8,
                  flip = False, map_kwargs=None, gridspec_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
