@@ -1116,7 +1116,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 figsize = (18,6)
             if projection == 'Orthographic':
                 figsize = (16,6)
-        print(figsize)
 
     # set the projection
     proj = set_proj(projection=projection, proj_default=proj_default)
@@ -1146,7 +1145,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     if gs_slot == None:
         _gs = gridspec.GridSpec(1, 1)#, **gridspec_kwargs)
         gs_slot = _gs[0]
-    print('gs_slot',gs_slot.__dict__)
     if projection == 'Robinson':
         gs_sub = gs_slot.subgridspec(1, 3)
         gs_subslot = gs_sub[0,:]
@@ -1166,7 +1164,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs else [.7,.05,16, 5]
     gs = gs_subslot.subgridspec(1, len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
-    print('gridspec_kwargs', gridspec_kwargs)
+
     ax_d['cb'] = fig.add_subplot(gs[0])
     ax_d['map'] = fig.add_subplot(gs[-2], projection=proj)
     ax_d['leg'] = fig.add_subplot(gs[-1])
@@ -1328,5 +1326,4 @@ def centroid_coords(lat,lon):
     else:
         clat = lat.mean()
         clon = lon.mean()
-    print('clat', clat, 'clon', clon)
     return clat, clon
