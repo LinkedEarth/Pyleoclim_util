@@ -1699,8 +1699,10 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None, time_unit = None, xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
-                  spine_lw=1.5, grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
+    def stackplot(self, figsize=None, savefig_settings=None, time_unit = None, 
+                  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', 
+                  norm=None, labels='auto', ylabel_fontsize = 8, spine_lw=1.5, grid_lw=0.5,
+                  label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
         ''' Stack plot of multiple series
 
         Time units are harmonized prior to plotting. 
@@ -1789,7 +1791,7 @@ class MultipleSeries:
             Arguments to further customize the plot from matplotlib.pyplot.plot.
 
             - Dictionary: Arguments will be applied to all lines in the stackplots
-            - List of dictionary: Allows to customize one line at a time.
+            - List of dictionaries: Allows to customize one line at a time.
 
         Returns
         -------
@@ -1916,7 +1918,7 @@ class MultipleSeries:
             ax[idx].patch.set_alpha(0)
             ax[idx].set_xlim(xlim)
             time_label, value_label = ts.make_labels()
-            ax[idx].set_ylabel(value_label, weight='bold')
+            ax[idx].set_ylabel(value_label, weight='bold', size=ylabel_fontsize)
 
             mu = np.nanmean(ts.value)
             std = np.nanstd(ts.value)

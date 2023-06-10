@@ -86,7 +86,7 @@ class MultipleGeoSeries(MultipleSeries):
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
             edgecolor='k', projection='auto',
             proj_default=True, crit_dist=5000,colorbar=True,
-            background=True, borders=False, rivers=False, lakes=False, land=True,ocean=True,
+            background=True, borders=True, rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, scatter_kwargs=None, gridspec_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
         '''

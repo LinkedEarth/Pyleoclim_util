@@ -451,13 +451,17 @@ def map(lat, lon, criteria, marker=None, color=None,
                  'central_longitude': clon}
         proj2 = {'central_latitude': clat}
         proj3 = {'central_longitude': clon}
+        proj4 = {}
         try:
             proj = set_proj(projection=projection, proj_default=proj1)
         except:
             try:
                 proj = set_proj(projection=projection, proj_default=proj3)
             except:
-                proj = set_proj(projection=projection, proj_default=proj2)
+                try:
+                    proj = set_proj(projection=projection, proj_default=proj2)
+                except:
+                    proj = set_proj(projection=projection, proj_default=proj4)
 
     data_crs = ccrs.PlateCarree()
     # Make the figure
@@ -1188,6 +1192,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         ax_d['map'].add_feature(cfeature.LAND, alpha=.5)
     if extent == 'global':
         ax_d['map'].set_global()
+    elif isinstance(extent, list) and len(extent)==4:
+        ax_d['map'].set_extent(extent,crs=ccrs.PlateCarree())
 
     x = 'lon'
     y = 'lat'
@@ -1299,10 +1305,12 @@ def lon_180_to_360(x):
 
 def centroid_coords(lat,lon, true_centroid=False):
     '''
-    Computes the centroid of the geographic coordinates via Shapely
-    h/t Tim Roberts, via StackOverflow: https://stackoverflow.com/a/72737621.
-    If there aren't enough vertices to form a polygon, then the arithmetic
+    Computes the centroid of the geographic coordinates via Shapely.
+    
+    If there aren't enough vertices to form a polygon (4), then the arithmetic
     mean of the coordinates is returned.
+    
+    h/t Tim Roberts, via StackOverflow: https://stackoverflow.com/a/72737621.
 
     Parameters
     ----------

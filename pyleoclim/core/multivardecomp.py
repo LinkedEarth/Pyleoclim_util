@@ -254,10 +254,8 @@ class MultivariateDecomp:
         
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
-        from ..core.multipleseries import MultipleSeries
         
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-
 
         if flip:
             PC = -self.pcs[:, index]
@@ -270,8 +268,7 @@ class MultivariateDecomp:
         if gs == None:
             gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
             gridspec_defaults = dict(wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
-                                   height_ratios=[2,1,5])
-
+                                     height_ratios=[2,1,5])
             gridspec_defaults.update(gridspec_kwargs)
             gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
 
@@ -304,6 +301,7 @@ class MultivariateDecomp:
         rivers = map_kwargs.pop('rivers', False)
         borders = map_kwargs.pop('borders', True)
         background = map_kwargs.pop('background', True)
+        extent = map_kwargs.pop('extent', 'global')
 
         gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
         scatter_kwargs = map_kwargs.pop('scatter_kwargs', {})
@@ -332,9 +330,9 @@ class MultivariateDecomp:
             _, ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
                                                proj_default=proj_default,
                                                background=background, borders=borders, rivers=rivers, lakes=lakes,
-                                               ocean=ocean, land=land,
+                                               ocean=ocean, land=land, extent=extent,
                                                figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
-                                                gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
+                                               gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
                                                legend=legend, cmap=cmap,
                                                fig=fig, gs_slot=gs[2, :]) #label rf'$EOF_{index + 1}$'
             
