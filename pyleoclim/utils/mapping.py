@@ -41,7 +41,7 @@ def pick_proj(lat, lon, crit_dist=5000):
         latitudes in [-90, 90]
     lon : 1d array
         longitudes in (-180, 180]
-    crit_dist : float                   
+    crit_dist : float
         critical radius. Default: 5000 km
 
     Returns
@@ -51,24 +51,24 @@ def pick_proj(lat, lon, crit_dist=5000):
 
     '''
     lon = lon_360_to_180(lon) # convert longitudes to [-180, 180]
-    
-    lat_c, lon_c = centroid_coords(lat,lon) # find coordinates of centroid 
-    
+
+    lat_c, lon_c = centroid_coords(lat,lon) # find coordinates of centroid
+
     d = compute_dist(lat_c, lon_c, lat, lon) # computes distances to centroid
-    dmax = np.array(d).max()  # find maximum distance 
+    dmax = np.array(d).max()  # find maximum distance
     if dmax > crit_dist:
         proj = 'Robinson'
     else:
         proj = 'Orthographic'
-    
+
     return proj
 
 def set_proj(projection='Robinson', proj_default=True):
     """ Set the projection for Cartopy.
-    
+
     Parameters
     ----------
-    
+
     projection : string
 
         the map projection. Available projections:
@@ -86,15 +86,15 @@ def set_proj(projection='Robinson', proj_default=True):
         If True, uses the standard projection attributes from Cartopy.
         Enter new attributes in a dictionary to change them. Lists of attributes
         can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
-    
+
     Returns
     -------
         proj : the Cartopy projection object
-        
+
     See Also
     --------
     pyleoclim.utils.mapping.map : mapping function making use of the projection
-    
+
     """
     if proj_default is not True and type(proj_default) is not dict:
         raise TypeError('The default for the projections should either be provided' +
@@ -288,31 +288,31 @@ def map(lat, lon, criteria, marker=None, color=None,
         figsize=None, ax=None, scatter_kwargs=None, legend=True, legend_title=None,
         lgd_kwargs=None, savefig_settings=None):
     """ Map the location of all lat/lon according to some criteria
-    
+
     DEPRECATED: use scatter_map() instead
-    
-    Map the location of all lat/lon according to some criteria. Based on functions defined in the Cartopy package. 
-    
+
+    Map the location of all lat/lon according to some criteria. Based on functions defined in the Cartopy package.
+
     Parameters
     ----------
-    
+
     lat : list
         a list of latitudes.
-        
+
     lon : list
         a list of longitudes.
-        
+
     criteria : list
         a list of unique criteria for plotting purposes. For instance,
         a map by the types of archive present in the dataset or proxy
-        observations. Should have the same length as lon/lat.  
-    
+        observations. Should have the same length as lon/lat.
+
     marker : list
         a list of possible markers for each criterion. If None, will use pyleoclim default
-    
+
     color : list
         a list of possible colors for each criterion. If None, will use pyleoclim default
-    
+
     projection : string
         the map projection. Available projections:
         'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
@@ -323,49 +323,49 @@ def map(lat, lon, criteria, marker=None, color=None,
         'Geostationary','NearsidePerspective','EckertI','EckertII',
         'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
         'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        By default, projection == 'auto', so the projection will be picked 
-        based on the degree of clustering of the sites. 
-        
+        By default, projection == 'auto', so the projection will be picked
+        based on the degree of clustering of the sites.
+
     proj_default : bool
         If True, uses the standard projection attributes.
         Enter new attributes in a dictionary to change them. Lists of attributes
-        can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_. 
-    
-    crit_dist : float                   
+        can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
+
+    crit_dist : float
         critical radius for projection choice. Default: 5000 km
         Only active if projection == 'auto'
-        
+
     background : bool
         If True, uses a shaded relief background (only one available in Cartopy)
-        
+
     borders : bool
         Draws the countries border. Defaults is off (False).
-        
+
     rivers : bool
         Draws major rivers. Default is off (False).
-        
+
     lakes : bool
-        Draws major lakes. 
-        Default is off (False).  
-        
+        Draws major lakes.
+        Default is off (False).
+
     figsize : list
         the size for the figure
-        
+
     ax: axis,optional
-        Return as axis instead of figure (useful to integrate plot into a subplot) 
-        
+        Return as axis instead of figure (useful to integrate plot into a subplot)
+
     scatter_kwargs : dict
-        Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.     
-    
+        Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.
+
     legend : bool
         Whether the draw a legend on the figure
-    
+
     legend_title : str
         Use this instead of a dynamic range for legend
-    
+
     lgd_kwargs : dict
         Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
-    
+
     savefig_settings : dict
 
         Dictionary of arguments for matplotlib.pyplot.saveFig.
@@ -373,11 +373,11 @@ def map(lat, lon, criteria, marker=None, color=None,
         - "path" must be specified; it can be any existed or non-existed path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
-    
+
     Returns
     -------
-    
-    ax: The figure, or axis if ax specified 
+
+    ax: The figure, or axis if ax specified
 
     See Also
     --------
@@ -443,7 +443,7 @@ def map(lat, lon, criteria, marker=None, color=None,
     # get the projection:
     if projection == 'auto':
         projection = pick_proj(lat, lon, crit_dist=crit_dist)
-        
+
     proj = set_proj(projection=projection, proj_default=proj_default)
     if proj_default == True:
         clat, clon = centroid_coords(lat, lon)
@@ -460,7 +460,7 @@ def map(lat, lon, criteria, marker=None, color=None,
                 proj = set_proj(projection=projection, proj_default=proj2)
 
     data_crs = ccrs.PlateCarree()
-    # Make the figure        
+    # Make the figure
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=proj))
         # draw the coastlines
@@ -547,14 +547,14 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
     return geos_df
 
 
-def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='k', 
-                proj_default=True, projection='auto', crit_dist=5000, 
+def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='k',
+                proj_default=True, projection='auto', crit_dist=5000,
                 background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, gridspec_kwargs=None, extent='global',
                 lgd_kwargs=None, legend=True, colorbar=True, cmap=None,
                 fig=None, gs_slot=None, **kwargs):
     '''
-    
+
 
     Parameters
     ----------
@@ -586,9 +586,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         'Geostationary','NearsidePerspective','EckertI','EckertII',
         'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
         'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        By default, projection == 'auto', so the projection will be picked 
-        based on the degree of clustering of the sites. 
-        
+        By default, projection == 'auto', so the projection will be picked
+        based on the degree of clustering of the sites.
+
     proj_default : bool, optional
         If True, uses the standard projection attributes.
         Enter new attributes in a dictionary to change them. Lists of attributes can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
@@ -597,29 +597,29 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     crit_dist : float, optional
         critical radius for projection choice. Default: 5000 km
         Only active if projection == 'auto'
-         
+
     background : bool, optional
         If True, uses a shaded relief background (only one available in Cartopy)
-         
+
     borders : bool, optional
         Draws the countries border.
         Defaults is off (False).
-         
+
     rivers : bool, optional
         Draws major rivers.
         Default is off (False).
-         
+
     lakes : bool, optional
         Draws major lakes.
         Default is off (False).
-         
+
     figsize : list or tuple, optional
         Size for the figure
 
     scatter_kwargs : dict, optional
         Dict of arguments available in `seaborn.scatterplot <https://seaborn.pydata.org/generated/seaborn.scatterplot.html>`_.
         Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.
-     
+
     legend : bool, optional
         Whether the draw a legend on the figure.
         Default is True.
@@ -630,14 +630,14 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     lgd_kwargs : dict, optional
         Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
-     
+
     savefig_settings : dict, optional
         Dictionary of arguments for matplotlib.pyplot.saveFig.
 
          - "path" must be specified; it can be any existed or non-existed path,
            with or without a suffix; if the suffix is not given in "path", it will follow "format"
          - "format" can be one of {"pdf", "eps", "png", "ps"}
-         
+
     extent : TYPE, optional
         DESCRIPTION.
         The default is 'global'.
@@ -671,7 +671,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     -------
     TYPE
         fig, dictionary of ax objects which includes the as many as three items: 'cb' (colorbar ax), 'map' (scatter map), and 'leg' (legend ax)
-        
+
     See Also
     --------
     pyleoclim.utils.mapping.set_proj : Set the projection for Cartopy-based maps
@@ -765,7 +765,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                      ax=None, ax_d=None, proj=None, scatter_kwargs=None, legend=True, lgd_kwargs=None, colorbar=True,
                      fig=None,  #gs_slot=None,
                      cmap=None, **kwargs):
-        
+
         scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
         lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
         norm_kwargs = kwargs.pop('norm_kwargs', {})
@@ -1088,7 +1088,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     # from ..core.multiplegeoseries import MultipleGeoSeries
     # from ..core.geoseries import GeoSeries
-    
+
     # if geos is not
     if type(geos) != pd.DataFrame:#in [MultipleGeoSeries, GeoSeries]:
         df = make_df(geos, hue=hue, marker=marker, size=size)
@@ -1109,14 +1109,13 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     # get the projection
     if projection == 'auto':
-        projection = pick_proj(df['lat'].values, 
+        projection = pick_proj(df['lat'].values,
                                df['lon'].values, crit_dist=crit_dist)
         if figsize == None:
             if projection == 'Robinson':
                 figsize = (18,6)
             if projection == 'Orthographic':
                 figsize = (16,6)
-        print(figsize)
 
     # set the projection
     proj = set_proj(projection=projection, proj_default=proj_default)
@@ -1146,7 +1145,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     if gs_slot == None:
         _gs = gridspec.GridSpec(1, 1)#, **gridspec_kwargs)
         gs_slot = _gs[0]
-    print('gs_slot',gs_slot.__dict__)
     if projection == 'Robinson':
         gs_sub = gs_slot.subgridspec(1, 3)
         gs_subslot = gs_sub[0,:]
@@ -1166,7 +1164,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs else [.7,.05,16, 5]
     gs = gs_subslot.subgridspec(1, len(gridspec_kwargs['width_ratios']),  **gridspec_kwargs)
-    print('gridspec_kwargs', gridspec_kwargs)
+
     ax_d['cb'] = fig.add_subplot(gs[0])
     ax_d['map'] = fig.add_subplot(gs[-2], projection=proj)
     ax_d['leg'] = fig.add_subplot(gs[-1])
@@ -1202,7 +1200,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 def dist_sphere(lat1, lon1, lat2, lon2):
     """Uses the haversine formula to calculate distance on a sphere
     https://en.wikipedia.org/wiki/Haversine_formula
-    
+
     Parameters
     ----------
     lat1: float
@@ -1213,7 +1211,7 @@ def dist_sphere(lat1, lon1, lat2, lon2):
         Latitude of the second point, in radians
     lon2: float
         Longitude of the second point, in radians
-        
+
     Returns
     -------
     dist: float
@@ -1233,7 +1231,7 @@ def dist_sphere(lat1, lon1, lat2, lon2):
 def compute_dist(lat_r, lon_r, lat_c, lon_c):
     """ Computes the distance in (km) between a reference point and an array
     of other coordinates.
-    
+
     Parameters
     ----------
     lat_r: float
@@ -1244,20 +1242,20 @@ def compute_dist(lat_r, lon_r, lat_c, lon_c):
         A list of latitudes for the comparison points, in deg
     lon_c: list
         A list of longitudes for the comparison points, in deg
-    
+
     See also
     --------
-    
+
     pyleoclim.utils.mapping.dist_sphere: calculate distance on a sphere
-    
+
     Returns
     -------
-    
+
     dist: list
         A list of distances in km.
     """
     dist = []
-    lon_c = lon_360_to_180(np.array(lon_c)) 
+    lon_c = lon_360_to_180(np.array(lon_c))
     lon_r = lon_360_to_180(np.array(lon_r))
     for idx, val in enumerate(lat_c):
         lat1 = np.radians(lat_r)
@@ -1271,19 +1269,19 @@ def compute_dist(lat_r, lon_r, lat_c, lon_c):
 
 def within_distance(distance, radius):
     """ Returns the index of the records that are within a certain distance
-    
+
     Parameters
-    ----------   
-    
+    ----------
+
     distance: list
         A list containing the distance
-        
+
     radius: float
         The radius to be considered
-        
+
     Returns
     -------
-    
+
     idx: list
         a list of index
     """
@@ -1303,8 +1301,8 @@ def centroid_coords(lat,lon, true_centroid=False):
     '''
     Computes the centroid of the geographic coordinates via Shapely
     h/t Tim Roberts, via StackOverflow: https://stackoverflow.com/a/72737621.
-    If there aren't enough vertices to form a polygon, then the arithmetic 
-    mean of the coordinates is returned. 
+    If there aren't enough vertices to form a polygon, then the arithmetic
+    mean of the coordinates is returned.
 
     Parameters
     ----------
@@ -1312,10 +1310,10 @@ def centroid_coords(lat,lon, true_centroid=False):
        latitudes in [-90, 90]
     lon : 1d array
        longitudes in (-180, 180]
-    true_centroid : boolean              
+    true_centroid : boolean
         if True, computes a true centroid, otherwise a representative point,
         which is guaranteed to lie within the polygon.
-        
+
     See Also
     --------
     https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon
@@ -1325,7 +1323,7 @@ def centroid_coords(lat,lon, true_centroid=False):
     clat, clon : coordinates of the centroid
 
     '''
-    lon = lon_360_to_180(np.array(lon)) 
+    lon = lon_360_to_180(np.array(lon))
     lat = np.array(lat)
     if len(lon) >= 4:
         p = Polygon([(x, y) for (x,y) in zip(lon,lat)])
