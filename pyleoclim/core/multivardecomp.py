@@ -181,7 +181,7 @@ class MultivariateDecomp:
 
         return fig, ax
 
-    def modeplot(self, index=0, figsize=[8, 8], ax=None, savefig_settings=None,gs=None,
+    def modeplot(self, index=0, figsize=[8, 8], fig=None, savefig_settings=None,gs=None,
                  title_kwargs=None, spec_method='mtm', cmap='RdBu_r', cb_scale = 0.8,
                  flip = False, map_kwargs=None, gridspec_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
@@ -265,8 +265,10 @@ class MultivariateDecomp:
         else:
             PC = self.pcs[:, index]
             EOF = self.eigvecs[:, index]
+
+        if fig ==None:
+            fig = plt.figure(figsize=figsize)
             
-        fig = plt.figure(figsize=figsize)
         if gs == None:
             gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
             gridspec_defaults = dict(wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
