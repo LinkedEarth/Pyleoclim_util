@@ -255,6 +255,7 @@ class MultipleGeoSeries(MultipleSeries):
             Euro2k.map(projection='Orthographic', hue = 'observationType', proj_default=eur_coord) 
         
         All three sources of information may be combined, but the figure height will need to be enlarged manually to fit the legend:
+            
         .. jupyter-execute::
             
             Euro2k.map(projection='Orthographic',hue = 'observationType',
