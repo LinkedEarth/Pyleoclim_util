@@ -55,7 +55,6 @@ class MultipleSeries:
 
     .. jupyter-execute::
 
-        import pyleoclim as pyleo        
         soi = pyleo.utils.load_dataset('SOI')
         nino = pyleo.utils.load_dataset('NINO3')
         ms = soi & nino
@@ -2093,7 +2092,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             co2ts = pyleo.utils.load_dataset('AACO2')
             lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
@@ -2107,7 +2105,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-             import pyleoclim as pyleo
              co2ts = pyleo.utils.load_dataset('AACO2')
              lr04 = pyleo.utils.load_dataset('LR04')
              edc = pyleo.utils.load_dataset('EDC-dD')
@@ -2303,6 +2300,32 @@ class MultipleSeries:
         return ms_new
     
     def resolution(self, statistic='median'):
+        '''
+        Extracts representative statistic for the resolution of each series in the object.
+
+        Parameters
+        ----------
+        statistic : str, optional
+           The statistic applied to the res9lution array of each series. 
+           Possible values: 'mean' or 'median'. The default is 'median'.
+
+
+        Returns
+        -------
+        res: NumPy array
+            array containing the statistic of interest for all series.  
+
+        Examples
+        --------
+        .. jupyter-execute::
+
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = edc & co2ts # create MS object
+            ms.convert_time_unit('kyr BP').resolution() 
+
+        Note that the output is only meaningful if all constituent series have the same units.
+        '''
         
         if statistic=='median':
             res = [np.median(ts.resolution().resolution) for ts in self.series_list]
