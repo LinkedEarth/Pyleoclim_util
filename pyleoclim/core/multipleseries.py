@@ -1786,6 +1786,10 @@ class MultipleSeries:
         
             The linewidth for the curves.
             
+        ylabel_fontsize : int
+            
+            Size for ylabel font. Default is 8, to avoid crowding. 
+            
         plot_kwargs: dict or list of dict
         
             Arguments to further customize the plot from matplotlib.pyplot.plot.
@@ -2298,6 +2302,16 @@ class MultipleSeries:
         
         return ms_new
     
+    def resolution(self, statistic='median'):
+        
+        if statistic=='median':
+            res = [np.median(ts.resolution().resolution) for ts in self.series_list]
+        elif statistic=='mean':
+            res = [np.mean(ts.resolution().resolution) for ts in self.series_list]
+        else:
+            raise ValueError('Unknown statistic',stacklevel=2)
+            
+        return np.array(res)
     
     def to_json(self, path=None):
         '''

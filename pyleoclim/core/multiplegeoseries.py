@@ -219,10 +219,10 @@ class MultipleGeoSeries(MultipleSeries):
         .. jupyter-execute::
             
             from pylipd.utils.dataset import load_dir
-            lipd = load_dir(name='Pages2k')
-            lipd_euro = lipd.filter_by_geo_bbox(-20,25,80,140)
-            df = lipd_euro.get_timeseries_essentials()
-            dfs = df.query("paleoData_variableName in ('temperature','d18O', 'Uk37', 'MXD', 'trsgi')")  # select series that could 
+            lipd = load_dir(name='Pages2k') # this loads a small subset of the PAGES 2k database
+            df = lipd.get_timeseries_essentials()
+            dfs = df.query("paleoData_variableName in ('temperature','d18O', 'MXD', 'Uk37','trsgi')") 
+
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -234,12 +234,26 @@ class MultipleGeoSeries(MultipleSeries):
                                                archiveType = row['archiveType'], verbose = False, 
                                                label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
 
-            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='minimal PAGES 2k',time_unit='years AD')  
 
-            Euro2k.map(crit_dist=2000) # By default, this will pick projection based on the degree of geographic clustering of the sites
+            Euro2k.map() 
+         
+        By default, a projection is picked based on the degree of geographic clustering of the sites. To focus the map on Europe and use a more local projection, do:   
             
-            Euro2k.map(projection='Orthographic',size='elevation')  # tweak the projection and represent elevation by size
-            Euro2k.map(projection='Orthographic',hue='elevation')  # tweak the projection and represent elevation by hue
+        .. jupyter-execute::     
+            
+            eur_coord = {'central_latitude':45, 'central_longitude':20}
+            Euro2k.map(projection='Orthographic',proj_default=eur_coord) 
+            
+        Same, with size to represent elevation:      
+        .. jupyter-execute::
+            
+            Euro2k.map(projection='Orthographic',size='elevation', proj_default=eur_coord) 
+        
+        Same, with hue to represent elevation:    
+        .. jupyter-execute::
+            
+            Euro2k.map(projection='Orthographic',hue='elevation',proj_default=eur_coord) 
 
         '''
 
