@@ -516,9 +516,10 @@ class MultipleGeoSeries(MultipleSeries):
         .. jupyter-execute::
 
             from pylipd.utils.dataset import load_dir
-            lipd_euro = lipd.filter_by_geo_bbox(0,90,-20,140)
+            lipd = load_dir(name='Pages2k') # this loads a small subset of the PAGES 2k database
+            lipd_euro = lipd.filter_by_geo_bbox(-20,20,40,80)
             df = lipd_euro.get_timeseries_essentials()
-            dfs = df.query("paleoData_variableName in ('temperature','d18O', 'Uk37', 'MXD', 'trsgi')") 
+            dfs = df.query("archiveType in ('tree') & paleoData_variableName not in ('year')") 
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
