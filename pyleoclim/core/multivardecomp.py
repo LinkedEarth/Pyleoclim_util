@@ -46,19 +46,13 @@ class MultivariateDecomp:
         
             original data, on a common time axis 
             
-        locs: float (p, 2)
-        
-            a p x 2 array of coordinates (latitude, longitude) for mapping spatial patterns. Defaults to None 
-
         neff: float
         
             scalar representing the effective sample size of the leading mode
-            
-            
 
     '''
 
-    def __init__(self, name, eigvals, eigvecs, pctvar, pcs, neff, orig, locs = None):
+    def __init__(self, name, eigvals, eigvecs, pctvar, pcs, neff, orig):
         self.name = name
         self.eigvals = eigvals
         self.eigvecs = eigvecs
@@ -66,7 +60,6 @@ class MultivariateDecomp:
         self.pcs = pcs
         self.neff = neff
         self.orig = orig
-        self.locs = locs
 
     def screeplot(self, figsize=[6, 4], uq='N82', title=None, ax=None, savefig_settings=None,
                   title_kwargs=None, xlim=[0, 10], clr_eig='C0'):

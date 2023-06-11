@@ -1194,10 +1194,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         ax_d['map'].set_global()
     elif isinstance(extent, list) and len(extent)==4:
         ax_d['map'].set_extent(extent,crs=ccrs.PlateCarree())
-
+    
     x = 'lon'
     y = 'lat'
-
     _, ax_d = plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax_d=ax_d, proj=None, edgecolor=edgecolor,
                  cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, lgd_kwargs=lgd_kwargs, **kwargs)  # , **kwargs)
     return fig, ax_d

@@ -1016,8 +1016,8 @@ class MultipleSeries:
                 name_str = 'PCA of unlabelled object'
             # assign result to MultivariateDecomp class
             res = MultivariateDecomp(name=name_str, neff= neff,
-                                pcs = out.scores, pctvar = pctvar,  locs = None,
-                                eigvals = out.eigenvals, eigvecs = out.eigenvecs, orig=self)
+                                pcs = out.scores, pctvar = pctvar, eigvals = out.eigenvals,
+                                eigvecs = out.eigenvecs, orig=self)
             return res
 
     # def mcpca(self,nMC=200,**pca_kwargs):
