@@ -393,11 +393,9 @@ class GeoSeries(Series):
                                                archiveType = row['archiveType'], verbose = False, 
                                                label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
         
-            mgs = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD') 
-            
-            gs = mgs.series_list[0]
-            
-            gs.map_neighbors(mgs, radius=4000, projection='auto')
+            mgs = pyleo.MultipleGeoSeries(ts_list,time_unit='years AD') 
+            gs = mgs.series_list[6] # extract one record as the target one
+            gs.map_neighbors(mgs, radius=4000)
             
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
