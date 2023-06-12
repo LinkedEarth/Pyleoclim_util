@@ -43,7 +43,19 @@ class TestUiGeoSeriesMap():
         ts = pinkgeoseries
         fig, ax = ts.map()
         pyleo.closefig(fig)
-
+        
+        
+def test_segment():
+    '''
+        test GeoSeries.segment
+    '''
+    import numpy as np
+    gs = pyleo.utils.datasets.load_dataset('EDC-dD')
+    gs.value[4000:5000] = np.nan # cut a large gap in the middle
+    mgs = gs.segment()
+    assert np.array_equal(mgs.series_list[0].value,gs.value[:4000]) 
+    assert np.array_equal(mgs.series_list[1].value,gs.value[5000:]) 
+    
 class TestUiGeoSeriesDashboard():
     ''' test GeoSeries.Dashboard
     '''

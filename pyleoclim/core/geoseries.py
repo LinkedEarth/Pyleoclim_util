@@ -2,7 +2,7 @@
 The GeoSeries class is a child of Series, with additional metadata latitude (lat) and longitude (lon)
 This unlocks plotting capabilities like map() and dashboard(). 
 """
-from ..utils import plotting, mapping, lipdutils, jsonutils, tsbase
+from ..utils import plotting, mapping, lipdutils, jsonutils, tsbase, tsutils
 from ..core.series import Series
 
 import matplotlib.pyplot as plt
@@ -674,6 +674,62 @@ class GeoSeries(Series):
             plotting.savefig(fig, settings=savefig_settings)
 
         return fig, ax
+    
+    def segment(self, factor=10, verbose = False):
+        """Gap detection
+
+        This function segments a timeseries into n parts following a gap- detection algorithm. The rule of gap detection is very simple:
+            we define the intervals between time points as dts, then if dts[i] is larger than factor * dts[i-1],
+            we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
+            and divide the time series into two segments here
+
+        Parameters
+        ----------
+
+        factor : float
+            The factor that adjusts the threshold for gap detection
+        
+        verbose : bool
+            If True, will print warning messages if there is any
+
+        Returns
+        -------
+
+        res : MultiplegGeoSeries or GeoSeries
+            If gaps were detected, returns the segments in a MultipleGeoSeries object,
+            else, returns the original timeseries.
+            
+        Examples
+        --------
+        .. jupyter-execute::
+            
+            import numpy as np
+            gs = pyleo.utils.datasets.load_dataset('EDC-dD')
+            gs.value[4000:5000] = np.nan # cut a large gap in the middle
+            mgs = gs.segment()
+            mgs.plot()
+        """
+        from ..core.multiplegeoseries import MultipleGeoSeries
+        seg_y, seg_t, n_segs = tsutils.ts2segments(self.value,self.time,factor=factor)
+        
+        if len(seg_y)>1:
+            s_list=[]
+            for idx,s in enumerate(seg_y):
+                if self.label is not None: 
+                    s_lbl =  self.label + ' segment ' + str(idx+1)  
+                else:
+                    s_lbl =  'segment ' + str(idx+1)
+                s_tmp = self.copy() # copy metadata
+                s_tmp.time = seg_t[idx]
+                s_tmp.value = s
+                s_tmp.label = s_lbl
+                s_list.append(s_tmp)
+            res=MultipleGeoSeries(series_list=s_list)
+        elif len(seg_y)==1:
+            res=self.copy()
+        else:
+            raise ValueError('No timeseries detected')
+        return res
     
     def resample(self, rule, keep_log = False, **kwargs):
         """
