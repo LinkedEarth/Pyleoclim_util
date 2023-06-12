@@ -175,7 +175,8 @@ class MultivariateDecomp:
         return fig, ax
 
     def modeplot(self, index=0, figsize=[8, 8], fig=None, savefig_settings=None,gs=None,
-                 title_kwargs=None, spec_method='mtm', cmap='RdBu_r', cb_scale = 0.8,
+                 title=None, title_kwargs=None, spec_method='mtm', cmap=None,
+                 hue='EOF', marker='archiveType', size=None, scatter_kwargs=None,
                  flip = False, map_kwargs=None, gridspec_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
@@ -188,62 +189,86 @@ class MultivariateDecomp:
         ----------
         
         index : int
-        
             the (0-based) index of the mode to visualize.
             Default is 0, corresponding to the first mode.
 
         figsize : list, optional
-        
             The figure size. The default is [8, 8].
 
         savefig_settings : dict
-        
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
+        title : str, optional
+            text for figure title
+
         title_kwargs : dict
-        
             the keyword arguments for ax.set_title()
 
         gs : matplotlib.gridspec object, optional
-        
-            the axis object from matplotlib
+            Requires at least two rows and two columns.
+            - top row, left: timeseries of principle component
+            - top row, right: PSD
+            - bottom row: spaghetti plot or map
             See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
 
         gridspec_kwargs : dict, optional
-
+            Dictionary with custom gridspec values.
+            - wspace changes space between columns (default: wspace=0.05)
+            - hspace changes space between rows (default: hspace=0.03)
+            - width_ratios: relative width of each column (default: width_ratios=[5,1,3] where middle column serves as a spacer)
+            - height_ratios: relative height of each row (default: height_ratios=[2,1,5] where middle row serves as a spacer)
 
         spec_method: str, optional
-        
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
             'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow.
             
-        cmap: str
-           colormap name for the loadings (https://matplotlib.org/stable/tutorials/colors/colormaps.html)  
-           
-        cb_scale : float in [0, 1) 
-                             
-           scale of the colorbar, called "shrink" in https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.colorbar.html
-           default is 0.8, which works well with default size. Change at your own risk. 
-           
-        map_kwargs : dict, optional
+        cmap: str, optional
+            if 'hue' is specified, will be used for map scatter plot values.
+            colormap name for the loadings (https://matplotlib.org/stable/tutorials/colors/colormaps.html)
 
-            Optional arguments for the map. See GeoSeries.map(). The default is None.
+        map_kwargs : dict, optional
+            Optional arguments for map configuration
+            - projection: str; Optional value for map projection. Default 'auto'.
+            - proj_default: bool
+            - lakes, land, ocean, rivers, borders, coastline, background: bool or dict;
+            - lgd_kwargs: dict; Optional values for how the map legend is configured
+            - gridspec_kwargs: dict; Optional values for adjusting the arrangement of the colorbar, map and legend in the map subplot
+            - legend: bool; Whether to draw a legend on the figure. Default is True
+            - colorbar: bool; Whether to draw a colorbar on the figure if the data associated with hue are numeric. Default is True
+            The default is None.
             
         scatter_kwargs : dict, optional
+            Optional arguments configuring how data are plotted on a map. See description of scatter_kwargs in pyleoclim.utils.mapping.scatter_map
+
+        hue : str, optional
+            (only applicable if using scatter map) Variable associated with color coding for points plotted on map. May correspond to a continuous or categorical variable.
+            The default is 'EOF'.
+
+        size : str, optional
+            (only applicable if using scatter map) Variable associated with size. Must correspond to a continuous numeric variable.
+            The default is None.
+
+        marker : string, optional
+            (only applicable if using scatter map) Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
+            The default is 'archiveType'.
             
-            Optional arguments for the scatterplot. See https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter
 
 
-        See Also
+        See also
         --------
+
         pyleoclim.core.MultipleSeries.pca : Principal Component Analysis
+
+        pyleoclim.core.MultipleGeoSeries.pca : Principal Component Analysis
         
         pyleoclim.utils.tsutils.eff_sample_size : Effective sample size
+
+        pyleoclim.utils.mapping.scatter_map : mapping
         
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
@@ -262,7 +287,7 @@ class MultivariateDecomp:
             
         if gs == None:
             gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
-            gridspec_defaults = dict(wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
+            gridspec_defaults = dict(wspace=0.05, hspace=0.03, width_ratios=[5,1,3],
                                      height_ratios=[2,1,5])
             gridspec_defaults.update(gridspec_kwargs)
             gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
@@ -279,8 +304,7 @@ class MultivariateDecomp:
         ax['pc'].set_ylabel(label)
                
         # plot its PSD
-        # ax['psd'] = fig.add_subplot(gs[0, 6:])
-        ax['psd'] = fig.add_subplot(gs[0, 2])
+        ax['psd'] = fig.add_subplot(gs[0, -1])
 
         psd = ts.interp().spectral(method=spec_method)
         _ = psd.plot(ax=ax['psd'], label=label)
@@ -295,21 +319,17 @@ class MultivariateDecomp:
         ocean = map_kwargs.pop('ocean', False)
         rivers = map_kwargs.pop('rivers', False)
         borders = map_kwargs.pop('borders', True)
+        coastline = map_kwargs.pop('coastline', True)
         background = map_kwargs.pop('background', True)
         extent = map_kwargs.pop('extent', 'global')
 
-        gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
-        scatter_kwargs = map_kwargs.pop('scatter_kwargs', {})
+        map_gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
         lgd_kwargs = map_kwargs.pop('lgd_kwargs', {})
 
-        marker = scatter_kwargs.pop('marker', 'archiveType')
-        hue = scatter_kwargs.pop('hue', 'EOF')
-        size = scatter_kwargs.pop('size', 'None')
 
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
 
-        cmap = map_kwargs.pop('cmap', None)
         legend = map_kwargs.pop('legend', True)
         colorbar = map_kwargs.pop('colorbar', True)
 
@@ -320,16 +340,17 @@ class MultivariateDecomp:
             df['EOF'] = EOF
 
             if legend == True:
-                gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs.keys() else [.7,.1, 12, 4]
+                map_gridspec_kwargs['width_ratios'] = map_gridspec_kwargs['width_ratios'] if 'width_ratios' in map_gridspec_kwargs.keys() else [.7,.1, 12, 4]
 
             _, ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
                                                proj_default=proj_default,
-                                               background=background, borders=borders, rivers=rivers, lakes=lakes,
+                                               background=background, borders=borders, coastline=coastline,
+                                               rivers=rivers, lakes=lakes,
                                                ocean=ocean, land=land, extent=extent,
                                                figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
-                                               gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
+                                               gridspec_kwargs=map_gridspec_kwargs, colorbar=colorbar,
                                                legend=legend, cmap=cmap,
-                                               fig=fig, gs_slot=gs[2, :]) #label rf'$EOF_{index + 1}$'
+                                               fig=fig, gs_slot=gs[-1, :]) #label rf'$EOF_{index + 1}$'
             
         else: # it must be a plain old MultipleSeries. No map for you! Just a spaghetti plot with the standardizes series
             ax['map'] = fig.add_subplot(gs[1:, :])
@@ -444,16 +465,15 @@ class MultivariateDecomp:
             # # make colorbar, h/t https://stackoverflow.com/a/73061877
             # fig.colorbar(sc, ax=ax['map'], label=rf'$EOF_{index + 1}$' ,
             #              shrink=cb_scale, orientation="vertical")
-                             
-        
 
-        # if title is not None:
-        #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
-        #     t_args = {'y': 1.1, 'weight': 'bold'}
-        #     t_args.update(title_kwargs)
-        #     fig.suptitle(title, **t_args)
-        fig.suptitle(self.name + ' mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',
-                      weight='bold', y=0.92)
+        if title is None:
+            title = self.name + ' mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(self.pctvar[index]) + '% variance explained'
+                      # weight='bold', y=0.92)
+
+        title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+        t_args = {'y': .92, 'weight': 'bold'}
+        t_args.update(title_kwargs)
+        fig.suptitle(title, **t_args)
         
         fig.tight_layout()
         
