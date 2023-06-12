@@ -208,7 +208,7 @@ class GeoSeries(Series):
         return cls(**b)
     
     def map(self, projection='Orthographic', proj_default=True,
-            background=True, borders=False, rivers=False, lakes=False, ocean=True,
+            background=True, borders=False, coastline=True, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None,
             figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
@@ -225,17 +225,39 @@ class GeoSeries(Series):
         proj_default : bool; {True, False}, optional
             Whether to use the Pyleoclim defaults for each projection type. The default is True.
 
-        background :  bool; {True, False}, optional
-            Whether to use a background. The default is True.
+        background : bool, optional
+            If True, uses a shaded relief background (only one available in Cartopy)
+            Default is on (True).
 
-        borders :  bool; {True, False}, optional
-            Draw borders. The default is False.
+        borders : bool or dict, optional
+            Draws the countries border.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
+            Defaults is off (False).
 
-        rivers :  bool; {True, False}, optional
-            Draw rivers. The default is False.
+        coastline : bool or dict, optional
+            Draws the coastline.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
+            Defaults is on (True).
 
-        lakes :  bool; {True, False}, optional
-            Draw lakes. The default is False.
+        land : bool or dict, optional
+            Colors land masses.
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is off (True). Overriden if background=True.
+
+        ocean : bool or dict, optional
+            Colors oceans.
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is on (True). Overriden if background=True.
+
+        rivers : bool or dict, optional
+            Draws major rivers.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
+            Default is off (False).
+
+        lakes : bool or dict, optional
+            Draws major lakes.
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is off (False).
 
         figsize : list or tuple, optional
             The size of the figure. The default is None.
@@ -293,7 +315,7 @@ class GeoSeries(Series):
                     proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes,
                     ocean=ocean,
-                    land=land,
+                    land=land, coastline=coastline,
                     figsize=figsize, scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
                     lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
                     cmap=cmap, edgecolor=edgecolor,
@@ -532,6 +554,7 @@ class GeoSeries(Series):
         ocean = map_kwargs.pop('ocean', False)
         rivers = map_kwargs.pop('rivers', False)
         borders = map_kwargs.pop('borders', True)
+        coastline = map_kwargs.pop('coastline', True)
         background = map_kwargs.pop('background', True)
 
         gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
@@ -553,7 +576,7 @@ class GeoSeries(Series):
             gridspec_kwargs['width_ratios'] = [.5,16, 1]
 
         _, ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
-                    background=background, borders=borders, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
+                    background=background, borders=borders, coastline=coastline, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
                     figsize=None, scatter_kwargs=scatter_kwargs,gridspec_kwargs = gridspec_kwargs,
                                           lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap, colorbar=colorbar,
                     fig=fig, gs_slot=gs[-1, 0:-4])

@@ -573,7 +573,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         Grouping variable that will produce points with different sizes. Expects to be numeric. Any data without a value for the size variable will be filtered out.
         The default is None.
 
-    marker : TYPE, optional
+    marker : string, optional
         Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
         The default is 'archiveType'.
 

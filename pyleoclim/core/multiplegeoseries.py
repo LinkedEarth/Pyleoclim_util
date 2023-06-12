@@ -85,7 +85,7 @@ class MultipleGeoSeries(MultipleSeries):
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
             edgecolor='k', projection='auto',
             proj_default=True, crit_dist=5000,colorbar=True,
-            background=True, borders=True, rivers=False, lakes=False, land=True,ocean=True,
+            background=True, borders=False, coastline=True,rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, scatter_kwargs=None, gridspec_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
         '''
@@ -134,24 +134,34 @@ class MultipleGeoSeries(MultipleSeries):
             If True, uses a shaded relief background (only one available in Cartopy)
             Default is on (True).
 
-        borders : bool, optional
+        borders : bool or dict, optional
             Draws the countries border.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
             Defaults is off (False).
 
-        land : bool, optional
+        coastline : bool or dict, optional
+            Draws the coastline.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
+            Defaults is on (True).
+
+        land : bool or dict, optional
             Colors land masses.
-            Default is off (False).
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is off (True). Overriden if background=True.
 
-        ocean : bool, optional
+        ocean : bool or dict, optional
             Colors oceans.
-            Default is off (False).
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is on (True). Overriden if background=True.
 
-        rivers : bool, optional
+        rivers : bool or dict, optional
             Draws major rivers.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
             Default is off (False).
 
-        lakes : bool, optional
+        lakes : bool or dict, optional
             Draws major lakes.
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
             Default is off (False).
 
         figsize : list or tuple, optional
@@ -268,7 +278,7 @@ class MultipleGeoSeries(MultipleSeries):
                                         proj_default=proj_default,
                                         crit_dist=crit_dist,
                                         background=background, borders=borders, rivers=rivers, lakes=lakes,
-                                        ocean=ocean,
+                                        ocean=ocean, coastline=coastline,
                                         land=land, gridspec_kwargs=gridspec_kwargs,
                                         figsize=figsize, scatter_kwargs=scatter_kwargs,
                                         lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
