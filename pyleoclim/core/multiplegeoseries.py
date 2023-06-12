@@ -404,6 +404,7 @@ class MultipleGeoSeries(MultipleSeries):
                         map_kwargs={'projection':'Robinson',
                                     'gridspec_kwargs': {'width_ratios': [.5, 1,14, 4], 'wspace':-.065},
                                     'lgd_kwargs':{'bbox_to_anchor':[-.015,1]}})
+
         '''
         # apply PCA fom parent class
         pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em,
