@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt, gridspec
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 from matplotlib.ticker import MaxNLocator
@@ -7,7 +8,7 @@ import cartopy.feature as cfeature
 
 from ..core import series
 from ..utils import plotting, lipdutils
-from ..utils import mapping as mp
+from ..utils import mapping
 
 
 class MultivariateDecomp:
@@ -45,19 +46,13 @@ class MultivariateDecomp:
         
             original data, on a common time axis 
             
-        locs: float (p, 2)
-        
-            a p x 2 array of coordinates (latitude, longitude) for mapping spatial patterns. Defaults to None 
-
         neff: float
         
             scalar representing the effective sample size of the leading mode
-            
-            
 
     '''
 
-    def __init__(self, name, eigvals, eigvecs, pctvar, pcs, neff, orig, locs = None):
+    def __init__(self, name, eigvals, eigvecs, pctvar, pcs, neff, orig):
         self.name = name
         self.eigvals = eigvals
         self.eigvecs = eigvecs
@@ -65,7 +60,6 @@ class MultivariateDecomp:
         self.pcs = pcs
         self.neff = neff
         self.orig = orig
-        self.locs = locs
 
     def screeplot(self, figsize=[6, 4], uq='N82', title=None, ax=None, savefig_settings=None,
                   title_kwargs=None, xlim=[0, 10], clr_eig='C0'):
@@ -180,13 +174,15 @@ class MultivariateDecomp:
 
         return fig, ax
 
-    def modeplot(self, index=0, figsize=[8, 8], ax=None, savefig_settings=None,
+    def modeplot(self, index=0, figsize=[8, 8], fig=None, savefig_settings=None,gs=None,
                  title_kwargs=None, spec_method='mtm', cmap='RdBu_r', cb_scale = 0.8,
-                 flip = False, map_kwargs=None, scatter_kwargs=None):
+                 flip = False, map_kwargs=None, gridspec_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
-            3. The loadings (EOF or similar), possibly geolocated.
+            3. The loadings (EOF or similar), possibly geolocated. If the object
+                does not have geolocation information, a spaghetti plot of the standardized
+                series is displayed.
 
         Parameters
         ----------
@@ -216,6 +212,9 @@ class MultivariateDecomp:
             the axis object from matplotlib
             See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
 
+        gridspec_kwargs : dict, optional
+
+
         spec_method: str, optional
         
             The name of the spectral method to be applied on the PC. Default: MTM
@@ -238,7 +237,8 @@ class MultivariateDecomp:
         scatter_kwargs : dict, optional
             
             Optional arguments for the scatterplot. See https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter
-            
+
+
         See Also
         --------
         pyleoclim.core.MultipleSeries.pca : Principal Component Analysis
@@ -246,22 +246,32 @@ class MultivariateDecomp:
         pyleoclim.utils.tsutils.eff_sample_size : Effective sample size
         
         '''
-        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        from ..core.multiplegeoseries import MultipleGeoSeries
         
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
         if flip:
             PC = -self.pcs[:, index]
             EOF = -self.eigvecs[:, index]
         else:
             PC = self.pcs[:, index]
             EOF = self.eigvecs[:, index]
+
+        if fig ==None:
+            fig = plt.figure(figsize=figsize)
             
-        fig = plt.figure(figsize=figsize)
-        gs = gridspec.GridSpec(4, 3, wspace=0.3, hspace=0.3)
+        if gs == None:
+            gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
+            gridspec_defaults = dict(wspace=0.051, hspace=0.03, width_ratios=[5,1,3],
+                                     height_ratios=[2,1,5])
+            gridspec_defaults.update(gridspec_kwargs)
+            gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
+
         gs.update(left=0, right=1.1)
         
         ax = {}
         # plot the PC
-        ax['pc'] = fig.add_subplot(gs[0, :2])
+        ax['pc'] = fig.add_subplot(gs[0, 0])
         label = rf'$PC_{index + 1}$' 
         t = self.orig.series_list[0].time
         ts = series.Series(time=t, value=PC, verbose=False)  # define timeseries object for the PC
@@ -269,120 +279,173 @@ class MultivariateDecomp:
         ax['pc'].set_ylabel(label)
                
         # plot its PSD
+        # ax['psd'] = fig.add_subplot(gs[0, 6:])
         ax['psd'] = fig.add_subplot(gs[0, 2])
+
         psd = ts.interp().spectral(method=spec_method)
         _ = psd.plot(ax=ax['psd'], label=label)
 
         # plot spatial pattern or spaghetti
-       
-        if self.locs is not None:
-            # make the map - brute force since projection is not being returned properly
-            lats = self.locs[:,0]
-            lons = self.locs[:,1]
+        map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
+
+        projection = map_kwargs.pop('projection', 'auto')
+        proj_default = map_kwargs.pop('proj_default', True)
+        lakes = map_kwargs.pop('lakes', False)
+        land = map_kwargs.pop('land', False)
+        ocean = map_kwargs.pop('ocean', False)
+        rivers = map_kwargs.pop('rivers', False)
+        borders = map_kwargs.pop('borders', True)
+        background = map_kwargs.pop('background', True)
+        extent = map_kwargs.pop('extent', 'global')
+
+        gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
+        scatter_kwargs = map_kwargs.pop('scatter_kwargs', {})
+        lgd_kwargs = map_kwargs.pop('lgd_kwargs', {})
+
+        marker = scatter_kwargs.pop('marker', 'archiveType')
+        hue = scatter_kwargs.pop('hue', 'EOF')
+        size = scatter_kwargs.pop('size', 'None')
+
+        if 'edgecolor' in map_kwargs.keys():
+            scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
+
+        cmap = map_kwargs.pop('cmap', None)
+        legend = map_kwargs.pop('legend', True)
+        colorbar = map_kwargs.pop('colorbar', True)
+
+        if isinstance(self.orig, MultipleGeoSeries):
+            # This makes a bare bones dataframe from a MultipleGeoSeries object
+            df = mapping.make_df(self.orig, hue=hue, marker=marker, size=size)
+            # additional columns are added manually
+            df['EOF'] = EOF
+
+            if legend == True:
+                gridspec_kwargs['width_ratios'] = gridspec_kwargs['width_ratios'] if 'width_ratios' in gridspec_kwargs.keys() else [.7,.1, 12, 4]
+
+            _, ax['map'] = mapping.scatter_map(df, hue=hue, size=size, marker=marker, projection=projection,
+                                               proj_default=proj_default,
+                                               background=background, borders=borders, rivers=rivers, lakes=lakes,
+                                               ocean=ocean, land=land, extent=extent,
+                                               figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
+                                               gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
+                                               legend=legend, cmap=cmap,
+                                               fig=fig, gs_slot=gs[2, :]) #label rf'$EOF_{index + 1}$'
             
-            map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
-            if 'projection' in map_kwargs.keys():
-                projection = map_kwargs['projection']
-            else:
-                projection = 'Robinson'
-            if 'proj_default' in map_kwargs.keys():
-                proj_default = map_kwargs['proj_default']
-            else:
-                proj_default = True
-            if proj_default == True:
-                proj1 = {'central_latitude': lats.mean(),
-                         'central_longitude': lons.mean()}
-                proj2 = {'central_latitude': lats.mean()}
-                proj3 = {'central_longitude': lons.mean()}
-                try:
-                    proj = mp.set_proj(projection=projection, proj_default=proj1)
-                except:
-                    try:
-                        proj = mp.set_proj(projection=projection, proj_default=proj3)
-                    except:
-                        proj = mp.set_proj(projection=projection, proj_default=proj2)
-            if 'marker' in map_kwargs.keys():
-                marker = map_kwargs['marker']
-            else:
-                marker = 'o'
-                #marker = [lipdutils.PLOT_DEFAULT[ts.archiveType][1] for ts in self.orig.series_list] 
-        
-            if 'background' in map_kwargs.keys():
-                background = map_kwargs['background']
-            else:
-                background = False
-            if 'force_global' in map_kwargs.keys():
-                force_global = map_kwargs['force_global']
-            else:
-                force_global = True
-            if 'land' in map_kwargs.keys():
-                land = map_kwargs['land']
-            else:
-                land = True
-            if 'borders' in map_kwargs.keys():
-                borders = map_kwargs['borders']
-            else:
-                borders = True
-            if 'rivers' in map_kwargs.keys():
-                rivers = map_kwargs['rivers']
-            else:
-                rivers = False
-            if 'lakes' in map_kwargs.keys():
-                lakes = map_kwargs['lakes']
-            else:
-                lakes = False
-            if 'scatter_kwargs' in map_kwargs.keys():
-                scatter_kwargs = map_kwargs['scatter_kwargs']
-            else:
-                scatter_kwargs = {}
-            if 'markersize' in map_kwargs.keys():
-                scatter_kwargs.update({'s': map_kwargs['markersize']})
-            else:
-                scatter_kwargs.update({'s': 100})
-                
-            if 'edgecolors' in map_kwargs.keys():
-                scatter_kwargs.update({'edgecolors': map_kwargs['edgecolors']})
-            else:
-                scatter_kwargs.update({'edgecolors':'white'})
-            
-            # prepare the map
-            data_crs = ccrs.PlateCarree() 
-            ax['map'] = fig.add_subplot(gs[1:, :], projection=proj)
-            if force_global:
-                ax['map'].set_global()
-            ax['map'].coastlines()
-            if background is True:
-                ax['map'].stock_img()
-            # Additional information
-            if land is True:
-                ax['map'].add_feature(cfeature.LAND)
-                #ax['map'].add_feature(cfeature.OCEAN, alpha=0.5)
-                
-            if borders is True:
-                ax['map'].add_feature(cfeature.BORDERS, alpha=0.5)
-            if lakes is True:
-                ax['map'].add_feature(cfeature.LAKES, alpha=0.5)
-            if rivers is True:
-                ax['map'].add_feature(cfeature.RIVERS)
-                
-            # h/t to this solution: https://stackoverflow.com/a/66578339  
-            # right now, marker is ignored ; need to loop over values but then the colors get messed up
-            vext = np.abs(EOF).max()
-            
-            sc = ax['map'].scatter(lons, lats, marker=marker, 
-                              c=EOF, cmap=cmap, vmin = -vext, vmax = vext,
-                              transform=data_crs, **scatter_kwargs)
-            # if legend == True:
-            #     ax.legend(**lgd_kwargs)
-         
-            # make colorbar, h/t https://stackoverflow.com/a/73061877
-            fig.colorbar(sc, ax=ax['map'], label=rf'$EOF_{index + 1}$' , 
-                         shrink=cb_scale, orientation="vertical")
-                             
-        else: # plot the original data
+        else: # it must be a plain old MultipleSeries. No map for you! Just a spaghetti plot with the standardizes series
             ax['map'] = fig.add_subplot(gs[1:, :])
             self.orig.standardize().plot(ax=ax['map'], title='',
-                                         ylabel = 'Original Data (standardized)')   
+                                         ylabel = 'Original Data (standardized)')
+            
+        # except:
+        #     ax['map'] = fig.add_subplot(gs[1:, :])
+        #     self.orig.standardize().plot(ax=ax['map'], title='',
+        #                                      ylabel = 'Original Data (standardized)')
+
+
+            # # make the map - brute force since projection is not being returned properly
+            # lats = self.locs[:,0]
+            # lons = self.locs[:,1]
+            #
+            # map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
+            # if 'projection' in map_kwargs.keys():
+            #     projection = map_kwargs['projection']
+            # else:
+            #     projection = 'Robinson'
+            # if 'proj_default' in map_kwargs.keys():
+            #     proj_default = map_kwargs['proj_default']
+            # else:
+            #     proj_default = True
+            # if proj_default == True:
+            #     proj1 = {'central_latitude': lats.mean(),
+            #              'central_longitude': lons.mean()}
+            #     proj2 = {'central_latitude': lats.mean()}
+            #     proj3 = {'central_longitude': lons.mean()}
+            #     try:
+            #         proj = mp.set_proj(projection=projection, proj_default=proj1)
+            #     except:
+            #         try:
+            #             proj = mp.set_proj(projection=projection, proj_default=proj3)
+            #         except:
+            #             proj = mp.set_proj(projection=projection, proj_default=proj2)
+            # if 'marker' in map_kwargs.keys():
+            #     marker = map_kwargs['marker']
+            # else:
+            #     marker = 'o'
+            #     #marker = [lipdutils.PLOT_DEFAULT[ts.archiveType][1] for ts in self.orig.series_list]
+            #
+            # if 'background' in map_kwargs.keys():
+            #     background = map_kwargs['background']
+            # else:
+            #     background = False
+            # if 'force_global' in map_kwargs.keys():
+            #     force_global = map_kwargs['force_global']
+            # else:
+            #     force_global = True
+            # if 'land' in map_kwargs.keys():
+            #     land = map_kwargs['land']
+            # else:
+            #     land = True
+            # if 'borders' in map_kwargs.keys():
+            #     borders = map_kwargs['borders']
+            # else:
+            #     borders = True
+            # if 'rivers' in map_kwargs.keys():
+            #     rivers = map_kwargs['rivers']
+            # else:
+            #     rivers = False
+            # if 'lakes' in map_kwargs.keys():
+            #     lakes = map_kwargs['lakes']
+            # else:
+            #     lakes = False
+            # if 'scatter_kwargs' in map_kwargs.keys():
+            #     scatter_kwargs = map_kwargs['scatter_kwargs']
+            # else:
+            #     scatter_kwargs = {}
+            # if 'markersize' in map_kwargs.keys():
+            #     scatter_kwargs.update({'s': map_kwargs['markersize']})
+            # else:
+            #     scatter_kwargs.update({'s': 100})
+            #
+            # if 'edgecolors' in map_kwargs.keys():
+            #     scatter_kwargs.update({'edgecolors': map_kwargs['edgecolors']})
+            # else:
+            #     scatter_kwargs.update({'edgecolors':'white'})
+            #
+            # # prepare the map
+            # data_crs = ccrs.PlateCarree()
+            # ax['map'] = fig.add_subplot(gs[1:, :], projection=proj)
+            # if force_global:
+            #     ax['map'].set_global()
+            # ax['map'].coastlines()
+            # if background is True:
+            #     ax['map'].stock_img()
+            # # Additional information
+            # if land is True:
+            #     ax['map'].add_feature(cfeature.LAND)
+            #     #ax['map'].add_feature(cfeature.OCEAN, alpha=0.5)
+            #
+            # if borders is True:
+            #     ax['map'].add_feature(cfeature.BORDERS, alpha=0.5)
+            # if lakes is True:
+            #     ax['map'].add_feature(cfeature.LAKES, alpha=0.5)
+            # if rivers is True:
+            #     ax['map'].add_feature(cfeature.RIVERS)
+            #
+            # # h/t to this solution: https://stackoverflow.com/a/66578339
+            # # right now, marker is ignored ; need to loop over values but then the colors get messed up
+            # vext = np.abs(EOF).max()
+            #
+            # sc = ax['map'].scatter(lons, lats, marker=marker,
+            #                   c=EOF, cmap=cmap, vmin = -vext, vmax = vext,
+            #                   transform=data_crs, **scatter_kwargs)
+            # # if legend == True:
+            # #     ax.legend(**lgd_kwargs)
+            #
+            # # make colorbar, h/t https://stackoverflow.com/a/73061877
+            # fig.colorbar(sc, ax=ax['map'], label=rf'$EOF_{index + 1}$' ,
+            #              shrink=cb_scale, orientation="vertical")
+                             
+        
 
         # if title is not None:
         #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()

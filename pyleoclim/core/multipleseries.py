@@ -55,7 +55,6 @@ class MultipleSeries:
 
     .. jupyter-execute::
 
-        import pyleoclim as pyleo        
         soi = pyleo.utils.load_dataset('SOI')
         nino = pyleo.utils.load_dataset('NINO3')
         ms = soi & nino
@@ -911,7 +910,7 @@ class MultipleSeries:
 
         L = lengths[0]
         r = lengths[1:]
-        flag = all (l==L for l in r)
+        flag = all(l==L for l in r)
 
         return flag, lengths
 
@@ -997,29 +996,29 @@ class MultipleSeries:
             for j in range(p):
                 ys[:,j] = self.series_list[j].value  # fill in data matrix
 
-        #nc = min(ys.shape) # number of components to return
+            #nc = min(ys.shape) # number of components to return
 
-        out  = PCA(ys,weights=weights,missing=missing,tol_em=tol_em, max_em_iter=max_em_iter,**pca_kwargs)
+            out  = PCA(ys,weights=weights,missing=missing,tol_em=tol_em, max_em_iter=max_em_iter,**pca_kwargs)
 
-        # compute effective sample size
-        PC1  = out.factors[:,0]
-        neff = tsutils.eff_sample_size(PC1)
+            # compute effective sample size
+            PC1 = out.factors[:,0]
+            neff = tsutils.eff_sample_size(PC1)
 
-        # compute percent variance
-        pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
+            # compute percent variance
+            pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
 
-        # assign name
-        if name is not None:
-            name_str = name + ' PCA'
-        elif self.label is not None:
-            name_str = self.label + ' PCA'
-        else:
-            name_str = 'PCA of unlabelled object'
-        # assign result to MultivariateDecomp class
-        res = MultivariateDecomp(name=name_str, neff= neff,
-                            pcs = out.scores, pctvar = pctvar,  locs = None,
-                            eigvals = out.eigenvals, eigvecs = out.eigenvecs, orig=self)
-        return res
+            # assign name
+            if name is not None:
+                name_str = name + ' PCA'
+            elif self.label is not None:
+                name_str = self.label + ' PCA'
+            else:
+                name_str = 'PCA of unlabelled object'
+            # assign result to MultivariateDecomp class
+            res = MultivariateDecomp(name=name_str, neff= neff,
+                                pcs = out.scores, pctvar = pctvar, eigvals = out.eigenvals,
+                                eigvecs = out.eigenvecs, orig=self)
+            return res
 
     # def mcpca(self,nMC=200,**pca_kwargs):
     #     ''' Monte Carlo Principal Component Analysis
@@ -1699,8 +1698,10 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None, time_unit = None, xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
-                  spine_lw=1.5, grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
+    def stackplot(self, figsize=None, savefig_settings=None, time_unit = None, 
+                  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', 
+                  norm=None, labels='auto', ylabel_fontsize = 8, spine_lw=1.5, grid_lw=0.5,
+                  label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
         ''' Stack plot of multiple series
 
         Time units are harmonized prior to plotting. 
@@ -1784,12 +1785,16 @@ class MultipleSeries:
         
             The linewidth for the curves.
             
+        ylabel_fontsize : int
+            
+            Size for ylabel font. Default is 8, to avoid crowding. 
+            
         plot_kwargs: dict or list of dict
         
             Arguments to further customize the plot from matplotlib.pyplot.plot.
 
             - Dictionary: Arguments will be applied to all lines in the stackplots
-            - List of dictionary: Allows to customize one line at a time.
+            - List of dictionaries: Allows to customize one line at a time.
 
         Returns
         -------
@@ -1916,7 +1921,7 @@ class MultipleSeries:
             ax[idx].patch.set_alpha(0)
             ax[idx].set_xlim(xlim)
             time_label, value_label = ts.make_labels()
-            ax[idx].set_ylabel(value_label, weight='bold')
+            ax[idx].set_ylabel(value_label, weight='bold', size=ylabel_fontsize)
 
             mu = np.nanmean(ts.value)
             std = np.nanstd(ts.value)
@@ -2087,7 +2092,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             co2ts = pyleo.utils.load_dataset('AACO2')
             lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
@@ -2101,7 +2105,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-             import pyleoclim as pyleo
              co2ts = pyleo.utils.load_dataset('AACO2')
              lr04 = pyleo.utils.load_dataset('LR04')
              edc = pyleo.utils.load_dataset('EDC-dD')
@@ -2296,6 +2299,42 @@ class MultipleSeries:
         
         return ms_new
     
+    def resolution(self, statistic='median'):
+        '''
+        Extracts representative statistic for the resolution of each series in the object.
+
+        Parameters
+        ----------
+        statistic : str, optional
+           The statistic applied to the res9lution array of each series. 
+           Possible values: 'mean' or 'median'. The default is 'median'.
+
+
+        Returns
+        -------
+        res: NumPy array
+            array containing the statistic of interest for all series.  
+
+        Examples
+        --------
+        .. jupyter-execute::
+
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = edc & co2ts # create MS object
+            ms.convert_time_unit('kyr BP').resolution() 
+
+        Note that the output is only meaningful if all constituent series have the same units.
+        '''
+        
+        if statistic=='median':
+            res = [np.median(ts.resolution().resolution) for ts in self.series_list]
+        elif statistic=='mean':
+            res = [np.mean(ts.resolution().resolution) for ts in self.series_list]
+        else:
+            raise ValueError('Unknown statistic',stacklevel=2)
+            
+        return np.array(res)
     
     def to_json(self, path=None):
         '''

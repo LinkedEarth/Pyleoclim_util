@@ -14,7 +14,14 @@ from matplotlib import cm
 from itertools import cycle
 import matplotlib.lines as mlines
 import numpy as np
-import copy
+#import warnings
+
+#import matplotlib.pyplot as plt
+#import matplotlib as mpl
+#from matplotlib import cm
+#from itertools import cycle
+#import matplotlib.lines as mlines
+#import copy
 
 
 class MultipleGeoSeries(MultipleSeries):
@@ -46,9 +53,9 @@ class MultipleGeoSeries(MultipleSeries):
     .. jupyter-execute::
         
         from pylipd.utils.dataset import load_dir
-        lipd = load_dir(name='Euro2k')
+        lipd = load_dir(name='Pages2k')
         df = lipd.get_timeseries_essentials()
-        dfs = df.query("archiveType in ('tree')") 
+        dfs = df.query("archiveType in ('tree','documents','coral','lake sediment')") 
         # place in a MultipleGeoSeries object
         ts_list = []
         for _, row in dfs.iterrows():
@@ -60,79 +67,160 @@ class MultipleGeoSeries(MultipleSeries):
                                            label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
     
         Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
-        Euro2k.map(projection='Orthographic') 
+        Euro2k.map() 
     '''
 
     def __init__(self, series_list, time_unit=None, label=None):
-        # check that all components are GeoSeries
         self.series_list = series_list
         from ..core.geoseries import GeoSeries
+        # check that all components are GeoSeries
         if not all([isinstance(ts, GeoSeries) for ts in series_list]):
             raise ValueError('All components must be GeoSeries objects')
         
         super().__init__(series_list, time_unit, label)
 
     # ============ MAP goes here ================
-    def map(self, marker='archiveType', hue=None, size=None,
-            color_pal=None, legend_attribute=None, projection='Robinson', proj_default=True,
-            background=True, borders=False, rivers=False, lakes=False,
-            figsize=None, ax=None, scatter_kwargs=None, legend=True,
+
+
+    def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
+            edgecolor='k', projection='auto',
+            proj_default=True, crit_dist=5000,colorbar=True,
+            background=True, borders=True, rivers=False, lakes=False, land=True,ocean=True,
+            figsize=None, fig=None, scatter_kwargs=None, gridspec_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
         '''
         
 
         Parameters
         ----------
-        hue : TYPE, optional
-            DESCRIPTION. The default is 'archiveType'.
+        hue : string, optional
+            Grouping variable that will produce points with different colors. Can be either categorical or numeric, although color mapping will behave differently in latter case.
+            The default is 'archiveType'.
+
+        size : string, optional
+            Grouping variable that will produce points with different sizes. Expects to be numeric. Any data without a value for the size variable will be filtered out.
+            The default is None.
+
         marker : TYPE, optional
-            DESCRIPTION. The default is None.
-        size : TYPE, optional
-            DESCRIPTION. The default is None.
-        color_pal : TYPE, optional
-            DESCRIPTION. The default is None.
-        legend_attribute : TYPE, optional
-            DESCRIPTION. The default is None.
-        projection : TYPE, optional
-            DESCRIPTION. The default is 'Robinson'.
-        proj_default : TYPE, optional
-            DESCRIPTION. The default is True.
-        background : TYPE, optional
-            DESCRIPTION. The default is True.
-        borders : TYPE, optional
-            DESCRIPTION. The default is False.
-        rivers : TYPE, optional
-            DESCRIPTION. The default is False.
-        lakes : TYPE, optional
-            DESCRIPTION. The default is False.
-        figsize : TYPE, optional
-            DESCRIPTION. The default is None.
-        ax : TYPE, optional
-            DESCRIPTION. The default is None.
-        scatter_kwargs : TYPE, optional
-            DESCRIPTION. The default is None.
-        legend : TYPE, optional
-            DESCRIPTION. The default is True.
-        lgd_kwargs : TYPE, optional
-            DESCRIPTION. The default is None.
-        savefig_settings : TYPE, optional
-            DESCRIPTION. The default is None.
-        **kwargs : TYPE
+            Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
+            The default is 'archiveType'.
+
+        edgecolor : color (string) or list of rgba tuples, optional
+            Color of marker edge. The default is 'w'.
+
+        projection : string
+            the map projection. Available projections:
+            'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
+            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic',
+            'Sinusoidal','Stereographic','TransverseMercator','UTM',
+            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+            'Geostationary','NearsidePerspective','EckertI','EckertII',
+            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+            By default, projection == 'auto', so the projection will be picked
+            based on the degree of clustering of the sites.
+
+        proj_default : bool, optional
+            If True, uses the standard projection attributes.
+            Enter new attributes in a dictionary to change them. Lists of attributes can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
+            The default is True.
+
+        crit_dist : float, optional
+            critical radius for projection choice. Default: 5000 km
+            Only active if projection == 'auto'
+
+        background : bool, optional
+            If True, uses a shaded relief background (only one available in Cartopy)
+            Default is on (True).
+
+        borders : bool, optional
+            Draws the countries border.
+            Defaults is off (False).
+
+        land : bool, optional
+            Colors land masses.
+            Default is off (False).
+
+        ocean : bool, optional
+            Colors oceans.
+            Default is off (False).
+
+        rivers : bool, optional
+            Draws major rivers.
+            Default is off (False).
+
+        lakes : bool, optional
+            Draws major lakes.
+            Default is off (False).
+
+        figsize : list or tuple, optional
+            Size for the figure
+
+        scatter_kwargs : dict, optional
+            Dict of arguments available in `seaborn.scatterplot <https://seaborn.pydata.org/generated/seaborn.scatterplot.html>`_.
+            Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.
+
+        legend : bool, optional
+            Whether the draw a legend on the figure.
+            Default is True.
+
+        colorbar : bool, optional
+            Whether the draw a colorbar on the figure if the data associated with hue are numeric.
+            Default is True.
+
+        lgd_kwargs : dict, optional
+            Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
+
+        savefig_settings : dict, optional
+            Dictionary of arguments for matplotlib.pyplot.saveFig.
+
+             - "path" must be specified; it can be any existed or non-existed path,
+               with or without a suffix; if the suffix is not given in "path", it will follow "format"
+             - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        extent : TYPE, optional
             DESCRIPTION.
+            The default is 'global'.
+
+        cmap : string or list, optional
+            Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_.
+            The default is None.
+
+        fig : matplotlib.pyplot.figure, optional
+            See matplotlib.pyplot.figure <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib-pyplot-figure>_.
+            The default is None.
+
+        gs_slot : Gridspec slot, optional
+            If generating a map for a multi-plot, pass a gridspec slot.
+            The default is None.
+
+        gridspec_kwargs : dict, optional
+            Function assumes the possibility of a colorbar, map, and legend. A list of floats associated with the keyword `width_ratios` will assume the first (index=0) is the relative width of the colorbar, the second to last (index = -2) is the relative width of the map, and the last (index = -1) is the relative width of the area for the legend.
+            For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>_. The default is None.
+
+        kwargs: dict, optional
+            - 'missing_val_hue', 'missing_val_marker', 'missing_val_label' can all be used to change the way missing values are represented ('k', '?',  are default hue and marker values will be associated with the label: 'missing').
+            - 'hue_mapping' and 'marker_mapping' can be used to submit dictionaries mapping hue values to colors and marker values to markers. Does not replace passing a string value for hue or marker.
+
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
+        fig, ax_d
+            Matplotlib figure, dictionary of ax objects which includes the as many as three items: 'cb' (colorbar ax), 'map' (scatter map), and 'leg' (legend ax)
+            
+        See also
+        --------
+        pyleoclim.utils.mapping.scatter_map: information-rich scatterplot on Cartopy map
             
         Examples
         --------
         .. jupyter-execute::
             
             from pylipd.utils.dataset import load_dir
-            lipd = load_dir(name='Euro2k')
+            lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree')") 
+            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment','borehole')") 
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -140,201 +228,53 @@ class MultipleGeoSeries(MultipleSeries):
                                                time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
                                                time_unit=row['time_units'], value_unit=row['paleoData_units'],
                                                lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               elevation = row['geo_meanElev'], observationType = row['paleoData_proxy'],
                                                archiveType = row['archiveType'], verbose = False, 
                                                label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
-    
+        
             Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
+            Euro2k.map() 
+         
+        By default, a projection is picked based on the degree of geographic clustering of the sites. To focus on Europe and use a more local projection, do:   
             
-            Euro2k.map(projection='Orthographic')  # By default, this will employ a Robinson projection
+        .. jupyter-execute::     
+            
+            eur_coord = {'central_latitude':45, 'central_longitude':20}
+            Euro2k.map(projection='Orthographic',proj_default=eur_coord) 
+        
+        By default, the shape and colors of symbols denote proxy archives; however, one can use either graphical device to convey other information. For instance, if elevation is available, it may be displayed by size, like so: 
+        
+        .. jupyter-execute::
+            
+            Euro2k.map(projection='Orthographic', size='elevation', proj_default=eur_coord) 
+            
+        Same with observationType:
+            
+        .. jupyter-execute::
+            
+            Euro2k.map(projection='Orthographic', hue = 'observationType', proj_default=eur_coord) 
+        
+        All three sources of information may be combined, but the figure height will need to be enlarged manually to fit the legend:
+            
+        .. jupyter-execute::
+            
+            Euro2k.map(projection='Orthographic',hue = 'observationType',
+                       size='elevation', proj_default=eur_coord, figsize=[18, 8]) 
+
         '''
 
-        def make_scalar_mappable(cmap, lims=None, n=None):
-            if type(cmap) == list:
-                if n is None:
-                    ax_cmap = mpl.colors.LinearSegmentedColormap.from_list("MyCmapName", ["r", "b"])
-                else:
-                    ax_cmap = mpl.colors.LinearSegmentedColormap.from_list("MyCmapName", ["r", "b"], N=n)
-            elif type(cmap) == str:
-                if n is None:
-                    ax_cmap = plt.get_cmap(cmap)
-                else:
-                    ax_cmap = plt.get_cmap(cmap, n)
-            else:
-                print('what madness is this?')
-
-            if type(lims) in [list, tuple]:
-                ax_norm = mpl.colors.Normalize(vmin=min(lims), vmax=max(lims), clip=False)
-            else:
-                ax_norm = None
-            ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
-
-            return ax_sm
-
-        mappings = {'color_pal': color_pal}
-        f = lambda m, c, s: mlines.Line2D([], [], marker=m, color=c, markersize=s, ls="none")
-        for key in ['hue_mapping', 'marker_mapping']:
-            if key in kwargs:
-                mappings[key] = kwargs[key]
-
-        missing_d = {'hue': kwargs['missing_val_hue'] if 'missing_val_hue' in kwargs else 'k',
-                     'marker': kwargs['missing_val_marker'] if 'missing_val_marker' in kwargs else 'X',
-                     'size': kwargs['missing_val_size'] if 'missing_val_size' in kwargs else 10,
-                     }
-
-        def make_cont_hue(trait_vals, mappings):
-            color_pal = mappings['color_pal']
-            if color_pal == None:
-                color_pal = 'viridis'
-
-            hue_mappable = make_scalar_mappable(color_pal, lims=[min([val for val in trait_vals if val != None]),
-                                                                 max([val for val in trait_vals if val != None])])
-            return dict(f=hue_mappable.to_rgba, mappable=hue_mappable)
-
-        def make_cat_hue(trait_unique, mappings):
-            if 'hue_mapping' in mappings:
-                hue_mapping = mappings['hue_mapping']
-            else:
-                color_pal = mappings['color_pal']
-                if color_pal is None:
-                    color_pal = 'turbo'
-                hue_mappable = make_scalar_mappable(color_pal, lims=None, n=len(trait_unique))
-                hue_mapping = {trait_val: hue_mappable.cmap.colors[ik] for ik, trait_val in enumerate(trait_unique)}
-                hue_mapping['unknown'] =missing_d['hue']
-
-            leg_d = {'handles': [], 'labels': []}
-            for key in hue_mapping:
-                leg_d['handles'].append(f("s", hue_mapping[key], 8))
-                leg_d['labels'].append(key)
-
-            return dict(f=lambda x: hue_mapping[x], mapping=hue_mapping, leg=leg_d)  # 'mappable': hue_mappable,
-
-        def make_cont_size(trait_vals, mappings):
-            lims = [min([val for val in trait_vals if val != None]),
-                    max([val for val in trait_vals if val != None])]
-            szes = np.linspace(lims[0], lims[1], 4)
-            size_f = lambda x: x * 10 / (lims[1] - lims[0])
-            leg_d = {'handles': [], 'labels': []}
-            for key in szes:
-                leg_d['handles'].append(f('s', "k", size_f(key)))
-                leg_d['labels'].append(int(key))
-            return dict(f=size_f, lims=lims, leg=leg_d)
-
-        def make_cat_marker(trait_unique, mappings):
-            if 'marker_mapping' in mappings:
-                marker_mapping = mappings['marker_mapping']
-            else:
-                # the dot and the filled circle look to much alike to be considered different markers
-                m = cycle(mlines.Line2D.filled_markers[1:])
-                marker_mapping = {trait_val: next(m) for ik, trait_val in enumerate(trait_unique)}
-                marker_mapping['unknown'] =missing_d['marker']
-            leg_d = {'handles': [], 'labels': []}
-            for key in marker_mapping:
-                leg_d['handles'].append(f(marker_mapping[key], "k", 8))
-                leg_d['labels'].append(key)
-            return dict(f=lambda x: marker_mapping[x], mapping=marker_mapping, leg=leg_d)
-
-        continuous_d = {'hue': make_cont_hue,
-                        'size': make_cont_size,
-                        'marker': None
-                        }
-
-        categorical_d = {'hue': make_cat_hue,
-                         'size': None,
-                         'marker': make_cat_marker
-                         }
-
-        trait_d = {'hue': hue, 'marker': marker, 'size': size}
-        legend_d = {'hue': None, 'marker': None, 'size': None}
-
-        for trait_key in trait_d.keys():
-            trait = trait_d[trait_key]
-            if trait is None:
-                trait_vals = [None for ik in range(len(self.series_list))]
-                if trait_key == 'hue':
-                    attrib_vals = [missing_d[trait_key] for ik in trait_vals]
-                else:
-                    attrib_vals = None
-                d = {'attrib_vals': attrib_vals}
-            else:
-                trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
-                              self.series_list]
-                trait_vals = [val if val != 'None' else None for val in trait_vals]
-                trait_unique = list(set([val for val in trait_vals if val != None]))
-                trait_val_types = [True if type(val) == np.str_ else False for val in trait_unique]
-
-                # categorical
-                if True in trait_val_types:
-                    if categorical_d[trait_key] != None:
-                        d = categorical_d[trait_key](trait_unique, mappings)
-                        d['attrib_vals'] = [d['mapping'][val] if val != None else missing_d[trait_key] for val in
-                                            trait_vals]
-                        # legend = True
-                        if legend_attribute is None:
-                            legend_attribute = trait_key
-                    else:
-                        # attrib_vals = [missing_d[trait_key] for ik in trait_vals]
-                        d = {'attrib_vals': None}
-
-                # continuous
-                else:
-                    if continuous_d[trait_key] != None:
-                        d = continuous_d[trait_key](trait_vals, mappings)
-                        trait_vals = [int(val) if np.isnan(val) == False else None for val in trait_vals]
-                        d['attrib_vals'] = [d['f'](val) if val != None else missing_d[trait_key] for val in trait_vals]
-                        # legend = False
-                    else:
-                        attrib_vals = [missing_d[trait_key] for ik in trait_vals]
-                        d = {'attrib_vals': None}
-                        # legend = False
-
-                trait_vals = [val if val is not None else 'unknown' for val in trait_vals]
-                legend_d[trait_key] = trait_vals
-            trait_d[trait_key] = d
-
-        if type(scatter_kwargs) == dict:
-            scatter_kwargs['s'] = trait_d['size']['attrib_vals']
-        elif scatter_kwargs is None:
-            scatter_kwargs = {'s': trait_d['size']['attrib_vals'], 'edgecolors':'w'}
-
-        if type(lgd_kwargs) != dict:
-        #     lgd_kwargs['bbox_to_anchor'] = (1.3, 1)
-        # else:
-            lgd_kwargs = {'loc': 'upper left', 'bbox_to_anchor': (1.3, 1)}
-
-        lats = [geos.lat for geos in self.series_list]
-        lons = [geos.lon for geos in self.series_list]
-        if legend_attribute is None:
-            ptlabels = [None for ik in lats]
-        else:
-            ptlabels = legend_d[legend_attribute]
-            
-        res = mp.map(lats, lons, ptlabels, marker=trait_d['marker']['attrib_vals'],
-                     color=trait_d['hue']['attrib_vals'],
-                     projection=projection, proj_default=proj_default,
-                     background=background, borders=borders, rivers=rivers, lakes=lakes,
-                     figsize=figsize, ax=ax, scatter_kwargs=scatter_kwargs, legend=legend,
-                     lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-
-        if legend == True:
-            handles = []
-            labels = []
-            for key in trait_d:
-                if 'leg' in trait_d[key]:
-                    handles += trait_d[key]['leg']['handles']
-                    labels += trait_d[key]['leg']['labels']
-                    handles.append(copy.copy(handles[0]))
-                    handles[-1].set_alpha(0)
-                    labels.append('')
-            res[1].legend(handles, labels,  **lgd_kwargs)#bbox_to_anchor=(1, 1),loc="upper left")
-
-            # if hue is not None:
-            #     if 'mapping' not in trait_d['hue']:
-            #         if 'mappable' in trait_d['hue']:
-            #             cb2 = plt.colorbar(trait_d['hue']['mappable'], ax=ax, shrink=0.55, aspect=20 * 0.7,
-            #                                orientation='vertical', label=hue)
-
-        return res
-
+        fig, ax_d = mp.scatter_map(self, hue=hue, size=size, marker=marker,
+                    edgecolor=edgecolor, projection=projection,
+                                        proj_default=proj_default,
+                                        crit_dist=crit_dist,
+                                        background=background, borders=borders, rivers=rivers, lakes=lakes,
+                                        ocean=ocean,
+                                        land=land, gridspec_kwargs=gridspec_kwargs,
+                                        figsize=figsize, scatter_kwargs=scatter_kwargs,
+                                        lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
+                                        cmap=cmap,
+                                        fig=fig, gs_slot=gridspec_slot, **kwargs)
+        return fig, ax_d
 
     def pca(self, weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
         '''Principal Component Analysis (Empirical Orthogonal Functions)
@@ -350,12 +290,12 @@ class MultipleGeoSeries(MultipleSeries):
         ----------
 
         weights : ndarray, optional
-        
+
             Series weights to use after transforming data according to standardize
             or demean when computing the principal components.
 
         missing : {str, None}
-        
+
             Method for missing data.  Choices are:
 
             * 'drop-row' - drop rows with missing values.
@@ -366,11 +306,11 @@ class MultipleGeoSeries(MultipleSeries):
             * `None` raises if data contains NaN values.
 
         tol_em : float
-        
+
             Tolerance to use when checking for convergence of the EM algorithm.
-            
+
         max_em_iter : int
-        
+
             Maximum iterations for the EM algorithm.
 
         Returns
@@ -379,14 +319,14 @@ class MultipleGeoSeries(MultipleSeries):
         res: MultivariateDecomp
 
             Resulting pyleoclim.MultivariateDecomp object
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
         pyleoclim.core.multivardecomp.MultivariateDecomp : The multivariate decomposition object
-        
+
         pyleoclim.core.mulitpleseries.MulitpleSeries.common_time : align time axes
 
         Examples
@@ -395,9 +335,10 @@ class MultipleGeoSeries(MultipleSeries):
         .. jupyter-execute::
 
             from pylipd.utils.dataset import load_dir
-            lipd = load_dir(name='Euro2k')
-            df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree')") 
+            lipd = load_dir(name='Pages2k') # this loads a small subset of the PAGES 2k database
+            lipd_euro = lipd.filter_by_geo_bbox(-20,20,40,80)
+            df = lipd_euro.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree') & paleoData_variableName not in ('year')") 
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -405,28 +346,43 @@ class MultipleGeoSeries(MultipleSeries):
                                                time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
                                                time_unit=row['time_units'], value_unit=row['paleoData_units'],
                                                lat = row['geo_meanLat'], lon = row['geo_meanLon'],
-                                               archiveType = row['archiveType'], verbose = False, 
-                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
-        
-            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
-            
-            res = Euro2k.pca() # carry out PCA
+                                               elevation = row['geo_meanElev'], observationType = row['paleoData_proxy'],
+                                               archiveType = row['archiveType'], verbose = False,
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName']))
+
+            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')
+
+            res = Euro2k.common_time().pca() # carry out PCA
             type(res) # the result is a MultivariateDecomp object
 
-            res.screeplot() # plot the eigenvalue spectrum
-            res.modeplot() # plot the first mode, equivalent to res.modeplot(index=0)
-            res.modeplot(index=1) # plot the second mode (note the zero-based indexing)
+        To plot the eigenvalue spectrum:
+            
+        .. jupyter-execute::
+            
+            res.screeplot() 
+            
+        To plot the first mode, equivalent to `res.modeplot(index=0)`:
+            
+        .. jupyter-execute::
+            
+            res.modeplot() 
+            
+        To plot the second (note the zero-based indexing):
+            
+        .. jupyter-execute::    
+            
+            res.modeplot(index=1)  
+            
+        One can use map semantics to display the observation type as well:
+            
+        .. jupyter-execute::    
+            
+            res.modeplot(index=1, map_kwargs={'marker':'observationType'})  # needs fixing
         '''
-        # extract geographical coordinate
-        lats = np.array([ts.lat for ts in self.series_list])
-        lons = np.array([ts.lon for ts in self.series_list])
-        locs = np.column_stack([lats,lons])
-        
         # apply PCA fom parent class
-        pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em, 
+        pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em,
                            max_em_iter=max_em_iter,**pca_kwargs)
-        # add geographical information
-        pca_res.locs = locs 
-        
+        pca_res.orig = self  # add original object for plotting purposes
+
         return pca_res
         

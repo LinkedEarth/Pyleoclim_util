@@ -36,13 +36,17 @@ MultipleSeries (pyleoclim.MultipleSeries)
 .. autoclass:: pyleoclim.core.multipleseries.MultipleSeries
    :members:
 
+MultipleGeoSeries (pyleoclim.MultipleGeoSeries)
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.multiplegeoseries.MultipleGeoSeries
+   :members:
 
 EnsembleSeries (pyleoclim.EnsembleSeries)
 """""""""""""""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.ensembleseries.EnsembleSeries
    :members:
-
 
 SurrogateSeries (pyleoclim.SurrogateSeries)
 """""""""""""""""""""""""""""""""""""""""""

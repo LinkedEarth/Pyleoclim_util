@@ -20,9 +20,9 @@ Notes on how to test:
 import pytest
 import pyleoclim as pyleo
 import numpy as np
-import pandas as pd
-from urllib.request import urlopen
-import json
+#import pandas as pd
+#from urllib.request import urlopen
+#import json
 
 class TestUIGeoSeriesResample():
     ''' test GeoSeries.Resample()
