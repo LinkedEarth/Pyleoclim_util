@@ -300,6 +300,131 @@ class GeoSeries(Series):
                     fig=fig, gs_slot=gridspec_slot)
         return fig, ax
     
+    def map_neighbors(self, mgs, radius=3000, projection='Orthographic', proj_default=True,
+            background=True, borders=False, rivers=False, lakes=False, ocean=True,
+            land=True, fig=None, gridspec_slot=None,
+            figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
+            markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
+            legend=True, lgd_kwargs=None, savefig_settings=None):
+        
+        '''Map all records within a given radius of the object
+
+        Parameters
+        ----------
+        mgs : MultipleGeoSeries
+            object containing the series to be considered as neighbors
+            
+        radius : float
+            search radius for the record, in km. Default is 3000. 
+            
+        projection : str, optional
+            The projection to use. The default is 'Orthographic'.
+
+        proj_default : bool; {True, False}, optional
+            Whether to use the Pyleoclim defaults for each projection type. The default is True.
+
+        background :  bool; {True, False}, optional
+            Whether to use a background. The default is True.
+
+        borders :  bool; {True, False}, optional
+            Draw borders. The default is False.
+
+        rivers :  bool; {True, False}, optional
+            Draw rivers. The default is False.
+
+        lakes :  bool; {True, False}, optional
+            Draw lakes. The default is False.
+
+        figsize : list or tuple, optional
+            The size of the figure. The default is None.
+
+        marker : str, optional
+            The marker type for each archive.
+            The default is None. Uses plot_default
+
+        hue : str, optional
+            Variable associated with color coding.
+            The default is None. Uses plot_default.
+
+        markersize : float, optional
+            Size of the marker. The default is None.
+
+        scatter_kwargs : dict, optional
+            Parameters for the scatter plot. The default is None.
+
+        legend :  bool; {True, False}, optional
+            Whether to plot the legend. The default is True.
+
+        lgd_kwargs : dict, optional
+            Arguments for the legend. The default is None.
+
+        savefig_settings : dict, optional
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+
+        Returns
+        -------
+
+        res : fig,ax
+
+        See also
+        --------
+
+        pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            from pylipd.utils.dataset import load_dir
+            lipd = load_dir(name='Pages2k')
+            df = lipd.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment') and paleoData_variableName not in ('year')") 
+            # place in a MultipleGeoSeries object
+            ts_list = []
+            for _, row in dfs.iterrows():
+                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               archiveType = row['archiveType'], verbose = False, 
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+        
+            mgs = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD') 
+            
+            gs = mgs.series_list[0]
+            
+            gs.map_neighbors(mgs)
+            
+        '''
+        from ..core.multiplegeoseries import MultipleGeoSeries
+        if markersize != None:
+            scatter_kwargs['markersize'] = markersize
+            
+        # find neighbors
+        lats = [ts.lat for ts in mgs.series_list]
+        lons = [ts.lon for ts in mgs.series_list]
+        dist = mapping.compute_dist(self.lat, self.lon, lats, lons)
+        neigh_idx = mapping.within_distance(dist, radius)
+        neighbors = MultipleGeoSeries([mgs.series_list[i] for i in neigh_idx])
+        
+        # plot neighbors
+        fig, ax = neighbors.map(hue=hue, size=size, marker=marker, projection=projection,
+                    proj_default=proj_default, cmap=cmap, fig=fig,
+                    background=background, borders=borders, rivers=rivers, lakes=lakes,
+                    ocean=ocean, land=land,figsize=figsize, 
+                    scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
+                    lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
+                    edgecolor=edgecolor)#, gs_slot=gridspec_slot)
+        
+        # plot the record itself with label 
+        fig, ax = self.map(fig=fig)
+
+        return fig, ax
+    
     def dashboard(self, figsize=[11, 8], plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,gridspec_kwargs=None,
                   savefig_settings=None):
