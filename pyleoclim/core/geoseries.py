@@ -367,7 +367,7 @@ class GeoSeries(Series):
         Returns
         -------
 
-        res : fig,ax
+        res : fig,ax_d
 
         See also
         --------
@@ -397,10 +397,11 @@ class GeoSeries(Series):
             
             gs = mgs.series_list[0]
             
-            gs.map_neighbors(mgs)
+            gs.map_neighbors(mgs, radius=4000, projection='auto')
             
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
+        import pandas as pd
         if markersize != None:
             scatter_kwargs['markersize'] = markersize
             
@@ -409,21 +410,28 @@ class GeoSeries(Series):
         lons = [ts.lon for ts in mgs.series_list]
         dist = mapping.compute_dist(self.lat, self.lon, lats, lons)
         neigh_idx = mapping.within_distance(dist, radius)
-        neighbors = MultipleGeoSeries([mgs.series_list[i] for i in neigh_idx])
-        
-        # plot neighbors
-        fig, ax = neighbors.map(hue=hue, size=size, marker=marker, projection=projection,
-                    proj_default=proj_default, cmap=cmap, fig=fig,
-                    background=background, borders=borders, rivers=rivers, lakes=lakes,
-                    ocean=ocean, land=land,figsize=figsize, 
-                    scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
-                    lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
-                    edgecolor=edgecolor)#, gs_slot=gridspec_slot)
-        
-        # plot the record itself with label 
-        fig, ax = self.map(fig=fig)
 
-        return fig, ax
+        neighbors =[mgs.series_list[i] for i in neigh_idx if i !=0]
+        neighbors = MultipleGeoSeries(neighbors)
+
+        df = mapping.make_df(neighbors, hue=hue, marker=marker, size=size)
+        df_self = mapping.make_df(self, hue=hue, marker=marker, size=size)
+
+        neighborhood = pd.concat([df, df_self], axis=0)
+        # additional columns are added manually
+        neighbor_coloring = ['w' for ik in range(len(neighborhood))]
+        neighbor_coloring[-1] = 'k'
+        neighborhood['original'] =neighbor_coloring
+        # plot neighbors
+
+        fig, ax_d = mapping.scatter_map(neighborhood, hue=hue, size=size, marker=marker, projection=projection,
+                                           proj_default=proj_default,
+                                           background=background, borders=borders, rivers=rivers, lakes=lakes,
+                                           ocean=ocean, land=land,
+                                           figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
+                                           gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
+                                           legend=legend, cmap=cmap,edgecolor=neighborhood['original'].values)
+        return fig, ax_d
     
     def dashboard(self, figsize=[11, 8], plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,gridspec_kwargs=None,
