@@ -20,9 +20,30 @@ Notes on how to test:
 import pytest
 import pyleoclim as pyleo
 import numpy as np
-#import pandas as pd
-#from urllib.request import urlopen
-#import json
+
+# here's the "fixture". Can't figure out how to make an actual pytest fixture take arguments
+def multiple_pinkgeoseries(nrecs = 20, seed = 108, geobox=[-85.0,85.0,-180,180]):
+    """Set of Multiple geoseries with 1/f (pink) temporal structure """
+    nt = 200
+    lats = np.random.default_rng(seed=seed).uniform(geobox[0],geobox[1],nrecs)
+    lons = np.random.default_rng(seed=seed+1).uniform(geobox[2],geobox[3],nrecs)
+    elevs = np.random.default_rng(seed=seed+2).uniform(0,4000,nrecs)
+    unknowns = np.random.randint(0,len(elevs)-1, size=2)
+    for ik in unknowns:
+        elevs[ik]=None
+    
+    archives = np.random.default_rng(seed=seed).choice(list(pyleo.utils.PLOT_DEFAULT.keys())+[None],size=nrecs)
+    obsTypes = np.random.default_rng(seed=seed).choice(['MXD', 'd18O', 'Sr/Ca', None],size=nrecs)
+    
+    ts_list = []
+    for i in range(nrecs):
+        t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=nt)
+        ts = pyleo.GeoSeries(t,v, verbose=False, label = f'pink series {i}',
+                             archiveType=archives[i], observationType=obsTypes[i],
+                             lat=lats[i], lon = lons[i], elevation=elevs[i]).standardize()
+        ts_list.append(ts)
+        
+    return pyleo.MultipleGeoSeries(ts_list, label='Multiple Pink GeoSeries')
 
 class TestUIGeoSeriesResample():
     ''' test GeoSeries.Resample()
@@ -33,7 +54,21 @@ class TestUIGeoSeriesResample():
         res = EDC5k.resolution()
         assert np.isclose(res.describe()['mean'], 5000)
         assert res.describe()['variance'] < 1e-3
-    
+
+class TestUIGeoSeriesMapNeighbors():
+    ''' test GeoSeries.map_neighbors()
+    '''    
+    def test_map_neighbors_t0(self, pinkgeoseries):
+        ts = pinkgeoseries
+        mgs = multiple_pinkgeoseries()
+        fig, ax = ts.map_neighbors(mgs)
+        pyleo.closefig(fig)
+        
+    def test_map_neighbors_t1(self, pinkgeoseries):
+        ts = pinkgeoseries
+        mgs = multiple_pinkgeoseries()
+        fig, ax = ts.map_neighbors(mgs, radius=5000)
+        pyleo.closefig(fig)
 
 class TestUiGeoSeriesMap():
     ''' test GeoSeries.map()

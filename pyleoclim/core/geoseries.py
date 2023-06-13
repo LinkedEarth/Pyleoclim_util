@@ -7,6 +7,7 @@ from ..core.series import Series
 
 import matplotlib.pyplot as plt
 import re
+import pandas as pd
 
 #from copy import deepcopy
 from matplotlib import gridspec
@@ -291,7 +292,104 @@ class GeoSeries(Series):
         Returns
         -------
 
-        res : fig,ax
+        res : fig,ax_d
+
+        See also
+        --------
+
+        pyleoclim.utils.mapping.scatter_map : Underlying mapping function for Pyleoclim
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+            ts = pyleo.utils.datasets.load_dataset('EDC-dD')
+            fig, ax = ts.map()
+
+        '''
+        if markersize != None:
+            scatter_kwargs['markersize'] = markersize
+
+        fig, ax_d = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
+                    proj_default=proj_default,
+                    background=background, borders=borders, rivers=rivers, lakes=lakes,
+                    ocean=ocean, land=land, coastline=coastline,
+                    figsize=figsize, scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
+                    lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
+                    cmap=cmap, edgecolor=edgecolor,
+                    fig=fig, gs_slot=gridspec_slot)
+        return fig, ax_d
+    
+    def map_neighbors(self, mgs, radius=3000, projection='Orthographic', proj_default=True,
+            background=True, borders=False, rivers=False, lakes=False, ocean=True,
+            land=True, fig=None, gridspec_slot=None,
+            figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
+            markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
+            legend=True, lgd_kwargs=None, savefig_settings=None):
+        
+        '''Map all records within a given radius of the object
+
+        Parameters
+        ----------
+        mgs : MultipleGeoSeries
+            object containing the series to be considered as neighbors
+            
+        radius : float
+            search radius for the record, in km. Default is 3000. 
+            
+        projection : str, optional
+            The projection to use. The default is 'Orthographic'.
+
+        proj_default : bool; {True, False}, optional
+            Whether to use the Pyleoclim defaults for each projection type. The default is True.
+
+        background :  bool; {True, False}, optional
+            Whether to use a background. The default is True.
+
+        borders :  bool; {True, False}, optional
+            Draw borders. The default is False.
+
+        rivers :  bool; {True, False}, optional
+            Draw rivers. The default is False.
+
+        lakes :  bool; {True, False}, optional
+            Draw lakes. The default is False.
+
+        figsize : list or tuple, optional
+            The size of the figure. The default is None.
+
+        marker : str, optional
+            The marker type for each archive.
+            The default is None. Uses plot_default
+
+        hue : str, optional
+            Variable associated with color coding.
+            The default is None. Uses plot_default.
+
+        markersize : float, optional
+            Size of the marker. The default is None.
+
+        scatter_kwargs : dict, optional
+            Parameters for the scatter plot. The default is None.
+
+        legend :  bool; {True, False}, optional
+            Whether to plot the legend. The default is True.
+
+        lgd_kwargs : dict, optional
+            Arguments for the legend. The default is None.
+
+        savefig_settings : dict, optional
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+
+        Returns
+        -------
+
+        res : fig,ax_d
 
         See also
         --------
@@ -303,108 +401,56 @@ class GeoSeries(Series):
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-            fig, ax = ts.map() # by default, the legend conflicts with the map, but it's easy to push it outside with this keyword argument'
-
+            from pylipd.utils.dataset import load_dir
+            lipd = load_dir(name='Pages2k')
+            df = lipd.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment') and paleoData_variableName not in ('year')") 
+            # place in a MultipleGeoSeries object
+            ts_list = []
+            for _, row in dfs.iterrows():
+                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               archiveType = row['archiveType'], verbose = False, 
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+        
+            mgs = pyleo.MultipleGeoSeries(ts_list,time_unit='years AD') 
+            gs = mgs.series_list[6] # extract one record as the target one
+            gs.map_neighbors(mgs, radius=4000)
+            
         '''
+        from ..core.multiplegeoseries import MultipleGeoSeries
         if markersize != None:
             scatter_kwargs['markersize'] = markersize
+            
+        # find neighbors
+        lats = [ts.lat for ts in mgs.series_list]
+        lons = [ts.lon for ts in mgs.series_list]
+        dist = mapping.compute_dist(self.lat, self.lon, lats, lons)
+        neigh_idx = mapping.within_distance(dist, radius)
 
-        fig, ax_d = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
-                    proj_default=proj_default,
-                    background=background, borders=borders, rivers=rivers, lakes=lakes,
-                    ocean=ocean,
-                    land=land, coastline=coastline,
-                    figsize=figsize, scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
-                    lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
-                    cmap=cmap, edgecolor=edgecolor,
-                    fig=fig, gs_slot=gridspec_slot)
+        neighbors =[mgs.series_list[i] for i in neigh_idx if i !=0]
+        neighbors = MultipleGeoSeries(neighbors)
+
+        df = mapping.make_df(neighbors, hue=hue, marker=marker, size=size)
+        df_self = mapping.make_df(self, hue=hue, marker=marker, size=size)
+
+        neighborhood = pd.concat([df, df_self], axis=0)
+        # additional columns are added manually
+        neighbor_coloring = ['w' for ik in range(len(neighborhood))]
+        neighbor_coloring[-1] = 'k'
+        neighborhood['original'] =neighbor_coloring
+        # plot neighbors
+
+        fig, ax_d = mapping.scatter_map(neighborhood, fig=fig, gs_slot=gridspec_slot, hue=hue, size=size, marker=marker, projection=projection,
+                                           proj_default=proj_default,
+                                           background=background, borders=borders, rivers=rivers, lakes=lakes,
+                                           ocean=ocean, land=land,
+                                           figsize=figsize, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
+                                           gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
+                                           legend=legend, cmap=cmap, edgecolor=neighborhood['original'].values)
         return fig, ax_d
-
-        # scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
-        # # get the information from the timeseries
-        # lat = [self.lat]
-        # lon = [self.lon]
-        #
-        # if self.archiveType is not None:
-        #     archiveType = lipdutils.LipdToOntology(self.archiveType).lower().replace(" ", "")
-        # else:
-        #     archiveType = 'other'
-        #
-        # # make sure criteria is in the plot_default list
-        # if archiveType not in lipdutils.PLOT_DEFAULT.keys():
-        #     archiveType = 'other'
-        #
-        # if markersize is not None:
-        #     scatter_kwargs.update({'s': markersize})
-        #
-        # if marker == None:
-        #     marker = lipdutils.PLOT_DEFAULT[archiveType][1]
-        #
-        # if color == None:
-        #     color = lipdutils.PLOT_DEFAULT[archiveType][0]
-        #
-        # if proj_default == True:
-        #     proj1 = {'central_latitude': lat[0],
-        #              'central_longitude': lon[0]}
-        #     proj2 = {'central_latitude': lat[0]}
-        #     proj3 = {'central_longitude': lon[0]}
-        #
-        # archiveType = [archiveType]  # list so it will work with map
-        # marker = [marker]
-        # color = [color]
-        #
-        # if self.label is not None:
-        #     legend_title = self.label
-        # else:
-        #     legend_title = None
-        #
-        #
-        # if proj_default == True:
-        #
-        #     try:
-        #         res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-        #                           marker=marker, color=color,
-        #                           projection=projection, proj_default=proj1,
-        #                           background=background, borders=borders,
-        #                           rivers=rivers, lakes=lakes,
-        #                           figsize=figsize, ax=ax,
-        #                           scatter_kwargs=scatter_kwargs, legend=legend, legend_title=legend_title,
-        #                           lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-        #
-        #     except:
-        #         try:
-        #             res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-        #                               marker=marker, color=color,
-        #                               projection=projection, proj_default=proj3,
-        #                               background=background, borders=borders,
-        #                               rivers=rivers, lakes=lakes,
-        #                               figsize=figsize, ax=ax,
-        #                               scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
-        #                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-        #         except:
-        #             res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-        #                               marker=marker, color=color,
-        #                               projection=projection, proj_default=proj2,
-        #                               background=background, borders=borders,
-        #                               rivers=rivers, lakes=lakes,
-        #                               figsize=figsize, ax=ax,
-        #                               scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
-        #                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-        #
-        # else:
-        #     res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-        #                       marker=marker, color=color,
-        #                       projection=projection, proj_default=proj_default,
-        #                       background=background, borders=borders,
-        #                       rivers=rivers, lakes=lakes,
-        #                       figsize=figsize, ax=ax,
-        #                       scatter_kwargs=scatter_kwargs, legend=legend,legend_title=legend_title,
-        #                       lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-        #
-        #
-        # return res
     
     def dashboard(self, figsize=[11, 8], gs=None, plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,
@@ -486,8 +532,8 @@ class GeoSeries(Series):
         fig : matplotlib.figure
             The figure
 
-        ax : matplolib.axis
-            The axis
+        ax : dict
+            dictionary of matplotlib ax
 
         See also
         --------
@@ -600,91 +646,8 @@ class GeoSeries(Series):
         _, ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
                     background=background, borders=borders, coastline=coastline, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
                     figsize=None, scatter_kwargs=scatter_kwargs,gridspec_kwargs = map_gridspec_kwargs,
-                                          lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap, colorbar=colorbar,
+                    lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap, colorbar=colorbar,
                     fig=fig, gs_slot=gs[-1, 0:1])
-
-        # make the map - brute force since projection is not being returned properly
-        # lat = [self.lat]
-        # lon = [self.lon]
-        #
-        # map_kwargs = {} if map_kwargs is None else map_kwargs.copy()
-        # if 'projection' in map_kwargs.keys():
-        #     projection = map_kwargs['projection']
-        # else:
-        #     projection = 'Orthographic'
-        # if 'proj_default' in map_kwargs.keys():
-        #     proj_default = map_kwargs['proj_default']
-        # else:
-        #     proj_default = True
-        # if proj_default == True:
-        #     proj1 = {'central_latitude': lat[0],
-        #              'central_longitude': lon[0]}
-        #     proj2 = {'central_latitude': lat[0]}
-        #     proj3 = {'central_longitude': lon[0]}
-        #     try:
-        #         proj = mapping.set_proj(projection=projection, proj_default=proj1)
-        #     except:
-        #         try:
-        #             proj = mapping.set_proj(projection=projection, proj_default=proj3)
-        #         except:
-        #             proj = mapping.set_proj(projection=projection, proj_default=proj2)
-        # if 'marker' in map_kwargs.keys():
-        #     marker = map_kwargs['marker']
-        # else:
-        #     marker = lipdutils.PLOT_DEFAULT[archiveType][1]
-        # if 'color' in map_kwargs.keys():
-        #     color = map_kwargs['color']
-        # else:
-        #     color = lipdutils.PLOT_DEFAULT[archiveType][0]
-        # if 'background' in map_kwargs.keys():
-        #     background = map_kwargs['background']
-        # else:
-        #     background = True
-        # if 'borders' in map_kwargs.keys():
-        #     borders = map_kwargs['borders']
-        # else:
-        #     borders = False
-        # if 'rivers' in map_kwargs.keys():
-        #     rivers = map_kwargs['rivers']
-        # else:
-        #     rivers = False
-        # if 'lakes' in map_kwargs.keys():
-        #     lakes = map_kwargs['lakes']
-        # else:
-        #     lakes = False
-        # if 'scatter_kwargs' in map_kwargs.keys():
-        #     scatter_kwargs = map_kwargs['scatter_kwargs']
-        # else:
-        #     scatter_kwargs = {}
-        # if 'markersize' in map_kwargs.keys():
-        #     scatter_kwargs.update({'s': map_kwargs['markersize']})
-        # else:
-        #     pass
-        # if 'lgd_kwargs' in map_kwargs.keys():
-        #     lgd_kwargs = map_kwargs['lgd_kwargs']
-        # else:
-        #     lgd_kwargs = {}
-        # if 'legend' in map_kwargs.keys():
-        #     legend = map_kwargs['legend']
-        # else:
-        #     legend = False
-        # # make the plot map
-        #
-        # data_crs = ccrs.PlateCarree()
-        # ax['map'] = fig.add_subplot(gs[1, 0:2], projection=proj)
-        # ax['map'].coastlines()
-        # if background is True:
-        #     ax['map'].stock_img()
-        # # Other extra information
-        # if borders is True:
-        #     ax['map'].add_feature(cfeature.BORDERS)
-        # if lakes is True:
-        #     ax['map'].add_feature(cfeature.LAKES)
-        # if rivers is True:
-        #     ax['map'].add_feature(cfeature.RIVERS)
-        # ax['map'].scatter(lon, lat, zorder=10, label=marker, facecolor=color, transform=data_crs, **scatter_kwargs)
-        # if legend == True:
-        #     ax.legend(**lgd_kwargs)
 
         # spectral analysis
         spectral_kwargs = {} if spectral_kwargs is None else spectral_kwargs.copy()
