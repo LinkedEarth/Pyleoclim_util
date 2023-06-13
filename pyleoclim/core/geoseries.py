@@ -7,6 +7,7 @@ from ..core.series import Series
 
 import matplotlib.pyplot as plt
 import re
+import pandas as pd
 
 #from copy import deepcopy
 from matplotlib import gridspec
@@ -291,12 +292,12 @@ class GeoSeries(Series):
         Returns
         -------
 
-        res : fig,ax
+        res : fig,ax_d
 
         See also
         --------
 
-        pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
+        pyleoclim.utils.mapping.scatter_map : Underlying mapping function for Pyleoclim
 
         Examples
         --------
@@ -305,7 +306,7 @@ class GeoSeries(Series):
 
             import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-            fig, ax = ts.map() # by default, the legend conflicts with the map, but it's easy to push it outside with this keyword argument'
+            fig, ax = ts.map()
 
         '''
         if markersize != None:
@@ -314,13 +315,12 @@ class GeoSeries(Series):
         fig, ax_d = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
                     proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes,
-                    ocean=ocean,
-                    land=land, coastline=coastline,
+                    ocean=ocean, land=land, coastline=coastline,
                     figsize=figsize, scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
                     lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
                     cmap=cmap, edgecolor=edgecolor,
                     fig=fig, gs_slot=gridspec_slot)
-        return fig, ax
+        return fig, ax_d
     
     def map_neighbors(self, mgs, radius=3000, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
@@ -421,7 +421,6 @@ class GeoSeries(Series):
             
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
-        import pandas as pd
         if markersize != None:
             scatter_kwargs['markersize'] = markersize
             
@@ -444,13 +443,13 @@ class GeoSeries(Series):
         neighborhood['original'] =neighbor_coloring
         # plot neighbors
 
-        fig, ax_d = mapping.scatter_map(neighborhood, hue=hue, size=size, marker=marker, projection=projection,
+        fig, ax_d = mapping.scatter_map(neighborhood, fig=fig, gs_slot=gridspec_slot, hue=hue, size=size, marker=marker, projection=projection,
                                            proj_default=proj_default,
                                            background=background, borders=borders, rivers=rivers, lakes=lakes,
                                            ocean=ocean, land=land,
-                                           figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
+                                           figsize=figsize, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
                                            gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
-                                           legend=legend, cmap=cmap,edgecolor=neighborhood['original'].values)
+                                           legend=legend, cmap=cmap, edgecolor=neighborhood['original'].values)
         return fig, ax_d
     
     def dashboard(self, figsize=[11, 8], gs=None, plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
@@ -533,8 +532,8 @@ class GeoSeries(Series):
         fig : matplotlib.figure
             The figure
 
-        ax : matplolib.axis
-            The axis
+        ax : dict
+            dictionary of matplotlib ax
 
         See also
         --------
@@ -647,7 +646,7 @@ class GeoSeries(Series):
         _, ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
                     background=background, borders=borders, coastline=coastline, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
                     figsize=None, scatter_kwargs=scatter_kwargs,gridspec_kwargs = map_gridspec_kwargs,
-                                          lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap, colorbar=colorbar,
+                    lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap, colorbar=colorbar,
                     fig=fig, gs_slot=gs[-1, 0:1])
 
         # spectral analysis
