@@ -84,8 +84,8 @@ class MultipleGeoSeries(MultipleSeries):
 
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
             edgecolor='k', projection='auto',
-            proj_default=True, crit_dist=5000,colorbar=True,
-            background=True, borders=True, rivers=False, lakes=False, land=True,ocean=True,
+            proj_default=True, crit_dist=5000, colorbar=True,
+            background=True, borders=False, coastline=True,rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, scatter_kwargs=None, gridspec_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
         '''
@@ -101,7 +101,7 @@ class MultipleGeoSeries(MultipleSeries):
             Grouping variable that will produce points with different sizes. Expects to be numeric. Any data without a value for the size variable will be filtered out.
             The default is None.
 
-        marker : TYPE, optional
+        marker : string, optional
             Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
             The default is 'archiveType'.
 
@@ -134,24 +134,34 @@ class MultipleGeoSeries(MultipleSeries):
             If True, uses a shaded relief background (only one available in Cartopy)
             Default is on (True).
 
-        borders : bool, optional
+        borders : bool or dict, optional
             Draws the countries border.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
             Defaults is off (False).
 
-        land : bool, optional
+        coastline : bool or dict, optional
+            Draws the coastline.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
+            Defaults is on (True).
+
+        land : bool or dict, optional
             Colors land masses.
-            Default is off (False).
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is off (True). Overriden if background=True.
 
-        ocean : bool, optional
+        ocean : bool or dict, optional
             Colors oceans.
-            Default is off (False).
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is on (True). Overriden if background=True.
 
-        rivers : bool, optional
+        rivers : bool or dict, optional
             Draws major rivers.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
             Default is off (False).
 
-        lakes : bool, optional
+        lakes : bool or dict, optional
             Draws major lakes.
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
             Default is off (False).
 
         figsize : list or tuple, optional
@@ -162,11 +172,11 @@ class MultipleGeoSeries(MultipleSeries):
             Dictionary of arguments available in `matplotlib.pyplot.scatter <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html>`_.
 
         legend : bool, optional
-            Whether the draw a legend on the figure.
+            Whether to draw a legend on the figure.
             Default is True.
 
         colorbar : bool, optional
-            Whether the draw a colorbar on the figure if the data associated with hue are numeric.
+            Whether to draw a colorbar on the figure if the data associated with hue are numeric.
             Default is True.
 
         lgd_kwargs : dict, optional
@@ -258,7 +268,7 @@ class MultipleGeoSeries(MultipleSeries):
             
         .. jupyter-execute::
             
-            Euro2k.map(projection='Orthographic',hue = 'observationType',
+            Euro2k.map(projection='Orthographic',hue='observationType',
                        size='elevation', proj_default=eur_coord, figsize=[18, 8]) 
 
         '''
@@ -268,7 +278,7 @@ class MultipleGeoSeries(MultipleSeries):
                                         proj_default=proj_default,
                                         crit_dist=crit_dist,
                                         background=background, borders=borders, rivers=rivers, lakes=lakes,
-                                        ocean=ocean,
+                                        ocean=ocean, coastline=coastline,
                                         land=land, gridspec_kwargs=gridspec_kwargs,
                                         figsize=figsize, scatter_kwargs=scatter_kwargs,
                                         lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
@@ -377,7 +387,24 @@ class MultipleGeoSeries(MultipleSeries):
             
         .. jupyter-execute::    
             
-            res.modeplot(index=1, map_kwargs={'marker':'observationType'})  # needs fixing
+            res.modeplot(index=1, marker='observationType', size='elevation')
+
+        There are many ways to configure the map component. As a simple example, specifying the projection:
+
+        .. jupyter-execute::
+
+            res.modeplot(index=1, marker='observationType', size='elevation',
+                map_kwargs={'projection':'Robinson'})
+
+        Or dive into the nuances of gridspec and legend configurations:
+
+        .. jupyter-execute::
+
+            res.modeplot(index=1, marker='observationType', size='elevation',
+                        map_kwargs={'projection':'Robinson',
+                                    'gridspec_kwargs': {'width_ratios': [.5, 1,14, 4], 'wspace':-.065},
+                                    'lgd_kwargs':{'bbox_to_anchor':[-.015,1]}})
+
         '''
         # apply PCA fom parent class
         pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em,

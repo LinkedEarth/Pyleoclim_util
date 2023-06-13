@@ -553,7 +553,7 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
 
 def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='k',
                 proj_default=True, projection='auto', crit_dist=5000,
-                background=True, borders=False, rivers=False, lakes=False, ocean=True, land=True,
+                background=True, borders=False, coastline=True, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, gridspec_kwargs=None, extent='global',
                 lgd_kwargs=None, legend=True, colorbar=True, cmap=None,
                 fig=None, gs_slot=None, **kwargs):
@@ -573,7 +573,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         Grouping variable that will produce points with different sizes. Expects to be numeric. Any data without a value for the size variable will be filtered out.
         The default is None.
 
-    marker : TYPE, optional
+    marker : string, optional
         Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
         The default is 'archiveType'.
 
@@ -1174,22 +1174,24 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     ax_d['leg'] = fig.add_subplot(gs[-1])
 
     # draw the coastlines
-    ax_d['map'].add_feature(cfeature.COASTLINE, linewidths=(.5,))
+    # ax_d['map'].add_feature(cfeature.COASTLINE, linewidths=(.5,))
     # Background
     if background is True:
         ax_d['map'].stock_img()
 
     # Other extra information
-    if borders is True:
-        ax_d['map'].add_feature(cfeature.BORDERS, alpha=.5,  linewidths=(.5,))
-    if lakes is True:
-        ax_d['map'].add_feature(cfeature.LAKES, alpha=0.25)
-    if rivers is True:
-        ax_d['map'].add_feature(cfeature.RIVERS)
-    if ocean is True:
-        ax_d['map'].add_feature(cfeature.OCEAN, alpha=.25)
-    if land is True:
-        ax_d['map'].add_feature(cfeature.LAND, alpha=.5)
+    feature_d = {'borders':borders, 'lakes':lakes, 'rivers':rivers, 'land':land, 'ocean':ocean, 'coastline':coastline}
+    feature_d = {key:(value if type(value)==dict else {}) for key, value in feature_d.items() if value !=False }
+    feature_spec_defaults = {'borders':dict(alpha=.5,  linewidths=(.5,)), 'lakes':dict(alpha=0.25),
+                            'rivers': {}, 'land':dict(alpha=0.5), 'ocean':dict(alpha=0.25), 'coastline':dict(linewidths=(.5,))}
+    for key in feature_d.keys():
+        feature_spec_defaults[key].update(feature_d[key])
+
+    feature_types = {'borders':cfeature.BORDERS, 'coastline':cfeature.COASTLINE, 'lakes':cfeature.LAKES,
+                       'rivers':cfeature.RIVERS, 'land':cfeature.LAND, 'ocean':cfeature.OCEAN}
+    for feature in feature_d.keys():
+        ax_d['map'].add_feature(feature_types[feature], **feature_spec_defaults[feature])
+
     if extent == 'global':
         ax_d['map'].set_global()
     elif isinstance(extent, list) and len(extent)==4:

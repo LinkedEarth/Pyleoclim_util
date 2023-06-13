@@ -208,7 +208,7 @@ class GeoSeries(Series):
         return cls(**b)
     
     def map(self, projection='Orthographic', proj_default=True,
-            background=True, borders=False, rivers=False, lakes=False, ocean=True,
+            background=True, borders=False, coastline=True, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None,
             figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
@@ -225,17 +225,39 @@ class GeoSeries(Series):
         proj_default : bool; {True, False}, optional
             Whether to use the Pyleoclim defaults for each projection type. The default is True.
 
-        background :  bool; {True, False}, optional
-            Whether to use a background. The default is True.
+        background : bool, optional
+            If True, uses a shaded relief background (only one available in Cartopy)
+            Default is on (True).
 
-        borders :  bool; {True, False}, optional
-            Draw borders. The default is False.
+        borders : bool or dict, optional
+            Draws the countries border.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
+            Defaults is off (False).
 
-        rivers :  bool; {True, False}, optional
-            Draw rivers. The default is False.
+        coastline : bool or dict, optional
+            Draws the coastline.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
+            Defaults is on (True).
 
-        lakes :  bool; {True, False}, optional
-            Draw lakes. The default is False.
+        land : bool or dict, optional
+            Colors land masses.
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is off (True). Overriden if background=True.
+
+        ocean : bool or dict, optional
+            Colors oceans.
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is on (True). Overriden if background=True.
+
+        rivers : bool or dict, optional
+            Draws major rivers.
+            If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
+            Default is off (False).
+
+        lakes : bool or dict, optional
+            Draws major lakes.
+            If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
+            Default is off (False).
 
         figsize : list or tuple, optional
             The size of the figure. The default is None.
@@ -283,17 +305,17 @@ class GeoSeries(Series):
 
             import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-            fig, ax = ts.map(lgd_kwargs={'bbox_to_anchor':(1, 1)}) # by default, the legend conflicts with the map, but it's easy to push it outside with this keyword argument'
+            fig, ax = ts.map() # by default, the legend conflicts with the map, but it's easy to push it outside with this keyword argument'
 
         '''
         if markersize != None:
             scatter_kwargs['markersize'] = markersize
 
-        fig, ax = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
+        fig, ax_d = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
                     proj_default=proj_default,
                     background=background, borders=borders, rivers=rivers, lakes=lakes,
                     ocean=ocean,
-                    land=land,
+                    land=land, coastline=coastline,
                     figsize=figsize, scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
                     lgd_kwargs=lgd_kwargs, legend=legend, colorbar=colorbar,
                     cmap=cmap, edgecolor=edgecolor,
@@ -431,8 +453,10 @@ class GeoSeries(Series):
                                            legend=legend, cmap=cmap,edgecolor=neighborhood['original'].values)
         return fig, ax_d
     
-    def dashboard(self, figsize=[11, 8], plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
-                  spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,gridspec_kwargs=None,
+    def dashboard(self, figsize=[11, 8], gs=None, plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
+                  spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,
+                  hue='archiveType', marker='archiveType', size=None, scatter_kwargs=None,
+                  gridspec_kwargs=None,
                   savefig_settings=None):
         '''
 
@@ -441,6 +465,15 @@ class GeoSeries(Series):
         
         figsize : list or tuple, optional
             Figure size. The default is [11,8].
+
+        gs : matplotlib.gridspec object, optional
+            Requires at least two rows and 4 columns.
+            - top row, left: timeseries
+            - top row, right: histogram
+            - bottom left: map
+            - bottom right: PSD
+            See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
+
 
         plt_kwargs : dict, optional
             Optional arguments for the timeseries plot. See Series.plot() or EnsembleSeries.plot_envelope(). The default is None.
@@ -458,10 +491,30 @@ class GeoSeries(Series):
             Optional arguments for the power spectrum figure. See PSD.plot() or MultiplePSD.plot_envelope(). The default is None.
 
         map_kwargs : dict, optional
-            Optional arguments for the map and point plotted on map.
-            - scatter_kwargs: dict of values for configuring how data are plotted on a map
-            - gridspec_kwargs: dict of values for how the map gridspec is configured
+            Optional arguments for map configuration
+            - projection: str; Optional value for map projection. Default 'auto'.
+            - proj_default: bool
+            - lakes, land, ocean, rivers, borders, coastline, background: bool or dict;
+            - lgd_kwargs: dict; Optional values for how the map legend is configured
+            - gridspec_kwargs: dict; Optional values for adjusting the arrangement of the colorbar, map and legend in the map subplot
+            - legend: bool; Whether to draw a legend on the figure. Default is True
+            - colorbar: bool; Whether to draw a colorbar on the figure if the data associated with hue are numeric. Default is True
             The default is None.
+
+        hue : str, optional
+            Variable associated with color coding for points plotted on map. May correspond to a continuous or categorical variable.
+            The default is 'archiveType'.
+
+        size : str, optional
+            Variable associated with size. Must correspond to a continuous numeric variable.
+            The default is None.
+
+        marker : string, optional
+            Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
+            The default is 'archiveType'.
+
+        scatter_kwargs : dict, optional
+            Optional arguments configuring how data are plotted on a map. See description of scatter_kwargs in pyleoclim.utils.mapping.scatter_map
 
         gridspec_kwargs : dict, optional
             Optional dictionary for configuring dashboard layout using gridspec
@@ -506,7 +559,7 @@ class GeoSeries(Series):
 
         pyleoclim.core.geoseries.GeoSeries.map : map location of dataset
 
-        pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
+        pyleoclim.utils.mapping.scatter_map : Underlying mapping function for Pyleoclim
 
         Examples
         --------
@@ -523,15 +576,12 @@ class GeoSeries(Series):
         # start plotting
         fig = plt.figure(figsize=figsize)
 
-        gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
-        gridspec_defaults = dict(wspace=0, width_ratios=[1,1,1,.25,1,1,1],
-                               height_ratios=[1,.1,1], left=0, right=1.1)
-
-        gridspec_defaults.update(gridspec_kwargs)
-        gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
-
-        # gs = gridspec.GridSpec(2, 6, wspace=0)
-        # gs.update(left=0, right=1.1)
+        if gs == None:
+            gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
+            gridspec_defaults = dict(wspace=0, width_ratios=[3, .25, 2, 1],
+                                     height_ratios=[1, .1, 1], left=0, right=1.1)
+            gridspec_defaults.update(gridspec_kwargs)
+            gs = gridspec.GridSpec(len(gridspec_defaults['height_ratios']), len(gridspec_defaults['width_ratios']), **gridspec_defaults)
 
         ax = {}
         # Plot the timeseries
@@ -578,15 +628,11 @@ class GeoSeries(Series):
         ocean = map_kwargs.pop('ocean', False)
         rivers = map_kwargs.pop('rivers', False)
         borders = map_kwargs.pop('borders', True)
+        coastline = map_kwargs.pop('coastline', True)
         background = map_kwargs.pop('background', True)
 
-        gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
-        scatter_kwargs = map_kwargs.pop('scatter_kwargs', {})
+        map_gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
         lgd_kwargs = map_kwargs.pop('lgd_kwargs', {})
-
-        marker = scatter_kwargs.pop('marker', 'archiveType')
-        hue = scatter_kwargs.pop('hue', 'archiveType')
-        size = scatter_kwargs.pop('size', None)
 
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
@@ -596,13 +642,13 @@ class GeoSeries(Series):
         colorbar = map_kwargs.pop('colorbar', False)
 
         if legend == False:
-            gridspec_kwargs['width_ratios'] = [.5,16, 1]
+            map_gridspec_kwargs['width_ratios'] = [.5,16, 1]
 
         _, ax['map'] =mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection, proj_default=proj_default,
-                    background=background, borders=borders, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
-                    figsize=None, scatter_kwargs=scatter_kwargs,gridspec_kwargs = gridspec_kwargs,
+                    background=background, borders=borders, coastline=coastline, rivers=rivers, lakes=lakes, ocean=ocean, land=land,
+                    figsize=None, scatter_kwargs=scatter_kwargs,gridspec_kwargs = map_gridspec_kwargs,
                                           lgd_kwargs=lgd_kwargs, legend=legend, cmap=cmap, colorbar=colorbar,
-                    fig=fig, gs_slot=gs[-1, 0:-4])
+                    fig=fig, gs_slot=gs[-1, 0:1])
 
         # spectral analysis
         spectral_kwargs = {} if spectral_kwargs is None else spectral_kwargs.copy()
@@ -615,7 +661,7 @@ class GeoSeries(Series):
         else:
             spectral_kwargs.update({'freq_method': 'lomb_scargle'})
 
-        ax['spec'] = fig.add_subplot(gs[-1, -3:])
+        ax['spec'] = fig.add_subplot(gs[-1, -2:])
         spectralfig_kwargs = {} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
         spectralfig_kwargs.update({'ax': ax['spec']})
 
@@ -673,10 +719,13 @@ class GeoSeries(Series):
         
         Examples
         --------
-        >>> ts = pyleo.utils.load_dataset('EDC-dD').convert_time_unit('ky BP')
-        >>> ts5k = ts.resample('1ka').mean()
-        >>> fig, ax = ts.plot()
-        >>> ts5k.plot(ax=ax,color='C1')
+
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('EDC-dD').convert_time_unit('ky BP')
+            ts5k = ts.resample('1ka').mean()
+            fig, ax = ts.plot()
+            ts5k.plot(ax=ax,color='C1')
                 
         """
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
