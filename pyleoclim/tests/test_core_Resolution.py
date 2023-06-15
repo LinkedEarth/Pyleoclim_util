@@ -13,35 +13,40 @@ Notes on how to test:
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
 
+import pytest
 import pyleoclim as pyleo
 
 class TestUIResolutionDescribe:
     """Tests for Resolution.describe()"""
-
-    def test_describe_t0(self,unevenly_spaced_series):
-        resolution = unevenly_spaced_series.resolution()
+    @pytest.mark.parametrize('series', ['unevenly_spaced_series','unevenly_spaced_series_nans'])
+    def test_describe_t0(self,series,request):
+        series = request.getfixturevalue(series)
+        resolution = series.resolution()
         resolution.describe()
 
 class TestUIResolutionPlot:
     """Tests for Resolution.plot()"""
-
-    def test_plot_t0(self,unevenly_spaced_series):
-        resolution = unevenly_spaced_series.resolution()
+    @pytest.mark.parametrize('series', ['unevenly_spaced_series','unevenly_spaced_series_nans'])
+    def test_plot_t0(self,series,request):
+        series = request.getfixturevalue(series)
+        resolution = series.resolution()
         fig, ax = resolution.plot()
         pyleo.closefig(fig)
 
 class TestUIHistPlot:
     """Tests for Resolution.plot()"""
-
-    def test_histplot_t0(self,unevenly_spaced_series):
-        resolution = unevenly_spaced_series.resolution()
+    @pytest.mark.parametrize('series', ['unevenly_spaced_series','unevenly_spaced_series_nans'])
+    def test_histplot_t0(self,series,request):
+        series = request.getfixturevalue(series)
+        resolution = series.resolution()
         fig, ax = resolution.histplot()
         pyleo.closefig(fig)
 
 class TestUIDashboard:
     """Tests for Resolution.dashboard()"""
-
-    def test_dashboard_t0(self,unevenly_spaced_series):
-        resolution = unevenly_spaced_series.resolution()
+    @pytest.mark.parametrize('series', ['unevenly_spaced_series','unevenly_spaced_series_nans'])
+    def test_dashboard_t0(self,series,request):
+        series = request.getfixturevalue(series)
+        resolution = series.resolution()
         fig, ax = resolution.dashboard()
         pyleo.closefig(fig)

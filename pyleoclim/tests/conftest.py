@@ -44,6 +44,16 @@ def unevenly_spaced_series():
     return series
 
 @pytest.fixture
+def unevenly_spaced_series_nans():
+    """Pyleoclim series with unevenly spaced time axis"""
+    length = 10
+    t = np.linspace(1,length,length) ** 2
+    v = np.ones(length)
+    v[2:4] = np.nan
+    series = pyleo.Series(time=t, value =v, dropna=False, verbose=False)
+    return series
+
+@pytest.fixture
 def evenly_spaced_series():
     """Pyleoclim series with evenly spaced time axis"""
     length = 10

@@ -4017,12 +4017,22 @@ class Series:
             resolution.dashboard()
 
         """
-        
-        res,_,_ = tsbase.resolution(self.time)
+
+        copy = self.copy()
+
+        x = copy.time
+        v = copy.value
+
+        if any(np.isnan(v)):
+            v,x = tsbase.dropna(ts=x,ys=v)
+            copy.time = x
+            copy.value = v
+            
+        res,_,_ = tsbase.resolution(x=x)
 
         resolution = Resolution(
             resolution = res,
-            timeseries = self
+            timeseries = copy
         )
 
         return resolution
