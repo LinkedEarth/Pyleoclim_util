@@ -4017,8 +4017,12 @@ class Series:
             resolution.dashboard()
 
         """
-        
-        res,_,_ = tsbase.resolution(self.time)
+        x = self.time
+
+        if any(np.isnan(x)): #Drop nans from x if they're present
+            x = x[~np.isnan(x)]
+            
+        res,_,_ = tsbase.resolution(x=x)
 
         resolution = Resolution(
             resolution = res,
