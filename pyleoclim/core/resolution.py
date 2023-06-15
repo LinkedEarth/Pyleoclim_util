@@ -79,6 +79,9 @@ class Resolution:
         '''
         
         stats = st.describe(self.resolution)._asdict()
+        
+        median = np.median(self.resolution)
+        stats['median'] = median
 
         return stats
     
