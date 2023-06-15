@@ -4017,16 +4017,22 @@ class Series:
             resolution.dashboard()
 
         """
-        x = self.time
 
-        if any(np.isnan(x)): #Drop nans from x if they're present
-            x = x[~np.isnan(x)]
+        copy = self.copy()
+
+        x = copy.time
+        v = copy.value
+
+        if any(np.isnan(v)):
+            v,x = tsbase.dropna(ts=x,ys=v)
+            copy.time = x
+            copy.value = v
             
         res,_,_ = tsbase.resolution(x=x)
 
         resolution = Resolution(
             resolution = res,
-            timeseries = self
+            timeseries = copy
         )
 
         return resolution
