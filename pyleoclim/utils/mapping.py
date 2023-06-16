@@ -797,7 +797,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 fig = plt.figure(figsize=(20, 10))
                 ax = fig.add_subplot()
 
-        transform = ccrs.PlateCarree()
+        # transform = ccrs.PlateCarree()
         if type(ax) == cartopy.mpl.geoaxes.GeoAxes:
             transform=ccrs.PlateCarree()
             if proj is not None:
