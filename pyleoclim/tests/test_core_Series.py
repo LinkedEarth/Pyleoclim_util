@@ -117,7 +117,7 @@ class TestUISeriesMakeLabels:
         # call the target function for testing
         time_header, value_header = ts.make_labels()
 
-        assert time_header == 'time [years]'
+        assert time_header == 'time [years CE]'
         assert value_header == 'value'
 
 
@@ -156,7 +156,7 @@ class TestUISeriesMakeLabels:
 
         time_header, value_header = ts1.make_labels()
 
-        assert time_header == 'time [years]'
+        assert time_header == 'time [years CE]'
         assert value_header == 'Temperature [K]'
 
 

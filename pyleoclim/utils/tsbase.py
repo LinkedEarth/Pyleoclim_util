@@ -118,7 +118,7 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
     if time_name is not None:
         if time_name.lower() == 'age':
             direction = 'retrograde'
-        elif time_name.year() in MATCH_A:
+        elif time_name.lower() in MATCH_A:
             exponent = 0
             datum = 0
 
