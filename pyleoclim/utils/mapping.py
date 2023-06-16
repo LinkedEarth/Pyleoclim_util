@@ -797,13 +797,13 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 fig = plt.figure(figsize=(20, 10))
                 ax = fig.add_subplot()
 
-        # transform = ccrs.PlateCarree()
-        if type(ax) == cartopy.mpl.geoaxes.GeoAxes:
-            transform=ccrs.PlateCarree()
-            if proj is not None:
-                scatter_kwargs['transform'] = ccrs.PlateCarree()#proj
-            else:
-                scatter_kwargs['transform'] = ccrs.PlateCarree()
+
+        # if type(ax) == cartopy.mpl.geoaxes.GeoAxes:
+        #     transform=ccrs.PlateCarree()
+        #     if proj is not None:
+        #         scatter_kwargs['transform'] = ccrs.PlateCarree()#proj
+        #     else:
+        #         scatter_kwargs['transform'] = ccrs.PlateCarree()
 
         missing_d = {'hue': kwargs['missing_val_hue'] if 'missing_val_hue' in kwargs else 'k',
                      'marker': kwargs['missing_val_marker'] if 'missing_val_marker' in kwargs else r'$?$',
@@ -1107,6 +1107,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
     scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
+    scatter_kwargs['transform'] = ccrs.PlateCarree()
     lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
 
     if proj_default is not True and type(proj_default) is not dict:
