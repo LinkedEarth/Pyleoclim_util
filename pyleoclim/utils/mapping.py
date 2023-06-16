@@ -799,7 +799,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
         if type(ax) == cartopy.mpl.geoaxes.GeoAxes:
             if proj is not None:
-                scatter_kwargs['transform'] = proj
+                scatter_kwargs['transform'] = ccrs.PlateCarree()#proj
             else:
                 scatter_kwargs['transform'] = ccrs.PlateCarree()
 
