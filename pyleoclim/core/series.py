@@ -78,7 +78,7 @@ class Series:
 
     time_unit : string
         Units for the time vector (e.g., 'ky BP').
-        Default is None
+        Default is None. in which case 'years CE' are assumed
 
     time_name : string
         Name of the time vector (e.g., 'Time','Age').
@@ -146,9 +146,16 @@ class Series:
         
         # assign time metadata if they are not provided
         if time_unit is None:
-            time_unit='years'
+            time_unit='years CE'
         if time_name is None:    
             time_name='time'
+        # give a proper time name to those series that confuse that notion with time units
+        if time_name.lower() in tsbase.MATCH_A: 
+            time_name = 'time'
+            if time_unit.lower().replace(".","") in ['ad','ce']:
+                time_unit = 'years CE'
+            elif time_unit.lower().replace(".","") in ['bp','bnf','b1950']:
+                time_unit = 'years BP'
         
         if log is None:
             if keep_log == True:

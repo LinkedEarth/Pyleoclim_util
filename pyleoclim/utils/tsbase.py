@@ -118,6 +118,9 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
     if time_name is not None:
         if time_name.lower() == 'age':
             direction = 'retrograde'
+        elif time_name.year() in MATCH_A:
+            exponent = 0
+            datum = 0
 
     if verbose:
         print(f'Provided time metadata translated to {direction} flow, 10^{exponent} year units, and year {datum} datum')    
