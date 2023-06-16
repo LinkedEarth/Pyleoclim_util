@@ -932,7 +932,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             hue_data = _df[_df[hue_var] == missing_val]
             if len(hue_data)> 0:
                 sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,
-                                style=marker_var, transform=transform,
+                                style=marker_var, transform=transform, #change to transform=scatter_kwargs['transform']
                                 palette=[missing_d['hue'] for ik in range(len(hue_data))],
                                 ax=ax, **scatter_kwargs)
                 missing_handles, missing_labels = ax.get_legend_handles_labels()
@@ -943,13 +943,13 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             hue_data = _df[_df[hue_var] != missing_val]
             if hue_norm is not None:
                 scatter_kwargs['hue_norm'] = hue_norm
-            sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,transform=transform,
+            sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,transform=transform, #change to transform=scatter_kwargs['transform']
                             style=marker_var, palette=palette, ax=ax, **scatter_kwargs)
 
         else:
             scatter_kwargs['zorder'] = 13
             scatter_kwargs['c'] = missing_d['hue']
-            sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var, transform=transform,
+            sns.scatterplot(data=_df, x=x, y=y, hue=hue_var, size=size_var, transform=transform, #change to transform=scatter_kwargs['transform']
                             style=marker_var, ax=ax, **scatter_kwargs)
             missing_handles, missing_labels = ax.get_legend_handles_labels()
 
@@ -1107,7 +1107,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     gridspec_kwargs = {} if type(gridspec_kwargs) != dict else gridspec_kwargs
     scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
-    scatter_kwargs['transform'] = ccrs.PlateCarree()
+    # scatter_kwargs['transform'] = ccrs.PlateCarree()
     lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
 
     if proj_default is not True and type(proj_default) is not dict:
