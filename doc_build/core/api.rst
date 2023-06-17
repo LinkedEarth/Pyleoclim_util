@@ -8,7 +8,7 @@ These situations are described in classes, the beauty of which is called "inheri
 A major advantage of object-oriented design is that you, the user, can harness the power of Pyleoclim methods in very few lines of code through the user API without ever having to get your hands dirty with our code (unless you want to, of course).
 The flipside is that any user would do well to understand Pyleoclim classes, what they are intended for, and what methods they support.
 
-.. image:: Pyleoclim_API.png
+.. image:: Pyleoclim_API_2.png
    :scale: 50 %
    :width: 1477px
    :height: 946px
