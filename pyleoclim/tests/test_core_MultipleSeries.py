@@ -562,7 +562,7 @@ class TestToPandas:
         ms = pyleo.MultipleSeries([ts1, ts2])
         result = ms.to_pandas(paleo_style=paleo_style,method='bin', use_common_time=True, start=2)
         if paleo_style:
-            expected_index = pd.Index([3.0], dtype='float64', name='time')
+            expected_index = pd.Index([3.0], dtype='float64', name='Time')
         else:
             expected_index = pd.DatetimeIndex(
                 np.array(['0002-12-31 17:26:17'], dtype='datetime64[s]'),

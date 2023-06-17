@@ -29,6 +29,62 @@ MATCH_KA = frozenset(['ka', 'ky', 'kyr', 'kyrs', 'kiloyear', 'kiloyr', 'kiloyrs'
 MATCH_MA = frozenset(['ma', 'my','myr','myrs'])
 MATCH_GA = frozenset(['ga', 'gy', 'gyr', 'gyrs'])
 
+MATCH_CE = frozenset(['ad', 'ce'])
+MATCH_BP = frozenset(['bp','bnf','b1950'])
+
+def disambiguate_time_metadata(time_unit):
+    '''
+    Infer time_name and time_unit from (possibly ambiguous) time units as commonly
+    provided in the field. 
+
+    Parameters
+    ----------
+    time_unit : str
+        time units, preferaby something like "kyr BP" or 'year C.E.'. Otherwise,
+        wild guesses will be attempted to decipher your meaning. 
+
+    Returns
+    -------
+    time_name : str
+        Name of the time vector (e.g., 'Time','Age'). Possibly None if no guess could be made
+    time_unit : str
+        Updated units for the time vector (e.g., 'ky BP').
+
+    '''
+    time_name = None
+    tu = time_unit.lower().replace(".","").split()
+    
+    if tu[0] in MATCH_KA:
+        time_unit = 'ka'
+        time_name = 'Age'
+    elif tu[0] in MATCH_MA:
+        time_unit = 'Ma'
+        time_name = 'Age'
+    elif tu[0] in MATCH_GA:
+        time_unit = 'Ga'
+        time_name = 'Age'
+    elif tu[0] in MATCH_CE: 
+        time_name = 'Time'
+        time_unit = 'years CE'
+    elif tu[0] in MATCH_BP:
+        time_name = 'Age' 
+    elif tu[0] in MATCH_A:
+        time_name = 'Time'
+            
+    #else:
+    #   raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input of the form 'UNIT DATUM', where UNIT can be {MATCH_A} .")
+        #raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'CE', 'AD', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
+    
+    if len(tu)>1:
+        if tu[1] in MATCH_BP:
+            time_name = 'Age'
+        elif tu[1] in MATCH_CE:
+            #time_unit = 'years CE'
+            time_name = 'Time'
+    
+    return time_name, time_unit
+
+
 def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
     """Convert time unit (yr, ka, ma, etc) to a datum, exponent, direction 
     triplet. Based on the time_unit (and optionally, the time_name) the datum
@@ -68,14 +124,16 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
         (datum, exponent, direction)
 
     """
-
+    # set defaults ; overwrite if we find cause for it
+    exponent = 0
+    datum = 0
+    direction = 'prograde'
+    
     tu = time_unit.lower().split()
-
     # deal with statements explicit about exponents, and take a first guess at datum/direction
     if tu[0] in MATCH_A:
         exponent = 0
         datum = 0
-        direction = 'prograde'
     elif tu[0] in MATCH_KA:
         datum = 1950
         exponent = 3
@@ -88,19 +146,20 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
         datum = 1950
         exponent = 9
         direction = 'retrograde'
-    elif tu[0].replace('.','') in ['ad', 'ce']:
+    elif tu[0].replace('.','') in MATCH_CE:
         exponent = 0
         datum = 0
         direction = 'prograde'
-    elif tu[0].replace('.','') in ['bp']:
+    elif tu[0].replace('.','') in MATCH_BP:
+        exponent = 0
+        datum = 1950
+        direction = 'retrograde'    
+    elif tu[0].find('cal')>=0:
         exponent = 0
         datum = 1950
         direction = 'retrograde'    
     else:
         warnings.warn(f'Time unit "{time_unit}" unknown; triggering defaults', stacklevel=4)
-        exponent = 0
-        datum = 0
-        direction = 'prograde'
 
     # if provided, deal with statements about datum/direction, like kyr BP, years CE, etc
     if len(tu) > 1:
@@ -108,17 +167,20 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
         if datum_str == 'b2k':
             datum = 2000
             direction = 'retrograde'
-        elif datum_str in ['bp', 'bnf', 'b1950']:
+        elif datum_str in MATCH_BP:
             datum = 1950
             direction = 'retrograde'
-        elif datum_str in ['ad', 'ce']:
+        elif datum_str in MATCH_CE:
             datum = 0
             direction = 'prograde'
 
     if time_name is not None:
         if time_name.lower() == 'age':
-            direction = 'retrograde'
+            direction = 'retrograde' 
+        elif time_name.lower() == 'time':
+            direction = 'prograde'
         elif time_name.lower() in MATCH_A:
+            direction = 'prograde'
             exponent = 0
             datum = 0
 
