@@ -78,7 +78,7 @@ class Series:
 
     time_unit : string
         Units for the time vector (e.g., 'ky BP').
-        Default is None
+        Default is None. in which case 'years CE' are assumed
 
     time_name : string
         Name of the time vector (e.g., 'Time','Age').
@@ -146,10 +146,22 @@ class Series:
         
         # assign time metadata if they are not provided
         if time_unit is None:
-            time_unit='years'
-        if time_name is None:    
-            time_name='time'
-        
+            time_unit='years CE'
+            if verbose:
+                warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning)
+        else:
+            # give a proper time name to those series that confuse that notion with time units
+            time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
+            
+        if time_name is None:  
+            if verbose:
+                warnings.warn('No time_name parameter provided. Assuming "Time".', UserWarning)
+            time_name='Time'
+        elif time_name in tsbase.MATCH_A:
+            if verbose:
+                warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning)
+            time_name='Time'
+       
         if log is None:
             if keep_log == True:
                 self.log = ()
@@ -619,42 +631,26 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             ts = pyleo.utils.load_dataset('SOI')
-            new_ts = ts.convert_time_unit(time_unit='yrs BP')
+            tsBP = ts.convert_time_unit(time_unit='yrs BP')
             print('Original timeseries:')
             print('time unit:', ts.time_unit)
             print('time:', ts.time[:10])
             print()
             print('Converted timeseries:')
-            print('time unit:', new_ts.time_unit)
-            print('time:', new_ts.time[:10])
+            print('time unit:', tsBP.time_unit)
+            print('time:', tsBP.time[:10])
 
         '''
 
         new_ts = self.copy()
-
+        
         if time_unit is not None:
-            tu = time_unit.lower()
-            if tu.find('ky')>=0 or tu.find('ka')>=0:
-                time_unit_label = 'ky BP'
-                time_name = 'Age'
-            elif tu.find('My')>=0 or tu.find('Ma')>=0:
-                time_unit_label = 'My BP'
-                time_name = 'Age'
-            elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
-                time_unit_label = 'yrs BP'
-                time_name = 'Age'
-            elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0 or tu.find('ad')>=0 or tu.find('ce')>=0:
-                time_unit_label = 'yrs'
-                time_name = 'Time'
-            else:
-                raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'CE', 'AD', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
+            time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
         else:
             return new_ts
 
-        new_time = tsbase.convert_datetime_index_to_time(self.datetime_index, time_unit_label, time_name)
+        new_time = tsbase.convert_datetime_index_to_time(self.datetime_index, time_unit, time_name)
 
         dt = np.diff(new_time)
         if any(dt<=0):
@@ -663,7 +659,7 @@ class Series:
             new_value = self.copy().value
 
         new_ts.time = new_time
-        new_ts.value = new_value
+        new_ts.new_value = new_value
         new_ts.time_unit = time_unit
         new_ts.time_name = time_name
 
