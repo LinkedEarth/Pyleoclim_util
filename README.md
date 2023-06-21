@@ -52,7 +52,7 @@ Please submit any reproducible bugs you encounter to the [issue tracker](https:/
 ### License
 
 The project is licensed under the GNU Public License. Please refer to the file call license.
-If you use the code in publications, please credit the work using the citation file.
+If you use the code in publications, please credit the work using the citation file. 
 
 
 ### Disclaimer
