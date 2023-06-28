@@ -299,7 +299,9 @@ class MultivariateDecomp:
         ax['pc'] = fig.add_subplot(gs[0, 0])
         label = rf'$PC_{index + 1}$' 
         t = self.orig.series_list[0].time
-        ts = series.Series(time=t, value=PC, verbose=False)  # define timeseries object for the PC
+        ts = series.Series(time=t, value=PC, verbose=False,
+                           time_name=self.orig.time_name,
+                           time_unit=self.orig.time_unit)  # define timeseries object for the PC
         ts.plot(ax=ax['pc'])
         ax['pc'].set_ylabel(label)
                
