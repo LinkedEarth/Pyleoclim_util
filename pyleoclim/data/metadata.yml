@@ -136,7 +136,7 @@ cenogrid_d18O:
   pyleo_kwargs:
     time_unit: 'My BP'
     time_name: 'Tuned Time'
-    value_unit: '‰ (VPDB)'
+    value_unit: '‰ VPDB'
     value_name: '$\delta^{18} \mathrm{O}$'
     label: 'CENOGRID'
     archiveType: 'Marine Sediment'
@@ -152,7 +152,7 @@ cenogrid_d13C:
   pyleo_kwargs:
     time_unit: 'My BP'
     time_name: 'Tuned Time'
-    value_unit: '‰ (VPDB)'
+    value_unit: '‰ VPDB'
     value_name: '$\delta^{13} \mathrm{C}$'
     label: 'CENOGRID'
     archiveType: 'Marine Sediment'

@@ -1,6 +1,7 @@
 from ..utils import plotting, lipdutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
+from ..utils import tsbase
 
 #from ..core.multiplepsd import *
 #import ..core.multiplepsd
@@ -137,7 +138,9 @@ class PSD:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
+            name, unit = tsbase.disambiguate_time_metadata(timeseries.time_unit)
+            self.period_unit = unit
+            #self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
             self.period_unit = None
 
