@@ -1,7 +1,7 @@
-from ..utils import plotting, lipdutils
+from ..utils import plotting
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
-from ..utils import tsbase
+#from ..utils import tsbase
 
 #from ..core.multiplepsd import *
 #import ..core.multiplepsd
@@ -17,6 +17,27 @@ import warnings
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 
 
+# def infer_period_unit_from_time_unit(time_unit):
+#     ''' infer a period unit based on the given time unit
+
+#     '''
+#     if time_unit is None:
+#         period_unit = None
+#     else:
+#         unit_group = lipdutils.timeUnitsCheck(time_unit)
+#         if unit_group != 'unknown':
+#             if unit_group == 'kage_units':
+#                 period_unit = 'kyrs'
+#             else:
+#                 period_unit = 'yrs'
+#         else:
+#             if time_unit[-1] == 's':
+#                 period_unit = time_unit
+#             else:
+#                 period_unit = f'{time_unit}s'
+
+#     return period_unit
+
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
 
@@ -24,18 +45,8 @@ def infer_period_unit_from_time_unit(time_unit):
     if time_unit is None:
         period_unit = None
     else:
-        unit_group = lipdutils.timeUnitsCheck(time_unit)
-        if unit_group != 'unknown':
-            if unit_group == 'kage_units':
-                period_unit = 'kyrs'
-            else:
-                period_unit = 'yrs'
-        else:
-            if time_unit[-1] == 's':
-                period_unit = time_unit
-            else:
-                period_unit = f'{time_unit}s'
-
+        tu = time_unit.lower().replace(".","").split()
+        period_unit = tu[0]
     return period_unit
 
 class PSD:
@@ -138,9 +149,7 @@ class PSD:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            name, unit = tsbase.disambiguate_time_metadata(timeseries.time_unit)
-            self.period_unit = unit
-            #self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
+            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
             self.period_unit = None
 

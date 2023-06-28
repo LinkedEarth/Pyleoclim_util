@@ -151,7 +151,7 @@ class Series:
                 warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning)
         else:
             # give a proper time name to those series that confuse that notion with time units
-            time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
+            time_name, _ = tsbase.disambiguate_time_metadata(time_unit)
             
         if time_name is None:  
             if verbose:
