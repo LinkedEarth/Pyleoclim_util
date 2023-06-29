@@ -18,7 +18,7 @@ dependencies:
   - pyyaml
   - requests
   - scikit-learn
-  - scipy=1.11.0
+  - scipy<1.11.0
   - seaborn
   - statsmodels
   - tabulate
