@@ -144,11 +144,16 @@ class Series:
         time = np.array(time)
         value = np.array(value)
         
-        # assign time metadata if they are not provided
+        # assign time metadata if they are not provided or provided incorrectly
+        offending = [tsbase.MATCH_CE, tsbase.MATCH_BP]
+        
         if time_unit is None:
             time_unit='years CE'
             if verbose:
                 warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning)
+        elif time_unit.lower().replace(".","") in frozenset().union(*offending):
+            # fix up time name and units for offending cases
+            time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
         else:
             # give a proper time name to those series that confuse that notion with time units
             time_name, _ = tsbase.disambiguate_time_metadata(time_unit)
