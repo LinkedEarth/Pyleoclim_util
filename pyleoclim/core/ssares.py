@@ -24,10 +24,7 @@ class SsaRes:
 
     Parameters
     ----------
-    time : array
-        time axis 
-        
-    original : array 
+    orig: Series
         timeseries on which SSA was performed
         
     eigvals: float (M, 1)
@@ -59,9 +56,8 @@ class SsaRes:
 
     pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis
     '''
-    def __init__(self, time, original, label, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
-        self.time       = time
-        self.original   = original
+    def __init__(self, orig, label, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
+        self.orig       = orig
         self.label      = label
         self.eigvals    = eigvals
         self.eigvals_q  = eigvals_q
@@ -251,14 +247,14 @@ class SsaRes:
         gs = gridspec.GridSpec(2, 2)
         # plot RC
         ax = fig.add_subplot(gs[0, :])
-
-        ax.plot(self.time,RC,label='mode '+str(index+1),zorder=99)
+        ts_rc  = self.orig.copy()
+        ts_rc.value = RC
+        ts_rc.label = r'$RC_'+str(index+1)+'$'
+        ts_rc.plot(zorder=99,ax=ax)
         if plot_original:
-            ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
-            ax.legend()
-        ax.set_xlabel('Time')
-        ax.set_ylabel(r'$RC_'+str(index+1)+'$')
-        ax.set_title('SSA reconstructed component '+str(index+1)+', '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
+            self.orig.plot(ax=ax,color='Silver',linewidth=1)
+            
+        ax.set_title('SSA  mode '+str(index+1)+', '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
         ax.plot(self.eigvecs[:,index])
@@ -266,10 +262,9 @@ class SsaRes:
         ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])
-        ts_rc = series.Series(time=self.time, value=RC, verbose=False) # define timeseries object for the RC
         psd_mtm_rc = ts_rc.interp().spectral(method=spec_method)
         psd_mtm_rc.plot(ax=ax)
-        ax.set_xlabel('Period')
+        #ax.set_xlabel('Period')
         ax.set_title('RC Spectrum ('+spec_method+')')
 
         if 'path' in savefig_settings:

@@ -1,14 +1,13 @@
 import numpy as np
-import pandas as pd
+#import pandas as pd
 from matplotlib import pyplot as plt, gridspec
-from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
+#from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 from matplotlib.ticker import MaxNLocator
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
+#import cartopy.crs as ccrs
+#import cartopy.feature as cfeature
 
 from ..core import series
-from ..utils import plotting, lipdutils
-from ..utils import mapping
+from ..utils import plotting, mapping, tsbase
 
 
 class MultivariateDecomp:
@@ -306,7 +305,17 @@ class MultivariateDecomp:
         ax['pc'] = fig.add_subplot(gs[0, 0])
         label = rf'$PC_{index + 1}$' 
         t = self.orig.series_list[0].time
-        ts = series.Series(time=t, value=PC, verbose=False)  # define timeseries object for the PC
+        # get time unit
+        if self.orig.time_unit is not None:
+            time_unit = self.orig.time_unit
+        else:
+            time_unit = self.orig.series_list[0].time_unit
+        
+        time_name, _ = tsbase.disambiguate_time_metadata(time_unit)
+
+        ts = series.Series(time=t, value=PC, verbose=False,
+                           time_name=time_name,
+                           time_unit=time_unit)  # define timeseries object for the PC
         ts.plot(ax=ax['pc'])
         ax['pc'].set_ylabel(label)
                
