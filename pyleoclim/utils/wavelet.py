@@ -2381,7 +2381,7 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
 
         """
         def fft_kwargs(signal, **kwargs):
-            return {'n': np.int(2 ** np.ceil(np.log2(len(signal))))}
+            return {'n': int(2 ** np.ceil(np.log2(len(signal))))}
 
         W = coeff.transpose()
         m, n = np.shape(W)
@@ -2402,7 +2402,7 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
 
         # Smooth in scale
         wsize = 0.6 / dj * 2
-        win = rect(np.int(np.round(wsize)), normalize=True)
+        win = rect(int(np.round(wsize)), normalize=True)
         T = signal.convolve2d(T, win[:, np.newaxis], 'same')
         S = T.transpose()
 
@@ -2876,7 +2876,7 @@ def tc_wavelet(Y, dt, scale, mother, param, pad=False):
     if pad == True:
         # power of 2 nearest to N
         base2 = np.fix(np.log(n1) / np.log(2) + 0.4999)
-        nzeroes = (2 ** (base2 + 1) - n1).astype(np.int64)
+        nzeroes = int(2 ** (base2 + 1) - n1)
         x = np.concatenate((x, np.zeros(nzeroes)))
 
     n = len(x)
