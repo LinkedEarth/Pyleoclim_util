@@ -8,11 +8,7 @@ channels:
 dependencies:
   - python>=3.9
   - cartopy
-  - nitime
   - numba
-  - pathos
-  - pip
-  - pytest
   - pyyaml
   - requests
   - scikit-learn
@@ -21,7 +17,7 @@ dependencies:
   - tabulate
   - tqdm
   - wget
+  - pip
   - pip:
     - pyhht
     - '-e .'
-    - pandas>=2.0

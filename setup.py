@@ -29,6 +29,7 @@ setup(
     install_requires=[
         "LiPD==0.2.8.8",
         "pandas>=2.0.0",
+        "kneed>=0.7.0",
         "statsmodels>=0.13.2",
         "seaborn>=0.12.0",
         "scikit-learn>=0.24.2",
@@ -41,7 +42,6 @@ setup(
         "nitime>=0.9",
         "tabulate>=0.8.9",
         "Unidecode>=1.1.1",
-        "kneed>=0.7.0",
         "pyyaml",
     ],
     python_requires=">=3.9.0"
