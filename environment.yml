@@ -2,7 +2,6 @@
 # packages for this repo including running the test suite.
 name: pyleo
 channels:
-  - conda-forge
   - default
 dependencies:
   - python>=3.9
@@ -17,6 +16,7 @@ dependencies:
   - tqdm
   - wget
   - pip
+  - pytest
   - pip:
     - pyhht
     - '-e .'
