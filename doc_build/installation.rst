@@ -58,9 +58,14 @@ Once the pyleo environment is activated, you'll want to first install Cartopy:
 
 .. code-block:: bash
 
-  conda install -c conda-forge cartopy=0.21
+  conda install cartopy
 
-(note: under Python 3.10, cartopy>=0.21 will be installed by default, so specifying this version is unnecessary).
+To avoid a recent (July 2023) conflict between Cartopy and SciPy v1.11, once may install Statsmodels from conda so that SciPy v1.10 will be installed:
+
+.. code-block:: bash
+
+  conda install statsmodels
+
 Then install Pyleoclim through Pypi, which contains the most stable version of Pyleoclim:
 
 .. code-block:: bash
