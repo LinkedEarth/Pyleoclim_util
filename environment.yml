@@ -2,7 +2,6 @@
 # packages for this repo including running the test suite.
 name: pyleo
 channels:
-  - LinkedEarth
   - conda-forge
   - default
 dependencies:
