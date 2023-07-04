@@ -29,9 +29,6 @@ setup(
     install_requires=[
         "LiPD==0.2.8.8",
         "pandas>=2.0.0",
-        "numpy<=1.24.0",
-        "matplotlib>=3.6.0",
-        "scipy>=1.9.1",
         "statsmodels>=0.13.2",
         "seaborn>=0.12.0",
         "scikit-learn>=0.24.2",
