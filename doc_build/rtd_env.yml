@@ -2,8 +2,9 @@ name: rtd_env
 channels:
   - defaults
 dependencies:
-  - python>=3.9
+  - python>=3.10
   - cartopy
+  - statsmodels
   - pip:
     - Sphinx<6.0
     - pylint
