@@ -2,29 +2,21 @@
 # packages for this repo including running the test suite.
 name: pyleo
 channels:
-  - LinkedEarth
-  - conda-forge
   - default
 dependencies:
   - python>=3.9
   - cartopy
-  - matplotlib
-  - nitime
   - numba
-  - numpy
-  - pathos
-  - pip
-  - pytest
   - pyyaml
   - requests
   - scikit-learn
-  - scipy=1.10.1
   - seaborn
   - statsmodels
   - tabulate
   - tqdm
   - wget
+  - pip
+  - pytest
   - pip:
     - pyhht
     - '-e .'
-    - pandas>=2.0

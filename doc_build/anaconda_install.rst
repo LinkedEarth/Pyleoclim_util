@@ -9,12 +9,19 @@ Users may find it preferable to install the minimalist "miniconda" package.
 Step 1: Download the installation script for miniconda3
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-MacOS
------
+macOS (Intel)
+'''''''''''''
 
 .. code-block:: bash
 
   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+
+macOS (Apple Silicon)
+'''''''''''''''''''''
+
+.. code-block:: bash
+
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh
 
 Linux
 -----
