@@ -1251,7 +1251,7 @@ class Series:
             fig, ax = nino_mcssa.screeplot()
             print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
-        This suggests that modes 1-5 fall above the red noise benchmark. To inspect mode 1 (index 0), just type:
+        This suggests that modes 1-5 fall above the red noise benchmark, but so do a few others. To inspect mode 1 (index 0), just type:
 
         .. jupyter-execute::
 
@@ -1266,7 +1266,9 @@ class Series:
         RCseries.value = res['RCseries']
         if trunc is not None:
             RCseries.label = self.label + ' SSA reconstruction (' + trunc + ')'
-            
+        else:
+            RCseries.label = self.label + ' SSA reconstruction'
+
         resc = SsaRes(label=self.label, orig=self, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
                         pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'],
                         RCseries=RCseries, mode_idx=res['mode_idx'])

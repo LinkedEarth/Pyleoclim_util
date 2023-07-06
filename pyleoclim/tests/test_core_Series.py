@@ -1025,7 +1025,7 @@ class TestUISeriesSsa():
         soi_m.value[missing] = np.nan  # put NaNs at the randomly chosen locations
         miss_ssa = soi_m.ssa()
         assert all(miss_ssa.eigvals >= 0)
-        assert np.square(miss_ssa.RCseries - soi.value).mean() < 0.3
+        assert np.square(miss_ssa.RCseries.value - soi.value).mean() < 0.3
 
 
 
