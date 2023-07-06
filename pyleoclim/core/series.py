@@ -1215,19 +1215,20 @@ class Series:
             * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet
             * around i=15, the eigenvalues appear to reach a floor, and all subsequent eigenvalues explain a very small amount of variance.
 
-        So, summing the variance of the first 15 modes, we get:
+        So, summing the variance of the first 14 modes, we get:
 
         .. jupyter-execute::
 
             print(nino_ssa.pctvar[:14].sum())
 
-        That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
+        That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 14 columns:
 
         .. jupyter-execute::
 
-            RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
+            RCmat = nino_ssa.RCmat[:,:14]
+            RCk = (RCmat-RCmat.mean()).sum(axis=1) + ts.value.mean()
             fig, ax = ts.plot(title='SOI')
-            ax.plot(nino_ssa.time,RCk,label='SSA reconstruction, 14 modes',color='orange')
+            ax.plot(nino_ssa.orig.time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
 
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
@@ -1247,24 +1248,30 @@ class Series:
 
         .. jupyter-execute::
 
-
             fig, ax = nino_mcssa.screeplot()
-
             print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
-        This suggests that modes 1-5 fall above the red noise benchmark. To inspect mode 1 (index 0), just type:
+        This suggests that modes 1-5 fall above the red noise benchmark, but so do a few others. To inspect mode 1 (index 0), just type:
 
         .. jupyter-execute::
 
             fig, ax = nino_mcssa.modeplot(index=0)
+            
+        For other truncation methods, see http://linked.earth/PyleoTutorials/notebooks/L2_singular_spectrum_analysis.html  
 
         '''
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh, online=online)
+        RCseries = self.copy()
+        RCseries.value = res['RCseries']
+        if trunc is not None:
+            RCseries.label = 'SSA reconstruction (' + trunc + ')'
+        else:
+            RCseries.label = 'SSA reconstruction'
 
         resc = SsaRes(label=self.label, orig=self, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
                         pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'],
-                        RCseries=res['RCseries'], mode_idx=res['mode_idx'])
+                        RCseries=RCseries, mode_idx=res['mode_idx'])
         if nMC >= 0:
             resc.eigvals_q=res['eigvals_q'] # assign eigenvalue quantiles if Monte-Carlo SSA was called
 
