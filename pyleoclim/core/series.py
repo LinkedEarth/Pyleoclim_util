@@ -1265,9 +1265,9 @@ class Series:
         RCseries = self.copy()
         RCseries.value = res['RCseries']
         if trunc is not None:
-            RCseries.label = self.label + ' SSA reconstruction (' + trunc + ')'
+            RCseries.label = 'SSA reconstruction (' + trunc + ')'
         else:
-            RCseries.label = self.label + ' SSA reconstruction'
+            RCseries.label = 'SSA reconstruction'
 
         resc = SsaRes(label=self.label, orig=self, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
                         pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'],

@@ -39,7 +39,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
 
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v, sort_ts='none', verbose=False)
+    ts=pyleo.Series(t,v, verbose=False)
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
@@ -986,35 +986,29 @@ class TestUISeriesSsa():
         res = cn.ssa()
         assert abs(res.pctvar.sum() - 100.0)<0.01
 
-
-    def test_ssa_t1(self):
-        '''Test Series.ssa() with var truncation
+    @pytest.mark.parametrize('trunc',['var', 'kaiser'])
+    def test_ssa_t1(self, trunc):
+        '''Test Series.ssa() with various truncations
         '''
-        ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
-        ts.ssa(trunc='var')
+        ts = gen_ts(model = 'colored_noise', nt=100, alpha=1.0)
+        ssa = ts.ssa(trunc=trunc)
+        assert ssa.RCseries.label == 'SSA reconstruction (' + trunc + ')'
 
     def test_ssa_t2(self):
         '''Test Series.ssa() with Monte-Carlo truncation
         '''
-
-        ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
-        ts.ssa(M=60, nMC=10, trunc='mcssa')
-
+        ts = gen_ts(model = 'colored_noise', nt=100, alpha=1.0)
+        mc_ssa = ts.ssa(M=60, nMC=10, trunc='mcssa')
+        assert mc_ssa.RCseries.label == 'SSA reconstruction (mcssa)'
 
     def test_ssa_t3(self):
-        '''Test Series.ssa() with Kaiser truncation
-        '''
-        ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
-        ts.ssa(trunc='kaiser')
-    
-    def test_ssa_t4(self):
         '''Test Series.ssa() with Knee truncation'''
         ts = pyleo.utils.load_dataset('SOI')
         ssa = ts.ssa(trunc='knee')
         knee = 12
         assert_array_equal(ssa.mode_idx, np.arange(knee+1))
 
-    def test_ssa_t5(self):
+    def test_ssa_t4(self):
         '''Test Series.ssa() with missing values
         '''
         soi = pyleo.utils.load_dataset('SOI')
