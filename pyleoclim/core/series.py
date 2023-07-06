@@ -1157,7 +1157,7 @@ class Series:
 
         RCmat : (N,  M) array of reconstructed components
 
-        RCseries : (N,) reconstructed series, with mean and variance restored
+        RCseries : (N,) reconstructed series, with mean and variance restored (same type as original)
 
         pctvar: (M, ) array of the fraction of variance (%) associated with each mode
 
@@ -1257,6 +1257,13 @@ class Series:
         .. jupyter-execute::
 
             fig, ax = nino_mcssa.modeplot(index=0)
+            
+        To inspect the reconstructed series, simply do:
+            
+        .. jupyter-execute::
+
+            fig, ax = ts.plot()
+            nino_mcssa.RCseries.plot(ax=ax)
 
         '''
 
