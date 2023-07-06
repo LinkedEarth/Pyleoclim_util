@@ -1005,7 +1005,7 @@ class MultipleSeries:
             neff = tsutils.eff_sample_size(PC1)
 
             # compute percent variance
-            pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
+            pctvar = out.eigenvals/np.sum(out.eigenvals)*100
 
             # assign name
             if name is not None:

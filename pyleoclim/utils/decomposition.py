@@ -397,7 +397,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
                 PC[i, k] = sum(
                     prod[~np.isnan(prod)]) * M / ngood  # the columns of this matrix are Ak(t), k=1 to M (T-PCs)
 
-    pctvar = eigvals**2/np.sum(eigvals**2)*100 # percent variance
+    pctvar = eigvals/np.sum(eigvals)*100 # percent variance
 
     if nMC > 0: # If Monte-Carlo SSA is requested.
         trunc == 'mcssa'
@@ -418,7 +418,6 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
         mode_idx = np.where(eigvals>=eigvals_q[:,1])[0]
     else:
         eigvals_q = None
-
 
     if trunc is None:
         mode_idx = np.arange(M)
