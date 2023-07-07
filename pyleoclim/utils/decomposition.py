@@ -397,7 +397,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
                 PC[i, k] = sum(
                     prod[~np.isnan(prod)]) * M / ngood  # the columns of this matrix are Ak(t), k=1 to M (T-PCs)
 
-    pctvar = eigvals**2/np.sum(eigvals**2)*100 # percent variance
+    pctvar = eigvals/np.sum(eigvals)*100 # percent variance
 
     if nMC > 0: # If Monte-Carlo SSA is requested.
         trunc == 'mcssa'
@@ -418,7 +418,6 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
         mode_idx = np.where(eigvals>=eigvals_q[:,1])[0]
     else:
         eigvals_q = None
-
 
     if trunc is None:
         mode_idx = np.arange(M)
@@ -453,10 +452,11 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
     RCmat = scale*RCmat + np.tile(mu, reps=[N, M])  # restore the mean and variance
 
     #RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu
-
-    RCseries = RCmat[:,mode_idx].sum(axis=1)
-    if nmodes > 1:
-        RCseries -= mu*(nmodes-1)
+    
+    RCmodes = RCmat[:,mode_idx]
+    RCseries = (RCmodes-RCmodes.mean()).sum(axis=1) + mu
+    #if nmodes > 1:
+    #    RCseries -= scale*mu*(nmodes-1)
 
     # export results
     res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q, 'mode_idx': mode_idx}
