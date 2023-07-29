@@ -125,27 +125,36 @@ class MultivariateDecomp:
 
         if self.neff < 2:
             self.neff = 2
-
+            
+        if self.eigvals.ndim == 1:
+            print("The provided eigenvalue array has only one dimension. UQ defaults to NB82")
+            uq = 'N82'
+        
         # compute 95% CI
-        if uq == 'N82':
-            eb_lbl = r'95% CI ($n_\mathrm{eff} = $' + '{:.1f}'.format(self.neff) + ')'  # declare method
-            Lc = self.eigvals  # central estimate
-            Lerr = np.tile(Lc, (2, 1))  # declare array
-            Lerr[0, :] = Lc * np.sqrt(1 - np.sqrt(2 / self.neff))
-            Lerr[1, :] = Lc * np.sqrt(1 + np.sqrt(2 / self.neff))
-        elif uq == 'MC':
-            eb_lbl = '95% CI (Monte Carlo)'  # declare method
+        if uq == 'MC':
             try:
                 Lq = np.quantile(self.eigvals, [0.025, 0.5, 0.975], axis=1)
                 Lc = Lq[1, :]
                 Lerr = np.tile(Lc, (2, 1))  # declare array
                 Lerr[0, :] = Lq[0, :]
                 Lerr[1, :] = Lq[2, :]
+                eb_lbl = '95% CI (Monte Carlo)'  # declare method
 
             except ValueError:
-                print("Eigenvalue array must have more than 1 non-singleton dimension.")
+                print("MC method cannot be applied because eigvals has two few MC samples.")
+                
+        elif uq == 'N82':
+            eb_lbl = r'95% CI ($n_\mathrm{eff} = $' + '{:.1f}'.format(self.neff) + ')'  # declare method
+            Lc = self.eigvals  # central estimate
+            Lerr = np.tile(Lc, (2, 1))  # declare array
+            Lerr[0, :] = Lc * np.sqrt(1 - np.sqrt(2 / self.neff))
+            Lerr[1, :] = Lc * np.sqrt(1 + np.sqrt(2 / self.neff))
+        
         else:
             raise NameError("unknown UQ method. No action taken")
+            Lc = self.eigvals  # central estimate
+            Lerr = np.tile(Lc, (2, 1)) 
+            #Lerr = np.zeros((len(Lc),2))
 
         idx = np.arange(len(Lc)) + 1
 

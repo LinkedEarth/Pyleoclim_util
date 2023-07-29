@@ -33,8 +33,8 @@ def gen_ts(model, nt, alpha):
 class TestUiMultivariateDecompScreeplot:
     ''' Tests for MultivariateDecomp.screeplot()
     '''
-
-    def test_plot_t0(self):
+    @pytest.mark.parametrize('uq', ['NB82', 'MC'])
+    def test_plot_t0(self, uq):
         ''' Test MultivariateDecomp.screeplot() with default parameters
 
         '''
@@ -45,12 +45,13 @@ class TestUiMultivariateDecompScreeplot:
     
         mslist = []
         for i in range(p):
-            mslist.append(pyleo.Series(time = t, value = X[:,i]))
+            mslist.append(pyleo.Series(time = t, value = X[:,i], verbose=False, label='series_'+str(i)))
+            print(type(mslist[i]))
         ms = pyleo.MultipleSeries(mslist)
 
         res = ms.pca()
         
-        fig, ax = res.screeplot()
+        fig, ax = res.screeplot(uq=uq)
         pyleo.closefig(fig)
         
 class TestUiMultivariateDecompModeplot:
