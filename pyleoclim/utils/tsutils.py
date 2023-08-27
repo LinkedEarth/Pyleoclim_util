@@ -273,7 +273,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     return  res_dict
 
 
-def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, evenly_spaced=False, bin_edges=None, time_axis=None,no_nans=True):
+def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, evenly_spaced=False, bin_edges=None, time_axis=None,no_nans=True):
     '''Coarsen time resolution using a Gaussian kernel
 
     The behavior of bins, as defined either by start, stop and step (or step_style) or by the bins argument, is to have all bins
@@ -289,7 +289,9 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
         values on the original time axis
         
     h  : float 
-        kernel e-folding scale
+        kernel e-folding scale. Default value is None, in which case the median time step will be used.
+        If the median time step results in a series with nan values, the maximum time step will be used.
+        Note that if this variable is too small, this method may return nan values in parts of the series.
     
     step : float
         The interpolation step. Default is max spacing between consecutive points.
@@ -444,6 +446,9 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
 
     kernel = lambda x, s : 1.0/(s*np.sqrt(2*np.pi))*np.exp(-0.5*(x/s)**2)  # define kernel function
 
+    if h is None:
+        h = np.median(t)
+
     yc    = np.zeros((len(time_axis)))
     yc[:] = np.nan
 
@@ -465,7 +470,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     if no_nans:
         check = np.isnan(yc).any()
         if check:
-            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See tsutils.gkernel() documentation for details on parameter hierarchy.',stacklevel=2)
+            warnings.warn('no_nans is set to True but nans are present in the series. It may have been overridden by other parameters. See tsutils.gkernel() documentation for details on parameter hierarchy, and check that your h parameter is large enough.',stacklevel=2)
 
     return time_axis, yc
 

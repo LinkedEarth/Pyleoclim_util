@@ -42,6 +42,7 @@ setup(
         "nitime>=0.9",
         "tabulate>=0.8.9",
         "Unidecode>=1.1.1",
+        "cartopy>=0.22.0",
         "pyyaml",
     ],
     python_requires=">=3.9.0"
