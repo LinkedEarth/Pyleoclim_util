@@ -74,7 +74,7 @@ class Series:
         time axis (prograde or retrograde) 
 
     value : list of numpy.array
-        values of the dependent variable (y)3
+        values of the dependent variable (y)
 
     time_unit : string
         Units for the time vector (e.g., 'ky BP').
@@ -93,7 +93,7 @@ class Series:
         Default is None
 
     label : string
-        Name of the time series (e.g., 'Nino 3.4')
+        Name of the time series (e.g., 'NINO 3.4')
         Default is None
 
     log : dict
@@ -144,6 +144,7 @@ class Series:
         time = np.array(time)
         value = np.array(value)
         
+        tn = time_name
         # assign time metadata if they are not provided or provided incorrectly
         offending = [tsbase.MATCH_CE, tsbase.MATCH_BP]
         
@@ -166,7 +167,9 @@ class Series:
             if verbose:
                 warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning)
             time_name='Time'
-       
+        else:
+            time_name = tn
+            
         if log is None:
             if keep_log == True:
                 self.log = ()
