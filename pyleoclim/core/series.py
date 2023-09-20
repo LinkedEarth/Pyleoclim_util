@@ -65,7 +65,7 @@ class Series:
 
     * optionally, some metadata about both axes, like units, labels and origin.
 
-    How to create, manipulate and use such objects is described in `PyleoTutorials <https://http://linked.earth/PyleoTutorials/>`_.
+    How to create, manipulate and use such objects is described in `PyleoTutorials <https://linked.earth/PyleoTutorials/>`_.
 
     Parameters
     ----------
