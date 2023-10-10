@@ -123,6 +123,10 @@ class Series:
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
          Default is None (marked for deprecation)
 
+    auto_time_params : bool
+        If True, pyleoclim will use tsbase.disambiguate_time_metadata to make sure the time_name and time_unit are recognizable by pyleoclim.
+        If False, pyleoclim will not ensure that the time_name and time_unit are known. This may break some functionalities (e.g. common_time and convert_time_unit)
+
     Examples
     --------
     Import the Southern Oscillation Index (SOI) and display a quick synopsis:
@@ -138,34 +142,38 @@ class Series:
     def __init__(self, time, value, time_unit=None, time_name=None, 
                  value_name=None, value_unit=None, label=None, 
                  importedFrom=None, archiveType = None, log=None, keep_log=False,
-                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
+                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False,
+                 auto_time_params = True):
         
         # ensure ndarray instances
         time = np.array(time)
         value = np.array(value)
         
-        # assign time metadata if they are not provided or provided incorrectly
-        offending = [tsbase.MATCH_CE, tsbase.MATCH_BP]
-        
-        if time_unit is None:
-            time_unit='years CE'
-            if verbose:
-                warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning)
-        elif time_unit.lower().replace(".","") in frozenset().union(*offending):
-            # fix up time name and units for offending cases
-            time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
-        else:
-            # give a proper time name to those series that confuse that notion with time units
-            time_name, _ = tsbase.disambiguate_time_metadata(time_unit)
+        if auto_time_params:
+            # assign time metadata if they are not provided or provided incorrectly
+            offending = [tsbase.MATCH_CE, tsbase.MATCH_BP]
             
-        if time_name is None:  
-            if verbose:
-                warnings.warn('No time_name parameter provided. Assuming "Time".', UserWarning)
-            time_name='Time'
-        elif time_name in tsbase.MATCH_A:
-            if verbose:
-                warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning)
-            time_name='Time'
+            if time_unit is None:
+                time_unit='years CE'
+                if verbose:
+                    warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning)
+            elif time_unit.lower().replace(".","") in frozenset().union(*offending):
+                # fix up time name and units for offending cases
+                time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
+            else:
+                # give a proper time name to those series that confuse that notion with time units
+                time_name, _ = tsbase.disambiguate_time_metadata(time_unit)
+                
+            if time_name is None:  
+                if verbose:
+                    warnings.warn('No time_name parameter provided. Assuming "Time".', UserWarning)
+                time_name='Time'
+            elif time_name in tsbase.MATCH_A:
+                if verbose:
+                    warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning)
+                time_name='Time'
+        else:
+            pass
        
         if log is None:
             if keep_log == True:
@@ -4051,6 +4059,8 @@ class Series:
         )
 
         return resolution
+    
+    
 
 
 class SeriesResampler:
