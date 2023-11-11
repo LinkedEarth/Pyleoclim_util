@@ -32,6 +32,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
+from sklearn.neighbors import LocalOutlierFactor
 #import matplotlib.pyplot as plt
 
 import statsmodels.tsa.stattools as sms

@@ -818,7 +818,7 @@ class TestUISeriesOutliers:
         # Get a series object
         ts2 = pyleo.Series(time = ts.time, value = v_out)
         # Remove outliers
-        ts_out = ts2.outliers(method = 'kmeans', settings={'LOF'=True, 'n_frac':0.8, 'contamination':0.1})
+        ts_out = ts2.outliers(method = 'kmeans', settings={'LOF':True, 'n_frac':0.8, 'contamination':0.1})
         
 
 class TestUISeriesGkernel:
