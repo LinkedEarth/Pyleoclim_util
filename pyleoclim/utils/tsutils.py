@@ -1186,6 +1186,8 @@ def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=
     
     The Silhouette Coefficient is calculated using the mean intra-cluster distance (a) and the mean nearest-cluster distance (b) for each sample. The best value is 1 and the worst value is -1. Values near 0 indicate overlapping clusters. Negative values generally indicate that a sample has been assigned to the wrong cluster, as a different cluster is more similar. For additional details, see: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html
 
+    Outliers are identified based on their distance from the clusters. This can be done in two ways: (1) by using a threshold that corresponds to the Euclidean distance from the centroid and (2) using the Local Outlier Function (https://scikit-learn.org/stable/auto_examples/neighbors/plot_lof_outlier_detection.html)
+
     Parameters
     ----------
     ys : numpy.array
