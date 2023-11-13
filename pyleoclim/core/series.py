@@ -143,11 +143,15 @@ class Series:
                  value_name=None, value_unit=None, label=None, 
                  importedFrom=None, archiveType = None, log=None, keep_log=False,
                  sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False,
-                 auto_time_params = True):
+                 auto_time_params = None):
         
         # ensure ndarray instances
         time = np.array(time)
         value = np.array(value)
+
+        if auto_time_params is None:
+            warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True. In a future release this will be changed to False.', UserWarning, stacklevel=2)
+            auto_time_params = True
         
         if auto_time_params:
             # assign time metadata if they are not provided or provided incorrectly
@@ -156,7 +160,7 @@ class Series:
             if time_unit is None:
                 time_unit='years CE'
                 if verbose:
-                    warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning)
+                    warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning, stacklevel=2)
             elif time_unit.lower().replace(".","") in frozenset().union(*offending):
                 # fix up time name and units for offending cases
                 time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
@@ -166,11 +170,11 @@ class Series:
                 
             if time_name is None:  
                 if verbose:
-                    warnings.warn('No time_name parameter provided. Assuming "Time".', UserWarning)
+                    warnings.warn('No time_name parameter provided. Assuming "Time".', UserWarning, stacklevel=2)
                 time_name='Time'
             elif time_name in tsbase.MATCH_A:
                 if verbose:
-                    warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning)
+                    warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning, stacklevel=2)
                 time_name='Time'
         else:
             pass
