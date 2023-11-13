@@ -32,6 +32,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
+from sklearn.neighbors import LocalOutlierFactor
 #import matplotlib.pyplot as plt
 
 import statsmodels.tsa.stattools as sms
@@ -1177,13 +1178,15 @@ def detect_outliers_DBSCAN(ys, nbr_clusters = None, eps=None, min_samples=None, 
     
     return indices, res
 
-def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=3, kmeans_kwargs=None):
+def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=3, LOF=False, n_frac=0.9, contamination='auto', kmeans_kwargs=None):
     """
     Outlier detection using the unsupervised alogrithm kmeans. The algorithm runs through various number of clusters and optimizes based on the silhouette score.
     
     KMeans implementation: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html
     
     The Silhouette Coefficient is calculated using the mean intra-cluster distance (a) and the mean nearest-cluster distance (b) for each sample. The best value is 1 and the worst value is -1. Values near 0 indicate overlapping clusters. Negative values generally indicate that a sample has been assigned to the wrong cluster, as a different cluster is more similar. For additional details, see: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html
+
+    Outliers are identified based on their distance from the clusters. This can be done in two ways: (1) by using a threshold that corresponds to the Euclidean distance from the centroid and (2) using the Local Outlier Function (https://scikit-learn.org/stable/auto_examples/neighbors/plot_lof_outlier_detection.html)
 
     Parameters
     ----------
@@ -1194,7 +1197,14 @@ def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=
     max_cluster : int, optional
         The maximum number of clusters to consider in the optimization based on the Silhouette Score. The default is 10.
     threshold : int, optional
-        The algorithm uses the suclidean distance for each point in the cluster to identify the outliers. This parameter sets the threshold on the euclidean distance to define an outlier. The default is 3.
+        The algorithm uses the euclidean distance for each point in the cluster to identify the outliers. This parameter sets the threshold on the euclidean distance to define an outlier. The default is 3.
+    LOF : bool, optional
+        By default, detect_outliers_kmeans uses euclidean distance for outlier detection. Set LOF to True to use LocalOutlierFactor for outlier detection.
+    n_frac : float, optional
+        The percentage of the time series length (the length, representing number of points) to be used to set the n_neighbors parameter for the LOF function in scikit-learn. 
+        We recommend using at least 50% (n_frac=0.5) of the timeseries. You cannot use 100% (n_frac!=1)
+    contamination : ('auto', float), optional
+        Same as LOF parameter from scikit-learn. We recommend using the default mode of auto. See: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html for details.
     kmeans_kwargs : dict, optional
         Other parameters for the kmeans function. See: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html for details. The default is None.
 
@@ -1231,8 +1241,13 @@ def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=
         kmeans.fit(ys.reshape(-1, 1), **kmeans_kwargs)
         silhouette_avg.append(silhouette_score(ys.reshape(-1, 1), kmeans.labels_))
         center=kmeans.cluster_centers_[kmeans.labels_,0]
-        distance=np.sqrt((ys-center)**2)
-        idx_out.append(np.argwhere(distance>threshold).reshape(1,-1)[0])
+        if LOF:
+            model = LocalOutlierFactor(n_neighbors=int(ys.size*n_frac), contamination=contamination)
+            pred = model.fit_predict(ys.reshape(-1,1))
+            idx_out.append(np.where(pred==-1))
+        else:
+            distance=np.sqrt((ys-center)**2)
+            idx_out.append(np.argwhere(distance>threshold).reshape(1,-1)[0])
         clusters.append(kmeans.labels_)
     
     res = pd.DataFrame({'number of clusters':range_n_clusters, 'silhouette score':silhouette_avg,'outlier indices':idx_out,'clusters':clusters})
