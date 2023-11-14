@@ -211,22 +211,22 @@ class TestUIEnsembleSeriesHistplot():
         ts_ens.histplot()
         pyleo.closefig()
 
-class TestUIEnsembleSeriesDistplot():
-    def test_histplot_t0(self):
-        '''Test for EnsembleSeries.distplot()
-        '''
-        nn = 30 # number of noise realizations
-        nt = 500
-        series_list = []
+# class TestUIEnsembleSeriesDistplot():
+#     def test_histplot_t0(self):
+#         '''Test for EnsembleSeries.distplot()
+#         '''
+#         nn = 30 # number of noise realizations
+#         nt = 500
+#         series_list = []
 
-        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
-        noise = np.random.randn(nt, nn)
+#         signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
+#         noise = np.random.randn(nt, nn)
 
-        for idx in range(nn):  # noise
-            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
-            series_list.append(ts)
+#         for idx in range(nn):  # noise
+#             ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+#             series_list.append(ts)
 
-        ts_ens = pyleo.EnsembleSeries(series_list)
+#         ts_ens = pyleo.EnsembleSeries(series_list)
 
-        ts_ens.histplot()
-        pyleo.closefig()
+#         ts_ens.histplot()
+#         pyleo.closefig()
