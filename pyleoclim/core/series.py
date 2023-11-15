@@ -123,9 +123,10 @@ class Series:
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
          Default is None (marked for deprecation)
 
-    auto_time_params : bool
-        If True, pyleoclim will use tsbase.disambiguate_time_metadata to make sure the time_name and time_unit are recognizable by pyleoclim.
-        If False, pyleoclim will not ensure that the time_name and time_unit are known. This may break some functionalities (e.g. common_time and convert_time_unit)
+    auto_time_params : bool, 
+        If True, uses tsbase.disambiguate_time_metadata to ensure that time_name and time_unit are usable by Pyleoclim. This may override the provided metadata. 
+        If False, the provided time_name and time_unit are used. This may break some functionalities (e.g. common_time and convert_time_unit), so use at your own risk.
+        If not provided, code will set to True for internal consistency.  
 
     Examples
     --------
@@ -150,7 +151,7 @@ class Series:
         value = np.array(value)
 
         if auto_time_params is None:
-            warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True. In a future release this will be changed to False.', UserWarning, stacklevel=2)
+            warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True. In a future release, this will be changed to False.', UserWarning, stacklevel=2)
             auto_time_params = True
 
         if auto_time_params:
