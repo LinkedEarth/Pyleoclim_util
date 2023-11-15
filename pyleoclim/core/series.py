@@ -65,13 +65,13 @@ class Series:
 
     * optionally, some metadata about both axes, like units, labels and origin.
 
-    How to create, manipulate and use such objects is described in `PyleoTutorials <https://http://linked.earth/PyleoTutorials/>`_.
+    How to create, manipulate and use such objects is described in `PyleoTutorials <https://linked.earth/PyleoTutorials/>`_.
 
     Parameters
     ----------
 
     time : list or numpy.array
-        time axis (prograde or retrograde) 
+        time axis (prograde or retrograde)
 
     value : list of numpy.array
         values of the dependent variable (y)
@@ -98,30 +98,34 @@ class Series:
 
     log : dict
         Dictionary of tuples documentating the various transformations applied to the object
-        
+
     keep_log : bool
         Whether to keep a log of applied transformations. False by default
-                                                                                             
+
     importedFrom : string
-        source of the dataset. If it came from a LiPD file, this could be the datasetID property 
+        source of the dataset. If it came from a LiPD file, this could be the datasetID property
 
     archiveType : string
-        climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'                                                                                  
+        climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'
 
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
         defaults to True
-        
+
     sort_ts : str
         Direction of sorting over the time coordinate; 'ascending' or 'descending'
         Defaults to 'ascending'
-        
+
     verbose : bool
         If True, will print warning messages if there is any
-        
+
     clean_ts : boolean flag
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
          Default is None (marked for deprecation)
+
+    auto_time_params : bool
+        If True, pyleoclim will use tsbase.disambiguate_time_metadata to make sure the time_name and time_unit are recognizable by pyleoclim.
+        If False, pyleoclim will not ensure that the time_name and time_unit are known. This may break some functionalities (e.g. common_time and convert_time_unit)
 
     Examples
     --------
@@ -132,44 +136,49 @@ class Series:
         import pyleoclim as pyleo
         soi = pyleo.utils.load_dataset('SOI')
         soi.view()
-          
+
     '''
 
-    def __init__(self, time, value, time_unit=None, time_name=None, 
-                 value_name=None, value_unit=None, label=None, 
+    def __init__(self, time, value, time_unit=None, time_name=None,
+                 value_name=None, value_unit=None, label=None,
                  importedFrom=None, archiveType = None, log=None, keep_log=False,
-                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
-        
+                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False,
+                 auto_time_params = None):
+
         # ensure ndarray instances
         time = np.array(time)
         value = np.array(value)
-        
-        tn = time_name
-        # assign time metadata if they are not provided or provided incorrectly
-        offending = [tsbase.MATCH_CE, tsbase.MATCH_BP]
-        
-        if time_unit is None:
-            time_unit='years CE'
-            if verbose:
-                warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning)
-        elif time_unit.lower().replace(".","") in frozenset().union(*offending):
-            # fix up time name and units for offending cases
-            time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
+
+        if auto_time_params is None:
+            warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True. In a future release this will be changed to False.', UserWarning, stacklevel=2)
+            auto_time_params = True
+
+        if auto_time_params:
+            # assign time metadata if they are not provided or provided incorrectly
+            offending = [tsbase.MATCH_CE, tsbase.MATCH_BP]
+
+            if time_unit is None:
+                time_unit='years CE'
+                if verbose:
+                    warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning, stacklevel=2)
+            elif time_unit.lower().replace(".","") in frozenset().union(*offending):
+                # fix up time name and units for offending cases
+                time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
+            else:
+                # give a proper time name to those series that confuse that notion with time units
+                time_name, _ = tsbase.disambiguate_time_metadata(time_unit)
+
+            if time_name is None:
+                if verbose:
+                    warnings.warn('No time_name parameter provided. Assuming "Time".', UserWarning, stacklevel=2)
+                time_name='Time'
+            elif time_name in tsbase.MATCH_A:
+                if verbose:
+                    warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning, stacklevel=2)
+                time_name='Time'
         else:
-            # give a proper time name to those series that confuse that notion with time units
-            time_name, _ = tsbase.disambiguate_time_metadata(time_unit)
-            
-        if time_name is None:  
-            if verbose:
-                warnings.warn('No time_name parameter provided. Assuming "Time".', UserWarning)
-            time_name='Time'
-        elif time_name in tsbase.MATCH_A:
-            if verbose:
-                warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning)
-            time_name='Time'
-        else:
-            time_name = tn
-            
+            pass
+
         if log is None:
             if keep_log == True:
                 self.log = ()
@@ -189,7 +198,7 @@ class Series:
             pass
         else:
             raise ValueError('clean_ts should be a boolean')
-        
+
         if dropna == True:
             value, time = tsbase.dropna(value, time, verbose=verbose)
             if keep_log == True:
@@ -205,23 +214,23 @@ class Series:
             pass
         else:
             raise ValueError('dropna should be a boolean')
-            
+
         # if check_sorting:
         #     res, stats, sign = tsbase.resolution(time)
         #     if sign == 'mixed':
         #         warnings.warn("The Series time axis is non-monotonic, which may cause errors. Suggest applying .sort()")
-            
-    
-          
+
+
+
         # if sort == 'auto':
         #     _, _, direction =  tsbase.time_unit_to_datum_exp_dir(time_unit)
         #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
         #                                   ascending = (direction == 'prograde'),
         #                                   verbose=verbose)
-        #     self.log += ({nlog+1: 'sort', 'direction': direction},)    
+        #     self.log += ({nlog+1: 'sort', 'direction': direction},)
         if sort_ts is not None:
             if sort_ts in ['ascending', 'descending']:
-                value, time = tsbase.sort_ts(value, time, verbose=verbose, 
+                value, time = tsbase.sort_ts(value, time, verbose=verbose,
                                              ascending = sort_ts == 'ascending')
                 if keep_log == True:
                     if len(self.log) > 1:
@@ -234,7 +243,7 @@ class Series:
                         self.log += ({len(self.log): 'sort_ts', 'direction': sort_ts},)
             else:
                 print(f"Unknown sorting option {sort_ts}; no sorting applied")
-         
+
         self.time = time
         self.value = value
         self.time_name = time_name
@@ -255,17 +264,17 @@ class Series:
                 mystring = ""
                 for item in str_archive:
                     mystring += str(item) + ', '
-                warnings.warn('archiveType should be one of the following: ' + mystring)                
-                
-    
+                warnings.warn('archiveType should be one of the following: ' + mystring)
+
+
     def __repr__(self):
         ser = self.to_pandas(paleo_style=True)
         d   = self.metadata
         keys = ['importedFrom', 'label', 'archiveType', 'log']
         metadata = {key: d[key] for key in keys if d[key] is not None}
         #df = ser.to_frame()
-        return f'{pprint(metadata)}\n{repr(ser)}'   
-    
+        return f'{pprint(metadata)}\n{repr(ser)}'
+
     def __and__(self, other):
         """
         Combine with another Series to get MultipleSeries.
@@ -293,7 +302,7 @@ class Series:
         if not isinstance(other, Series):
             raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
         return MultipleSeries([self, other])
-       
+
     @property
     def datetime_index(self):
         """
@@ -309,7 +318,7 @@ class Series:
         datum, exponent, direction = tsbase.time_unit_to_datum_exp_dir(self.time_unit)
         index = tsbase.time_to_datetime(self.time, datum, exponent, direction)
         return pd.DatetimeIndex(index, name='datetime')
-    
+
     @property
     def metadata(self):
         return dict(
@@ -322,24 +331,24 @@ class Series:
             importedFrom = self.importedFrom,
             log = self.log,
         )
-    
+
     @classmethod
     def from_pandas(cls, ser, metadata):
         if isinstance(ser.index, pd.DatetimeIndex):
-            index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index  
+            index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index
             time = tsbase.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
-        else:  
+        else:
             raise ValueError('The provided index must be a proper DatetimeIndex object')
-        
-        # metadata gap-filling. This does not handle the edge case where the keys exist but the entries are None 
+
+        # metadata gap-filling. This does not handle the edge case where the keys exist but the entries are None
         if 'time_name' not in metadata.keys():
-            metadata['time_name'] = ser.index.name 
+            metadata['time_name'] = ser.index.name
         if 'value_name' not in metadata.keys():
-            metadata['value_name'] = ser.name   
-                
+            metadata['value_name'] = ser.name
+
         return cls(time=time,value=ser.values, **metadata,
-                   sort_ts = None, dropna = False, verbose=False) 
-        
+                   sort_ts = None, dropna = False, verbose=False)
+
     def to_pandas(self, paleo_style=False):
         '''
         Export to pandas Series
@@ -359,7 +368,7 @@ class Series:
             time_label, value_label = self.make_labels()
             ser = ser.set_axis(self.time).rename(value_label).rename_axis(time_label)
         return ser
-    
+
     def to_csv(self, metadata_header=True, path = None):
         '''
         Export Series to csv
@@ -368,18 +377,18 @@ class Series:
         ----------
         metadata_header : boolean, optional
             DESCRIPTION. The default is True.
-            
+
         path : str, optional
             system path to save the file. Default is '.'
 
         Returns
         -------
         None
-        
+
         See Also
         --------
         pyleoclim.Series.from_csv
-        
+
         Examples
         --------
 
@@ -394,12 +403,12 @@ class Series:
 
         '''
         if path is None:
-            path = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
+            path = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv'
         ser = self.to_pandas(paleo_style=True)
-        
+
         # export metadata
         if metadata_header:
-            with open(path, 'w', newline='')  as file:       
+            with open(path, 'w', newline='')  as file:
                 hd_writer = csv.writer(file)
                 hd_writer.writerow(["###", "Series metadata"])
                 hd_writer.writerow(["written by", "Pyleoclim " + version('Pyleoclim')])
@@ -412,12 +421,12 @@ class Series:
             # export Series object to CSV
             ser.to_csv(path, header = True)
         print('Series exported to ' + path)
-    
-    @classmethod    
+
+    @classmethod
     def from_csv(cls, path):
         '''
-        Read in Series object from CSV file. Expects a metadata header 
-        dealineated by '###' lines, as written by the Series.to_csv() method. 
+        Read in Series object from CSV file. Expects a metadata header
+        dealineated by '###' lines, as written by the Series.to_csv() method.
 
         Parameters
         ----------
@@ -430,16 +439,16 @@ class Series:
         -------
         Series
             pyleoclim Series object containing data and metadata.
-            
+
         See Also
         --------
-        pyleoclim.Series.to_csv     
+        pyleoclim.Series.to_csv
 
         '''
         metadata = {}
         # read in metadata header
         # TODO: improve error handling
-        with open(path, 'r')  as file: 
+        with open(path, 'r')  as file:
             reader_obj = csv.reader(file)
             for i, row in enumerate(reader_obj):
                 if row[0] == '###' and i > 0:
@@ -456,12 +465,12 @@ class Series:
         # make sure log is a tuple
         if 'log' in metadata.keys():
             metadata['log'] = eval(metadata['log']) # convert string to tuple
-        
-        # read in data    
+
+        # read in data
         df = pd.read_csv(path, header=header)
-        # export to Series 
+        # export to Series
         return cls(time=df.iloc[:,0],value=df.iloc[:,1], **metadata)
-    
+
     def to_json(self, path=None):
         """
         Export the pyleoclim.Series object to a json file
@@ -474,27 +483,27 @@ class Series:
         Returns
         -------
         None.
-        
+
         Examples
         --------
 
         .. jupyter-execute::
-                
+
             import pyleoclim as pyleo
-            ts = pyleo.utils.load_dataset('SOI')        
+            ts = pyleo.utils.load_dataset('SOI')
             ts.to_json('soi.json')
 
         """
-        
-        if path is None:        
-            path = self.label.replace(" ", "_") + '.json' if self.label is not None else 'series.json' 
-        
+
+        if path is None:
+            path = self.label.replace(" ", "_") + '.json' if self.label is not None else 'series.json'
+
         jsonutils.PyleoObj_to_json(self, path)
-        
-    @classmethod    
+
+    @classmethod
     def from_json(cls, path):
         ''' Creates a pyleoclim.Series from a JSON file
-        
+
         The keys in the JSON file must correspond to the parameter associated with a Series object
 
         Parameters
@@ -505,47 +514,47 @@ class Series:
         Returns
         -------
         ts : pyleoclim.core.series.Series
-            A Pyleoclim Series object. 
+            A Pyleoclim Series object.
 
         '''
-        
+
         a = jsonutils.open_json(path)
         b = jsonutils.iterate_through_dict(a, 'Series')
-        
+
         return cls(**b)
-    
+
     def pandas_method(self, method):
         ser = self.to_pandas()
         result = method(ser)
         if not isinstance(result, pd.Series):
             raise ValueError('Given method does not return a pandas Series and cannot be applied')
         return self.from_pandas(result, self.metadata)
-    
+
     def equals(self, ts, index_tol = 5, value_tol = 1e-5):
         '''
         Test whether two objects contain the same elements (values and datetime_index)
-        A printout is returned if metadata are different, but the statement is considered 
-        True as long as data match. 
+        A printout is returned if metadata are different, but the statement is considered
+        True as long as data match.
 
         Parameters
         ----------
         ts : Series object
            The target series for the comparison
-           
+
         index_tol: int, default 5
-            tolerance on difference in datetime indices (in dtype units, which are seconds by default) 
+            tolerance on difference in datetime indices (in dtype units, which are seconds by default)
 
         value_tol: float, default 1e-5
             tolerance on difference in values (in %)
-           
+
         Returns
         -------
         same_data: bool
-            Truth value of the proposition "the two series have the same data". 
-            
+            Truth value of the proposition "the two series have the same data".
+
         same_metadata: bool
-            Truth value of the proposition "the two series have the same metadata".  
-            
+            Truth value of the proposition "the two series have the same metadata".
+
         Examples
         --------
 
@@ -556,16 +565,16 @@ class Series:
             soi = pyleo.utils.load_dataset('SOI')
             NINO3 = pyleo.utils.load_dataset('NINO3')
             soi.equals(NINO3)
-                    
+
         '''
         left = self.to_pandas()
         right = ts.to_pandas()
-        
+
         if len(left) != len(right): # check that series have the same lengths
             print(f"The two series have different lengths, left: {len(left)} vs right: {len(right)}")
             same_values = False
             same_index = False
-        else:    
+        else:
             # check that the values are the same
             try:
                 same_values = np.allclose(left.values, right.values, rtol=value_tol, equal_nan=True)
@@ -574,13 +583,13 @@ class Series:
                 # check that the indices are the same
                 dt = left.index - right.index
                 same_index = all(dt.total_seconds() < index_tol)
-                 
+
                 if not same_index:
                     print(f"The series have indices differing by more than {index_tol} seconds")
-                
+
             except AssertionError as exp:
                 print(str(exp))
-                
+
         same_data = same_values & same_index
         # check that the metadata are the same
         same_metadata = (self.metadata == ts.metadata)
@@ -589,9 +598,9 @@ class Series:
             for key in self.metadata:
                 if self.metadata.get(key) != ts.metadata.get(key):
                     print(f"{key} property -- left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
-            
+
         return same_data, same_metadata
-    
+
     def view(self):
         '''
         Generates a DataFrame version of the Series object, suitable for viewing in a Jupyter Notebook
@@ -599,10 +608,10 @@ class Series:
         Returns
         -------
         pd.DataFrame
-        
+
         Examples
         --------
-        
+
         Plot the HadCRUT5 Global Mean Surface Temperature
 
         .. jupyter-execute::
@@ -614,8 +623,8 @@ class Series:
 
         '''
         return self.to_pandas(paleo_style=True).to_frame()
-    
-    
+
+
     def convert_time_unit(self, time_unit='ky BP', keep_log=False):
         ''' Convert the time units of the Series object
 
@@ -652,7 +661,7 @@ class Series:
         '''
 
         new_ts = self.copy()
-        
+
         if time_unit is not None:
             time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
         else:
@@ -733,7 +742,7 @@ class Series:
 
             import pyleoclim as pyleo
 
-            ts = pyleo.utils.load_dataset('SOI') 
+            ts = pyleo.utils.load_dataset('SOI')
             ts.stats()
 
         """
@@ -977,9 +986,9 @@ class Series:
 
         return res
 
-    def stripes(self, figsize=[8, 1], cmap = 'RdBu_r', ref_period=None,  
-                sat=1.0, top_label=None, bottom_label=None, 
-                label_color = 'gray', label_size = None, xlim=None, 
+    def stripes(self, figsize=[8, 1], cmap = 'RdBu_r', ref_period=None,
+                sat=1.0, top_label=None, bottom_label=None,
+                label_color = 'gray', label_size = None, xlim=None,
                 xlabel=None, savefig_settings=None, ax=None, invert_xaxis=False,
                 show_xaxis=False, x_offset = 0.03):
         '''Represents the Series as an Ed Hawkins "stripes" pattern
@@ -993,10 +1002,10 @@ class Series:
 
         figsize : list
             a list of two integers indicating the figure size (in inches)
-        
+
         cmap: str
             colormap name (https://matplotlib.org/stable/tutorials/colors/colormaps.html)
-            
+
         sat : float > 0
             Controls the saturation of the colormap normalization by scaling the vmin, vmax in https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
             default = 0.9
@@ -1049,8 +1058,8 @@ class Series:
         --------
         pyleoclim.utils.plotting.stripes : stripes representation of a timeseries
         pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
-        
-        
+
+
         Examples
         --------
 
@@ -1060,7 +1069,7 @@ class Series:
 
             gmst = pyleo.utils.load_dataset('HadCRUT5')
             fig, ax = gmst.stripes(ref_period=(1971,2000))
-        
+
         For a more pastel tone, dial down saturation:
 
         .. jupyter-execute::
@@ -1073,7 +1082,7 @@ class Series:
 
             fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='Spectral_r')
             fig, ax = gmst.stripes(ref_period=(1971,2000), cmap='magma_r')
-        
+
         To show the time axis:
 
         .. jupyter-execute::
@@ -1087,28 +1096,28 @@ class Series:
 
         if bottom_label is None:
             bottom_label = self.value_name
-        
+
         if ref_period is None:
             ref_period = [self.time.min(), self.time.max()]
-            
+
         if sat <= 0:
             raise ValueError('sat must be a strictly positive number, ideally close to unity.')
-         
+
         # Ed Hawkins says: Currently I use HadCRUT5 with a 1971-2000 baseline
         # and a colour scaling of +/- 0.75K (which is probably similar to LIM).
         # It should be relatively simple to duplicate the stripes exactly
-        
+
         # center and normalize values for proper display
         yc =  self.center(timespan=ref_period).value
         vmax = np.abs(yc).max()/sat
-        
+
         time_label, _ = self.make_labels()
 
         res = plotting.stripes_xy(x=self.time, y=yc, cmap=cmap, vmin=-vmax, vmax=vmax,
             top_label = top_label, bottom_label = bottom_label, label_color = label_color,
-            figsize=figsize, ax=ax,  xlim=xlim, invert_xaxis=invert_xaxis,  
+            figsize=figsize, ax=ax,  xlim=xlim, invert_xaxis=invert_xaxis,
             label_size=label_size, xlabel = time_label, x_offset = x_offset,
-            savefig_settings=savefig_settings, show_xaxis=show_xaxis, 
+            savefig_settings=savefig_settings, show_xaxis=show_xaxis,
         )
 
         return res
@@ -1138,13 +1147,13 @@ class Series:
             Default is None, which bypasses truncation (K = M)
                 (4) 'knee': Wherever the "knee" of the screeplot occurs.
             Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
-            While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton, 
+            While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton,
             then the knee-finding method is a good compromise between objectivity and efficiency.
             See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
         var_thresh : float
             variance threshold for reconstruction (only impactful if trunc is set to 'var')
         online : bool; {True,False}
-            Whether or not to conduct knee finding analysis online or offline. 
+            Whether or not to conduct knee finding analysis online or offline.
             Only called when trunc = 'knee'. Default is True
             See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`_ for details.
 
@@ -1259,15 +1268,15 @@ class Series:
         .. jupyter-execute::
 
             fig, ax = nino_mcssa.modeplot(index=0)
-            
+
         To inspect the reconstructed series, simply do:
-            
+
         .. jupyter-execute::
 
             fig, ax = ts.plot()
             nino_mcssa.RCseries.plot(ax=ax)
-        
-        For other truncation methods, see http://linked.earth/PyleoTutorials/notebooks/L2_singular_spectrum_analysis.html  
+
+        For other truncation methods, see http://linked.earth/PyleoTutorials/notebooks/L2_singular_spectrum_analysis.html
 
         '''
 
@@ -1715,7 +1724,7 @@ class Series:
                 - slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
                 - slot [4] contains the scalogram color bar
                 - slot [5] is empty
-                
+
             It is possible to tune the size and spacing of the various slots:
 
                 - 'width_ratios': list of two values describing the relative widths of the column containig the timeseries/scalogram/colorbar and the column containig the PSD plot (default: [6, 1])
@@ -1922,7 +1931,7 @@ class Series:
 
         # Plot scalogram
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
-        
+
         if y_label_loc is not None:
             ax['scal'].get_yaxis().set_label_coords(y_label_loc, 0.5)
 
@@ -2290,7 +2299,7 @@ class Series:
             ts_mean  = np.nanmean(self.slice(timespan).value)
         else:
             ts_mean  = np.nanmean(self.value)
-        
+
         new.value = self.value - ts_mean
 
         if keep_log == True:
@@ -2313,7 +2322,7 @@ class Series:
 
         factor : float
             The factor that adjusts the threshold for gap detection
-        
+
         verbose : bool
             If True, will print warning messages if there is any
 
@@ -2329,10 +2338,10 @@ class Series:
         if len(seg_y)>1:
             s_list=[]
             for idx,s in enumerate(seg_y):
-                if self.label is not None: 
-                    s_lbl =  self.label + ' segment ' + str(idx+1)  
+                if self.label is not None:
+                    s_lbl =  self.label + ' segment ' + str(idx+1)
                 else:
-                    s_lbl =  'segment ' + str(idx+1)  
+                    s_lbl =  'segment ' + str(idx+1)
                 s_tmp=Series(time=seg_t[idx],value=s,time_name=self.time_name,
                               time_unit=self.time_unit, value_name=self.value_name,
                               value_unit=self.value_unit,label=s_lbl, verbose=verbose)
@@ -2344,8 +2353,8 @@ class Series:
         else:
             raise ValueError('No timeseries detected')
         return res
-    
-    
+
+
     def sel(self, value=None, time=None, tolerance=0):
         """
         Slice Series based on 'value' or 'time'.
@@ -2368,7 +2377,7 @@ class Series:
             a `timedelta`).
         tolerance : int, float, default 0.
             Used by `value` and `time`, see above.
-        
+
         Returns
         -------
         Copy of `self`, sliced according to `value` and `time`.
@@ -2448,7 +2457,7 @@ class Series:
                 if isinstance(value.stop, (int, float)) and value.start is None:
                     return self.pandas_method(lambda x: x[x.le(value.stop-tolerance)])
             raise TypeError(f'Expected slice, int, or float, got: {type(value)}')
-        
+
         if time is not None:
             if isinstance(time, (int, float)):
                 return self.slice([time-tolerance, time+tolerance])
@@ -2469,7 +2478,7 @@ class Series:
                     raise TypeError(
                         f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
                     )
-                tolerance = np.timedelta64(tolerance, 's') 
+                tolerance = np.timedelta64(tolerance, 's')
                 return self.pandas_method(
                     lambda x: x[
                         (x.index>=np.datetime64(time, 's')-tolerance)
@@ -2498,7 +2507,7 @@ class Series:
                         raise TypeError(
                             f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
                         )
-                    tolerance = np.timedelta64(tolerance, 's') 
+                    tolerance = np.timedelta64(tolerance, 's')
                     return self.pandas_method(
                         lambda x: x[
                             (x.index>=np.datetime64(time.start, 's')-tolerance)
@@ -2512,7 +2521,7 @@ class Series:
                         raise TypeError(
                             f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
                         )
-                    tolerance = np.timedelta64(tolerance, 's') 
+                    tolerance = np.timedelta64(tolerance, 's')
                     return self.pandas_method(
                         lambda x: x[x.index>=np.datetime64(time.start, 's')-tolerance]
                     )
@@ -2521,7 +2530,7 @@ class Series:
                         tolerance = dt.timedelta(days=0)
                     if not isinstance(tolerance, dt.timedelta):
                         raise TypeError(f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}")
-                    tolerance = np.timedelta64(tolerance, 's') 
+                    tolerance = np.timedelta64(tolerance, 's')
                     return self.pandas_method(
                         lambda x: x[x.index<=np.datetime64(time.stop, 's')+tolerance]
                     )
@@ -2672,7 +2681,7 @@ class Series:
 
         keep_log : boolean
             if True, adds the removed trend and method parameters to the series log.
-            
+
         preserve_mean : boolean
             if True, ensures that the mean of the series is preserved despite the detrending
 
@@ -2697,10 +2706,10 @@ class Series:
             fig, ax = lr04.plot(invert_yaxis=True)
             ts_emd = lr04.detrend(method='emd',preserve_mean=True)
             ts_emd.plot(label=lr04.label+', EMD detrend',ax=ax)
-       
+
         '''
         new = self.copy()
-        v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, 
+        v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method,
                                        preserve_mean=preserve_mean, **kwargs)
         new.value = v_mod
         #new.label = self.label +' (' + method +' detrended)'
@@ -3556,9 +3565,9 @@ class Series:
                  fig_clusters=True,figsize_clusters=[10,4], plotclusters_kwargs=None,savefigclusters_settings=None, keep_log=False):
         """
         Remove outliers from timeseries data. The method employs clustering to identify clusters in the data, using the k-means and DBSCAN algorithms from scikit-learn. Points falling a certain distance from the cluster (either away from the centroid for k-means or in a area of low density for DBSCAN) are considered outliers.
-        The silhouette score is used to optimize parameter values. 
-        
-        A tutorial explaining how to use this method and set the parameters is available at https://github.com/LinkedEarth/PyleoTutorials/blob/main/notebooks/L2_outliers_detection.ipynb. 
+        The silhouette score is used to optimize parameter values.
+
+        A tutorial explaining how to use this method and set the parameters is available at https://github.com/LinkedEarth/PyleoTutorials/blob/main/notebooks/L2_outliers_detection.ipynb.
 
         Parameters
         ----------
@@ -3607,28 +3616,28 @@ class Series:
         pyleoclim.utils.tsutils.detect_outliers_kmeans : Outlier detection using the kmeans method
 
         pyleoclim.utils.tsutils.remove_outliers : Remove outliers from the series
-        
+
         Examples
         --------
-    
+
         .. jupyter-execute::
 
             import pyleoclim as pyleo
             LR04 = pyleo.utils.load_dataset('LR04')
             LR_out = LR04.detrend().standardize().outliers(method='kmeans')
-        
+
         To set the number of clusters:
 
         .. jupyter-execute::
 
             LR_out = LR04.detrend().standardize().outliers(method='kmeans', settings={'nbr_clusters':2})
-        
+
         The log contains diagnostic information, to access it, set the keep_log parameter to True:
 
         .. jupyter-execute::
 
             LR_out = LR04.detrend().standardize().outliers(method='kmeans', settings={'nbr_clusters':2}, keep_log=True)
-        
+
         """
         if method not in ['kmeans','DBSCAN']:
             raise ValueError('method should either be "kmeans" or "DBSCAN"')
@@ -3870,7 +3879,7 @@ class Series:
         if step_type is not None:
             warnings.warn("step_type is deprecated. Please use step_style instead",
                           DeprecationWarning, stacklevel=2)
-        
+
         new=self.copy()
         ti, vi = tsutils.gkernel(self.time, self.value, step_style=step_style, **kwargs) # apply kernel
         new.time = ti
@@ -3926,7 +3935,7 @@ class Series:
         will do the same thing as
 
             ser.pandas_method(lambda x: x.resample('AS').mean())
-        
+
         but will also accept some extra resampling rules, such as `'Ga'` (see below).
 
         Parameters
@@ -3941,13 +3950,13 @@ class Series:
 
         kwargs : dict
             Any other arguments which will be passed to pandas.Series.resample.
-        
+
         Returns
         -------
         SeriesResampler
             Resampler object, not meant to be used to directly. Instead,
             an aggregation should be called on it, see examples below.
-        
+
         Examples
         --------
 
@@ -3957,7 +3966,7 @@ class Series:
             ts5k = ts.resample('5ka').mean()
             fig, ax = ts.plot(invert_yaxis='True',xlim=[0, 1000])
             ts5k.plot(ax=ax,color='C1')
-                
+
         """
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
@@ -3981,23 +3990,23 @@ class Series:
             rule = f'{1_000_000*multiplier}AS'
         elif unit.lower() in tsbase.MATCH_GA:
             rule = f'{1_000_000_000*multiplier}AS'
-        
+
         ser = self.to_pandas()
-        
+
         return SeriesResampler(rule, ser, md, keep_log, kwargs)
-    
+
     def resolution(self):
         """Generate a resolution object
 
         Increments are assigned to the preceding time value.
         E.g. for time_axis = [0,1,3], resolution.resolution = [1,2] resolution.time = [0,1]
-        
+
         Returns
         -------
-        
+
         resolution : Resolution
             Resolution object
-            
+
         Examples
         --------
 
@@ -4022,12 +4031,12 @@ class Series:
 
             resolution.plot()
 
-        The distribution of resolution 
+        The distribution of resolution
 
         .. jupyter-execute::
 
             resolution.histplot()
-        
+
         Or a dashboard combining plot() and histplot() side by side:
 
         .. jupyter-execute::
@@ -4045,7 +4054,7 @@ class Series:
             v,x = tsbase.dropna(ts=x,ys=v)
             copy.time = x
             copy.value = v
-            
+
         res,_,_ = tsbase.resolution(x=x)
 
         resolution = Resolution(
@@ -4056,15 +4065,17 @@ class Series:
         return resolution
 
 
+
+
 class SeriesResampler:
     """
-    This is only meant to be used internally, and is not meant to 
+    This is only meant to be used internally, and is not meant to
     be public-facing or to be used directly by users.
 
     If users call
 
         ts.resample('1Y').mean()
-    
+
     then they will get back a pyleoclim.Series, and `SeriesResampler`
     will only be used in an intermediate step. Think of it as an
     implementation detail.
@@ -4075,7 +4086,7 @@ class SeriesResampler:
         self.metadata = metadata
         self.keep_log = keep_log
         self.kwargs = kwargs
-    
+
     def __getattr__(self, attr):
         attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
         def func(*args, **kwargs):
