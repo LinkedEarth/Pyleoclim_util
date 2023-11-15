@@ -32,6 +32,8 @@ MATCH_GA = frozenset(['ga', 'gy', 'gyr', 'gyrs'])
 MATCH_CE = frozenset(['ad', 'ce'])
 MATCH_BP = frozenset(['bp','bnf','b1950'])
 
+#MATCH_NAME = frozenset(['time', 'age'])
+
 def disambiguate_time_metadata(time_unit):
     '''
     Infer time_name and time_unit from (possibly ambiguous) time units as commonly
