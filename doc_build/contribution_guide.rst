@@ -31,13 +31,8 @@ Bug reports must:
 
 1. Include a minimal working example (a short, self*contained Python snippet reproducing the problem). You can format the code nicely by using GitHub Flavored Markdown::
 
-    import pyleoclim as pyleo
-    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/lipds.json'
-    response = urlopen(url)
-    D = json.loads(response.read())
-    d = pyleo.Lipd(lipd_dict=D)
-    ts = d.to_LipdSeries(number=6)
-    res=ts.mapNearRecord(d,mute=True)
+    gmst = pyleo.utils.load_dataset('HadCRUT5')
+    fig, ax = gmst.stripes(ref_period=(1971,2000))
 
 2. Include the full version string of pyleoclim, which you can obtain through::
 
@@ -292,17 +287,16 @@ You may use existing docstrings as examples. A good docstring explains:
   * what it does, with what properties/inputs/outputs)
   * how to use it, via a minimal working example.
 
-For the latter, make sure the example is prefaced by::
+For the latter, make sure the example is prefaced by:
 
-      :okwarning:
-      :okexcept:
+      .. jupyter-execute::
 
-and properly indented.
+and properly indented (look at other docstrings for inspiration).
 
 How to build the Pyleoclim documentation
 """"""""""""""""""""""""""""""""""""""""
 
-Navigate to the doc_build folder and type `make html`. This may require installing other packages (sphinx, nbsphinx, etc).
+Navigate to the doc_build folder and type `make html`. This may require installing other packages (sphinx, chardet, numpydoc, nbsphinx, sphinx_search, jupyter-sphinx, sphinx_copybutton, sphinx_rtd_theme).
 
 
 You are done! Thanks for playing.
