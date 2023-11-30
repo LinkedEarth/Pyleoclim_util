@@ -28,7 +28,7 @@ NINO3:
     archiveType: 'Instrumental'
   time_column: t
   value_column: nino
-  
+
 HadCRUT5:
   filename: 'HadCRUT.5.0.1.0.analysis.summary_series.global.annual'
   file_extension: 'csv'
@@ -43,8 +43,8 @@ HadCRUT5:
     archiveType: 'Instrumental'
     importedFrom: 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.monthly.csv'
   time_column: Time
-  value_column: Anomaly (deg C)  
-  
+  value_column: Anomaly (deg C)
+
 AIR:
   filename: 'wtc_test_data_nino_even'
   file_extension: 'csv'
@@ -58,8 +58,8 @@ AIR:
     value_unit: 'mm/month'
     archiveType: 'Instrumental'
   time_column: t
-  value_column: air  
-  
+  value_column: air
+
 LR04:
   filename: 'LR04'
   file_extension: 'csv'
@@ -69,12 +69,12 @@ LR04:
     time_name: 'Age'
     time_unit: 'ky BP'
     label: 'LR04 benthic stack'
-    value_name: '$\delta^{18} \mathrm{O}$' 
-    value_unit: '‰'
+    value_name: '$\delta^{18} \mathrm{O}$'
+    value_unit: '\u2030'
     archiveType: 'Marine Sediment'
   time_column: Time (ka)
-  value_column: Benthic d18O (per mil)  
-  
+  value_column: Benthic d18O (per mil)
+
 AACO2:
   filename: 'EPICA_Dome_C_CO2'
   file_extension: 'csv'
@@ -84,13 +84,13 @@ AACO2:
     time_name: 'Age'
     time_unit: 'ky BP'
     label: 'EPICA Dome C CO2'
-    value_name: '$CO_2$' 
+    value_name: '$CO_2$'
     value_unit: 'ppm'
     archiveType: 'Glacier Ice'
     importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/antarctica2015co2composite.txt'
   time_column: Age [kyr BP]
   value_column: $CO_2$ [ppm]
-  
+
 EDC-dD:
   filename: 'edc3deuttemp2007'
   file_extension: 'csv'
@@ -103,14 +103,14 @@ EDC-dD:
     time_name: 'Age'
     time_unit: 'y BP'
     label: 'EPICA Dome C dD'
-    value_name: '$\delta \mathrm{D}$' 
-    value_unit: '‰'
+    value_name: '$\delta \mathrm{D}$'
+    value_unit: '\u2030'
     archiveType: 'glacierice'
     sensorType: 'ice sheet'
     observationType: 'hydrogen isotopes'
     importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/epica_domec/edc3deuttemp2007.txt'
   time_column: Age
-  value_column: Deuterium    
+  value_column: Deuterium
 
 GISP2:
   filename: 'GISP2_d18O'
@@ -120,11 +120,11 @@ GISP2:
   pyleo_kwargs:
     time_unit: 'yr BP'
     time_name: 'Age'
-    value_unit: '‰'
+    value_unit: '\u2030'
     value_name: '$\delta^{18} \mathrm{O}$'
     label: 'GISP2'
     archiveType: 'Glacier Ice'
-    importedFrom: 'https://www.ncei.noaa.gov/access/paleo-search/study/17796' 
+    importedFrom: 'https://www.ncei.noaa.gov/access/paleo-search/study/17796'
   time_column: Age [yr BP]
   value_column: d18O [permil]
 
@@ -136,7 +136,7 @@ cenogrid_d18O:
   pyleo_kwargs:
     time_unit: 'My BP'
     time_name: 'Tuned Time'
-    value_unit: '‰ VPDB'
+    value_unit: '\u2030 VPDB'
     value_name: '$\delta^{18} \mathrm{O}$'
     label: 'CENOGRID'
     archiveType: 'Marine Sediment'
@@ -152,7 +152,7 @@ cenogrid_d13C:
   pyleo_kwargs:
     time_unit: 'My BP'
     time_name: 'Tuned Time'
-    value_unit: '‰ VPDB'
+    value_unit: '\u2030 VPDB'
     value_name: '$\delta^{13} \mathrm{C}$'
     label: 'CENOGRID'
     archiveType: 'Marine Sediment'
