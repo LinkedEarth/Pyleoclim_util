@@ -3262,6 +3262,7 @@ class Series:
 
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             settings.update({'tau': tau})
+            settings.pop('ntau')
 
         args[method].update(settings)
 
