@@ -3262,7 +3262,7 @@ class Series:
                 ntau = np.min([np.size(ts1.time), np.size(ts2.time), 50])
 
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
-            if tau in settings.keys():
+            if 'tau' in settings.keys():
                 tau = settings['tau']
             settings.update({'tau': tau})
             
