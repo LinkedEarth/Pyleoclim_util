@@ -3257,12 +3257,15 @@ class Series:
         if method == 'wwz':
             if 'ntau' in settings.keys():
                 ntau = settings['ntau']
+                settings.pop('ntau')
             else:
                 ntau = np.min([np.size(ts1.time), np.size(ts2.time), 50])
 
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
+            if tau in settings.keys():
+                tau = settings['tau']
             settings.update({'tau': tau})
-            settings.pop('ntau')
+            
 
         args[method].update(settings)
 
