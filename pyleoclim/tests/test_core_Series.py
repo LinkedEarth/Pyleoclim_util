@@ -972,6 +972,14 @@ class TestUISeriesWaveletCoherence():
         ts3 = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts4 = pyleo.Series(time=t1_unevenly, value=v1_unevenly)
         scal = ts3.wavelet_coherence(ts4,method='wwz')
+        
+    def test_xwave_t5(self):
+       ''' Test Series.wavelet_coherence() with WWZ with specified ntau
+       '''
+       nt = 100
+       ts1 = gen_ts(model='colored_noise', nt=nt)
+       ts2 = gen_ts(model='colored_noise', nt=nt)
+       _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'ntau':10})     
 
 class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
