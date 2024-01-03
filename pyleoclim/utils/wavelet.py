@@ -2108,7 +2108,7 @@ def make_freq_vector(ts, method='log', **kwargs):
     elif method == 'scale':
         freq = freq_vector_scale(ts, **kwargs)
     elif method == 'log':
-        freq = freq_vector_log(ts, fmin, fmax, **kwargs)
+        freq = freq_vector_log(ts, **kwargs)
     else:
         raise ValueError('This method is not supported')
     #  freq = freq[1:]  # discard the first element 0
