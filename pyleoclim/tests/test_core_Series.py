@@ -950,9 +950,8 @@ class TestUISeriesWaveletCoherence():
     def test_xwave_t2(self,mother):
         ''' Test Series.wavelet_coherence() with CWT with mother wavelet specified  via `settings`
         '''
-        nt = 500
-        ts1 = gen_ts(model='colored_noise', nt=nt)
-        ts2 = gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts(model='colored_noise')
+        ts2 = gen_ts(model='colored_noise')
         _ = ts1.wavelet_coherence(ts2,method='cwt',settings={'mother':mother})
 
     def test_xwave_t3(self):
@@ -971,15 +970,22 @@ class TestUISeriesWaveletCoherence():
         v1_unevenly =  np.delete(ts2.value, deleted_idx1)
         ts3 = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts4 = pyleo.Series(time=t1_unevenly, value=v1_unevenly)
-        scal = ts3.wavelet_coherence(ts4,method='wwz')
+        _ = ts3.wavelet_coherence(ts4,method='wwz')
         
     def test_xwave_t5(self):
        ''' Test Series.wavelet_coherence() with WWZ with specified ntau
        '''
-       nt = 100
-       ts1 = gen_ts(model='colored_noise', nt=nt)
-       ts2 = gen_ts(model='colored_noise', nt=nt)
-       _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'ntau':10})     
+       ts1 = gen_ts(model='colored_noise')
+       ts2 = gen_ts(model='colored_noise')
+       _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'ntau':10})  
+       
+    def test_xwave_t6(self):
+       ''' Test Series.wavelet_coherence() with WWZ with specified ntau
+       '''
+       ts1 = gen_ts(model='colored_noise')
+       ts2 = gen_ts(model='colored_noise')
+       tau = ts1.time[::10]
+       _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})    
 
 class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
