@@ -2036,13 +2036,14 @@ def freq_vector_log(ts, fmin=None, fmax= None, nf=None):
         fmin = 2/(np.max(ts)-np.min(ts))
     if fmax is None:
         fmax = fs/2
+        
     start = np.log2(fmin)
     stop = np.log2(fmax)
     freq = np.logspace(start, stop, nf, base=2)
 
     return freq
 
-def make_freq_vector(ts, method='log', fmin=None, fmax=None, **kwargs):
+def make_freq_vector(ts, method='log', **kwargs):
     ''' Make frequency vector
 
     This function selects among five methods to obtain the frequency
@@ -2059,17 +2060,17 @@ def make_freq_vector(ts, method='log', fmin=None, fmax=None, **kwargs):
 
         The method to use. Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
         
-    fmin : float
-        minimum frequency. If None is provided (default), inferred by the method.
-        
-    fmax : float
-        maximum frequency. If None is provided (default), inferred by the method. 
-
     kwargs : dict, optional
-
+            -fmin : float
+                minimum frequency. If None is provided (default), inferred by the method.
+                
+            - fmax : float
+                maximum frequency. If None is provided (default), inferred by the method. 
+                
+            - nf (int): number of frequency points
+    
             For Lomb_Scargle, additional parameters may be passed:
 
-            - nf (int): number of frequency points
             - ofac (float): Oversampling rate that influences the resolution of the frequency axis,
                  when equals to 1, it means no oversamling (should be >= 1).
                  The default value 4 is usaually a good value.
