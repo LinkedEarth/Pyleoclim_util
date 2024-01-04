@@ -220,14 +220,14 @@ class TestUISeriesSpectral:
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
-    @pytest.mark.parametrize('nfreq', [10, 20, 30])
-    def test_spectral_t2(self, pinkseries, nfreq, eps=0.3):
+    @pytest.mark.parametrize('nf', [10, 20, 30])
+    def test_spectral_t2(self, pinkseries, nf, eps=0.3):
         ''' Test Series.spectral() with MTM using `freq_method='log'` with different values for its keyword argument `nfreq`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         ts = pinkseries
-        psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nfreq': nfreq})
+        psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nf': nf})
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
