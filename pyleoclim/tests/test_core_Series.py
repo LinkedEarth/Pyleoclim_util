@@ -984,8 +984,8 @@ class TestUISeriesWaveletCoherence():
        scal = ts1.wavelet_coherence(ts2,method='cwt',freq_kwargs={'fmin':fmin,'fmax':fmax,'nf':nf})  
        freq = pyleo.utils.wavelet.freq_vector_log(ts1.time, fmin=fmin, fmax=fmax, nf=nf)
        
-       assert scal.frequency == freq
-               
+       assert all(scal.frequency == freq)
+            
     def test_xwave_t5(self):
        ''' Test Series.wavelet_coherence() with WWZ with specified ntau
        '''
