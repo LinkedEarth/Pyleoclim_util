@@ -7,8 +7,12 @@
 Installing Pyleoclim
 ====================
 
-We recommend the use of Anaconda or Miniconda, with Pyleoclim setup in
-its own `conda` environment. Some default packages shipping with the full Anaconda distribution are known to cause conflicts with the required Pyleoclim packages, so we recommend Miniconda, especially for beginners.
+If you know what you are doing, you may install Pyleoclim in any suitable Python environment, with a Python version >=3.9.
+
+However, we have not and cannot possibly, try every situation. 
+
+If you are new to Python, we recommend the use of Anaconda (or its minimal version Miniconda), to set up such an environment. Then you may install Pyleoclim via pip.
+
 
 Installing Anaconda or Miniconda
 """""""""""""""""""""""""""""""""
@@ -19,20 +23,19 @@ Click :ref:`here <anaconda_installation>` for a quick tutorial on MacOs and Linu
 
 Creating a new conda environment
 """""""""""""""""""""""""""""""""""
-
-To create a new environment using Python 3.10 via command line:
+As of Nov 2023, we recommend Python 3.11. Create an environment via the command line (e.g. Terminal app in MacOS):
 
 .. code-block:: bash
 
-  conda create -n pyleo python=3.10
+  conda create -n pyleo python=3.11
 
-To view a list of available environment:
+To view a list of available environments:
 
 .. code-block:: bash
 
   conda env list
 
-To activate your new environment:
+To activate the new environment:
 
 .. code-block:: bash
 
@@ -54,19 +57,7 @@ More information about managing conda environments can be found `here <https://d
 
 Installing Pyleoclim
 """"""""""""""""""""
-Once the pyleo environment is activated, you'll want to first install Cartopy:
-
-.. code-block:: bash
-
-  conda install cartopy
-
-To avoid a recent (July 2023) conflict between Cartopy and SciPy v1.11, once may install Statsmodels from conda so that SciPy v1.10 will be installed:
-
-.. code-block:: bash
-
-  conda install statsmodels
-
-Then install Pyleoclim through Pypi, which contains the most stable version of Pyleoclim:
+Once the pyleo environment is activated, simply run:
 
 .. code-block:: bash
 
@@ -79,12 +70,21 @@ This will install the latest official release, which you can view `here <https:/
   pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git
 
 This version may contain bugs not caught by our continuous integration test suite; if so, please report them via `github issues <https://github.com/LinkedEarth/Pyleoclim_util/issues>`_
-If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:
+If you would like to use Spyder for code development:
 
 .. code-block:: bash
 
   conda install spyder
-  conda install jupyter
+  
+If you intend on using Pyleoclim within a Jupyter Notebook, we recommend using `ipykernel <https://anaconda.org/anaconda/ipykernel>`_.   
+  
+.. code-block:: bash
+
+  conda install ipykernel    
+  python -m ipykernel install --user --name=pyleo       
+  
+The first line will install ipykernel and its dependencies, including IPython, Jupyter, etc. The second line will make sure the pyleo environment is visible to Jupyter (see `this page for context <https://queirozf.com/entries/jupyter-kernels-how-to-add-change-remove>`_)
+
 
 Building from source for the f2py feature of WWZ
 """"""""""""""""""""""""""""""""""""""""""""""""
