@@ -10,6 +10,12 @@ build:
   os: ubuntu-22.04
   tools:
     python: "miniconda3-4.7"
+  jobs:
+    pre_install:
+      - pip install --upgrade pip ipython ipykernel
+      - ipython kernel install --name "python3" --user
+    post_checkout:
+      - conda activate rtd_env
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
@@ -22,6 +28,10 @@ sphinx:
   fail_on_warning: true
 
 formats: []
+
+#build:
+#  commands: 
+#    - conda activate rtd_env
 
 # We recommend specifying your dependencies to enable reproducible builds:
 # https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
