@@ -30,8 +30,15 @@ def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None,
         x value
     y : numpy.array
         y value
-    c : TYPE, optional
-        DESCRIPTION. The default is None.
+    c : array-like or list of colors or color, optional
+      The marker colors. Possible values:
+      - A scalar or sequence of n numbers to be mapped to colors using cmap and norm.
+      - A 2D array in which the rows are RGB or RGBA.
+      - A sequence of colors of length n.
+      - A single color format string.
+      Note that c should not be a single numeric RGB or RGBA sequence because that is indistinguishable from an array of values to be colormapped. If you want to specify the same RGB or RGBA value for all points, use a 2D array with a single row. Otherwise, value-matching will have precedence in case of a size matching with x and y.
+      If you wish to specify a single color for all points prefer the color keyword argument.
+      Defaults to None. In that case the marker color is determined by the value of color, facecolor or facecolors. In case those are not specified or None, the marker color is determined by the next color of the Axes' current "shape and fill" color cycle. This cycle defaults to rcParams["axes.prop_cycle"] (default: cycler('color', ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'])).
     figsize : list, optional
         A list of two integers indicating the dimension of the figure. The default is None.
     xlabel : str, optional

@@ -950,9 +950,8 @@ class TestUISeriesWaveletCoherence():
     def test_xwave_t2(self,mother):
         ''' Test Series.wavelet_coherence() with CWT with mother wavelet specified  via `settings`
         '''
-        nt = 500
-        ts1 = gen_ts(model='colored_noise', nt=nt)
-        ts2 = gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts(model='colored_noise')
+        ts2 = gen_ts(model='colored_noise')
         _ = ts1.wavelet_coherence(ts2,method='cwt',settings={'mother':mother})
 
     def test_xwave_t3(self):
@@ -986,7 +985,22 @@ class TestUISeriesWaveletCoherence():
        freq = pyleo.utils.wavelet.freq_vector_log(ts1.time, fmin=fmin, fmax=fmax, nf=nf)
        
        assert scal.frequency == freq
+               
+    def test_xwave_t5(self):
+       ''' Test Series.wavelet_coherence() with WWZ with specified ntau
+       '''
+       ts1 = gen_ts(model='colored_noise')
+       ts2 = gen_ts(model='colored_noise')
+       _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'ntau':10})  
        
+    def test_xwave_t6(self):
+       ''' Test Series.wavelet_coherence() with WWZ with specified ntau
+       '''
+       ts1 = gen_ts(model='colored_noise')
+       ts2 = gen_ts(model='colored_noise')
+       tau = ts1.time[::10]
+       _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})    
+
 
 class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
