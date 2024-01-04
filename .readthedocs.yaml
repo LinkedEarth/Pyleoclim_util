@@ -10,11 +10,6 @@ build:
   os: ubuntu-22.04
   tools:
     python: "miniconda3-4.7"
-  jobs:
-    post_checkout:
-      - conda activate rtd_env
-      - pip install --upgrade pip ipython ipykernel
-      - ipython kernel install --name "python3" --user
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
