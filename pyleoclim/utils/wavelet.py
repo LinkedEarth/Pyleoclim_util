@@ -1894,7 +1894,7 @@ def freq_vector_nfft(ts):
 
 def freq_vector_scale(ts, dj=0.25, s0=None,j1=None, mother='MORLET',param=None):
     ''' Return the frequency vector based on scales for wavelet analysis. 
-    This function is adapted from Torrence and Compo
+    This function is adapted from Torrence and Compo [1998]
 
     Parameters
     ----------
