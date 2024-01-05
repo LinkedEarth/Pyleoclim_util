@@ -63,9 +63,6 @@ class MultipleSeries:
                 
     '''
     def __init__(self, series_list, time_unit=None, label=None, name=None):
-        from ..core.series import Series
-        from ..core.geoseries import GeoSeries
-        from ..core.lipdseries import LipdSeries
         
         self.series_list = series_list
         self.time_unit = time_unit
@@ -75,8 +72,11 @@ class MultipleSeries:
             warnings.warn("`name` is a deprecated property, which will be removed in future releases. Please use `label` instead.",
                           DeprecationWarning, stacklevel=2)
         # check that all components are Series
-        if not all([isinstance(ts, (Series, GeoSeries, LipdSeries)) for ts in self.series_list]):
-            raise ValueError('All components must be of the same type')
+        from ..core.series import Series
+        from ..core.geoseries import GeoSeries
+        from ..core.lipdseries import LipdSeries
+        #if not all([isinstance(ts, (Series, GeoSeries, LipdSeries)) for ts in self.series_list]):
+        #    raise ValueError('All components must be of the same type')
 
         if self.time_unit is not None:
             new_ts_list = []
