@@ -2,9 +2,9 @@ name: rtd_env
 channels:
   - conda-forge
   - defaults
-  - ipykernel
 dependencies:
   - python=3.11
+  - ipykernel
   - pip:
     - cartopy
     - Sphinx<6.0
