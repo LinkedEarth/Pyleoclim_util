@@ -39,7 +39,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
 
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v, verbose=False)
+    ts=pyleo.Series(t,v, verbose=False, auto_time_params=True)
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
@@ -47,7 +47,7 @@ def gen_normal(loc=0, scale=1, nt=100):
     '''
     t = np.arange(nt)
     v = np.random.normal(loc=loc, scale=scale, size=nt)
-    ts = pyleo.Series(t,v, verbose=False)
+    ts = pyleo.Series(t,v, verbose=False, auto_time_params=True)
     return ts
 
 # def load_data():
@@ -220,14 +220,14 @@ class TestUISeriesSpectral:
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
-    @pytest.mark.parametrize('nfreq', [10, 20, 30])
-    def test_spectral_t2(self, pinkseries, nfreq, eps=0.3):
+    @pytest.mark.parametrize('nf', [10, 20, 30])
+    def test_spectral_t2(self, pinkseries, nf, eps=0.3):
         ''' Test Series.spectral() with MTM using `freq_method='log'` with different values for its keyword argument `nfreq`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         ts = pinkseries
-        psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nfreq': nfreq})
+        psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nf': nf})
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
@@ -971,7 +971,21 @@ class TestUISeriesWaveletCoherence():
         ts3 = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts4 = pyleo.Series(time=t1_unevenly, value=v1_unevenly)
         _ = ts3.wavelet_coherence(ts4,method='wwz')
-        
+  
+    def test_xwave_t4(self):
+       ''' Test Series.wavelet_coherence() with specified frequency parameters
+       '''
+       nt = 100
+       ts1 = gen_ts(model='colored_noise', nt=nt)
+       ts2 = gen_ts(model='colored_noise', nt=nt)
+       nf = 10
+       fmin = 1/(nt//2)
+       fmax = 10*fmin
+       scal = ts1.wavelet_coherence(ts2,method='cwt',freq_kwargs={'fmin':fmin,'fmax':fmax,'nf':nf})  
+       freq = pyleo.utils.wavelet.freq_vector_log(ts1.time, fmin=fmin, fmax=fmax, nf=nf)
+       
+       assert all(scal.frequency == freq)
+            
     def test_xwave_t5(self):
        ''' Test Series.wavelet_coherence() with WWZ with specified ntau
        '''
@@ -986,6 +1000,7 @@ class TestUISeriesWaveletCoherence():
        ts2 = gen_ts(model='colored_noise')
        tau = ts1.time[::10]
        _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})    
+
 
 class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
