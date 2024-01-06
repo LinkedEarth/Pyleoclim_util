@@ -75,8 +75,9 @@ class MultipleSeries:
         from ..core.series import Series
         from ..core.geoseries import GeoSeries
         from ..core.lipdseries import LipdSeries
-        #if not all([isinstance(ts, (Series, GeoSeries, LipdSeries)) for ts in self.series_list]):
-        #    raise ValueError('All components must be of the same type')
+        
+        if not all([isinstance(ts, (Series, GeoSeries, LipdSeries)) for ts in self.series_list]):
+            raise ValueError('All components must be of the same type')
 
         if self.time_unit is not None:
             new_ts_list = []

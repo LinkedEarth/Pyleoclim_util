@@ -11,11 +11,37 @@ import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
 import numpy as np
-import pandas as pd
-from matplotlib.patches import Rectangle
-from matplotlib.collections import PatchCollection
-from matplotlib.colors import ListedColormap
-import seaborn as sns
+from ..utils import lipdutils
+
+# import pandas as pd
+# from matplotlib.patches import Rectangle
+# from matplotlib.collections import PatchCollection
+# from matplotlib.colors import ListedColormap
+# import seaborn as sns
+
+# this is here because it's only used to set labels in plots
+def infer_period_unit_from_time_unit(time_unit):
+    ''' infer a period unit based on the given time unit
+
+    '''
+    if time_unit is None:
+        period_unit = None
+    else:
+        unit_group = lipdutils.timeUnitsCheck(time_unit)
+        if unit_group != 'unknown':
+            if unit_group == 'kage_units':
+                period_unit = 'kyrs'
+            else:
+                period_unit = 'yrs'
+        else:
+            period_unit = f'{time_unit}'
+            # if time_unit[-1] == 's':
+            #     period_unit = time_unit
+            # else:
+            #     period_unit = f'{time_unit}s'
+
+    return period_unit
+
 
 
 def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None, 

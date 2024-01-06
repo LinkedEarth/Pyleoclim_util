@@ -3235,8 +3235,9 @@ class Series:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
         args = {}
-        args['wwz'] = {'freq': freq}
+        args['wwz'] = {'freq': freq, 'verbose': verbose}
         args['cwt'] = {'freq': freq}
+        
 
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):
@@ -3262,12 +3263,17 @@ class Series:
             else:
                 ntau = np.min([np.size(ts1.time), np.size(ts2.time), 50])
 
-            tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             if 'tau' in settings.keys():
                 tau = settings['tau']
+            else:
+                lb1, ub1 = np.min(ts1.time), np.max(ts1.time)
+                lb2, ub2 = np.min(ts2.time), np.max(ts2.time)
+                lb = np.max([lb1, lb2])
+                ub = np.min([ub1, ub2])
+
+                tau = np.linspace(lb, ub, ntau)
             settings.update({'tau': tau})
             
-
         args[method].update(settings)
 
         # Apply WTC method
