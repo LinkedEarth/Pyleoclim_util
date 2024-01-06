@@ -464,7 +464,7 @@ class TestUISeriesSlice:
     We commit slices at known time intervals and check minimum and maximum values'''
 
     def test_slice(self):
-        ts = gen_normal()
+        ts = gen_normal(nt=100)
         ts_slice = ts.slice(timespan = (10, 50, 80, 90))
         times = ts_slice.__dict__['time']
 
