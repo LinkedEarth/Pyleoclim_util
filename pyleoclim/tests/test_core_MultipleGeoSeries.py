@@ -35,8 +35,6 @@ def multiple_pinkgeoseries(nrecs = 20, seed = 108, geobox=[-85.0,85.0,-180,180])
         
     return pyleo.MultipleGeoSeries(ts_list, label='Multiple Pink GeoSeries')
 
-
-
 class TestUIMultipleGeoSeriesMap:
     def test_map_archives(self):
         '''
@@ -123,6 +121,15 @@ class TestUIMultipleGeoSeriesPCA:
         mgs = multiple_pinkgeoseries()
         pca = mgs.pca()
         fig, ax = pca.modeplot(index=1)
+
+class TestUIMultipleGeoSeriesTimeGeoPlot:
+    def test_time_geo_plot_t0(self):
+        '''
+        test PCA output
+        '''
+        mgs = multiple_pinkgeoseries()
+        fig,ax = mgs.time_geo_plot()
+        pyleo.closefig(fig)
         
 
 # def create_Euro2k():
