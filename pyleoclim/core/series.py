@@ -3201,7 +3201,21 @@ class Series:
              coh_wwz.plot()
 
         As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
-        Significance is assessed similarly as with PSD or Scalogram objects:
+        For instance, one can adjust the resolution of the time axis on which coherence is evaluated:
+            
+        .. jupyter-execute::
+
+             coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz', settings = {'ntau':20})
+             coh_wwz.plot()
+             
+        The frequency (scale) axis can also be customized, e.g. to focus on scales from 1 to 20y, with 24 scales:
+        
+        .. jupyter-execute::
+            
+             coh = ts_air.wavelet_coherence(ts_nino, freq_kwargs={'fmin':1/20,'fmax':1,'nf':24})
+             coh.plot()
+        
+        Significance is assessed similarly to PSD or Scalogram objects:
 
         .. jupyter-execute::
 
@@ -3219,6 +3233,8 @@ class Series:
             cwt_sig.dashboard()
 
         Note: this design balances many considerations, and is not easily customizable.
+        
+        
         '''
         if not verbose:
             warnings.simplefilter('ignore')
