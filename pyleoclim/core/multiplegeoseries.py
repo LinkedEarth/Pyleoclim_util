@@ -421,7 +421,9 @@ class MultipleGeoSeries(MultipleSeries):
              legend=True, inline_legend=False, plot_kwargs=None, lgd_kwargs=None,
              label_x_offset=200,label_y_offset=0,savefig_settings=None, ax=None,
              invert_xaxis=False, invert_yaxis=False):
-        '''A plot of the temporal coverage of the records in a MultipleGeoSeries object organized by latitude.
+        '''A plot of the temporal coverage of the records in a MultipleGeoSeries object organized by latitude or longitude.
+
+        Similar in behaviour to MultipleSeries.time_coverage_plot
 
         Inspired by Dr. Mara Y. McPartland.
         
@@ -559,6 +561,8 @@ class MultipleGeoSeries(MultipleSeries):
 
         See also
         --------
+
+        pyleoclim.multipleseries.MultipleSeries.time_coverage_plot
 
         pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 

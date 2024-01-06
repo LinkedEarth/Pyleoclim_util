@@ -2386,7 +2386,7 @@ class MultipleSeries:
              legend=True, inline_legend=True, plot_kwargs=None, lgd_kwargs=None,
              label_x_offset=200,label_y_offset=0,savefig_settings=None, ax=None, ypad=None,
              invert_xaxis=False, invert_yaxis=False):
-        '''A plot of the temporal coverage of the records in a MultipleGeoSeries object organized by latitude.
+        '''A plot of the temporal coverage of the records in a MultipleSeries object organized by ranked length.
 
         Inspired by Dr. Mara Y. McPartland.
         
