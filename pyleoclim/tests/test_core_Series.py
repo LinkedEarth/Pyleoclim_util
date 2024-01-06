@@ -35,14 +35,14 @@ from statsmodels.tsa.arima_process import arma_generate_sample
 
 # a collection of useful functions
 
-def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
+def gen_ts(model='colored_noise',alpha=1, nt=50, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
 
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
     ts=pyleo.Series(t,v, verbose=False, auto_time_params=True)
     return ts
 
-def gen_normal(loc=0, scale=1, nt=100):
+def gen_normal(loc=0, scale=1, nt=20):
     ''' Generate random data with a Gaussian distribution
     '''
     t = np.arange(nt)
@@ -975,11 +975,10 @@ class TestUISeriesWaveletCoherence():
     def test_xwave_t4(self):
        ''' Test Series.wavelet_coherence() with specified frequency parameters
        '''
-       nt = 100
-       ts1 = gen_ts(model='colored_noise', nt=nt)
-       ts2 = gen_ts(model='colored_noise', nt=nt)
+       ts1 = gen_ts(model='colored_noise')
+       ts2 = gen_ts(model='colored_noise')
        nf = 10
-       fmin = 1/(nt//2)
+       fmin = 1/(len(ts1.time)//2)
        fmax = 10*fmin
        scal = ts1.wavelet_coherence(ts2,method='cwt',freq_kwargs={'fmin':fmin,'fmax':fmax,'nf':nf})  
        freq = pyleo.utils.wavelet.freq_vector_log(ts1.time, fmin=fmin, fmax=fmax, nf=nf)
@@ -994,7 +993,7 @@ class TestUISeriesWaveletCoherence():
        _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'ntau':10})  
        
     def test_xwave_t6(self):
-       ''' Test Series.wavelet_coherence() with WWZ with specified ntau
+       ''' Test Series.wavelet_coherence() with WWZ with specified tau
        '''
        ts1 = gen_ts(model='colored_noise')
        ts2 = gen_ts(model='colored_noise')
@@ -1225,12 +1224,12 @@ class TestUISeriesSort:
 
     @pytest.mark.parametrize('keep_log',[True,False])
     def test_sort_t0(self,keep_log):
-        ts = gen_ts(nt=500,alpha=1.0)
+        ts = gen_ts(nt=50,alpha=1.0)
         ts = ts.sort()
         np.all(np.diff(ts.time) >= 0)
 
     def test_sort_t1(self):
-        t = np.arange(500,0,-1)
+        t = np.arange(50,0,-1)
         v = np.ones(len(t))
         ts = pyleo.Series(t,v)
         ts.sort()

@@ -35,6 +35,13 @@ def metadata():
     }
 
 @pytest.fixture
+def gen_ts():
+    """ Generate realistic-ish Series for testing """
+    t,v = pyleo.utils.gen_ts(model='colored_noise',nt=50)
+    ts = pyleo.Series(t,v, verbose=False)
+    return ts
+
+@pytest.fixture
 def unevenly_spaced_series():
     """Pyleoclim series with unevenly spaced time axis"""
     length = 10

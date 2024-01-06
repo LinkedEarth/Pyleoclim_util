@@ -17,48 +17,37 @@ Notes on how to test:
 import pytest
 import pyleoclim as pyleo
 
-
-def gen_ts(model,nt):
-    'wrapper for gen_ts in pyleoclim'
-    
-    t,v = pyleo.utils.gen_ts(model=model,nt=nt)
-    ts=pyleo.Series(t,v)
-    return ts
-
 # Tests below
       
 class TestUiCoherencePlot:
     ''' Tests for Coherence.plot()
     '''
 
-    def test_plot_t0(self):
+    def test_plot_t0(self, gen_ts):
         ''' Test Coherence.plot with default parameters
         '''
-        nt = 200
-        ts1 = gen_ts(model='colored_noise', nt=nt)
-        ts2 = gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts
+        ts2 = gen_ts
         coh = ts2.wavelet_coherence(ts1)
         fig,ax = coh.plot()
         pyleo.closefig(fig)
     
-    def test_plot_t1(self):
+    def test_plot_t1(self, gen_ts):
         ''' Test Coherence.plot WTC with significance
         '''
-        nt = 200
-        ts1 = gen_ts(model='colored_noise', nt=nt)
-        ts2 = gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts
+        ts2 = gen_ts
         coh = ts2.wavelet_coherence(ts1)
         
         coh_signif = coh.signif_test(number=10,qs = [0.8, 0.9, .95])
         fig,ax = coh_signif.plot(signif_thresh=0.99)
         pyleo.closefig(fig)
         
-    def test_plot_t2(self):
+    def test_plot_t2(self, gen_ts):
         ''' Test Coherence.plot XWT with significance
         '''
-        nt = 200
-        ts1 = gen_ts(model='colored_noise', nt=nt)
-        ts2 = gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts
+        ts2 = gen_ts
         coh = ts2.wavelet_coherence(ts1)
         
         coh_signif = coh.signif_test(number=10)
@@ -68,22 +57,20 @@ class TestUiCoherencePlot:
 class TestUiCoherenceDashboard:
     ''' Tests for Coherence.dashboard()
     '''        
-    def test_dashboard_t0(self):
+    def test_dashboard_t0(self, gen_ts):
         ''' Test Coherence.dashboard() with default parameters
         '''
-        nt = 200
-        ts1 = gen_ts(model='colored_noise', nt=nt)
-        ts2 = gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts
+        ts2 = gen_ts
         coh = ts2.wavelet_coherence(ts1)
         fig,ax  = coh.dashboard()
         pyleo.closefig(fig)
         
-    def test_dashboard_t1(self):
+    def test_dashboard_t1(self, gen_ts):
         ''' Test Coherence.dashboard() with optional parameter
         '''
-        nt = 200
-        ts1 = gen_ts(model='colored_noise', nt=nt)
-        ts2 = gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts
+        ts2 = gen_ts
         coh = ts2.wavelet_coherence(ts1)
         fig, ax = coh.dashboard(wavelet_plot_kwargs={'contourf_style':{'cmap': 'cividis'}})
         pyleo.closefig(fig)
@@ -91,11 +78,10 @@ class TestUiCoherenceDashboard:
 class TestUiCoherencePhaseStats:
     ''' Tests for Coherence.phase_stats()
     '''        
-    def test_phasestats_t0(self):
+    def test_phasestats_t0(self, gen_ts):
         ''' Test Coherence.phase_stats() with default parameters
         '''
-        nt = 200
-        ts1 = gen_ts(model='colored_noise', nt=nt)
-        ts2 = gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts
+        ts2 = gen_ts
         coh = ts2.wavelet_coherence(ts1)
-        phase = coh.phase_stats(scales=[2,8])
+        _ = coh.phase_stats(scales=[2,8])
