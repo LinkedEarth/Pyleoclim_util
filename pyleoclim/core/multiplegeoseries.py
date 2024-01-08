@@ -566,6 +566,27 @@ class MultipleGeoSeries(MultipleSeries):
 
         pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
+        Examples
+        --------
+        .. jupyter-execute::
+            
+            from pylipd.utils.dataset import load_dir
+            lipd = load_dir(name='Pages2k')
+            df = lipd.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment')") 
+            # place in a MultipleGeoSeries object
+            ts_list = []
+            for _, row in dfs.iloc[:5].iterrows():
+                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                            time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                            time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                            lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                            archiveType = row['archiveType'], verbose = False, 
+                                            label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+
+            ms = pyleo.MultipleGeoSeries(ts_list, time_unit='years AD')  
+            ms.time_geo_plot()
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
