@@ -1754,7 +1754,7 @@ class MultipleSeries:
             
         norm : matplotlib.colors.Normalize like
         
-            The nomorlization for the colormap.
+            The normalization for the colormap.
             If None, a linear normalization will be used.
             
         labels: None, 'auto' or list
@@ -1966,21 +1966,44 @@ class MultipleSeries:
                 ax[idx].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
             ax[idx].axhline(y=mu, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
 
+        # subplots_height = 1-height*(1-v_shift_factor)
+        # ax['subplots_canvas'] = fig.add_axes([left, bottom, width, subplots_height],
+        #                                      **{'zorder':-1})
+        # ax['subplots_canvas'].spines['left'].set_visible(False)
+        # ax['subplots_canvas'].spines['right'].set_visible(False)
+        # ax['subplots_canvas'].spines['bottom'].set_visible(False)
+        # ax['subplots_canvas'].set_yticks([])
+        # ax['subplots_canvas'].set_xlim(xlim)
+        # ax['subplots_canvas'].tick_params(axis='x', which='both', length=0)
+        #
+        # ax['subplots_canvas'].set_xlabel('')
+        # ax['subplots_canvas'].set_ylabel('')
+        # ax['subplots_canvas'].set_xticklabels([])
+        # ax['subplots_canvas'].set_yticklabels([])
+        # ax['subplots_canvas'].grid(False)
+
         bottom -= height*(1-v_shift_factor)
-        ax[n_ts] = fig.add_axes([left, bottom, width, height])
-        ax[n_ts].set_xlabel(time_label)
-        ax[n_ts].spines['left'].set_visible(False)
-        ax[n_ts].spines['right'].set_visible(False)
-        ax[n_ts].spines['bottom'].set_visible(True)
-        ax[n_ts].spines['bottom'].set_linewidth(spine_lw)
-        ax[n_ts].set_yticks([])
-        ax[n_ts].patch.set_alpha(0)
-        ax[n_ts].set_xlim(xlim)
-        ax[n_ts].grid(False)
-        ax[n_ts].tick_params(axis='x', which='both', length=3.5)
-        xt = ax[n_ts].get_xticks()[1:-1]
+        # other subplots are set inside the subplot that controls the time axis
+        # trying to make that time axis subplot the whole size of the figure
+
+        x_axis_key = 'x_axis'
+        # x_axis_key = n_ts
+
+        ax[x_axis_key] = fig.add_axes([left, bottom, width, height])
+        ax[x_axis_key].set_xlabel(time_label)
+        ax[x_axis_key].spines['left'].set_visible(False)
+        ax[x_axis_key].spines['right'].set_visible(False)
+        ax[x_axis_key].spines['bottom'].set_visible(True)
+        ax[x_axis_key].spines['bottom'].set_linewidth(spine_lw)
+        ax[x_axis_key].set_yticks([])
+        ax[x_axis_key].patch.set_alpha(0)
+        ax[x_axis_key].set_xlim(xlim)
+        ax[x_axis_key].grid(False)
+        ax[x_axis_key].tick_params(axis='x', which='both', length=3.5)
+        xt = ax[x_axis_key].get_xticks()[1:-1]
         for x in xt:
-            ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+            ax[x_axis_key].axvline(x=x, color='lightgray', linewidth=grid_lw,
+                                   ls='-', zorder=-1)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
