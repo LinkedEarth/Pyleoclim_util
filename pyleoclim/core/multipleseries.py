@@ -2523,6 +2523,17 @@ class MultipleSeries:
 
         pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+             co2ts = pyleo.utils.load_dataset('AACO2')
+             lr04 = pyleo.utils.load_dataset('LR04')
+             edc = pyleo.utils.load_dataset('EDC-dD')
+             ms = lr04.flip() & edc & co2ts # create MS object
+             fig, ax = ms.time_coverage_plot()
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
