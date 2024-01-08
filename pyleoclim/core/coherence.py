@@ -6,8 +6,6 @@ It includes wavelet transform coherency and cross-wavelet transform.
 """
 from ..utils import plotting
 from ..utils import wavelet as waveutils
-from ..utils import lipdutils
-
 from ..core.scalograms import Scalogram, MultipleScalogram
 
 import matplotlib.pyplot as plt
@@ -21,28 +19,6 @@ from matplotlib import gridspec
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
 import warnings
-
-def infer_period_unit_from_time_unit(time_unit):
-    ''' infer a period unit based on the given time unit
-
-    '''
-    if time_unit is None:
-        period_unit = None
-    else:
-        unit_group = lipdutils.timeUnitsCheck(time_unit)
-        if unit_group != 'unknown':
-            if unit_group == 'kage_units':
-                period_unit = 'kyrs'
-            else:
-                period_unit = 'yrs'
-        else:
-            if time_unit[-1] == 's':
-                period_unit = time_unit
-            else:
-                period_unit = f'{time_unit}s'
-
-    return period_unit
-
 
 class Coherence:
     '''Coherence object, meant to receive the WTC and XWT part of Series.wavelet_coherence()
@@ -85,9 +61,9 @@ class Coherence:
         if scale_unit is not None:
             self.scale_unit = scale_unit
         elif timeseries1 is not None:
-            self.scale_unit = infer_period_unit_from_time_unit(timeseries1.time_unit)
+            self.scale_unit = plotting.infer_period_unit_from_time_unit(timeseries1.time_unit)
         elif timeseries2 is not None:
-            self.scale_unit = infer_period_unit_from_time_unit(timeseries2.time_unit)
+            self.scale_unit = plotting.infer_period_unit_from_time_unit(timeseries2.time_unit)
         else:
             self.scale_unit = None
 
@@ -443,7 +419,7 @@ class Coherence:
             return ax
 
 
-    def dashboard(self, title=None, figsize=[9,12], phase_style = {}, 
+    def dashboard(self, title=None, figsize=[9,12], overlap = True, phase_style = {}, 
                   line_colors = ['tab:blue','tab:orange'], savefig_settings={},
                   ts_plot_kwargs = None, wavelet_plot_kwargs= None):
          ''' Cross-wavelet dashboard, including the two series, WTC and XWT.
@@ -461,6 +437,19 @@ class Coherence:
          
              Figure size. The default is [9, 12], as this is an information-rich figure.
              
+         overlap : boolean, optional
+             whether to restrict the plot to the period of overlap between the series. Defaults to True
+             
+         phase_style : dict, optional
+         
+             Arguments for the phase arrows. The default is {}. It includes:
+             - 'pt': the default threshold above which phase arrows will be plotted
+             - 'skip_x': the number of points to skip between phase arrows along the x-axis
+             - 'skip_y':  the number of points to skip between phase arrows along the y-axis
+             - 'scale': number of data units per arrow length unit (see matplotlib.pyplot.quiver)
+             - 'width': shaft width in arrow units (see matplotlib.pyplot.quiver)
+             - 'color': arrow color (see matplotlib.pyplot.quiver)
+          
          line_colors : list, optional
          
              Colors for the 2 traces For nomenclature, see https://matplotlib.org/stable/gallery/color/named_colors.html
@@ -472,16 +461,6 @@ class Coherence:
              - "path" must be specified; it can be any existed or non-existed path,
                with or without a suffix; if the suffix is not given in "path", it will follow "format"
              - "format" can be one of {"pdf", "eps", "png", "ps"}
-
-         phase_style : dict, optional
-         
-             Arguments for the phase arrows. The default is {}. It includes:
-             - 'pt': the default threshold above which phase arrows will be plotted
-             - 'skip_x': the number of points to skip between phase arrows along the x-axis
-             - 'skip_y':  the number of points to skip between phase arrows along the y-axis
-             - 'scale': number of data units per arrow length unit (see matplotlib.pyplot.quiver)
-             - 'width': shaft width in arrow units (see matplotlib.pyplot.quiver)
-             - 'color': arrow color (see matplotlib.pyplot.quiver)
 
          ts_plot_kwargs : dict
          
@@ -547,6 +526,9 @@ class Coherence:
          gs = gridspec.GridSpec(8, 1)
          gs.update(wspace=0, hspace=0.5) # add some breathing room
          ax = {}
+         
+         # assess period of overlap 
+         xlims = np.min(self.time), np.max(self.time) 
 
          # 1) plot timeseries
          #plt.rc('ytick', labelsize=8) 
@@ -558,6 +540,8 @@ class Coherence:
          ax['ts1'].spines['bottom'].set_visible(False)
          ax['ts1'].grid(False)
          ax['ts1'].set_xlabel('')
+         if overlap:
+             ax['ts1'].set_xlim(xlims)
 
          ax['ts2'] = ax['ts1'].twinx()
          self.timeseries2.plot(ax=ax['ts2'], color=line_colors[1],  **ts_plot_kwargs, legend=False)
@@ -567,6 +551,8 @@ class Coherence:
          ax['ts2'].spines['right'].set_visible(True)
          ax['ts2'].spines['left'].set_visible(False)
          ax['ts2'].grid(False)
+         if overlap:
+             ax['ts2'].set_xlim(xlims)
 
          # 2) plot WTC
          ax['wtc'] = plt.subplot(gs[2:5, 0], sharex=ax['ts1'])

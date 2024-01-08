@@ -117,7 +117,7 @@ class Series:
         Defaults to 'ascending'
 
     verbose : bool
-        If True, will print warning messages if there is any
+        If True, will print warning messages if there are any
 
     clean_ts : boolean flag
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
@@ -151,8 +151,9 @@ class Series:
         value = np.array(value)
 
         if auto_time_params is None:
-            warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True. In a future release, this will be changed to False.', UserWarning, stacklevel=2)
             auto_time_params = True
+            if verbose:
+                warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True, which might modify your supplied time metadata.  Please set to False if you want a different behavior.', UserWarning, stacklevel=2)
 
         if auto_time_params:
             # assign time metadata if they are not provided or provided incorrectly
@@ -3200,7 +3201,21 @@ class Series:
              coh_wwz.plot()
 
         As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
-        Significance is assessed similarly as with PSD or Scalogram objects:
+        For instance, one can adjust the resolution of the time axis on which coherence is evaluated:
+            
+        .. jupyter-execute::
+
+             coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz', settings = {'ntau':20})
+             coh_wwz.plot()
+             
+        The frequency (scale) axis can also be customized, e.g. to focus on scales from 1 to 20y, with 24 scales:
+        
+        .. jupyter-execute::
+            
+             coh = ts_air.wavelet_coherence(ts_nino, freq_kwargs={'fmin':1/20,'fmax':1,'nf':24})
+             coh.plot()
+        
+        Significance is assessed similarly to PSD or Scalogram objects:
 
         .. jupyter-execute::
 
@@ -3218,6 +3233,8 @@ class Series:
             cwt_sig.dashboard()
 
         Note: this design balances many considerations, and is not easily customizable.
+        
+        
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -3234,8 +3251,9 @@ class Series:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
         args = {}
-        args['wwz'] = {'freq': freq}
+        args['wwz'] = {'freq': freq, 'verbose': verbose}
         args['cwt'] = {'freq': freq}
+        
 
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):
@@ -3261,12 +3279,17 @@ class Series:
             else:
                 ntau = np.min([np.size(ts1.time), np.size(ts2.time), 50])
 
-            tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             if 'tau' in settings.keys():
                 tau = settings['tau']
+            else:
+                lb1, ub1 = np.min(ts1.time), np.max(ts1.time)
+                lb2, ub2 = np.min(ts2.time), np.max(ts2.time)
+                lb = np.max([lb1, lb2])
+                ub = np.min([ub1, ub2])
+
+                tau = np.linspace(lb, ub, ntau)
             settings.update({'tau': tau})
             
-
         args[method].update(settings)
 
         # Apply WTC method

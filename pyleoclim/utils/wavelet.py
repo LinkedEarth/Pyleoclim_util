@@ -1541,7 +1541,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
     return res
 
 
-def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
+def wwz_coherence(y1, t1, y2, t2, smooth_factor=0.25,
                   tau=None, freq=None, freq_method='log', freq_kwargs=None,
                   c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, detrend=False, sg_kwargs=None,
                   verbose=False,  method='Kirchner_numba',
@@ -1551,19 +1551,19 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     Parameters
     ----------
 
-    ys1 : array
+    y1 : array
 
         first of two time series
 
-    ys2 : array
+    y2 : array
 
         second of the two time series
 
-    ts1 : array
+    t1 : array
 
         time axis of first time series
 
-    ts2 : array
+    t2 : array
 
         time axis of the second time series
 
@@ -1664,27 +1664,26 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 
     '''
     
-    if standardize == True:
+    if standardize:
         warnings.warn('Standardizing the timeseries')
-
-    # TODO: should this use common_time()?
+    
     if tau is None:
-        lb1, ub1 = np.min(ts1), np.max(ts1)
-        lb2, ub2 = np.min(ts2), np.max(ts2)
+        lb1, ub1 = np.min(t1), np.max(t1)
+        lb2, ub2 = np.min(t2), np.max(t2)
         lb = np.max([lb1, lb2])
         ub = np.min([ub1, ub2])
 
-        inside = ts1[(ts1>=lb) & (ts1<=ub)]
+        inside = t1[(t1>=lb) & (t1<=ub)]
         tau = np.linspace(lb, ub, np.size(inside)//10)
         print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
 
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = make_freq_vector(ts1, method=freq_method, **freq_kwargs)
-        print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
+        freq = make_freq_vector(t1, method=freq_method, **freq_kwargs)
+        print(f'Setting freq={freq[:3]}...{freq[-3:]}, nf={np.size(freq)}')
 
-    ys1_cut, ts1_cut, freq1, tau1 = prepare_wwz(ys1, ts1, freq=freq, tau=tau)
-    ys2_cut, ts2_cut, freq2, tau2 = prepare_wwz(ys2, ts2, freq=freq, tau=tau)
+    y1_cut, t1_cut, freq1, tau1 = prepare_wwz(y1, t1, freq=freq, tau=tau)
+    y2_cut, t2_cut, freq2, tau2 = prepare_wwz(y2, t2, freq=freq, tau=tau)
 
     if np.any(tau1 != tau2):
         if verbose: print('inconsistent `tau`, recalculating...')
@@ -1707,10 +1706,10 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     if freq[0] == 0:
         freq = freq[1:] # delete 0 frequency if present
 
-    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff_threshold=Neff_threshold,
+    res_wwz1 = wwz(y1_cut, t1_cut, tau=tau, freq=freq, c=c, Neff_threshold=Neff_threshold,
                    nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
                    gaussianize=gaussianize, standardize=standardize, method=method)
-    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff_threshold=Neff_threshold, 
+    res_wwz2 = wwz(y2_cut, t2_cut, tau=tau, freq=freq, c=c, Neff_threshold=Neff_threshold, 
                    nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
                    gaussianize=gaussianize, standardize=standardize, method=method)
 
@@ -2657,7 +2656,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
 
     return res
 
-def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={},
+def cwt_coherence(y1, t1, y2, t2, freq=None, freq_method='log',freq_kwargs={},
                   scale = None, detrend=False,sg_kwargs={}, pad = False,
                   standardize = True, gaussianize=False, tau = None, Neff_threshold=3,
                   mother='MORLET',param=None, smooth_factor=0.25):
@@ -2666,26 +2665,26 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
     Parameters
     ----------
 
-    ys1 : array
+    y1 : array
 
         first of two time series
 
-    ys2 : array
+    y2 : array
 
         second of the two time series
 
-    ts1 : array
+    t1 : array
 
         time axis of first time series
 
-    ts2 : array
+    t2 : array
 
-        time axis of the second time series (should be = ts1)
+        time axis of the second time series (should be = t1)
 
     tau : array
 
         evenly-spaced time points at which to evaluate coherence 
-        Defaults to None, which uses ts1
+        Defaults to None, which uses t1
 
     freq : array
 
@@ -2776,30 +2775,30 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
     pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
 
     '''
-    assert np.array_equal(ts1,ts2)  and len(ys1) == len(ys2) , "ts1 and ts2 should be the same. Suggest using common_time()"
+    assert np.array_equal(t1,t2)  and len(y1) == len(y2) , "t1 and t2 should be the same. Suggest using common_time()"
     
     
     if standardize == True:
         warnings.warn('Standardizing the timeseries')
     
     if tau is None:
-        tau = ts1
+        tau = t1
 
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = make_freq_vector(ts1, method=freq_method, **freq_kwargs)
+        freq = make_freq_vector(t1, method=freq_method, **freq_kwargs)
         print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
   
     if freq[0] == 0:
         freq = freq[1:] # delete 0 frequency if present
 
     #  Compute CWT for both series       
-    cwt1 = cwt(ys1,ts1,freq=freq,freq_method=freq_method,freq_kwargs=freq_kwargs,
+    cwt1 = cwt(y1,t1,freq=freq,freq_method=freq_method,freq_kwargs=freq_kwargs,
                scale = scale, detrend=detrend, sg_kwargs=sg_kwargs,
                gaussianize=gaussianize, standardize=standardize, pad=pad,
                mother=mother,param=param)
     
-    cwt2 = cwt(ys2,ts2,freq=freq,freq_method=freq_method,freq_kwargs=freq_kwargs,
+    cwt2 = cwt(y2,t2,freq=freq,freq_method=freq_method,freq_kwargs=freq_kwargs,
                scale = scale, detrend=detrend, sg_kwargs=sg_kwargs,
                gaussianize=gaussianize, standardize=standardize, pad=pad,
                mother=mother,param=param)
