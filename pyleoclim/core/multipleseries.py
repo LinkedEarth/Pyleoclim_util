@@ -2527,12 +2527,24 @@ class MultipleSeries:
         --------
 
         .. jupyter-execute::
+            import pyleoclim as pyleo
 
             co2ts = pyleo.utils.load_dataset('AACO2')
             lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
             ms = lr04.flip() & edc & co2ts # create MS object
-            fig, ax = ms.time_coverage_plot()
+            fig, ax = ms.time_coverage_plot(label_y_offset=-.08) #Fiddling with label offsets is sometimes necessary for aesthetic
+
+        .. jupyter-execute::
+
+            #When using fewer records, awkward vertical spacing can be adjusted by varying linewidth and figure size
+            import pyleoclim as pyleo
+            
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            lr04 = pyleo.utils.load_dataset('LR04')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = lr04.flip() & edc & co2ts # create MS object
+            fig, ax = ms.time_coverage_plot(linewidth=20,figsize=[10,2],label_y_offset=-.1)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -2597,14 +2609,19 @@ class MultipleSeries:
                     legend=legend, lgd_kwargs=lgd_kwargs, plot_kwargs=plot_kwargs, ax=ax,
                 )
 
+        #Don't need the y-axis for these plots, can just remove it.
+        ax.get_yaxis().set_visible(False)
+        ax.spines[['left']].set_visible(False)
+
+        #Increase padding to minimize cutoff likelihood.
+        ylim = ax.get_ylim()
+        ax.set_ylim([0.5,ylim[-1]+.2])
+
         if invert_xaxis:
             ax.invert_xaxis()
 
         if invert_yaxis:
             ax.invert_yaxis()
-
-        #Don't need the y-axis for these plots, can just remove it.
-        ax.get_yaxis().set_visible(False)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
