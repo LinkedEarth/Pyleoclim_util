@@ -4,8 +4,7 @@
 Plotting utilities, leveraging Matplotlib.
 """
 
-__all__ = ['set_style','closefig', 'savefig']
-
+__all__ = ['set_style', 'closefig', 'savefig']
 
 import matplotlib.pyplot as plt
 import pathlib
@@ -18,9 +17,9 @@ from matplotlib.colors import ListedColormap
 import seaborn as sns
 
 
-def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None, 
-            xlim=None, ylim=None, savefig_settings=None, ax=None,
-            legend=True, plot_kwargs=None, lgd_kwargs=None):
+def scatter_xy(x, y, c=None, figsize=None, xlabel=None, ylabel=None, title=None,
+               xlim=None, ylim=None, savefig_settings=None, ax=None,
+               legend=True, plot_kwargs=None, lgd_kwargs=None):
     """
     Make scatter plot. 
 
@@ -74,7 +73,7 @@ def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None,
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
     plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
     lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
-    
+
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -108,11 +107,10 @@ def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None,
         return ax
 
 
-def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
+def plot_scatter_xy(x1, y1, x2, y2, figsize=None, xlabel=None,
                     ylabel=None, title=None, xlim=None, ylim=None,
-                    savefig_settings=None, ax=None, legend=True, 
+                    savefig_settings=None, ax=None, legend=True,
                     plot_kwargs=None, lgd_kwargs=None):
-    
     ''' Plot a scatter on top of a line plot.
     
     Parameters
@@ -203,9 +201,9 @@ def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
         return ax
 
 
-def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, 
-            xlim=None, ylim=None,savefig_settings=None, ax=None,
-            legend=True, plot_kwargs=None, lgd_kwargs=None, 
+def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
+            xlim=None, ylim=None, savefig_settings=None, ax=None,
+            legend=True, plot_kwargs=None, lgd_kwargs=None,
             invert_xaxis=False, invert_yaxis=False):
     ''' Plot a timeseries
     
@@ -292,7 +290,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     if invert_xaxis:
         ax.invert_xaxis()
-        
+
     if invert_yaxis:
         ax.invert_yaxis()
 
@@ -302,12 +300,13 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         return fig, ax
     else:
         return ax
-    
+
+
 def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
                vmin=None, vmax=None, xlabel=None, ylabel=None,
-               title=None, xlim=None, savefig_settings=None, label_color = None,
-               x_offset = 0.05, label_size = None, show_xaxis = False,
-               invert_xaxis=False, top_label = None, bottom_label = None): 
+               title=None, xlim=None, savefig_settings=None, label_color=None,
+               x_offset=0.05, label_size=None, show_xaxis=False,
+               invert_xaxis=False, top_label=None, bottom_label=None):
     '''
     Represent y = f(x) as an Ed Hawkins "warming stripes" pattern
     Uses Matplotlib's pcolormesh'
@@ -362,16 +361,16 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     '''
     # handle dict defaults
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-    
+
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
-      
+
     if label_size is None:
         label_size = mpl.rcParams['axes.labelsize']
 
     ones = np.array([0, 1])
-    #ax.set_axis_off()
-    ax.pcolormesh(x, ones, np.vstack([y, y]), cmap=cmap, 
+    # ax.set_axis_off()
+    ax.pcolormesh(x, ones, np.vstack([y, y]), cmap=cmap,
                   vmin=vmin, vmax=vmax, shading='auto')
     # hide y axis
     ax.get_yaxis().set_visible(False)
@@ -381,14 +380,14 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     ax.get_xaxis().set_visible(show_xaxis)
     if show_xaxis is True and xlabel is not None:
         ax.set_xlabel(xlabel)
-    
+
     # parameters for label position
     thickness = ax.get_ybound()[1]
-    xmax = ax.get_xbound()[1]*(1+x_offset/10)
-    #xmax = x.max()*0.8*(1+x_offset)
-    ax.text(xmax, 0.5*thickness, top_label, color=label_color, 
-            fontsize=label_size, fontweight = 'bold')
-    ax.text(xmax, 0*thickness, bottom_label, color=label_color,
+    xmax = ax.get_xbound()[1] * (1 + x_offset / 10)
+    # xmax = x.max()*0.8*(1+x_offset)
+    ax.text(xmax, 0.5 * thickness, top_label, color=label_color,
+            fontsize=label_size, fontweight='bold')
+    ax.text(xmax, 0 * thickness, bottom_label, color=label_color,
             fontsize=label_size)
 
     if ylabel is not None:
@@ -401,15 +400,16 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
         ax.set_xlim(xlim)
 
     if invert_xaxis:
-        ax.invert_xaxis()       
+        ax.invert_xaxis()
 
     if 'fig' in locals():
-        #fig.tight_layout()
+        # fig.tight_layout()
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
         return fig, ax
     else:
         return ax
+
 
 def closefig(fig=None):
     '''Close the figure
@@ -424,6 +424,7 @@ def closefig(fig=None):
         plt.close(fig)
     else:
         plt.close()
+
 
 def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
     ''' Save a figure to a path
@@ -615,11 +616,210 @@ def set_style(style='journal', font_scale=1.0, dpi=300):
         mpl.rcParams.update(d)
 
 
+def make_phantom_ax(ax):
+    ''' Remove all visual annotation from ax object
+
+    This function removes axis lines, axis labels, tick labels, tick marks and grid lines.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes object
+        the axes object to clear
+
+    Returns
+    -------
+    ax : matplotlib.axis
+        the axis object from matplotlib
+        See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
+
+    '''
+
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.set_yticks([])
+    # _ax.set_xlim(xlim)
+    ax.tick_params(axis='x', which='both', length=0)
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+    ax.grid(False)
+
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    return ax
 
 
+def make_annotation_ax(fig, ax, loc='overlay',
+                       ax_name='highlighted_intervals',
+                       height=None, v_offset=0, b=None,
+                       width=None, h_offset=0, l=None,
+                       zorder=-1):
+    ''' Makes a clean axis for adding annotation
+
+    This function creates a new axes for adding annotation.
+    If the bottom left corner is not specified, it is established based on the ax objects in ax.
+    If there is only one ax object, this overkill, but is helpful to introduce annotations that span multiple data axes.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes object or dict
+        If ax is a dict, assumes data axes are assigned to integer keys and
+        supplemental axes have string keys
+
+    loc : string
+        if "overlay", annotation ax will attempt to cover the area with data axes
+        if "above", annotation ax will be located directly above the top data ax
+        if "below", annotation ax will be located below the bottom data ax
+
+    ax_name : string
+        name associated with new ax object
+
+    height : float
+        height of annotation ax
+        if loc = "above" or "below", height=.025 if not specified
+        if loc = "overlay", height=vertical span of data axes, if not specified
+
+    v_offset : float
+        vertical offset between data plot area and annotation ax
+        a positive v_offset will place the bottom corner higher
+
+    width : float
+        width of annotation ax
+        horizontal span of data axes, if not specified
+
+    b : float
+        location of bottom corner of annotation ax
+
+    h_offset : float
+        horizontal offset from left corner
+        a positive h_offset will place the left corner farther to the right
+
+    l : float
+        location of left corner of annotation ax
+
+    zorder : numeric
+        index of annotation ax layer in fig
+        zorder = -1 will place the layer behind other layers
+        zorder = 1000 will place the layer in front of other layers
+
+    Returns
+    -------
+    ax_d : dict
+        ax_d contains the original ax object(s) and new annotation ax assigned to specified ax_name
+        See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
+
+    '''
+
+    if type(ax) != dict:
+        ax_d = {0: ax}
+    else:
+        ax_d = ax
+
+    ll = []
+    ur = []
+    keys_list = [key for key in ax_d.keys() if type(key) == int]
+    keys_list.sort()
+
+    for ax_key in keys_list:
+        bbox_coords = ax_d[ax_key].get_position()
+        ll.append(bbox_coords._points[0].tolist())
+        ur.append(bbox_coords._points[1].tolist())
+        xlims = ax_d[ax_key].get_xlim()
+
+    if l is None:
+        l = min([_ll[0] for _ll in ll])
+
+    u = max([_ur[1] for _ur in ur])
+    r = max([_ur[0] for _ur in ur])
+
+    if loc == 'overlay':
+        if b is None:
+            b = min([_ll[1] for _ll in ll])
+        if height is None:
+            height = u - b
+    else:
+        if height is None:
+            height = .025
+        if loc == 'above':
+            if b is None:
+                b = u
+        if loc == 'below':
+            if b is None:
+                b = min([_ll[1] for _ll in ll]) - height
+
+    if width is None:
+        width = r - l
+    b += v_offset
+    l += h_offset
+
+    ax_d[ax_name] = fig.add_axes([l, b, width, height],
+                                 **{'zorder': zorder})
+    ax_d[ax_name].set_xlim(xlims)
+    ax_d[ax_name] = make_phantom_ax(ax_d[ax_name])
+
+    return ax_d
 
 
+def hightlight_intervals(ax, intervals, color='g', alpha=.3):
+    ''' Hightlights intervals
+
+    This function highlights intervals.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes object
+
+    intervals : list
+        list of intervals to be highlighted
+
+    color : string or list
+        If a string is passed, all intervals will be the specified color
+        If a list is passed, the list is expected to be the same length as intervals
+
+    alpha : float or list
+        If a float is passed, all intervals will have the same specified alpha value
+        If a list is passed, the list is expected to be the same length as intervals
+
+    Returns
+    -------
+    ax : matplotlib.axis
+        the axis object from matplotlib
+        See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
 
 
+    Examples
+    --------
 
+    .. jupyter-execute::
 
+        import pyleoclim as pyleo
+
+        ts_18 = pyleo.utils.load_dataset('cenogrid_d18O')
+        ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
+        ms = pyleo.MultipleSeries([ts_18, ts_13], label='Cenogrid', time_unit='ma BP')
+
+        fig, ax = ms.stackplot(linewidth=0.5, fill_between_alpha=0)
+
+        ax=make_annotation_ax(fig, ax, ax_name = 'highlighted_intervals', zorder=-1)
+        intervals = [[3, 8], [12, 18], [30, 31], [40,43], [49, 60], [60, 65]]
+        hightlight_intervals(ax['highlighted_intervals'], intervals,
+                 color='g', alpha=.1)
+
+    '''
+
+    if isinstance(intervals[0], list) is False:
+        intervals = [intervals]
+
+    for ik, _ts in enumerate(intervals):
+        if isinstance(color, list) is True:
+            c = color[ik]
+        else:
+            c = color
+        if isinstance(alpha, list) is True:
+            a = alpha[ik]
+        else:
+            a = alpha
+
+        ax.axvspan(_ts[0], _ts[1], facecolor=c, alpha=a)
+
+    return ax
