@@ -800,10 +800,10 @@ def hightlight_intervals(ax, intervals, color='g', alpha=.3):
 
         fig, ax = ms.stackplot(linewidth=0.5, fill_between_alpha=0)
 
-        ax=make_annotation_ax(fig, ax, ax_name = 'highlighted_intervals', zorder=-1)
+        ax=pyleo.utils.plotting.make_annotation_ax(fig, ax, ax_name = 'highlighted_intervals', zorder=-1)
         intervals = [[3, 8], [12, 18], [30, 31], [40,43], [49, 60], [60, 65]]
-        hightlight_intervals(ax['highlighted_intervals'], intervals,
-                 color='g', alpha=.1)
+        ax['highlighted_intervals'] = pyleo.utils.plotting.hightlight_intervals(ax['highlighted_intervals'], intervals,
+            color='g', alpha=.1)
 
     '''
 
