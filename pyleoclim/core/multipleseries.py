@@ -2537,7 +2537,7 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            #When using fewer records, awkward vertical spacing can be adjusted by varying linewidth and figure size
+            #Awkward vertical spacing can be adjusted by varying linewidth and figure size
             import pyleoclim as pyleo
             
             co2ts = pyleo.utils.load_dataset('AACO2')
