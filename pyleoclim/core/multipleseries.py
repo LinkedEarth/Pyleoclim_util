@@ -2379,9 +2379,9 @@ class MultipleSeries:
         
         return cls(**b)
 
-    def time_coverage_plot(self, figsize=[10, 4],
+    def time_coverage_plot(self, figsize=[10, 3],
              marker=None, markersize=None, alpha = .8,
-             linestyle=None, linewidth=10, colors=None, cmap='viridis',
+             linestyle=None, linewidth=10, colors=None, cmap='turbo',
              norm=None, xlabel=None, ylabel=None, title=None, time_unit = None,
              legend=True, inline_legend=True, plot_kwargs=None, lgd_kwargs=None,
              label_x_offset=200,label_y_offset=0,savefig_settings=None, ax=None, ypad=None,
@@ -2426,7 +2426,7 @@ class MultipleSeries:
             
         cmap : str
         
-            The colormap to use when "colors" is None.
+            The colormap to use when "colors" is None. Default is 'turbo'
             
         norm : matplotlib.colors.Normalize
        
@@ -2528,11 +2528,11 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-             co2ts = pyleo.utils.load_dataset('AACO2')
-             lr04 = pyleo.utils.load_dataset('LR04')
-             edc = pyleo.utils.load_dataset('EDC-dD')
-             ms = lr04.flip() & edc & co2ts # create MS object
-             fig, ax = ms.time_coverage_plot()
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            lr04 = pyleo.utils.load_dataset('LR04')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = lr04.flip() & edc & co2ts # create MS object
+            fig, ax = ms.time_coverage_plot()
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -2551,7 +2551,7 @@ class MultipleSeries:
         if ylabel is None:
             ylabel = 'Length Rank'
             
-        sorted_series_list = list(dict(sorted({len(series.time):series for series in self.series_list}.items())).values())
+        sorted_series_list = list(dict(sorted({max(series.time)-min(series.time):series for series in self.series_list}.items())).values())
 
         for idx, s in enumerate(sorted_series_list):
             if colors is None:
@@ -2602,6 +2602,9 @@ class MultipleSeries:
 
         if invert_yaxis:
             ax.invert_yaxis()
+
+        #Don't need the y-axis for these plots, can just remove it.
+        ax.get_yaxis().set_visible(False)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:

@@ -414,9 +414,9 @@ class MultipleGeoSeries(MultipleSeries):
 
         return pca_res
     
-    def time_geo_plot(self, figsize=[10, 4],
+    def time_geo_plot(self, figsize=[10, 3],
              marker=None, markersize=None, alpha = .8, y_criteria = 'lat',
-             linestyle=None, linewidth=10, colors=None, cmap='viridis',
+             linestyle=None, linewidth=10, colors=None, cmap='turbo',
              norm=None, xlabel=None, ylabel=None, title=None, time_unit = None,
              legend=True, inline_legend=False, plot_kwargs=None, lgd_kwargs=None,
              label_x_offset=200,label_y_offset=0,savefig_settings=None, ax=None,
@@ -467,7 +467,7 @@ class MultipleGeoSeries(MultipleSeries):
             
         cmap : str
         
-            The colormap to use when "colors" is None.
+            The colormap to use when "colors" is None. Default is 'turbo'.
             
         norm : matplotlib.colors.Normalize
        
