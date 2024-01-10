@@ -101,4 +101,18 @@ def pinkgeoseries(geometadata):
     ts = pyleo.GeoSeries(t,v, verbose=False, **geometadata).standardize()
     return ts
 
+@pytest.fixture
+def multipleseries_basic():
+    ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]))
+    ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]))
+    ms = pyleo.MultipleSeries([ts1, ts2])
+    return ms
+
+@pytest.fixture
+def multipleseries_science():
+    soi = pyleo.utils.load_dataset('SOI')
+    nino = pyleo.utils.load_dataset('NINO3')
+    ms = soi & nino
+    ms.name = 'ENSO'
+    return ms
 

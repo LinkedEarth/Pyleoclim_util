@@ -2379,3 +2379,254 @@ class MultipleSeries:
         b = jsonutils.iterate_through_dict(a, 'MultipleSeries')
         
         return cls(**b)
+
+    def time_coverage_plot(self, figsize=[10, 3],
+             marker=None, markersize=None, alpha = .8,
+             linestyle=None, linewidth=10, colors=None, cmap='turbo',
+             norm=None, xlabel=None, ylabel=None, title=None, time_unit = None,
+             legend=True, inline_legend=True, plot_kwargs=None, lgd_kwargs=None,
+             label_x_offset=200,label_y_offset=0,savefig_settings=None, ax=None, ypad=None,
+             invert_xaxis=False, invert_yaxis=False):
+        '''A plot of the temporal coverage of the records in a MultipleSeries object organized by ranked length.
+
+        Inspired by Dr. Mara Y. McPartland.
+        
+        Parameters
+        ----------
+        
+        figsize : list, optional
+        
+            Size of the figure. The default is [10, 4].
+            
+        marker : str, optional
+        
+            Marker type. The default is None.
+            
+        markersize : float, optional
+        
+            Marker size. The default is None.
+
+        alpha : float, optional
+        
+            Alpha of the lines
+            
+        linestyle : str, optional
+        
+            Line style. The default is None.
+            
+        linewidth : float, optional
+        
+            The width of the line. The default is 10.
+            
+        colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+        
+            Colors for plotting.
+            If None, the plotting will cycle the 'viridis' colormap;
+            if only one color is specified, then all curves will be plotted with that single color;
+            if a list of colors are specified, then the plotting will cycle that color list.
+            
+        cmap : str
+        
+            The colormap to use when "colors" is None. Default is 'turbo'
+            
+        norm : matplotlib.colors.Normalize
+       
+            The normalization for the colormap.
+            If None, a linear normalization will be used.
+            
+        xlabel : str, optional
+        
+            x-axis label. The default is None.
+            
+        ylabel : str, optional
+        
+            y-axis label. The default is None.
+            
+        title : str, optional
+        
+            Title. The default is None.
+            
+        time_unit : str
+        
+            the target time unit, possible input:
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+            default is None, in which case the code picks the most common time unit in the collection.
+            If no unambiguous winner can be found, the unit of the first series in the collection is used. 
+            
+        legend : bool, optional
+        
+            Whether the show the legend. The default is True.
+
+        inline_legend : bool, optional
+
+            Whether to use inline labels or the default pyleoclim legend. This option overrides lgd_kwargs
+            
+        plot_kwargs : dict, optional
+        
+            Plot parameters. The default is None.
+            
+        lgd_kwargs : dict, optional
+        
+            Legend parameters. The default is None.
+
+            If inline_legend is True, lgd_kwargs will be passed to ax.text() (see matplotlib.axes.Axes.text documentation)
+            If inline_legend is False, lgd_kwargs will be passed to ax.legend() (see matplotlib.axes.Axes.legend documentation)
+
+        label_x_offset: float or list, optional
+
+            Amount to offset label by in the x direction. Only used if inline_legend is True. Default is 200.
+            If list, should have the same number of elements as the MultipleSeries object.
+
+        label_y_offset : float or list, optional
+
+            Amount to offset label by in the y direction. Only used if inline_legend is True. Default is 0.
+            If list, should have the same number of elements as the MultipleSeries object.
+            
+        savefig_settings : dictionary, optional
+        
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existing or non-existing path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            
+        ax : matplotlib.ax, optional
+        
+            The matplotlib axis onto which to return the figure. The default is None.
+            
+        invert_xaxis : bool, optional
+        
+            if True, the x-axis of the plot will be inverted
+
+        invert_yaxis : bool, optional
+        
+            if True, the y-axis of the plot will be inverted
+
+        Returns
+        -------
+
+        fig : matplotlib.figure
+        
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+        
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+            import pyleoclim as pyleo
+
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            lr04 = pyleo.utils.load_dataset('LR04')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = lr04.flip() & edc & co2ts # create MS object
+            fig, ax = ms.time_coverage_plot(label_y_offset=-.08) #Fiddling with label offsets is sometimes necessary for aesthetic
+
+        .. jupyter-execute::
+
+            #Awkward vertical spacing can be adjusted by varying linewidth and figure size
+            import pyleoclim as pyleo
+            
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            lr04 = pyleo.utils.load_dataset('LR04')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = lr04.flip() & edc & co2ts # create MS object
+            fig, ax = ms.time_coverage_plot(linewidth=20,figsize=[10,2],label_y_offset=-.1)
+
+        '''
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+        # deal with time units
+        self = self.convert_time_unit(time_unit=time_unit)
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+            
+        if title is None and self.label is not None:
+            ax.set_title(self.label, fontweight='bold')
+
+        if ylabel is None:
+            ylabel = 'Length Rank'
+            
+        sorted_series_list = list(dict(sorted({max(series.time)-min(series.time):series for series in self.series_list}.items())).values())
+
+        for idx, s in enumerate(sorted_series_list):
+            if colors is None:
+                cmap_obj = plt.get_cmap(cmap)
+                nc = len(self.series_list)
+                if norm is None:
+                    norm = mpl.colors.Normalize(vmin=0, vmax=nc-1)
+                clr = cmap_obj(norm(idx%nc))
+            elif type(colors) is str:
+                clr = colors
+            elif type(colors) is list:
+                nc = len(colors)
+                clr = colors[idx%nc]
+            else:
+                raise TypeError("'colors' should be a list of, or one of, Python's supported color codes (a string of hex code or a tuple of rgba values)")
+            
+            s.value = np.ones(len(s.value))*(idx+1)
+
+            if legend and inline_legend:
+            
+                ax = s.plot(
+                    figsize=figsize, marker=marker, markersize=markersize, alpha=alpha, color=clr, linestyle=linestyle,
+                    linewidth=linewidth, label=s.label, xlabel=xlabel, ylabel=ylabel, title=title,
+                    legend=False, lgd_kwargs=None, plot_kwargs=plot_kwargs, ax=ax,
+                )
+
+                if isinstance(label_x_offset,list):
+                    x_offset = label_x_offset[idx]
+                else:
+                    x_offset=label_x_offset
+                if isinstance(label_y_offset,list):
+                    y_offset = label_y_offset[idx]
+                else:
+                    y_offset=label_y_offset
+
+                ax.text(s.time[-1]+x_offset, s.value[-1]+y_offset, s.label, color=clr, **lgd_kwargs)
+
+            else:
+                
+                ax = s.plot(
+                    figsize=figsize, marker=marker, markersize=markersize, alpha=alpha, color=clr, linestyle=linestyle,
+                    linewidth=linewidth, label=s.label, xlabel=xlabel, ylabel=ylabel, title=title,
+                    legend=legend, lgd_kwargs=lgd_kwargs, plot_kwargs=plot_kwargs, ax=ax,
+                )
+
+        #Don't need the y-axis for these plots, can just remove it.
+        ax.get_yaxis().set_visible(False)
+        ax.spines[['left']].set_visible(False)
+
+        #Increase padding to minimize cutoff likelihood.
+        ylim = ax.get_ylim()
+        ax.set_ylim([0.5,ylim[-1]+.2])
+
+        if invert_xaxis:
+            ax.invert_xaxis()
+
+        if invert_yaxis:
+            ax.invert_yaxis()
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax

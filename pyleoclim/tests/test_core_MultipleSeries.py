@@ -686,4 +686,11 @@ class TestSel:
         with pytest.raises(TypeError, match="Cannot pass both `value` and `time`"):
             ms.sel(time=1, value=1)
 
-    
+class TestUIMultipleSeriesTimeCoveragePlot:
+    def test_time_coverage_plot_t0(self,multipleseries_basic):
+        '''
+        test PCA output
+        '''
+        ms = multipleseries_basic
+        fig,ax = ms.time_coverage_plot()
+        pyleo.closefig(fig)
