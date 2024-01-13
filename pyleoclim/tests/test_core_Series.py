@@ -116,7 +116,13 @@ class TestUISeriesInit:
          
          assert datum == 1950
          assert direction == 'retrograde'
-         
+    
+     @pytest.mark.parametrize('archiveType', ['FluvialSediment', 'creek'])
+     def test_init_archiveType(self, archiveType):
+         ts =pyleo.Series(time=[2,3,5], value =[4,5,6], archiveType=archiveType, control_archiveType=True)
+        
+         assert ts.archiveType=='FluvialSediment'
+          
 
 class TestSeriesIO:
     ''' Test Series import from and export to other formats
@@ -1241,7 +1247,7 @@ class TestResample:
             'value_unit': 'mb',
             'value_name': 'SOI',
             'label': f'Southern Oscillation Index ({rule} resampling)',
-            'archiveType': 'instrumental',
+            'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
                     {0: 'dropna', 'applied': True, 'verbose': True},
@@ -1283,7 +1289,7 @@ class TestResample:
             'value_unit': 'mb',
             'value_name': 'SOI',
             'label': f'Southern Oscillation Index ({rule} resampling)',
-            'archiveType': 'instrumental',
+            'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
                     {0: 'dropna', 'applied': True, 'verbose': True},

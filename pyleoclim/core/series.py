@@ -106,8 +106,14 @@ class Series:
         source of the dataset. If it came from a LiPD file, this could be the datasetID property
 
     archiveType : string
-        climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'
-
+        climate archive, one of 'Borehole', 'Coral', 'FluvialSediment', 'GlacierIce', 'GroundIce', 'LakeSediment', 'MarineSediment', 'Midden', 'MolluskShell', 'Peat', 'Sclerosponge', 'Shoreline', 'Speleothem', 'TerrestrialSediment', 'Wood'                                                                                   
+        Reference: https://lipdverse.org/vocabulary/archivetype/
+    
+    control_archiveType  : [True, False]
+        Whether to standardize the name of the archiveType agains the vocabulary from: https://lipdverse.org/vocabulary/paleodata_proxy/. 
+        If set to True, will only allow for these terms and automatically convert known synonyms to the standardized name. Only standardized variable names will be automatically assigned a color scheme.  
+        Default is False. 
+        
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
         defaults to True
@@ -142,8 +148,8 @@ class Series:
 
     def __init__(self, time, value, time_unit=None, time_name=None,
                  value_name=None, value_unit=None, label=None,
-                 importedFrom=None, archiveType = None, log=None, keep_log=False,
-                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False,
+                 importedFrom=None, archiveType = None, control_archiveType=False,
+                 log=None, keep_log=False, sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False,
                  auto_time_params = None):
 
         # ensure ndarray instances
@@ -256,16 +262,47 @@ class Series:
         self.sort_ts = sort_ts
         self.clean_ts = clean_ts
         self.importedFrom = importedFrom
-        self.archiveType = archiveType
         if archiveType is not None:
-            archiveType = lipdutils.LipdToOntology(archiveType)
-            self.archiveType = archiveType.lower().replace(" ", "") #remove spaces
-            if self.archiveType not in lipdutils.PLOT_DEFAULT.keys():
-                str_archive = list(lipdutils.PLOT_DEFAULT.keys())[0:-1]
-                mystring = ""
-                for item in str_archive:
-                    mystring += str(item) + ', '
-                warnings.warn('archiveType should be one of the following: ' + mystring)
+            #Deal with archiveType
+            
+            #Get the possible list of archiveTyp
+            
+            
+            if control_archiveType == True:
+                
+                res = lipdutils.get_archive_type()
+                std_var = list(res.keys())
+                std_var_lower = [key.lower() for key in res.keys()]
+                
+                data = []
+                for key, values in res.items():
+                    if values:  # Check if the list is not empty
+                        for val in values:
+                            data.append([key.lower(), val.lower().replace(" ", "")])
+                    else:
+                        data.append([key.lower(), None])  # If the list is empty, append None as value
+
+                # Creating DataFrame
+                df = pd.DataFrame(data, columns=['Key', 'Value'])
+                synonym = df[df['Value'].isin([archiveType.lower().replace(" ", "")])]['Key']
+                if synonym.empty == True:
+                    synonym = None
+                else: 
+                    synonym = synonym.to_string(header=False, index=False)
+            
+                
+                if archiveType.lower().replace(" ", "") in std_var_lower:
+                    index = std_var_lower.index(archiveType.lower().replace(" ", ""))
+                    self.archiveType = std_var[index]
+                elif synonym is not None:
+                    index = std_var_lower.index(synonym)
+                    self.archiveType = std_var[index]
+                else:
+                    raise ValueError('Not a proper archiveName or a known synonym')
+            else:
+                self.archiveType = archiveType
+        else:
+            self.archiveType = None
 
 
     def __repr__(self):
