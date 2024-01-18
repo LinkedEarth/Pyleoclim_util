@@ -2528,6 +2528,7 @@ class MultipleSeries:
         --------
 
         .. jupyter-execute::
+
             import pyleoclim as pyleo
 
             co2ts = pyleo.utils.load_dataset('AACO2')
@@ -2536,9 +2537,10 @@ class MultipleSeries:
             ms = lr04.flip() & edc & co2ts # create MS object
             fig, ax = ms.time_coverage_plot(label_y_offset=-.08) #Fiddling with label offsets is sometimes necessary for aesthetic
 
+        Awkward vertical spacing can be adjusted by varying linewidth and figure size
+        
         .. jupyter-execute::
 
-            #Awkward vertical spacing can be adjusted by varying linewidth and figure size
             import pyleoclim as pyleo
             
             co2ts = pyleo.utils.load_dataset('AACO2')
