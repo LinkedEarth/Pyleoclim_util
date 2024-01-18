@@ -70,14 +70,19 @@ class GeoSeries(Series):
         source of the dataset. If it came from a LiPD file, this could be the datasetID property 
 
     archiveType : string
-        climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'                                                                                     
+        climate archive, one of 'Borehole', 'Coral', 'FluvialSediment', 'GlacierIce', 'GroundIce', 'LakeSediment', 'MarineSediment', 'Midden', 'MolluskShell', 'Peat', 'Sclerosponge', 'Shoreline', 'Speleothem', 'TerrestrialSediment', 'Wood'                                                                                   
         Reference: https://lipdverse.org/vocabulary/archivetype/
+    
+    control_archiveType  : [True, False]
+        Whether to standardize the name of the archiveType agains the vocabulary from: https://lipdverse.org/vocabulary/paleodata_proxy/. 
+        If set to True, will only allow for these terms and automatically convert known synonyms to the standardized name. Only standardized variable names will be automatically assigned a color scheme.  
+        Default is False. 
         
     sensorType : string
-        sensor, e.g. a paleoclimate proxy sensor, defined in https://wiki.linked.earth/Category:ProxySensor_(L)
+        sensor, e.g. a paleoclimate proxy sensor. This property can be used to differentiate between species of foraminifera
         
     observationType : string
-        observation type,  e.g. a paleoclimate proxy observation, defined in https://wiki.linked.earth/Category:ProxyObservation_(L)
+        observation type,  e.g. a proxy observation. See https://lipdverse.org/vocabulary/paleodata_proxy/. Note: this is preferred terminology but not enforced
         
     depth : array
         depth at which the values were collected
@@ -119,7 +124,8 @@ class GeoSeries(Series):
 
     def __init__(self, time, value, lat, lon, elevation = None, time_unit=None, time_name=None, 
                  value_name=None, value_unit=None, label=None, importedFrom=None, 
-                 archiveType = None, sensorType = None, observationType = None,
+                 archiveType = None, control_archiveType = False, 
+                 sensorType = None, observationType = None,
                  log=None, keep_log=False, verbose=True,
                  depth = None, depth_name = None, depth_unit= None,
                  sort_ts = 'ascending', dropna = True,  clean_ts=False):
@@ -155,7 +161,7 @@ class GeoSeries(Series):
         # PSM 
         self.sensorType = sensorType
         self.observationType = observationType
-        
+                
         # depth infornation
         self.depth = depth
         self.depth_name = depth_name
@@ -163,7 +169,7 @@ class GeoSeries(Series):
             
         #assign all the rest
         super().__init__(time, value, time_unit, time_name, value_name,
-                         value_unit, label, importedFrom, archiveType,
+                         value_unit, label, importedFrom, archiveType, control_archiveType,
                          log, keep_log, sort_ts, dropna, verbose, clean_ts)
                       
 
@@ -591,8 +597,10 @@ class GeoSeries(Series):
         
         if self.archiveType is not None:
             archiveType = lipdutils.LipdToOntology(self.archiveType).lower().replace(" ", "")
+            if archiveType not in lipdutils.PLOT_DEFAULT.keys():
+                archiveType = 'Other'                
         else: 
-            archiveType = 'other'
+            archiveType = 'Other'
         
         if 'marker' not in plt_kwargs.keys():
             plt_kwargs.update({'marker': lipdutils.PLOT_DEFAULT[archiveType][1]})

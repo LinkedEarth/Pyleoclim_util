@@ -89,7 +89,7 @@ def geometadata():
             'value_unit': '‰',
             'value_name': '$\\delta \\mathrm{D}$',
             'label': 'pink noise geoseries',
-            'archiveType': 'Glacier Ice',
+            'archiveType': 'GlacierIce',
             'importedFrom': 'who knows where',
             'log': None
     }
