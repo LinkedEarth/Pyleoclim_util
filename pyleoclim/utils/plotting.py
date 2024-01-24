@@ -15,6 +15,8 @@ from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import ListedColormap
 import seaborn as sns
+from matplotlib.lines import Line2D
+
 
 
 def scatter_xy(x, y, c=None, figsize=None, xlabel=None, ylabel=None, title=None,
@@ -759,8 +761,9 @@ def make_annotation_ax(fig, ax, loc='overlay',
 
     return ax_d
 
+import matplotlib.patches as mpatches
 
-def hightlight_intervals(ax, intervals, color='g', alpha=.3):
+def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend=True):
     ''' Hightlights intervals
 
     This function highlights intervals.
@@ -810,16 +813,260 @@ def hightlight_intervals(ax, intervals, color='g', alpha=.3):
     if isinstance(intervals[0], list) is False:
         intervals = [intervals]
 
+    handles = []
+
+    new_labels = []
+    new_colors = []
+    new_alphas=[]
+
     for ik, _ts in enumerate(intervals):
         if isinstance(color, list) is True:
             c = color[ik]
         else:
             c = color
+        new_colors.append(c)
+
         if isinstance(alpha, list) is True:
             a = alpha[ik]
         else:
             a = alpha
+        new_alphas.append(a)
+
+        if isinstance(labels, list) is True:
+            label = labels[ik]
+        else:
+            label = ''
+        new_labels.append(label)
 
         ax.axvspan(_ts[0], _ts[1], facecolor=c, alpha=a)
+
+    return ax
+
+
+def calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=.1):
+    """
+    Calculate overlapping sets of labels based on their positions and widths.
+
+    This function identifies sets of labels that would overlap if rendered at the same height on a plot.
+    It is used to determine how to place labels to avoid overlap in visualizations.
+
+    Parameters:
+    -----------
+    ax : matplotlib.axes.Axes
+        The Axes object on which the labels will be plotted.
+
+    labels : list of str
+        A list of label strings.
+
+    x_locs : list of float
+        A list of x-coordinates where the labels are to be positioned.
+
+    fontsize : int
+        The font size used for the labels.
+
+    buffer : float, optional
+        Additional space to consider around each label to prevent overlap.
+        Defaults to 0.1.
+
+    Returns:
+    --------
+    list of list of int: A list where each sublist contains the indices of overlapping labels.
+
+    """
+
+    # Calculate the horizontal span of each label
+    intervals = []
+    for i, label in enumerate(labels):
+        ann = ax.text(x_locs[i], 0, label, size=fontsize)
+        box = ax.transData.inverted().transform(ann.get_tightbbox(fig.canvas.get_renderer()))
+        w = box[1][0] - box[0][0] + buffer
+        interval = pd.Interval(left=x_locs[i] - w / 2, right=x_locs[i] + w / 2)
+        intervals.append(interval)
+        ann.remove()
+
+    # Group overlapping labels
+    overlapping_sets = []
+    for i, interval_i in enumerate(intervals):
+        found = False
+        for overlap_set in overlapping_sets:
+            if any(interval_i.overlaps(intervals[j]) for j in overlap_set):
+                overlap_set.add(i)
+                found = True
+                break
+        if not found:
+            overlapping_sets.append({i})
+
+    # Convert sets to sorted lists
+    return [sorted(list(s)) for s in overlapping_sets]
+
+
+def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_sets=None, baseline=0.5,
+                    height=0.5, buffer=0.1, fontsize=10, linewidth=None, linestyle_kwargs=None,
+                    text_kwargs=None
+                    ):
+    """
+    Place labels on a plot with given orientations and style parameters, avoiding overlaps.
+
+    This function positions labels at specified x-locations with adjustments to avoid overlaps.
+    Labels can be oriented either above (north) or below (south) a baseline.
+
+    Parameters:
+    --------
+    ax : matplotlib.axes.Axes
+        The Axes object where the labels are to be placed.
+
+    labels : list of str
+        A list of label strings.
+
+    x_locs : list of float
+        A list of x-coordinates for the labels.
+
+    orientation : str, optional
+        The vertical orientation of the labels, either 'north' or 'south'. Defaults to 'north'.
+
+    overlapping_sets : list of list of int, optional
+        Precomputed overlapping sets of labels. If None, the function will compute them. Defaults to None.
+
+    baseline : float, optional
+        The baseline height for the first label slot. Defaults to 0.5.
+
+    height : float, optional
+        The vertical spacing between slots. Defaults to 0.5.
+
+    buffer : float, optional
+        Horizontal buffer space around labels to prevent overlap. Defaults to 0.1.
+
+    fontsize : int, optional
+        Font size for labels. Defaults to 10.
+
+    linewidth : float, optional
+        Line width for connecting lines. If None, defaults to 1.
+
+    linestyle_kwargs : dict, optional
+        Additional keyword arguments for styling the connecting lines (per Matplotlib).
+
+    text_kwargs : dict, optional
+        Additional keyword arguments for styling the text labels (per Matplotlib).
+
+    Returns:
+    --------
+    matplotlib.axes.Axes: The modified Axes object with labels placed.
+
+    Examples
+    --------
+
+    .. jupyter-execute::
+
+        import pyleoclim as pyleo
+        import numpy as np
+
+        ts_18 = pyleo.utils.load_dataset('cenogrid_d18O')
+        ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
+        ms = pyleo.MultipleSeries([ts_18, ts_13], label='Cenogrid', time_unit='ma BP')
+
+        fig, ax = ms.stackplot(linewidth=0.5, fill_between_alpha=0)
+
+        ax=pyleo.utils.plotting.make_annotation_ax(fig, ax, ax_name = 'epochs', height=.03,
+                                           loc='above', v_offset=.015,zorder=-2)
+        ax['epochs'].set_facecolor((1, 1, 1, 0))
+
+        ceno_intervals_pairs = [[0.0, 0.01], [0.01, 1.6], [1.6, 5.3], [5.3, 23.7], [23.7, 36.6], [36.6, 57.8], [57.8, 66.4]]
+        ceno_epoch_labels = ['Holocene', 'Pleistocene', 'Pliocene', 'Miocene', 'Oligocene', 'Eocene', 'Paleocene']
+        ax['epochs'].set_ylim([-1,0])
+
+        colors = ['r', 'm', 'orange', 'blue', 'green', 'aqua', 'navy', 'pink']#['r', 'b']#'r' if ik%2 ==0 else 'b' for ik, _ts in enumerate(geo_ts)]
+        ax['epochs'] = pyleo.utils.plotting.hightlight_intervals(ax['epochs'],
+                                                    ceno_intervals_pairs, color=colors,
+                                                                              alpha=.1)
+
+        ### EPOCHS (labels)
+        ax=pyleo.utils.plotting.make_annotation_ax(fig, ax['epochs'], ax_name = 'epoch_annotation',
+                                                   zorder=1, v_offset=0.01,
+                                                   height=.25, loc='above')
+
+        x_locs = [np.mean(interval) for interval in ceno_intervals_pairs]
+        ax['epoch_annotation'].set_ylim([0,3])
+        labels = ceno_epoch_df['EPOCH'].values
+        ax['epoch_annotation'] = pyleo.utils.plotting.label_intervals(fig, ax['epoch_annotation'], ceno_epoch_labels, x_locs,
+                                                               orientation='north', baseline=.45, height=0.35, buffer=0.1,
+                                           linestyle_kwargs= {'color':'gray'}, text_kwargs={'fontsize':10, 'va':'bottom'}
+                                          )
+
+
+    """
+
+    if linestyle_kwargs is None:
+        linestyle_kwargs = {}
+
+    linestyle_defaults = {'linestyle': '--', 'color': 'gray', 'linewidth': 1 if linewidth is None else linewidth}
+    for key in linestyle_defaults:
+        if key not in linestyle_kwargs:
+            linestyle_kwargs[key] = linestyle_defaults[key]
+
+    if text_kwargs is None:
+        text_kwargs = {}
+
+    text_defaults = {'fontsize': 10 if fontsize is None else fontsize, 'ha': 'center'}
+    for key in text_defaults:
+        if key not in text_kwargs:
+            text_kwargs[key] = text_defaults[key]
+    fontsize = text_kwargs['fontsize']
+
+    # if overlapping sets aren't specified, calculate them
+    if overlapping_sets is None:
+        overlapping_sets = calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=buffer)
+
+    def get_label_width(label, fontsize=fontsize):
+        text = ax.text(0, 0, label, size=fontsize)
+        width = text.get_window_extent(renderer=ax.figure.canvas.get_renderer()).width
+        text.remove()  # Remove the text used for measurement
+        return width + buffer
+
+    label_alignments = ['center' for _ in labels]
+    label_slots = [0 for _ in labels]
+
+    for overlap_set in overlapping_sets:
+        if len(overlap_set) > 1:
+            sorted_set = sorted(overlap_set, key=lambda i: x_locs[i])
+            peak = len(sorted_set) // 2
+            for i, label_index in enumerate(sorted_set):
+                label_slots[label_index] = i if i <= peak else peak - (i - peak)
+
+            cluster_min, cluster_max = x_locs[sorted_set[0]], x_locs[sorted_set[-1]]
+            for i, label_index in enumerate(sorted_set):
+                if i == 0:
+                    label_alignments[label_index] = 'right'
+                else:
+                    if len(sorted_set) == 2:
+                        label_alignments[label_index] = 'center'
+                    else:
+                        if i == int((len(sorted_set) - 1) / 2):
+                            label_alignments[label_index] = 'center'
+                        elif i > int((len(sorted_set) - 1) / 2):
+                            label_alignments[label_index] = 'left'
+                        else:
+                            label_width = get_label_width(labels[label_index])
+                            if x_locs[label_index] - label_width / 2 < cluster_min:
+                                label_alignments[label_index] = 'right'
+                            elif x_locs[label_index] + label_width / 2 > cluster_max:
+                                label_alignments[label_index] = 'left'
+                            else:
+                                label_alignments[label_index] = 'center'
+
+        else:
+            label_index = overlap_set[0]
+            label_alignments[label_index] = 'center'
+
+    for i, label in enumerate(labels):
+        label_text_kwargs = text_kwargs.copy()
+        slot_height = baseline + label_slots[i] * height if orientation == 'north' else -baseline - label_slots[
+            i] * height
+
+        label_text_kwargs['ha'] = label_alignments[i]
+        if 'va' not in label_text_kwargs:
+            label_text_kwargs['va'] = 'bottom' if orientation == 'north' else 'top'
+
+        ax.text(x_locs[i], slot_height, label, **label_text_kwargs)
+        ax.plot([x_locs[i], x_locs[i]], [0, slot_height], **linestyle_kwargs)
 
     return ax
