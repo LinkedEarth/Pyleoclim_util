@@ -756,8 +756,10 @@ def make_annotation_ax(fig, ax, loc='overlay',
 
     ax_d[ax_name] = fig.add_axes([l, b, width, height],
                                  **{'zorder': zorder})
+
     ax_d[ax_name].set_xlim(xlims)
     ax_d[ax_name] = make_phantom_ax(ax_d[ax_name])
+    ax_d[ax_name].set_facecolor((1, 1, 1, 0))
 
     return ax_d
 
@@ -986,7 +988,6 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
 
         x_locs = [np.mean(interval) for interval in ceno_intervals_pairs]
         ax['epoch_annotation'].set_ylim([0,3])
-        labels = ceno_epoch_df['EPOCH'].values
         ax['epoch_annotation'] = pyleo.utils.plotting.label_intervals(fig, ax['epoch_annotation'], ceno_epoch_labels, x_locs,
                                                                orientation='north', baseline=.45, height=0.35, buffer=0.1,
                                            linestyle_kwargs= {'color':'gray'}, text_kwargs={'fontsize':10, 'va':'bottom'}
