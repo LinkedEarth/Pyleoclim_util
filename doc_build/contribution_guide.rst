@@ -25,8 +25,8 @@ If for whatever reason you are not able to continue working with the issue, plea
 Bug reports and enhancement requests
 ====================================
 
-Bug reports are an important part of improving any software. Having a complete bug report will allow others to reproduce the bug and provide insight into fixing. See this `stackoverflow article` <https://stackoverflow.com/help/mcve>`_ and `this blogpost <https://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports>`_ for tips on writing a good bug report.
-Trying the bug*producing code out on the master branch is often a worthwhile exercise to confirm the bug still exists. It is also worth searching existing bug reports and pull requests to see if the issue has already been reported and/or fixed.
+Bug reports are an important part of improving any software. Having a complete bug report will allow others to reproduce the bug and provide insight into fixing. See this `stackoverflow article <https://stackoverflow.com/help/mcve>`_ and `this blog post <https://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports>`_ for tips on writing a good bug report.
+Trying the bug-producing code out on the master branch is often a worthwhile exercise to confirm the bug still exists. It is also worth searching existing bug reports and pull requests to see if the issue has already been reported and/or fixed.
 Bug reports must:
 
 1. Include a minimal working example (a short, self*contained Python snippet reproducing the problem). You can format the code nicely by using GitHub Flavored Markdown::
@@ -73,7 +73,7 @@ We recommend developing in the same conda environment in which you installed Pyl
 
 Creating a branch
 """""""""""""""""
-You want your master branch to reflect only production*ready code, so create a feature branch for making your changes. For example::
+You want your master branch to reflect only production-ready code, so create a feature branch for making your changes. For example::
 
     git branch shiny-new-feature
     git checkout shiny-new-feature
@@ -106,8 +106,8 @@ Contributing new functionalities
   Now you may implement the new functionality inside Pyleoclim. In so doing, make sure you:
     * Re-use as many of Pyleoclim’s existing utilities as you can, introducing new package  dependencies only as necessary.
     * Create a docstring for your new function, describing arguments and returned variables, and showing an example of use. (Use an existing docstring for inspiration).
-    * If possible, also include a unit test for `continuous integration <https://youtu.be/_WvjhrZR01U>`_ (Pyleoclim uses `pytest` and `TravisCI`). Feel free to ask for help from the package developers.
-  4. Expose the new functionality in the Pyleoclim API (`ui.py`)
+    * If possible, also include a unit test for `continuous integration <https://youtu.be/_WvjhrZR01U>`_ (Pyleoclim uses `pytest`). Feel free to ask for help from the package developers.
+  4. Expose the new functionality in the Pyleoclim user API (files located in the `core` folder)
 
 
 Updating existing functionalities
@@ -140,7 +140,7 @@ To run the test(s):
 
 3.  To perform all tests in all testing files inside the specified directory, execute `pytest {directory_path}`
 
-The order above is somewhat loose, but goes from least complex (time*consuming) to more complex.
+The order above is somewhat loose, but goes from least complex (time-consuming) to more complex.
 
 
 Stylistic considerations
@@ -201,13 +201,13 @@ If you added the upstream repository as described above you will see something l
     origin  git@github.com:yourname/Pyleoclim_util.git (fetch)
     origin  git@github.com:yourname/Pyleoclim_util.git (push)
     upstream  git://github.com/LinkedEarth/Pyleoclim_util.git (fetch)
-    upstream  git://github.comLinkedEarth/Pyleoclim_util.git (push)
+    upstream  git://github.com/LinkedEarth/Pyleoclim_util.git (push)
 
 Now your code is on GitHub, but it is not yet a part of the Pyleoclim project. For that to happen, a pull request needs to be submitted on GitHub.
 
 Filing a Pull Request
 """""""""""""""""""""
-When you’re ready to ask for a code review, file a pull request. But before you do, please double*check that you have followed all the guidelines outlined in this document regarding code style, tests, performance tests, and documentation. You should also double check your branch changes against the branch it was based on:
+When you’re ready to ask for a code review, file a pull request. But before you do, please double-check that you have followed all the guidelines outlined in this document regarding code style, tests, performance tests, and documentation. You should also double check your branch changes against the branch it was based on:
 
   * Navigate to your repository on GitHub
   * Click on Branches
@@ -267,7 +267,7 @@ Tips for a successful pull request
 If you have made it to the “Review your code” phase, one of the core contributors will take a look. Please note however that response time will be variable (e.g. don’t try the week before AGU).
 To improve the chances of your pull request being reviewed, you should:
 
-  * Reference an open issue for non*trivial changes to clarify the PR’s purpose
+  * Reference an open issue for non-trivial changes to clarify the PR’s purpose
   * Ensure you have appropriate tests. These should be the first part of any PR
   * Keep your pull requests as simple as possible. Larger PRs take longer to review
   * If you need to add on to what you submitted, keep updating your original pull request, either by request or every few days
