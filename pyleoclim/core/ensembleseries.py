@@ -131,8 +131,8 @@ class EnsembleSeries(MultipleSeries):
 
     
 
-    def quantiles(self, qs=[0.05, 0.5, 0.95], mode = 'value'):
-        '''Calculate quantiles of an EnsembleSeries object. If mode is 'paleo', the calculation requires for the time axis to be the same. You can use the common_time method to do so. In essence, it transforms the time uncertainty into a y-axis uncertainty. If mode is 'chron', the values should be the same for all members of the emsemble. 
+    def quantiles(self, qs=[0.05, 0.5, 0.95], axis = 'value'):
+        '''Calculate quantiles of an EnsembleSeries object. If axis is 'value', the calculation requires for the time axis to be the same. You can use the common_time method to do so. In essence, it transforms the time uncertainty into a y-axis uncertainty. If axis is 'time', the values should be the same for all members of the emsemble. 
 
         Reuses [scipy.stats.mstats.mquantiles](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mstats.mquantiles.html) function.
 
@@ -143,7 +143,7 @@ class EnsembleSeries(MultipleSeries):
 
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
         
-        mode : ['time', 'value']
+        axis : ['time', 'value']
             
             Whether to calculate the quantiles over the values or time. Default is 'value'. 
 
@@ -199,10 +199,10 @@ class EnsembleSeries(MultipleSeries):
             
             time_ens = pyleo.EnsembleSeries(series_list)
             
-            ens_qs = time_ens.quantiles(mode='time')            
+            ens_qs = time_ens.quantiles(axis='time')            
 
         '''
-        if mode == 'value':
+        if axis == 'value':
             time = np.copy(self.series_list[0].time)
             vals = []
             for ts in self.series_list:
@@ -220,7 +220,7 @@ class EnsembleSeries(MultipleSeries):
                 ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%', verbose=False)
                 ts_list.append(ts)
         
-        elif mode == 'time':
+        elif axis == 'time':
             
             value = np.copy(self.series_list[0].value)
             vals = []
@@ -240,7 +240,7 @@ class EnsembleSeries(MultipleSeries):
                 ts_list.append(ts)
         
         else:
-            raise ValueError("Mode should be either 'value' or 'time'")
+            raise ValueError("Axis should be either 'value' or 'time'")
 
         ens_qs = EnsembleSeries(series_list=ts_list)
 
@@ -1053,20 +1053,20 @@ class EnsembleSeries(MultipleSeries):
         else:
             return ax
 
-    def to_dataframe(self, mode = 'value'):
+    def to_dataframe(self, axis = 'value'):
         '''
         Export the ensemble as a Pandas DataFrame, with members of the ensemble as columns. The columns are labeled according to the label in the individual series or numbered if 'label' is None.
         
 
         Parameters
         ----------
-        mode : str, ['time', 'value']
+        axis : str, ['time', 'value']
             Whether the return the ensemble from value or time. each The default is 'value'.
 
         Raises
         ------
         ValueError
-            Mode should be either 'time' or 'value'
+            Axis should be either 'time' or 'value'
 
         Returns
         -------
@@ -1089,16 +1089,16 @@ class EnsembleSeries(MultipleSeries):
                 series_list.append(ts)
             
             time_ens = pyleo.EnsembleSeries(series_list)
-            ens_qs = time_ens.quantiles(mode='time')
+            ens_qs = time_ens.quantiles(axis='time')
             
-            df=ens_qs.to_dataframe(mode='time')
+            df=ens_qs.to_dataframe(axis='time')
 
         '''
         
         df_dict = {}
         idx = 0
         
-        if mode == 'value':
+        if axis == 'value':
             for ts in self.series_list:
                 if ts.label is None:
                     df_dict[idx]=ts.value
@@ -1106,7 +1106,7 @@ class EnsembleSeries(MultipleSeries):
                     df_dict[ts.label]=ts.value
                 idx+=1
         
-        elif mode == 'time':
+        elif axis == 'time':
             for ts in self.series_list:
                 if ts.label is None:
                     df_dict[idx]=ts.time
@@ -1115,19 +1115,19 @@ class EnsembleSeries(MultipleSeries):
                 idx+=1
         
         else:
-            raise ValueError('Mode should be either "time" or "value"')
+            raise ValueError('Axis should be either "time" or "value"')
             
         df = pd.DataFrame(df_dict)
         
         return df
     
-    def to_array(self, mode='value', labels=True):
+    def to_array(self, axis='value', labels=True):
         '''
         Returns an ensemble as a numpy array with an optional list for labels. Each column in the array corresponds to an ensemble member.
 
         Parameters
         ----------
-        mode : str, ['time', 'value'], optional
+        axis : str, ['time', 'value'], optional
             Whether the return the ensemble from value or time. The default is 'value'.
         labels : bool, [True,False], optional
             Whether to retrun a separate list with the timseries labels. The default is True.
@@ -1135,7 +1135,7 @@ class EnsembleSeries(MultipleSeries):
         Raises
         ------
         ValueError
-            Mode should be either 'time' or 'value'
+            Axis should be either 'time' or 'value'
 
         Returns
         -------
@@ -1164,27 +1164,27 @@ class EnsembleSeries(MultipleSeries):
                 series_list.append(ts)
             
             time_ens = pyleo.EnsembleSeries(series_list)
-            ens_qs = time_ens.quantiles(mode='time')
+            ens_qs = time_ens.quantiles(axis='time')
             
-            vals,headers=ens_qs.to_dataframe(mode='time')    
+            vals,headers=ens_qs.to_dataframe(axis='time')    
 
         '''
         
         vals=np.empty((len(self.series_list[0].value),len(self.series_list)))
         headers=[]
         
-        if mode == 'value':
+        if axis == 'value':
             for i, ts in enumerate(self.series_list):
                 headers.append(ts.label)
                 vals[:,i]=ts.value
         
-        elif mode == 'time':
+        elif axis == 'time':
             for i, ts in enumerate(self.series_list):
                 headers.append(ts.label)
                 vals[:,i]=ts.time
         
         else:
-            raise ValueError('Mode should be either "time" or "value"')
+            raise ValueError('Axis should be either "time" or "value"')
         
         if labels == True:
             return vals, headers
