@@ -211,6 +211,100 @@ class TestUIEnsembleSeriesHistplot():
         ts_ens.histplot()
         pyleo.closefig()
 
+class TestUIEnsembleSeriesQuantiles():
+    def test_quantiles_t0(self):
+        nn = 30 # number of noise realizations
+        nt = 500
+        series_list = []
+
+        t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+        signal = pyleo.Series(t,v)
+
+        for idx in range(nn):  # noise
+            noise = np.random.randn(nt,nn)*100
+            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx], verbose=False)
+            series_list.append(ts)
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        ens_qs = ts_ens.quantiles()
+    
+    def test_quantiles_t1(self):
+        
+        nn = 30 #number of age models
+        time = np.arange(1,20000,100) #create a time vector
+        std_dev = 20 # Noise to be considered
+        
+        t,v = pyleo.utils.gen_ts(model='colored_noise',nt=len(time),alpha=1.0)
+        
+        series_list = []
+        
+        for i in range(nn):
+            noise = np.random.normal(0,std_dev,len(time))
+            ts=pyleo.Series(time=np.sort(time+noise),value=v,verbose=False)
+            series_list.append(ts)
+        
+        time_ens = pyleo.EnsembleSeries(series_list)
+        
+        ens_qs = time_ens.quantiles(axis='time') 
+        
+class TestUIEnsembleSeriesDataFrame():
+    @pytest.mark.parametrize('axis',['time','value'])
+    def test_to_dataframe_t0(self, axis):
+        nn = 30 #number of age models
+        time = np.arange(1,20000,100) #create a time vector
+        std_dev = 20 # Noise to be considered
+        
+        t,v = pyleo.utils.gen_ts(model='colored_noise',nt=len(time),alpha=1.0)
+        
+        series_list = []
+        
+        for i in range(nn):
+            noise = np.random.normal(0,std_dev,len(time))
+            ts=pyleo.Series(time=np.sort(time+noise),value=v,verbose=False)
+            series_list.append(ts)
+        
+        time_ens = pyleo.EnsembleSeries(series_list)
+        ens_qs = time_ens.quantiles(axis='time')
+        
+        if axis == 'time':        
+            df=ens_qs.to_dataframe(axis='time')
+        elif axis == 'value':
+            df=time_ens.to_dataframe(axis='value')
+
+class TestUIEnsembleSeriesArray():
+    
+    @pytest.mark.parametrize(
+        ('labels', 'mode'),
+        [
+            (True,'time'),
+            (True,'value'),
+            (False,'time'),
+            (False,'value'),
+        ]
+    )
+    def test_to_array_t0(self,labels,mode):
+        nn = 30 #number of age models
+        time = np.arange(1,20000,100) #create a time vector
+        std_dev = 20 # Noise to be considered
+        
+        t,v = pyleo.utils.gen_ts(model='colored_noise',nt=len(time),alpha=1.0)
+        
+        series_list = []
+        
+        for i in range(nn):
+            noise = np.random.normal(0,std_dev,len(time))
+            ts=pyleo.Series(time=np.sort(time+noise),value=v,verbose=False)
+            series_list.append(ts)
+        
+        time_ens = pyleo.EnsembleSeries(series_list)
+        ens_qs = time_ens.quantiles(axis='time')
+        
+        if labels == True:
+            vals,headers=ens_qs.to_array(axis=mode) 
+        else:
+            vals = ens_qs.to_array(axis=mode) 
+
 # class TestUIEnsembleSeriesDistplot():
 #     def test_histplot_t0(self):
 #         '''Test for EnsembleSeries.distplot()

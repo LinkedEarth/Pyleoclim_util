@@ -23,6 +23,10 @@ sphinx:
 
 formats: []
 
+#build:
+#  commands: 
+#    - conda activate rtd_env
+
 # We recommend specifying your dependencies to enable reproducible builds:
 # https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
 # python:

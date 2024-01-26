@@ -18,25 +18,20 @@ import pandas as pd
 import os
 
 from numpy.testing import assert_array_equal, assert_allclose
-#from pandas.testing import assert_frame_equal
-
 import pytest
-#from urllib.request import urlopen
-#import json
 
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
     ar1_sim,
     colored_noise,
 )
-# from pyleoclim.utils.decomposition import mcpca
 
 # a collection of useful functions
 
 def gen_ts(model, nt, alpha, t=None):
     'wrapper for gen_ts in pyleoclim'
     t, v = pyleo.utils.gen_ts(model=model, nt=nt, alpha=alpha, t=t)
-    ts = pyleo.Series(t, v)
+    ts = pyleo.Series(t, v, verbose=False,auto_time_params=True)
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
@@ -691,4 +686,11 @@ class TestSel:
         with pytest.raises(TypeError, match="Cannot pass both `value` and `time`"):
             ms.sel(time=1, value=1)
 
-    
+class TestUIMultipleSeriesTimeCoveragePlot:
+    def test_time_coverage_plot_t0(self,multipleseries_basic):
+        '''
+        test PCA output
+        '''
+        ms = multipleseries_basic
+        fig,ax = ms.time_coverage_plot()
+        pyleo.closefig(fig)

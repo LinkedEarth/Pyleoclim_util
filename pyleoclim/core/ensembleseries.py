@@ -131,8 +131,8 @@ class EnsembleSeries(MultipleSeries):
 
     
 
-    def quantiles(self, qs=[0.05, 0.5, 0.95]):
-        '''Calculate quantiles of an EnsembleSeries object
+    def quantiles(self, qs=[0.05, 0.5, 0.95], axis = 'value'):
+        '''Calculate quantiles of an EnsembleSeries object. If axis is 'value', the calculation requires for the time axis to be the same. You can use the common_time method to do so. In essence, it transforms the time uncertainty into a y-axis uncertainty. If axis is 'time', the values should be the same for all members of the emsemble. 
 
         Reuses [scipy.stats.mstats.mquantiles](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mstats.mquantiles.html) function.
 
@@ -142,6 +142,10 @@ class EnsembleSeries(MultipleSeries):
         qs : list, optional
 
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
+        
+        axis : ['time', 'value']
+            
+            Whether to calculate the quantiles over the values or time. Default is 'value'. 
 
         Returns
         -------
@@ -149,6 +153,11 @@ class EnsembleSeries(MultipleSeries):
         ens_qs : EnsembleSeries
 
             EnsembleSeries object containing empirical quantiles of original 
+        
+        See also
+        --------
+        
+        pyleoclim.core.multipleseries.MultipleSeries.common_time : A method to align axes
 
         Examples
         --------
@@ -170,24 +179,68 @@ class EnsembleSeries(MultipleSeries):
             ts_ens = pyleo.EnsembleSeries(series_list)
 
             ens_qs = ts_ens.quantiles()
+            
+        To calculate in the time dimension:
+            
+        .. jupyter-execute::
+            
+            nn = 30 #number of age models
+            time = np.arange(1,20000,100) #create a time vector
+            std_dev = 20 # Noise to be considered
+            
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=len(time),alpha=1.0)
+            
+            series_list = []
+            
+            for i in range(nn):
+                noise = np.random.normal(0,std_dev,len(time))
+                ts=pyleo.Series(time=np.sort(time+noise),value=v,verbose=False)
+                series_list.append(ts)
+            
+            time_ens = pyleo.EnsembleSeries(series_list)
+            
+            ens_qs = time_ens.quantiles(axis='time')            
 
         '''
-        time = np.copy(self.series_list[0].time)
-        vals = []
-        for ts in self.series_list:
-            if not np.array_equal(ts.time, time):
-                raise ValueError('Time axis not consistent across the ensemble!')
-
-            vals.append(ts.value)
-
-        vals = np.array(vals)
-        # ens_qs = mquantiles(vals, qs, axis=0)
-        ens_qs = np.nanquantile(vals, qs, axis=0)
-
-        ts_list = []
-        for i, quant in enumerate(ens_qs):
-            ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%', verbose=False)
-            ts_list.append(ts)
+        if axis == 'value':
+            time = np.copy(self.series_list[0].time)
+            vals = []
+            for ts in self.series_list:
+                if not np.array_equal(ts.time, time):
+                    raise ValueError('Time axis not consistent across the ensemble!')
+    
+                vals.append(ts.value)
+    
+            vals = np.array(vals)
+            # ens_qs = mquantiles(vals, qs, axis=0)
+            ens_qs = np.nanquantile(vals, qs, axis=0)
+    
+            ts_list = []
+            for i, quant in enumerate(ens_qs):
+                ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%', verbose=False)
+                ts_list.append(ts)
+        
+        elif axis == 'time':
+            
+            value = np.copy(self.series_list[0].value)
+            vals = []
+            for ts in self.series_list:
+                if not np.array_equal(ts.value, value):
+                    raise ValueError('Value axis not consistent across the ensemble!')
+                vals.append(ts.time)        
+            
+            vals = np.array(vals)
+                    
+            # ens_qs = mquantiles(vals, qs, axis=0)
+            ens_qs = np.nanquantile(vals, qs, axis=0)
+    
+            ts_list = []
+            for i, quant in enumerate(ens_qs):
+                ts = Series(time=quant, value=value, label=f'{qs[i]*100:g}%', verbose=False)
+                ts_list.append(ts)
+        
+        else:
+            raise ValueError("Axis should be either 'value' or 'time'")
 
         ens_qs = EnsembleSeries(series_list=ts_list)
 
@@ -999,3 +1052,144 @@ class EnsembleSeries(MultipleSeries):
             return fig, ax
         else:
             return ax
+
+    def to_dataframe(self, axis = 'value'):
+        '''
+        Export the ensemble as a Pandas DataFrame, with members of the ensemble as columns. The columns are labeled according to the label in the individual series or numbered if 'label' is None.
+        
+
+        Parameters
+        ----------
+        axis : str, ['time', 'value']
+            Whether the return the ensemble from value or time. each The default is 'value'.
+
+        Raises
+        ------
+        ValueError
+            Axis should be either 'time' or 'value'
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            A Pandas DataFrame containing members of the ensemble as columns. 
+        
+        .. jupyter-execute::
+            
+            nn = 30 #number of age models
+            time = np.arange(1,20000,100) #create a time vector
+            std_dev = 20 # Noise to be considered
+            
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=len(time),alpha=1.0)
+            
+            series_list = []
+            
+            for i in range(nn):
+                noise = np.random.normal(0,std_dev,len(time))
+                ts=pyleo.Series(time=np.sort(time+noise),value=v,verbose=False)
+                series_list.append(ts)
+            
+            time_ens = pyleo.EnsembleSeries(series_list)
+            ens_qs = time_ens.quantiles(axis='time')
+            
+            df=ens_qs.to_dataframe(axis='time')
+
+        '''
+        
+        df_dict = {}
+        idx = 0
+        
+        if axis == 'value':
+            for ts in self.series_list:
+                if ts.label is None:
+                    df_dict[idx]=ts.value
+                else:
+                    df_dict[ts.label]=ts.value
+                idx+=1
+        
+        elif axis == 'time':
+            for ts in self.series_list:
+                if ts.label is None:
+                    df_dict[idx]=ts.time
+                else:
+                    df_dict[ts.label]=ts.time
+                idx+=1
+        
+        else:
+            raise ValueError('Axis should be either "time" or "value"')
+            
+        df = pd.DataFrame(df_dict)
+        
+        return df
+    
+    def to_array(self, axis='value', labels=True):
+        '''
+        Returns an ensemble as a numpy array with an optional list for labels. Each column in the array corresponds to an ensemble member.
+
+        Parameters
+        ----------
+        axis : str, ['time', 'value'], optional
+            Whether the return the ensemble from value or time. The default is 'value'.
+        labels : bool, [True,False], optional
+            Whether to retrun a separate list with the timseries labels. The default is True.
+
+        Raises
+        ------
+        ValueError
+            Axis should be either 'time' or 'value'
+
+        Returns
+        -------
+        vals: numpy.array
+            An array where each column corresponds to an ensemble member
+            
+        headers: list
+            A list of corresponding labels for each columm
+            
+        Example
+        -------
+            
+        .. jupyter-execute::
+            
+            nn = 30 #number of age models
+            time = np.arange(1,20000,100) #create a time vector
+            std_dev = 20 # Noise to be considered
+            
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=len(time),alpha=1.0)
+            
+            series_list = []
+            
+            for i in range(nn):
+                noise = np.random.normal(0,std_dev,len(time))
+                ts=pyleo.Series(time=np.sort(time+noise),value=v,verbose=False)
+                series_list.append(ts)
+            
+            time_ens = pyleo.EnsembleSeries(series_list)
+            ens_qs = time_ens.quantiles(axis='time')
+            
+            vals,headers=ens_qs.to_dataframe(axis='time')    
+
+        '''
+        
+        vals=np.empty((len(self.series_list[0].value),len(self.series_list)))
+        headers=[]
+        
+        if axis == 'value':
+            for i, ts in enumerate(self.series_list):
+                headers.append(ts.label)
+                vals[:,i]=ts.value
+        
+        elif axis == 'time':
+            for i, ts in enumerate(self.series_list):
+                headers.append(ts.label)
+                vals[:,i]=ts.time
+        
+        else:
+            raise ValueError('Axis should be either "time" or "value"')
+        
+        if labels == True:
+            return vals, headers
+        else:
+            return vals
+            
+        
+        

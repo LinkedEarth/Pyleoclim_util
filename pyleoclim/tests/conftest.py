@@ -35,6 +35,13 @@ def metadata():
     }
 
 @pytest.fixture
+def gen_ts():
+    """ Generate realistic-ish Series for testing """
+    t,v = pyleo.utils.gen_ts(model='colored_noise',nt=50)
+    ts = pyleo.Series(t,v, verbose=False)
+    return ts
+
+@pytest.fixture
 def unevenly_spaced_series():
     """Pyleoclim series with unevenly spaced time axis"""
     length = 10
@@ -82,7 +89,7 @@ def geometadata():
             'value_unit': '‰',
             'value_name': '$\\delta \\mathrm{D}$',
             'label': 'pink noise geoseries',
-            'archiveType': 'Glacier Ice',
+            'archiveType': 'GlacierIce',
             'importedFrom': 'who knows where',
             'log': None
     }
@@ -94,4 +101,18 @@ def pinkgeoseries(geometadata):
     ts = pyleo.GeoSeries(t,v, verbose=False, **geometadata).standardize()
     return ts
 
+@pytest.fixture
+def multipleseries_basic():
+    ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]))
+    ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]))
+    ms = pyleo.MultipleSeries([ts1, ts2])
+    return ms
+
+@pytest.fixture
+def multipleseries_science():
+    soi = pyleo.utils.load_dataset('SOI')
+    nino = pyleo.utils.load_dataset('NINO3')
+    ms = soi & nino
+    ms.name = 'ENSO'
+    return ms
 

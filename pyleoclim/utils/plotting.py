@@ -14,6 +14,7 @@ import pandas as pd
 
 from ..utils import lipdutils
 
+# import pandas as pd
 # from matplotlib.patches import Rectangle
 # from matplotlib.collections import PatchCollection
 # from matplotlib.colors import ListedColormap
@@ -41,6 +42,7 @@ def infer_period_unit_from_time_unit(time_unit):
             #     period_unit = f'{time_unit}s'
 
     return period_unit
+
 
 def scatter_xy(x, y, c=None, figsize=None, xlabel=None, ylabel=None, title=None,
                xlim=None, ylim=None, savefig_settings=None, ax=None,
@@ -871,9 +873,14 @@ def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend
 
 
 def get_label_width(ax, label, buffer=0., fontsize=10):
+    """
+    Helper function to find width of text when rendered in ax object
+    """
+    
     text = ax.text(0, 0, label, size=fontsize)
     width = text.get_window_extent(renderer=ax.figure.canvas.get_renderer()).width
     text.remove()  # Remove the text used for measurement
+    
     return width + buffer
 
 

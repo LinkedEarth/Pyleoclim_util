@@ -106,8 +106,14 @@ class Series:
         source of the dataset. If it came from a LiPD file, this could be the datasetID property
 
     archiveType : string
-        climate archive, one of 'ice-other', 'ice/rock', 'coral', 'documents', 'glacierice', 'hybrid', 'lakesediment', 'marinesediment', 'sclerosponge', 'speleothem', 'wood', 'molluskshells', 'peat', 'midden', 'instrumental', 'model', 'other'
-
+        climate archive, one of 'Borehole', 'Coral', 'FluvialSediment', 'GlacierIce', 'GroundIce', 'LakeSediment', 'MarineSediment', 'Midden', 'MolluskShell', 'Peat', 'Sclerosponge', 'Shoreline', 'Speleothem', 'TerrestrialSediment', 'Wood'                                                                                   
+        Reference: https://lipdverse.org/vocabulary/archivetype/
+    
+    control_archiveType  : [True, False]
+        Whether to standardize the name of the archiveType agains the vocabulary from: https://lipdverse.org/vocabulary/paleodata_proxy/. 
+        If set to True, will only allow for these terms and automatically convert known synonyms to the standardized name. Only standardized variable names will be automatically assigned a color scheme.  
+        Default is False. 
+        
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
         defaults to True
@@ -117,7 +123,7 @@ class Series:
         Defaults to 'ascending'
 
     verbose : bool
-        If True, will print warning messages if there is any
+        If True, will print warning messages if there are any
 
     clean_ts : boolean flag
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
@@ -142,8 +148,8 @@ class Series:
 
     def __init__(self, time, value, time_unit=None, time_name=None,
                  value_name=None, value_unit=None, label=None,
-                 importedFrom=None, archiveType = None, log=None, keep_log=False,
-                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False,
+                 importedFrom=None, archiveType = None, control_archiveType=False,
+                 log=None, keep_log=False, sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False,
                  auto_time_params = None):
 
         # ensure ndarray instances
@@ -151,8 +157,9 @@ class Series:
         value = np.array(value)
 
         if auto_time_params is None:
-            warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True. In a future release, this will be changed to False.', UserWarning, stacklevel=2)
             auto_time_params = True
+            if verbose:
+                warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True, which might modify your supplied time metadata.  Please set to False if you want a different behavior.', UserWarning, stacklevel=2)
 
         if auto_time_params:
             # assign time metadata if they are not provided or provided incorrectly
@@ -256,16 +263,47 @@ class Series:
         self.sort_ts = sort_ts
         self.clean_ts = clean_ts
         self.importedFrom = importedFrom
-        self.archiveType = archiveType
         if archiveType is not None:
-            archiveType = lipdutils.LipdToOntology(archiveType)
-            self.archiveType = archiveType.lower().replace(" ", "") #remove spaces
-            if self.archiveType not in lipdutils.PLOT_DEFAULT.keys():
-                str_archive = list(lipdutils.PLOT_DEFAULT.keys())[0:-1]
-                mystring = ""
-                for item in str_archive:
-                    mystring += str(item) + ', '
-                warnings.warn('archiveType should be one of the following: ' + mystring)
+            #Deal with archiveType
+            
+            #Get the possible list of archiveTyp
+            
+            
+            if control_archiveType == True:
+                
+                res = lipdutils.get_archive_type()
+                std_var = list(res.keys())
+                std_var_lower = [key.lower() for key in res.keys()]
+                
+                data = []
+                for key, values in res.items():
+                    if values:  # Check if the list is not empty
+                        for val in values:
+                            data.append([key.lower(), val.lower().replace(" ", "")])
+                    else:
+                        data.append([key.lower(), None])  # If the list is empty, append None as value
+
+                # Creating DataFrame
+                df = pd.DataFrame(data, columns=['Key', 'Value'])
+                synonym = df[df['Value'].isin([archiveType.lower().replace(" ", "")])]['Key']
+                if synonym.empty == True:
+                    synonym = None
+                else: 
+                    synonym = synonym.to_string(header=False, index=False)
+            
+                
+                if archiveType.lower().replace(" ", "") in std_var_lower:
+                    index = std_var_lower.index(archiveType.lower().replace(" ", ""))
+                    self.archiveType = std_var[index]
+                elif synonym is not None:
+                    index = std_var_lower.index(synonym)
+                    self.archiveType = std_var[index]
+                else:
+                    raise ValueError('Not a proper archiveName or a known synonym')
+            else:
+                self.archiveType = archiveType
+        else:
+            self.archiveType = None
 
 
     def __repr__(self):
@@ -3200,7 +3238,21 @@ class Series:
              coh_wwz.plot()
 
         As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
-        Significance is assessed similarly as with PSD or Scalogram objects:
+        For instance, one can adjust the resolution of the time axis on which coherence is evaluated:
+            
+        .. jupyter-execute::
+
+             coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz', settings = {'ntau':20})
+             coh_wwz.plot()
+             
+        The frequency (scale) axis can also be customized, e.g. to focus on scales from 1 to 20y, with 24 scales:
+        
+        .. jupyter-execute::
+            
+             coh = ts_air.wavelet_coherence(ts_nino, freq_kwargs={'fmin':1/20,'fmax':1,'nf':24})
+             coh.plot()
+        
+        Significance is assessed similarly to PSD or Scalogram objects:
 
         .. jupyter-execute::
 
@@ -3218,6 +3270,8 @@ class Series:
             cwt_sig.dashboard()
 
         Note: this design balances many considerations, and is not easily customizable.
+        
+        
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -3234,8 +3288,9 @@ class Series:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
         args = {}
-        args['wwz'] = {'freq': freq}
+        args['wwz'] = {'freq': freq, 'verbose': verbose}
         args['cwt'] = {'freq': freq}
+        
 
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):
@@ -3261,12 +3316,17 @@ class Series:
             else:
                 ntau = np.min([np.size(ts1.time), np.size(ts2.time), 50])
 
-            tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             if 'tau' in settings.keys():
                 tau = settings['tau']
+            else:
+                lb1, ub1 = np.min(ts1.time), np.max(ts1.time)
+                lb2, ub2 = np.min(ts2.time), np.max(ts2.time)
+                lb = np.max([lb1, lb2])
+                ub = np.min([ub1, ub2])
+
+                tau = np.linspace(lb, ub, ntau)
             settings.update({'tau': tau})
             
-
         args[method].update(settings)
 
         # Apply WTC method

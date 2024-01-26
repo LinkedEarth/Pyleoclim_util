@@ -15,27 +15,6 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from scipy.stats.mstats import mquantiles
 
 #from ..core import MultipleScalogram
-def infer_period_unit_from_time_unit(time_unit):
-    ''' infer a period unit based on the given time unit
-
-    '''
-    if time_unit is None:
-        period_unit = None
-    else:
-        unit_group = lipdutils.timeUnitsCheck(time_unit)
-        if unit_group != 'unknown':
-            if unit_group == 'kage_units':
-                period_unit = 'kyrs'
-            else:
-                period_unit = 'yrs'
-        else:
-            if time_unit[-1] == 's':
-                period_unit = time_unit
-            else:
-                period_unit = f'{time_unit}s'
-
-    return period_unit
-
 
 class Scalogram:
     '''
@@ -159,7 +138,7 @@ class Scalogram:
         if scale_unit is not None:
             self.scale_unit = scale_unit
         elif timeseries is not None:
-            self.scale_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
+            self.scale_unit = plotting.infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
             self.scale_unit = None
 

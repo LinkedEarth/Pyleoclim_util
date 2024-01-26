@@ -71,7 +71,7 @@ LR04:
     label: 'LR04 benthic stack'
     value_name: '$\delta^{18} \mathrm{O}$'
     value_unit: "\u2030"
-    archiveType: 'Marine Sediment'
+    archiveType: 'MarineSediment'
   time_column: Time (ka)
   value_column: Benthic d18O (per mil)
 
@@ -86,7 +86,7 @@ AACO2:
     label: 'EPICA Dome C CO2'
     value_name: '$CO_2$'
     value_unit: 'ppm'
-    archiveType: 'Glacier Ice'
+    archiveType: 'GlacierIce'
     importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/antarctica2015co2composite.txt'
   time_column: Age [kyr BP]
   value_column: $CO_2$ [ppm]
@@ -105,7 +105,7 @@ EDC-dD:
     label: 'EPICA Dome C dD'
     value_name: '$\delta \mathrm{D}$'
     value_unit: "\u2030"
-    archiveType: 'glacierice'
+    archiveType: 'GlacierIce'
     sensorType: 'ice sheet'
     observationType: 'hydrogen isotopes'
     importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/epica_domec/edc3deuttemp2007.txt'
@@ -123,7 +123,7 @@ GISP2:
     value_unit: "\u2030"
     value_name: '$\delta^{18} \mathrm{O}$'
     label: 'GISP2'
-    archiveType: 'Glacier Ice'
+    archiveType: 'GlacierIce'
     importedFrom: 'https://www.ncei.noaa.gov/access/paleo-search/study/17796'
   time_column: Age [yr BP]
   value_column: d18O [permil]
@@ -139,7 +139,7 @@ cenogrid_d18O:
     value_unit: "\u2030 VPDB"
     value_name: '$\delta^{18} \mathrm{O}$'
     label: 'CENOGRID $\delta^{18} \mathrm{O}$'
-    archiveType: 'Marine Sediment'
+    archiveType: 'MarineSediment'
     importedFrom: 'https://doi.pangaea.de/10.1594/PANGAEA.917660'
   time_column: Tuned time [Ma]
   value_column: Foram bent δ18O [‰ PDB] (VPDB)
@@ -155,7 +155,7 @@ cenogrid_d13C:
     value_unit: "\u2030 VPDB"
     value_name: '$\delta^{13} \mathrm{C}$'
     label: 'CENOGRID $\delta^{13} \mathrm{C}$'
-    archiveType: 'Marine Sediment'
+    archiveType: 'MarineSediment'
     importedFrom: 'https://doi.pangaea.de/10.1594/PANGAEA.917660'
   time_column: Tuned time [Ma]
   value_column: Foram bent δ13C [‰ PDB] (VPDB)

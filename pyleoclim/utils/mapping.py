@@ -530,17 +530,24 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
     lats = [geos.lat for geos in geo_series_list]
     lons = [geos.lon for geos in geo_series_list]
 
-    traits = [hue, marker, size]
+    traits = [hue, marker, size]   
     if type(cols) == list:
         traits += cols
     value_d = {'lat': lats, 'lon': lons}
+    
+
     for trait in traits:  # trait_d.keys():
         # trait = trait_d[trait_key]
         if trait != None:
-            trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
+            if trait == 'archiveType':
+                trait_vals = [LipdToOntology(geos.__dict__[trait]) if trait in geos.__dict__.keys() else None for geos in
                           geo_series_list]
+            else: 
+                trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
+                              geo_series_list]
             value_d[trait] = [trait_val if trait_val != 'None' else None for trait_val in trait_vals]
 
+        
     geos_df = pd.DataFrame(value_d)
     if type(d) == dict:
         for trait in d.keys():

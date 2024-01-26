@@ -11,27 +11,114 @@ import os
 import json
 import requests
 import wget
-#from unidecode import unidecode
+from bs4 import BeautifulSoup
 import string
 
 
-PLOT_DEFAULT = {'ice-other': ['#FFD600', 'h'],
-                     'ice/rock': ['#FFD600', 'h'],
-                     'coral': ['#FF8B00', 'o'],
-                     'documents': ['k', 'p'],
-                     'glacierice': ['#86CDFA', 'd'],
-                     'hybrid': ['#00BEFF', '*'],
-                     'lakesediment': ['#4169E0', 's'],
-                     'marinesediment': ['#8A4513', 's'],
-                     'sclerosponge': ['r', 'o'],
-                     'speleothem': ['#FF1492', 'd'],
-                     'wood': ['#32CC32', '^'],
-                     'molluskshells': ['#FFD600', 'h'],
-                     'peat': ['#2F4F4F', '*'],
-                     'midden': ['#824E2B', 'o'],
-                     'instrumental' : ['#8f21d8', '*'],
-                     'model' : ['#b4a7d6', "d"],
-                     'other': ['k', 'o']}
+PLOT_DEFAULT = {'GroundIce': ['#FFD600', 'h'],
+                     'Borehole': ['#FFD600', 'h'],
+                     'Coral': ['#FF8B00', 'o'],
+                     'Documents': ['k', 'p'],
+                     'GlacierIce': ['#86CDFA', 'd'],
+                     'Hybrid': ['#00BEFF', '*'],
+                     'LakeSediment': ['#4169E0', 's'],
+                     'MarineSediment': ['#8A4513', 's'],
+                     'Sclerosponge': ['r', 'o'],
+                     'Speleothem': ['#FF1492', 'd'],
+                     'Wood': ['#32CC32', '^'],
+                     'MolluskShell': ['#FFD600', 'h'],
+                     'Peat': ['#2F4F4F', '*'],
+                     'Midden': ['#824E2B', 'o'],
+                     'FluvialSediment': ['#4169E0','d'],
+                     'TerrestrialSediment': ['#8A4513','o'],
+                     'Shoreline': ['#32CC32','o'],
+                     'Instrumental' : ['#8f21d8', '*'],
+                     'Model' : ['#b4a7d6', "d"],
+                     'Other': ['k', 'o']
+                    }
+
+
+"""
+The followng functions handle web scrapping to grab information regarding the controlled vocabulary
+
+"""
+
+def get_archive_type():
+    '''
+    Scrape the LiPDverse website to obtain the list of possible archives and associated synonyms
+
+    Returns
+    -------
+    res : Dictionary
+        Keys correspond to the preferred terms and values represent known synonyms
+
+    '''
+    url = "https://lipdverse.org/vocabulary/archivetype/"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        # Parse the content of the request with BeautifulSoup
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Get the names of the archiveTypes   
+        
+        h3_tags = soup.find_all('h3')
+        archiveName = []
+        for item in h3_tags:
+            archiveName.append(item.get_text())
+            
+        
+            
+        # Get the known synonyms
+        h4_tags = soup.find_all('h4', string="Known synonyms")
+        
+        synonyms=[]
+        
+        
+        for h4_tag in h4_tags:
+            next_element = h4_tag.find_next_sibling()
+
+            found_p = False
+            while next_element and next_element.name != 'div':
+                if next_element.name == 'p':
+                    synonyms_text = next_element.get_text()
+                    words = [word.strip() for word in synonyms_text.split(',')]
+                    synonyms.append(words)
+                    found_p = True
+                    break
+
+                next_element = next_element.find_next_sibling()
+            
+            # If a <p> tag was not found, insert an empty string
+            if not found_p:
+                synonyms.append([])
+        
+        #create a dictionary for the results
+        res= {}
+        for idx,item in enumerate(archiveName):
+            res[item]=synonyms[idx]
+
+    else:
+        print("failed to retrieve the webpage; returning static list, which may be out of date")
+        
+        res = ["Borehole",
+                       "Coral",
+                       "FluvialSediment",
+                       "GlacierIce",
+                       "GroundIce",
+                       "LakeSediment",
+                       "MarineSediment",
+                       "Midden",
+                       "MolluskShell",
+                       "Peat",
+                       "Scelorosponge",
+                       "Shoreline",
+                       "Spleleothem",
+                       "TerrestrialSediment",
+                       "Wood"]
+    
+    return res
+
 
 """
 The following functions handle the LiPD files
@@ -520,16 +607,17 @@ def LipdToOntology(archiveType):
 
     """
     #Align with the ontology
-    if archiveType.lower().replace(" ", "") == "icecore":
-        archiveType = 'glacierice'
-    elif archiveType.lower().replace(" ", "") == "ice-other":
-        archiveType = 'glacierice'
-    elif archiveType.lower().replace(" ", "") == 'tree':
-        archiveType = 'wood'
-    elif archiveType.lower().replace(" ", "") == 'borehole':
-        archiveType = 'ice/rock'
-    elif archiveType.lower().replace(" ", "") == 'bivalve':
-        archiveType = 'molluskshells'
+    
+    if archiveType != None:
+    
+        if archiveType.lower().replace(" ", "") == "icecore":
+            archiveType = 'GlacierIce'
+        elif archiveType.lower().replace(" ", "") == "ice-other":
+            archiveType = 'GlacierIce'
+        elif archiveType.lower().replace(" ", "") == 'tree':
+            archiveType = 'Wood'
+        elif archiveType.lower().replace(" ","") not in [key.lower() for key in PLOT_DEFAULT.keys()]:
+            archiveType='Other'
 
     return archiveType
 
