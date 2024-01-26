@@ -188,6 +188,7 @@ class GeoSeries(Series):
             sensorType  = self.sensorType,
             observationType = self.observationType, 
             importedFrom = self.importedFrom,
+            control_archiveType = self.control_archiveType,
             log = self.log,
         )
     
@@ -596,7 +597,7 @@ class GeoSeries(Series):
         # use the defaults if color/markers not specified
         
         if self.archiveType is not None:
-            archiveType = lipdutils.LipdToOntology(self.archiveType).lower().replace(" ", "")
+            archiveType = lipdutils.LipdToOntology(self.archiveType)
             if archiveType not in lipdutils.PLOT_DEFAULT.keys():
                 archiveType = 'Other'                
         else: 

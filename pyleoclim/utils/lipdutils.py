@@ -15,13 +15,20 @@ from bs4 import BeautifulSoup
 import string
 
 
-PLOT_DEFAULT = {'GroundIce': ['#FFD600', 'h'],
-                     'Borehole': ['#FFD600', 'h'],
+class CaseInsensitiveDict(dict):
+    def __setitem__(self, key, value):
+        super().__setitem__(key.lower().replace(" ", ""), value)
+
+    def __getitem__(self, key):
+        return super().__getitem__(key.lower().replace(" ", ""))
+
+PLOT_DEFAULT = {'GroundIce': ['#86CDFA', 'h'],
+                     'Borehole': ['#00008b', 'h'],
                      'Coral': ['#FF8B00', 'o'],
-                     'Documents': ['k', 'p'],
+                     'Documents': ['#f8d568', 'p'],
                      'GlacierIce': ['#86CDFA', 'd'],
-                     'Hybrid': ['#00BEFF', '*'],
-                     'LakeSediment': ['#4169E0', 's'],
+                     'Hybrid': ['#808000', '*'],
+                     'LakeSediment': ['#8A4513', '^'],
                      'MarineSediment': ['#8A4513', 's'],
                      'Sclerosponge': ['r', 'o'],
                      'Speleothem': ['#FF1492', 'd'],
@@ -31,7 +38,7 @@ PLOT_DEFAULT = {'GroundIce': ['#FFD600', 'h'],
                      'Midden': ['#824E2B', 'o'],
                      'FluvialSediment': ['#4169E0','d'],
                      'TerrestrialSediment': ['#8A4513','o'],
-                     'Shoreline': ['#32CC32','o'],
+                     'Shoreline': ['#add8e6','o'],
                      'Instrumental' : ['#8f21d8', '*'],
                      'Model' : ['#b4a7d6', "d"],
                      'Other': ['k', 'o']
