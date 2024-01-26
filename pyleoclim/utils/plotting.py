@@ -10,14 +10,36 @@ import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
 import numpy as np
-import pandas as pd
-from matplotlib.patches import Rectangle
-from matplotlib.collections import PatchCollection
-from matplotlib.colors import ListedColormap
-import seaborn as sns
-from matplotlib.lines import Line2D
+from ..utils import lipdutils
 
+# import pandas as pd
+# from matplotlib.patches import Rectangle
+# from matplotlib.collections import PatchCollection
+# from matplotlib.colors import ListedColormap
+# import seaborn as sns
 
+# this is here because it's only used to set labels in plots
+def infer_period_unit_from_time_unit(time_unit):
+    ''' infer a period unit based on the given time unit
+
+    '''
+    if time_unit is None:
+        period_unit = None
+    else:
+        unit_group = lipdutils.timeUnitsCheck(time_unit)
+        if unit_group != 'unknown':
+            if unit_group == 'kage_units':
+                period_unit = 'kyrs'
+            else:
+                period_unit = 'yrs'
+        else:
+            period_unit = f'{time_unit}'
+            # if time_unit[-1] == 's':
+            #     period_unit = time_unit
+            # else:
+            #     period_unit = f'{time_unit}s'
+
+    return period_unit
 
 def scatter_xy(x, y, c=None, figsize=None, xlabel=None, ylabel=None, title=None,
                xlim=None, ylim=None, savefig_settings=None, ax=None,
@@ -763,7 +785,9 @@ def make_annotation_ax(fig, ax, loc='overlay',
 
     return ax_d
 
+
 import matplotlib.patches as mpatches
+
 
 def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend=True):
     ''' Hightlights intervals
@@ -819,7 +843,7 @@ def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend
 
     new_labels = []
     new_colors = []
-    new_alphas=[]
+    new_alphas = []
 
     for ik, _ts in enumerate(intervals):
         if isinstance(color, list) is True:
@@ -843,6 +867,13 @@ def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend
         ax.axvspan(_ts[0], _ts[1], facecolor=c, alpha=a)
 
     return ax
+
+
+def get_label_width(ax, label, buffer=0., fontsize=10):
+    text = ax.text(0, 0, label, size=fontsize)
+    width = text.get_window_extent(renderer=ax.figure.canvas.get_renderer()).width
+    text.remove()  # Remove the text used for measurement
+    return width + buffer
 
 
 def calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=.1):
@@ -879,12 +910,14 @@ def calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=.1):
     # Calculate the horizontal span of each label
     intervals = []
     for i, label in enumerate(labels):
-        ann = ax.text(x_locs[i], 0, label, size=fontsize)
-        box = ax.transData.inverted().transform(ann.get_tightbbox(fig.canvas.get_renderer()))
-        w = box[1][0] - box[0][0] + buffer
+        w = get_label_width(ax, label, buffer=buffer, fontsize=fontsize)
+        # ann = ax.text(x_locs[i], 0, label, size=fontsize)
+        # box = ax.transData.inverted().transform(ann.get_tightbbox(fig.canvas.get_renderer()))
+        # w = box[1][0] - box[0][0] + buffer
+        # ann.remove()
+
         interval = pd.Interval(left=x_locs[i] - w / 2, right=x_locs[i] + w / 2)
         intervals.append(interval)
-        ann.remove()
 
     # Group overlapping labels
     overlapping_sets = []
@@ -1017,12 +1050,6 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
     if overlapping_sets is None:
         overlapping_sets = calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=buffer)
 
-    def get_label_width(label, fontsize=fontsize):
-        text = ax.text(0, 0, label, size=fontsize)
-        width = text.get_window_extent(renderer=ax.figure.canvas.get_renderer()).width
-        text.remove()  # Remove the text used for measurement
-        return width + buffer
-
     label_alignments = ['center' for _ in labels]
     label_slots = [0 for _ in labels]
 
@@ -1046,7 +1073,8 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
                         elif i > int((len(sorted_set) - 1) / 2):
                             label_alignments[label_index] = 'left'
                         else:
-                            label_width = get_label_width(labels[label_index])
+                            label_width = get_label_width(ax, labels[label_index], buffer=buffer, fontsize=fontsize)
+                            # label_width = get_label_width(labels[label_index])
                             if x_locs[label_index] - label_width / 2 < cluster_min:
                                 label_alignments[label_index] = 'right'
                             elif x_locs[label_index] + label_width / 2 > cluster_max:
