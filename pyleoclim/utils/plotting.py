@@ -10,9 +10,10 @@ import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
 import numpy as np
+import pandas as pd
+
 from ..utils import lipdutils
 
-# import pandas as pd
 # from matplotlib.patches import Rectangle
 # from matplotlib.collections import PatchCollection
 # from matplotlib.colors import ListedColormap
