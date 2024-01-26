@@ -4,13 +4,14 @@
 Plotting utilities, leveraging Matplotlib.
 """
 
-__all__ = ['set_style','closefig', 'savefig']
-
+__all__ = ['set_style', 'closefig', 'savefig']
 
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
 import numpy as np
+import pandas as pd
+
 from ..utils import lipdutils
 
 # import pandas as pd
@@ -43,10 +44,9 @@ def infer_period_unit_from_time_unit(time_unit):
     return period_unit
 
 
-
-def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None, 
-            xlim=None, ylim=None, savefig_settings=None, ax=None,
-            legend=True, plot_kwargs=None, lgd_kwargs=None):
+def scatter_xy(x, y, c=None, figsize=None, xlabel=None, ylabel=None, title=None,
+               xlim=None, ylim=None, savefig_settings=None, ax=None,
+               legend=True, plot_kwargs=None, lgd_kwargs=None):
     """
     Make scatter plot. 
 
@@ -100,7 +100,7 @@ def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None,
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
     plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
     lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
-    
+
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -134,11 +134,10 @@ def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None,
         return ax
 
 
-def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
+def plot_scatter_xy(x1, y1, x2, y2, figsize=None, xlabel=None,
                     ylabel=None, title=None, xlim=None, ylim=None,
-                    savefig_settings=None, ax=None, legend=True, 
+                    savefig_settings=None, ax=None, legend=True,
                     plot_kwargs=None, lgd_kwargs=None):
-    
     ''' Plot a scatter on top of a line plot.
     
     Parameters
@@ -229,9 +228,9 @@ def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
         return ax
 
 
-def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, 
-            xlim=None, ylim=None,savefig_settings=None, ax=None,
-            legend=True, plot_kwargs=None, lgd_kwargs=None, 
+def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
+            xlim=None, ylim=None, savefig_settings=None, ax=None,
+            legend=True, plot_kwargs=None, lgd_kwargs=None,
             invert_xaxis=False, invert_yaxis=False):
     ''' Plot a timeseries
     
@@ -318,7 +317,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     if invert_xaxis:
         ax.invert_xaxis()
-        
+
     if invert_yaxis:
         ax.invert_yaxis()
 
@@ -328,12 +327,13 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         return fig, ax
     else:
         return ax
-    
+
+
 def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
                vmin=None, vmax=None, xlabel=None, ylabel=None,
-               title=None, xlim=None, savefig_settings=None, label_color = None,
-               x_offset = 0.05, label_size = None, show_xaxis = False,
-               invert_xaxis=False, top_label = None, bottom_label = None): 
+               title=None, xlim=None, savefig_settings=None, label_color=None,
+               x_offset=0.05, label_size=None, show_xaxis=False,
+               invert_xaxis=False, top_label=None, bottom_label=None):
     '''
     Represent y = f(x) as an Ed Hawkins "warming stripes" pattern
     Uses Matplotlib's pcolormesh'
@@ -388,16 +388,16 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     '''
     # handle dict defaults
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-    
+
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
-      
+
     if label_size is None:
         label_size = mpl.rcParams['axes.labelsize']
 
     ones = np.array([0, 1])
-    #ax.set_axis_off()
-    ax.pcolormesh(x, ones, np.vstack([y, y]), cmap=cmap, 
+    # ax.set_axis_off()
+    ax.pcolormesh(x, ones, np.vstack([y, y]), cmap=cmap,
                   vmin=vmin, vmax=vmax, shading='auto')
     # hide y axis
     ax.get_yaxis().set_visible(False)
@@ -407,14 +407,14 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     ax.get_xaxis().set_visible(show_xaxis)
     if show_xaxis is True and xlabel is not None:
         ax.set_xlabel(xlabel)
-    
+
     # parameters for label position
     thickness = ax.get_ybound()[1]
-    xmax = ax.get_xbound()[1]*(1+x_offset/10)
-    #xmax = x.max()*0.8*(1+x_offset)
-    ax.text(xmax, 0.5*thickness, top_label, color=label_color, 
-            fontsize=label_size, fontweight = 'bold')
-    ax.text(xmax, 0*thickness, bottom_label, color=label_color,
+    xmax = ax.get_xbound()[1] * (1 + x_offset / 10)
+    # xmax = x.max()*0.8*(1+x_offset)
+    ax.text(xmax, 0.5 * thickness, top_label, color=label_color,
+            fontsize=label_size, fontweight='bold')
+    ax.text(xmax, 0 * thickness, bottom_label, color=label_color,
             fontsize=label_size)
 
     if ylabel is not None:
@@ -427,15 +427,16 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
         ax.set_xlim(xlim)
 
     if invert_xaxis:
-        ax.invert_xaxis()       
+        ax.invert_xaxis()
 
     if 'fig' in locals():
-        #fig.tight_layout()
+        # fig.tight_layout()
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
         return fig, ax
     else:
         return ax
+
 
 def closefig(fig=None):
     '''Close the figure
@@ -450,6 +451,7 @@ def closefig(fig=None):
         plt.close(fig)
     else:
         plt.close()
+
 
 def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
     ''' Save a figure to a path
@@ -641,11 +643,467 @@ def set_style(style='journal', font_scale=1.0, dpi=300):
         mpl.rcParams.update(d)
 
 
+def make_phantom_ax(ax):
+    ''' Remove all visual annotation from ax object
+
+    This function removes axis lines, axis labels, tick labels, tick marks and grid lines.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes object
+        the axes object to clear
+
+    Returns
+    -------
+    ax : matplotlib.axis
+        the axis object from matplotlib
+        See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
+
+    '''
+
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.set_yticks([])
+    # _ax.set_xlim(xlim)
+    ax.tick_params(axis='x', which='both', length=0)
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+    ax.grid(False)
+
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    return ax
 
 
+def make_annotation_ax(fig, ax, loc='overlay',
+                       ax_name='highlighted_intervals',
+                       height=None, v_offset=0, b=None,
+                       width=None, h_offset=0, l=None,
+                       zorder=-1):
+    ''' Makes a clean axis for adding annotation
+
+    This function creates a new axes for adding annotation.
+    If the bottom left corner is not specified, it is established based on the ax objects in ax.
+    If there is only one ax object, this overkill, but is helpful to introduce annotations that span multiple data axes.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes object or dict
+        If ax is a dict, assumes data axes are assigned to integer keys and
+        supplemental axes have string keys
+
+    loc : string
+        if "overlay", annotation ax will attempt to cover the area with data axes
+        if "above", annotation ax will be located directly above the top data ax
+        if "below", annotation ax will be located below the bottom data ax
+
+    ax_name : string
+        name associated with new ax object
+
+    height : float
+        height of annotation ax
+        if loc = "above" or "below", height=.025 if not specified
+        if loc = "overlay", height=vertical span of data axes, if not specified
+
+    v_offset : float
+        vertical offset between data plot area and annotation ax
+        a positive v_offset will place the bottom corner higher
+
+    width : float
+        width of annotation ax
+        horizontal span of data axes, if not specified
+
+    b : float
+        location of bottom corner of annotation ax
+
+    h_offset : float
+        horizontal offset from left corner
+        a positive h_offset will place the left corner farther to the right
+
+    l : float
+        location of left corner of annotation ax
+
+    zorder : numeric
+        index of annotation ax layer in fig
+        zorder = -1 will place the layer behind other layers
+        zorder = 1000 will place the layer in front of other layers
+
+    Returns
+    -------
+    ax_d : dict
+        ax_d contains the original ax object(s) and new annotation ax assigned to specified ax_name
+        See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
+
+    '''
+
+    if type(ax) != dict:
+        ax_d = {0: ax}
+    else:
+        ax_d = ax
+
+    ll = []
+    ur = []
+    keys_list = [key for key in ax_d.keys() if type(key) == int]
+    keys_list.sort()
+
+    for ax_key in keys_list:
+        bbox_coords = ax_d[ax_key].get_position()
+        ll.append(bbox_coords._points[0].tolist())
+        ur.append(bbox_coords._points[1].tolist())
+        xlims = ax_d[ax_key].get_xlim()
+
+    if l is None:
+        l = min([_ll[0] for _ll in ll])
+
+    u = max([_ur[1] for _ur in ur])
+    r = max([_ur[0] for _ur in ur])
+
+    if loc == 'overlay':
+        if b is None:
+            b = min([_ll[1] for _ll in ll])
+        if height is None:
+            height = u - b
+    else:
+        if height is None:
+            height = .025
+        if loc == 'above':
+            if b is None:
+                b = u
+        if loc == 'below':
+            if b is None:
+                b = min([_ll[1] for _ll in ll]) - height
+
+    if width is None:
+        width = r - l
+    b += v_offset
+    l += h_offset
+
+    ax_d[ax_name] = fig.add_axes([l, b, width, height],
+                                 **{'zorder': zorder})
+
+    ax_d[ax_name].set_xlim(xlims)
+    ax_d[ax_name] = make_phantom_ax(ax_d[ax_name])
+    ax_d[ax_name].set_facecolor((1, 1, 1, 0))
+
+    return ax_d
 
 
+import matplotlib.patches as mpatches
 
 
+def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend=True):
+    ''' Hightlights intervals
+
+    This function highlights intervals.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes object
+
+    intervals : list
+        list of intervals to be highlighted
+
+    color : string or list
+        If a string is passed, all intervals will be the specified color
+        If a list is passed, the list is expected to be the same length as intervals
+
+    alpha : float or list
+        If a float is passed, all intervals will have the same specified alpha value
+        If a list is passed, the list is expected to be the same length as intervals
+
+    Returns
+    -------
+    ax : matplotlib.axis
+        the axis object from matplotlib
+        See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
 
 
+    Examples
+    --------
+
+    .. jupyter-execute::
+
+        import pyleoclim as pyleo
+
+        ts_18 = pyleo.utils.load_dataset('cenogrid_d18O')
+        ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
+        ms = pyleo.MultipleSeries([ts_18, ts_13], label='Cenogrid', time_unit='ma BP')
+
+        fig, ax = ms.stackplot(linewidth=0.5, fill_between_alpha=0)
+
+        ax=pyleo.utils.plotting.make_annotation_ax(fig, ax, ax_name = 'highlighted_intervals', zorder=-1)
+        intervals = [[3, 8], [12, 18], [30, 31], [40,43], [49, 60], [60, 65]]
+        ax['highlighted_intervals'] = pyleo.utils.plotting.hightlight_intervals(ax['highlighted_intervals'], intervals,
+            color='g', alpha=.1)
+
+    '''
+
+    if isinstance(intervals[0], list) is False:
+        intervals = [intervals]
+
+    handles = []
+
+    new_labels = []
+    new_colors = []
+    new_alphas = []
+
+    for ik, _ts in enumerate(intervals):
+        if isinstance(color, list) is True:
+            c = color[ik]
+        else:
+            c = color
+        new_colors.append(c)
+
+        if isinstance(alpha, list) is True:
+            a = alpha[ik]
+        else:
+            a = alpha
+        new_alphas.append(a)
+
+        if isinstance(labels, list) is True:
+            label = labels[ik]
+        else:
+            label = ''
+        new_labels.append(label)
+
+        ax.axvspan(_ts[0], _ts[1], facecolor=c, alpha=a)
+
+    return ax
+
+
+def get_label_width(ax, label, buffer=0., fontsize=10):
+    """
+    Helper function to find width of text when rendered in ax object
+    """
+    
+    text = ax.text(0, 0, label, size=fontsize)
+    width = text.get_window_extent(renderer=ax.figure.canvas.get_renderer()).width
+    text.remove()  # Remove the text used for measurement
+    
+    return width + buffer
+
+
+def calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=.1):
+    """
+    Calculate overlapping sets of labels based on their positions and widths.
+
+    This function identifies sets of labels that would overlap if rendered at the same height on a plot.
+    It is used to determine how to place labels to avoid overlap in visualizations.
+
+    Parameters:
+    -----------
+    ax : matplotlib.axes.Axes
+        The Axes object on which the labels will be plotted.
+
+    labels : list of str
+        A list of label strings.
+
+    x_locs : list of float
+        A list of x-coordinates where the labels are to be positioned.
+
+    fontsize : int
+        The font size used for the labels.
+
+    buffer : float, optional
+        Additional space to consider around each label to prevent overlap.
+        Defaults to 0.1.
+
+    Returns:
+    --------
+    list of list of int: A list where each sublist contains the indices of overlapping labels.
+
+    """
+
+    # Calculate the horizontal span of each label
+    intervals = []
+    for i, label in enumerate(labels):
+        w = get_label_width(ax, label, buffer=buffer, fontsize=fontsize)
+        # ann = ax.text(x_locs[i], 0, label, size=fontsize)
+        # box = ax.transData.inverted().transform(ann.get_tightbbox(fig.canvas.get_renderer()))
+        # w = box[1][0] - box[0][0] + buffer
+        # ann.remove()
+
+        interval = pd.Interval(left=x_locs[i] - w / 2, right=x_locs[i] + w / 2)
+        intervals.append(interval)
+
+    # Group overlapping labels
+    overlapping_sets = []
+    for i, interval_i in enumerate(intervals):
+        found = False
+        for overlap_set in overlapping_sets:
+            if any(interval_i.overlaps(intervals[j]) for j in overlap_set):
+                overlap_set.add(i)
+                found = True
+                break
+        if not found:
+            overlapping_sets.append({i})
+
+    # Convert sets to sorted lists
+    return [sorted(list(s)) for s in overlapping_sets]
+
+
+def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_sets=None, baseline=0.5,
+                    height=0.5, buffer=0.1, fontsize=10, linewidth=None, linestyle_kwargs=None,
+                    text_kwargs=None
+                    ):
+    """
+    Place labels on a plot with given orientations and style parameters, avoiding overlaps.
+
+    This function positions labels at specified x-locations with adjustments to avoid overlaps.
+    Labels can be oriented either above (north) or below (south) a baseline.
+
+    Parameters:
+    --------
+    ax : matplotlib.axes.Axes
+        The Axes object where the labels are to be placed.
+
+    labels : list of str
+        A list of label strings.
+
+    x_locs : list of float
+        A list of x-coordinates for the labels.
+
+    orientation : str, optional
+        The vertical orientation of the labels, either 'north' or 'south'. Defaults to 'north'.
+
+    overlapping_sets : list of list of int, optional
+        Precomputed overlapping sets of labels. If None, the function will compute them. Defaults to None.
+
+    baseline : float, optional
+        The baseline height for the first label slot. Defaults to 0.5.
+
+    height : float, optional
+        The vertical spacing between slots. Defaults to 0.5.
+
+    buffer : float, optional
+        Horizontal buffer space around labels to prevent overlap. Defaults to 0.1.
+
+    fontsize : int, optional
+        Font size for labels. Defaults to 10.
+
+    linewidth : float, optional
+        Line width for connecting lines. If None, defaults to 1.
+
+    linestyle_kwargs : dict, optional
+        Additional keyword arguments for styling the connecting lines (per Matplotlib).
+
+    text_kwargs : dict, optional
+        Additional keyword arguments for styling the text labels (per Matplotlib).
+
+    Returns:
+    --------
+    matplotlib.axes.Axes: The modified Axes object with labels placed.
+
+    Examples
+    --------
+
+    .. jupyter-execute::
+
+        import pyleoclim as pyleo
+        import numpy as np
+
+        ts_18 = pyleo.utils.load_dataset('cenogrid_d18O')
+        ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
+        ms = pyleo.MultipleSeries([ts_18, ts_13], label='Cenogrid', time_unit='ma BP')
+
+        fig, ax = ms.stackplot(linewidth=0.5, fill_between_alpha=0)
+
+        ax=pyleo.utils.plotting.make_annotation_ax(fig, ax, ax_name = 'epochs', height=.03,
+                                           loc='above', v_offset=.015,zorder=-2)
+        ax['epochs'].set_facecolor((1, 1, 1, 0))
+
+        ceno_intervals_pairs = [[0.0, 0.01], [0.01, 1.6], [1.6, 5.3], [5.3, 23.7], [23.7, 36.6], [36.6, 57.8], [57.8, 66.4]]
+        ceno_epoch_labels = ['Holocene', 'Pleistocene', 'Pliocene', 'Miocene', 'Oligocene', 'Eocene', 'Paleocene']
+        ax['epochs'].set_ylim([-1,0])
+
+        colors = ['r', 'm', 'orange', 'blue', 'green', 'aqua', 'navy', 'pink']#['r', 'b']#'r' if ik%2 ==0 else 'b' for ik, _ts in enumerate(geo_ts)]
+        ax['epochs'] = pyleo.utils.plotting.hightlight_intervals(ax['epochs'],
+                                                    ceno_intervals_pairs, color=colors,
+                                                                              alpha=.1)
+
+        ### EPOCHS (labels)
+        ax=pyleo.utils.plotting.make_annotation_ax(fig, ax['epochs'], ax_name = 'epoch_annotation',
+                                                   zorder=1, v_offset=0.01,
+                                                   height=.25, loc='above')
+
+        x_locs = [np.mean(interval) for interval in ceno_intervals_pairs]
+        ax['epoch_annotation'].set_ylim([0,3])
+        ax['epoch_annotation'] = pyleo.utils.plotting.label_intervals(fig, ax['epoch_annotation'], ceno_epoch_labels, x_locs,
+                                                               orientation='north', baseline=.45, height=0.35, buffer=0.1,
+                                           linestyle_kwargs= {'color':'gray'}, text_kwargs={'fontsize':10, 'va':'bottom'}
+                                          )
+
+
+    """
+
+    if linestyle_kwargs is None:
+        linestyle_kwargs = {}
+
+    linestyle_defaults = {'linestyle': '--', 'color': 'gray', 'linewidth': 1 if linewidth is None else linewidth}
+    for key in linestyle_defaults:
+        if key not in linestyle_kwargs:
+            linestyle_kwargs[key] = linestyle_defaults[key]
+
+    if text_kwargs is None:
+        text_kwargs = {}
+
+    text_defaults = {'fontsize': 10 if fontsize is None else fontsize, 'ha': 'center'}
+    for key in text_defaults:
+        if key not in text_kwargs:
+            text_kwargs[key] = text_defaults[key]
+    fontsize = text_kwargs['fontsize']
+
+    # if overlapping sets aren't specified, calculate them
+    if overlapping_sets is None:
+        overlapping_sets = calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=buffer)
+
+    label_alignments = ['center' for _ in labels]
+    label_slots = [0 for _ in labels]
+
+    for overlap_set in overlapping_sets:
+        if len(overlap_set) > 1:
+            sorted_set = sorted(overlap_set, key=lambda i: x_locs[i])
+            peak = len(sorted_set) // 2
+            for i, label_index in enumerate(sorted_set):
+                label_slots[label_index] = i if i <= peak else peak - (i - peak)
+
+            cluster_min, cluster_max = x_locs[sorted_set[0]], x_locs[sorted_set[-1]]
+            for i, label_index in enumerate(sorted_set):
+                if i == 0:
+                    label_alignments[label_index] = 'right'
+                else:
+                    if len(sorted_set) == 2:
+                        label_alignments[label_index] = 'center'
+                    else:
+                        if i == int((len(sorted_set) - 1) / 2):
+                            label_alignments[label_index] = 'center'
+                        elif i > int((len(sorted_set) - 1) / 2):
+                            label_alignments[label_index] = 'left'
+                        else:
+                            label_width = get_label_width(ax, labels[label_index], buffer=buffer, fontsize=fontsize)
+                            # label_width = get_label_width(labels[label_index])
+                            if x_locs[label_index] - label_width / 2 < cluster_min:
+                                label_alignments[label_index] = 'right'
+                            elif x_locs[label_index] + label_width / 2 > cluster_max:
+                                label_alignments[label_index] = 'left'
+                            else:
+                                label_alignments[label_index] = 'center'
+
+        else:
+            label_index = overlap_set[0]
+            label_alignments[label_index] = 'center'
+
+    for i, label in enumerate(labels):
+        label_text_kwargs = text_kwargs.copy()
+        slot_height = baseline + label_slots[i] * height if orientation == 'north' else -baseline - label_slots[
+            i] * height
+
+        label_text_kwargs['ha'] = label_alignments[i]
+        if 'va' not in label_text_kwargs:
+            label_text_kwargs['va'] = 'bottom' if orientation == 'north' else 'top'
+
+        ax.text(x_locs[i], slot_height, label, **label_text_kwargs)
+        ax.plot([x_locs[i], x_locs[i]], [0, slot_height], **linestyle_kwargs)
+
+    return ax
