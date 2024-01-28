@@ -263,6 +263,7 @@ class Series:
         self.sort_ts = sort_ts
         self.clean_ts = clean_ts
         self.importedFrom = importedFrom
+        self.control_archiveType = control_archiveType
         if archiveType is not None:
             #Deal with archiveType
             

@@ -24,7 +24,7 @@ import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
 from .plotting import savefig
-from .lipdutils import PLOT_DEFAULT, LipdToOntology
+from .lipdutils import PLOT_DEFAULT, LipdToOntology, CaseInsensitiveDict
 
 
 
@@ -540,8 +540,17 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
         # trait = trait_d[trait_key]
         if trait != None:
             if trait == 'archiveType':
-                trait_vals = [LipdToOntology(geos.__dict__[trait]) if trait in geos.__dict__.keys() else None for geos in
-                          geo_series_list]
+                trait_vals = []
+                for geos in geo_series_list:
+                    if trait in geos.__dict__.keys():
+                        try:
+                            trait_vals.append(LipdToOntology(geos.__dict__[trait]).lower().replace(" ",""))
+                        except:
+                            trait_vals.append(None)
+                    else:
+                        trait_vals.append(None)
+                #trait_vals = [LipdToOntology(geos.__dict__[trait]).lower().replace(" ","") if trait in geos.__dict__.keys() else None for geos in
+                #          geo_series_list]
             else: 
                 trait_vals = [geos.__dict__[trait] if trait in geos.__dict__.keys() else None for geos in
                               geo_series_list]
@@ -781,7 +790,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
         norm_kwargs = kwargs.pop('norm_kwargs', {})
 
-        plot_defaults = copy.copy(PLOT_DEFAULT)
+        #plot_defaults = copy.copy(PLOT_DEFAULT)
+        f = copy.copy(PLOT_DEFAULT)
+        plot_defaults = CaseInsensitiveDict()
+        for key, value in f.items():
+            plot_defaults[key]=value
         palette = None
         hue_norm = None
         ax_sm = None
@@ -1098,6 +1111,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             return fig, ax_d
         else:
             return fig, {'map':ax}
+    ###### End of plot_scatter    
 
     # from ..core.multiplegeoseries import MultipleGeoSeries
     # from ..core.geoseries import GeoSeries
