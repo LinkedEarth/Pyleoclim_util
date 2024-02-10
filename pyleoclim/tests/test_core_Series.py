@@ -1276,12 +1276,12 @@ class TestResample:
         [
             (
                 '1ga',
-                pd.date_range(np.datetime64('500000000-01-01', 's'), np.datetime64('1500000000-01-01', 's'), freq='1000000000AS-JAN', unit='s'),
+                pd.date_range(start = np.datetime64('500000000-01-01', 's'), end = np.datetime64('1500000000-01-01', 's'), freq='1000000000YS-JAN', unit='s'),
                 np.array([0., 1.]),
             ),
             (
                 '1ma',
-                pd.date_range(np.datetime64('500000-01-01', 's'), np.datetime64('1000500000-01-01', 's'), freq='1000000AS-JAN', unit='s'),
+                pd.date_range(np.datetime64('500000-01-01', 's'), np.datetime64('1000500000-01-01', 's'), freq='1000000YS-JAN', unit='s'),
                 np.array([0.]+[np.nan]*999 + [1.]),
             ),
         ]
