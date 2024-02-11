@@ -36,7 +36,6 @@ setup(
         "pathos>=0.2.8",
         "tqdm>=4.61.2",
         "tftb>=0.1.3",
-        "pyhht>=0.1.0",
         "wget>=3.2",
         "numba>=0.56",
         "nitime>=0.9",
