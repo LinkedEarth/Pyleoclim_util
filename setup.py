@@ -44,7 +44,8 @@ setup(
         "Unidecode>=1.1.1",
         "cartopy>=0.22.0",
         "pyyaml",
-        "beautifulsoup4",        
+        "beautifulsoup4", 
+        "scipy",       
     ],
     python_requires=">=3.9.0"
 )
