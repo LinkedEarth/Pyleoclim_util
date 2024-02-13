@@ -109,3 +109,11 @@ jsonutils
 .. automodule:: pyleoclim.utils.jsonutils
   :members:
   :ignore-module-all: True
+
+
+Utilities for EMD decomposition
+"""""""""""""""""""""""""""""""
+
+.. automodule:: pyleoclim.utils.emd_utils
+  :members:
+  :ignore-module-all: True
