@@ -20,7 +20,7 @@ setup(
     description='A Python package for paleoclimate data analysis',
     long_description=read("README.md"),
     long_description_content_type = 'text/markdown',
-    author='Deborah Khider, Feng Zhu, Julien Emile-Geay, Jun Hu, Myron Kwan, Pratheek Athreya, Alexander James, Daniel Garijo',
+    author='Deborah Khider, Julien Emile-Geay, Feng Zhu, Jordan Landers, Alexander James, Jun Hu, Myron Kwan, Pratheek Athreya, Daniel Garijo',
     author_email='linkedearth@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
     download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/'+version,
@@ -28,7 +28,7 @@ setup(
     classifiers=[],
     install_requires=[
         "LiPD==0.2.8.8",
-        "pandas>=2.0.0",
+        "pandas==2.1.4",
         "kneed>=0.7.0",
         "statsmodels>=0.13.2",
         "seaborn==0.12.2",
