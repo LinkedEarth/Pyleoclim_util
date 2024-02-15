@@ -1,11 +1,11 @@
 ###,Series metadata
-written by,Pyleoclim 0.13.1b0
+written by,Pyleoclim 0.12.1b0
 time_unit,ky BP
 time_name,Age
 value_unit,‰
 value_name,$\delta^{18} \mathrm{O}$
 label,LR04 benthic stack
-archiveType,marinesediment
+archiveType,MarineSediment
 importedFrom,
 log,
 ###,end metadata

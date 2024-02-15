@@ -1168,7 +1168,7 @@ class EnsembleSeries(MultipleSeries):
             time_ens = pyleo.EnsembleSeries(series_list)
             ens_qs = time_ens.quantiles(axis='time')
             
-            vals,headers=ens_qs.to_dataframe(axis='time')    
+            vals,headers=ens_qs.to_array(axis='time')    
 
         '''
         
