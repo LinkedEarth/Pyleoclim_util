@@ -605,6 +605,12 @@ def set_style(style='journal', font_scale=1.0, dpi=300):
             'xtick.minor.width': 0,
             'ytick.minor.width': 0,
         })
+    
+    elif 'matplotlib' in style:
+        #mpl.rcParams.update(mpl.rcParamsDefault)
+        style_dict.update({})
+        
+        
     else:
         raise ValueError(f'Style [{style}] not availabel!')
 
