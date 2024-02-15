@@ -4049,13 +4049,13 @@ class Series:
             multiplier = int(multiplier)
         unit = search.group(2)
         if unit.lower() in tsbase.MATCH_A:
-            rule = f'{multiplier}AS'
+            rule = f'{multiplier}YS'
         elif unit.lower() in tsbase.MATCH_KA:
-            rule = f'{1_000*multiplier}AS'
+            rule = f'{1_000*multiplier}YS'
         elif unit.lower() in tsbase.MATCH_MA:
-            rule = f'{1_000_000*multiplier}AS'
+            rule = f'{1_000_000*multiplier}YS'
         elif unit.lower() in tsbase.MATCH_GA:
-            rule = f'{1_000_000_000*multiplier}AS'
+            rule = f'{1_000_000_000*multiplier}YS'
 
         ser = self.to_pandas()
 
