@@ -1402,6 +1402,8 @@ class MultiplePSD:
             lgd_args = {'frameon': False}
             lgd_args.update(lgd_kwargs)
             ax.legend(**lgd_args)
+        else:
+            ax.legend().set_visible(False)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
