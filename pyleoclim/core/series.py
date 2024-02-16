@@ -562,7 +562,7 @@ class Series:
         b = jsonutils.iterate_through_dict(a, 'Series')
 
         return cls(**b)
-
+    
     def pandas_method(self, method):
         ser = self.to_pandas()
         result = method(ser)
