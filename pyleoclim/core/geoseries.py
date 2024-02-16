@@ -11,10 +11,11 @@ import pandas as pd
 
 #from copy import deepcopy
 from matplotlib import gridspec
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
+#import cartopy.crs as ccrs
+#import cartopy.feature as cfeature
 
-#import warnings
+import warnings
+
 
 class GeoSeries(Series):
     '''The GeoSeries class is a child of the Series class, and requires geolocation
@@ -107,6 +108,11 @@ class GeoSeries(Series):
     clean_ts : boolean flag
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
          Default is None (marked for deprecation)
+    
+    auto_time_params : bool, 
+        If True, uses tsbase.disambiguate_time_metadata to ensure that time_name and time_unit are usable by Pyleoclim. This may override the provided metadata. 
+        If False, the provided time_name and time_unit are used. This may break some functionalities (e.g. common_time and convert_time_unit), so use at your own risk.
+        If not provided, code will set to True for internal consistency.
 
     Examples
     --------
@@ -128,8 +134,38 @@ class GeoSeries(Series):
                  sensorType = None, observationType = None,
                  log=None, keep_log=False, verbose=True,
                  depth = None, depth_name = None, depth_unit= None,
-                 sort_ts = 'ascending', dropna = True,  clean_ts=False):
+                 sort_ts = 'ascending', dropna = True,  clean_ts=False, auto_time_params = None):
         
+        if auto_time_params is None:
+            auto_time_params = True
+            if verbose:
+                warnings.warn('auto_time_params is not specified. Currently default behavior sets this to True, which might modify your supplied time metadata.  Please set to False if you want a different behavior.', UserWarning, stacklevel=2)
+
+        if auto_time_params:
+            # assign time metadata if they are not provided or provided incorrectly
+            offending = [tsbase.MATCH_CE, tsbase.MATCH_BP]
+
+            if time_unit is None:
+                time_unit='years CE'
+                if verbose:
+                    warnings.warn(f'No time_unit parameter provided. Assuming {time_unit}.', UserWarning, stacklevel=2)
+            elif time_unit.lower().replace(".","") in frozenset().union(*offending):
+                # fix up time name and units for offending cases
+                time_name, time_unit = tsbase.disambiguate_time_metadata(time_unit)
+            else:
+                # give a proper time name to those series that confuse that notion with time units
+                time_name, _ = tsbase.disambiguate_time_metadata(time_unit)
+
+            if time_name is None:
+                if verbose:
+                    warnings.warn('No time_name parameter provided. Assuming "Time".', UserWarning, stacklevel=2)
+                time_name='Time'
+            elif time_name in tsbase.MATCH_A:
+                if verbose:
+                    warnings.warn(f'{time_name} refers to the units, not the name of the axis. Picking "Time" instead', UserWarning, stacklevel=2)
+                time_name='Time'
+        else:
+            pass
        
         # assign latitude
         if lat is not None:
@@ -196,7 +232,7 @@ class GeoSeries(Series):
     def from_json(cls, path):
         ''' Creates a pyleoclim.Series from a JSON file
         
-        The keys in the JSON file must correspond to the parameter associated with a Series object
+        The keys in the JSON file must correspond to the parameter associated with a GeoSeries object
 
         Parameters
         ----------
@@ -214,6 +250,20 @@ class GeoSeries(Series):
         b = jsonutils.iterate_through_dict(a, 'GeoSeries')
         
         return cls(**b)
+    
+    @classmethod
+    def from_Series(lat, lon, elevation=None,sensorType=None,observationType=None, 
+                    depth=None, depth_name=None, depth_unit=None):
+        
+        print('a')
+        # time, value, lat, lon, elevation = None, time_unit=None, time_name=None, 
+        #              value_name=None, value_unit=None, label=None, importedFrom=None, 
+        #              archiveType = None, control_archiveType = False, 
+        #              sensorType = None, observationType = None,
+        #              log=None, keep_log=False, verbose=True,
+        #              depth = None, depth_name = None, depth_unit= None,
+        #              sort_ts = 'ascending', dropna = True,  clean_ts=False, auto_time_params = None
+
     
     def map(self, projection='Orthographic', proj_default=True,
             background=True, borders=False, coastline=True, rivers=False, lakes=False, ocean=True,
