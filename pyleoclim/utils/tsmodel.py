@@ -5,11 +5,12 @@ import numpy as np
 # new for statsmodels v0.12
 from statsmodels.tsa.arima_process import arma_generate_sample
 from statsmodels.tsa.arima.model import ARIMA
+from tqdm import tqdm
+from .tsutils import standardize
 
 from .tsbase import (
     is_evenly_spaced
 )
-#from .tsutils import preprocess   # no longer used here
 from scipy import optimize
 
 __all__ = [
@@ -60,7 +61,7 @@ def ar1_model(t, tau, output_sigma=1):
     return y
 
 
-def ar1_fit(y, t=None):
+def ar1_fit(y, t=None):   ## is this still used anywhere? Looks redundant
     ''' Return lag-1 autocorrelation
     
     Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
@@ -227,7 +228,6 @@ def ar1_fit_evenly(y):
     return g
 
 def tau_estimation(y, t):
-#  def tau_estimation(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
     ''' Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     Esimtates the temporal decay scale of an (un)evenly spaced time series. 
@@ -254,20 +254,103 @@ def tau_estimation(y, t):
         Comput. Geosci. 28, 69–72 (2002).
 
     '''
-    #  pd_y = preprocess(y, t, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
     dt = np.diff(t)
     #  assert dt > 0, "The time point should be increasing!"
 
     def ar1_fun(a):
-        #  return np.sum((pd_y[1:] - pd_y[:-1]*a**dt)**2)
         return np.sum((y[1:] - y[:-1]*a**dt)**2)
-
     a_est = optimize.minimize_scalar(ar1_fun, bounds=[0, 1], method='bounded').x
-    #  a_est = optimize.minimize_scalar(ar1_fun, method='brent').x
 
     tau_est = -1 / np.log(a_est)
 
     return tau_est
+
+
+
+
+def isopersistent_rn(y, p):
+    ''' Generates p realization of a red noise [i.e. AR(1)] process
+    with same persistence properties as y (Mean and variance are also preserved).
+
+    Parameters
+    ----------
+
+    X : array
+        vector of (real) numbers as a time series, no NaNs allowed
+    p : int
+        number of simulations
+
+    Returns
+    -------
+
+    red : numpy array
+        n rows by p columns matrix of an AR1 process, where n is the size of X
+    g :float
+        lag-1 autocorrelation coefficient
+    
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
+
+    Notes
+    -----
+
+    (Some Rights Reserved) Hepta Technologies, 2008
+
+    '''
+    n = np.size(y)
+    sig = np.std(y, ddof=1)
+
+    g = ar1_fit_evenly(y)
+    red = sm_ar1_sim(n, p, g, sig)
+
+    return red, g
+
+
+def sm_ar1_sim(n, p, g, sig):
+    ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g using statsmodels
+
+    Parameters
+    ----------
+
+    n : int
+        row dimensions
+    p : int
+        column dimensions
+
+    g : float
+        lag-1 autocorrelation coefficient
+        
+    sig : float
+        the standard deviation of the original time series
+
+    Returns
+    -------
+
+    red : numpy matrix
+        n rows by p columns matrix of an AR1 process
+
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
+
+    '''
+    # specify model parameters (statsmodel wants lag0 coefficents as unity)
+    ar = np.r_[1, -g]  # AR model parameter
+    ma = np.r_[1, 0.0] # MA model parameters
+    sig_n = sig*np.sqrt(1-g**2) # theoretical noise variance for red to achieve the same variance as X
+
+    red = np.empty(shape=(n, p)) # declare array
+
+    # simulate AR(1) model for each column
+    for i in np.arange(p):
+        red[:, i] = arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, scale=sig_n)
+
+    return red
 
 
 def colored_noise(alpha, t, f0=None, m=None, seed=None):
@@ -450,6 +533,78 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
     #ts = Series(time=t, value=v)
 
     return t, v
+
+
+def parametric_surrogates(y, p, model, param, seed):
+    ''' 
+    Generate `p` surrogates of array X according to a given
+    parametric model 
+        
+    Parameters
+    ----------
+    
+    model : str
+        Stochastic model for the temporal behavior. Accepted choices are:
+        - 'unif': resample uniformly from the posterior distribution
+        - 'ar': autoregressive model, see  https://www.statsmodels.org/dev/tsa.html#univariate-autoregressive-processes-ar
+        - 'fGn': fractional Gaussian noise, see https://stochastic.readthedocs.io/en/stable/noise.html#stochastic.processes.noise.FractionalGaussianNoise 
+        - 'power-law': aka Colored Noise, see https://stochastic.readthedocs.io/en/stable/noise.html#stochastic.processes.noise.ColoredNoise
+        
+    param : variable type [default is None]
+        parameter of the model. 
+        - 'unif': no parameter 
+        - 'ar': param is the result from fitting Statsmodels Autoreg.fit() (with zero-lag term)
+        - 'fGn': param is the Hurst exponent, H (float)
+        - 'power-law': param is the spectral exponent beta (float)
+        
+    Under allowable values, 'fGn' and 'power-law' should return equivalent results as long as H = (beta+1)/2 is in [0, 1)
+        
+    p : int
+        number of series to export
+        
+    trend : array, length self.nt
+        general trend of the ensemble. 
+        If None, it is calculated as the ensemble mean.
+        If provided, it will be added to the ensemble. 
+          
+    seed : int
+        seed for the random generator (provided for reproducibility)
+
+    Returns
+    -------
+    surr :  N x p array containing surrogates
+    '''
+    
+    if seed is not None:
+        np.random.seed(seed)
+    N = len(y)      
+        
+    paths = np.ndarray((N, p))
+    
+    if model == 'ar':
+        coeffs = param[1:] # ignore the zero-lag term
+        arparams = np.r_[1, -coeffs]
+        maparams = np.r_[1, np.zeros_like(coeffs)]
+       
+        for j in tqdm(range(p)):
+            y = arma_generate_sample(arparams, maparams, N)
+            z, _, _ = standardize(y)
+            paths[:,j] = z
+
+    elif model == 'power-law':
+        from stochastic.processes.noise import ColoredNoise
+        for j in tqdm(range(p)):
+            CN = ColoredNoise(beta=param,t=N)
+            z, _, _ = standardize(CN.sample(N-1))
+            paths[:,j] = z
+             
+    elif model == 'fGn':
+        from stochastic.processes.noise import FractionalGaussianNoise
+        for j in tqdm(range(p)):
+            fgn = FractionalGaussianNoise(hurst=param, t=N)
+            z, _, _ = standardize(fgn.sample(N, algorithm='daviesharte')) 
+            paths[:,j] = z
+        
 
 # def fBMsim(N=128, H=0.25):
 #     '''Simple method to generate fractional Brownian Motion

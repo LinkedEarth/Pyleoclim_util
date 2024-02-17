@@ -14,9 +14,9 @@ from scipy.stats import pearsonr
 from scipy.stats.mstats import gmean
 from scipy.stats import t as stu
 from scipy.stats import gaussian_kde
-import statsmodels.api as sm
 from sklearn import preprocessing
-from .tsmodel import ar1_fit_evenly
+from .tsmodel import ar1_fit_evenly, isopersistent_rn
+from .tsutils import phaseran
 
 
 def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
@@ -87,6 +87,9 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
         (r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
     elif method == 'isospectral':
         (r, signif, p) = corr_isospec(y1, y2, alpha=alpha, nsim=nsim)
+        
+    # apply this syntax:
+    # wave_res = wave_func[method](self.value, self.time, **args[method])
 
     res={'r':r,'signif':signif,'p':p}    
     
@@ -320,90 +323,7 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     return r, signif, pval
 
-def isopersistent_rn(X, p):
-    ''' Generates p realization of a red noise [i.e. AR(1)] process
-    with same persistence properties as X (Mean and variance are also preserved).
 
-    Parameters
-    ----------
-
-    X : array
-        vector of (real) numbers as a time series, no NaNs allowed
-    p : int
-        number of simulations
-
-    Returns
-    -------
-
-    red : numpy array
-        n rows by p columns matrix of an AR1 process, where n is the size of X
-    g :float
-        lag-1 autocorrelation coefficient
-    
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
-
-    Notes
-    -----
-
-    (Some Rights Reserved) Hepta Technologies, 2008
-
-    '''
-    n = np.size(X)
-    sig = np.std(X, ddof=1)
-
-    g = ar1_fit_evenly(X)
-    #  red = red_noise(N, M, g)
-    red = sm_ar1_sim(n, p, g, sig)
-
-    return red, g
-
-
-def sm_ar1_sim(n, p, g, sig):
-    ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g using statsmodels
-
-    Parameters
-    ----------
-
-    n : int
-        row dimensions
-    p : int
-        column dimensions
-
-    g : float
-        lag-1 autocorrelation coefficient
-        
-    sig : float
-        the standard deviation of the original time series
-
-    Returns
-    -------
-
-    red : numpy matrix
-        n rows by p columns matrix of an AR1 process
-
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
-
-    '''
-    # specify model parameters (statsmodel wants lag0 coefficents as unity)
-    ar = np.r_[1, -g]  # AR model parameter
-    ma = np.r_[1, 0.0] # MA model parameters
-    sig_n = sig*np.sqrt(1-g**2) # theoretical noise variance for red to achieve the same variance as X
-
-    red = np.empty(shape=(n, p)) # declare array
-
-    # simulate AR(1) model for each column
-    for i in np.arange(p):
-        red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, scale=sig_n)
-
-    return red
 
 # def red_noise(N, M, g):
 #     ''' Produce M realizations of an AR1 process of length N with lag-1 autocorrelation g
@@ -511,81 +431,6 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
 
     return r, signif, F
 
-def phaseran(recblk, nsurr):
-    ''' Simultaneous phase randomization of a set of time series
-    
-    It creates blocks of surrogate data with the same second order properties as the original
-    time series dataset by transforming the oriinal data into the frequency domain, randomizing the
-    phases simultaneoulsy across the time series and converting the data back into the time domain. 
-    
-    Written by Carlos Gias for MATLAB
-
-    http://www.mathworks.nl/matlabcentral/fileexchange/32621-phase-randomization/content/phaseran.m
-
-    Parameters
-    ----------
-
-    recblk : numpy array
-        2D array , Row: time sample. Column: recording.
-        An odd number of time samples (height) is expected.
-        If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
-        The class must be double and it must be nonsparse.
-    
-    nsurr : int
-        is the number of image block surrogates that you want to generate.
-
-    Returns
-    -------
-
-    surrblk : numpy array
-        3D multidimensional array image block with the surrogate datasets along the third dimension
-
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
-
-    References
-    ----------
-
-    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7
-    
-    - Carlos Gias (2020). Phase randomization, MATLAB Central File Exchange
-    '''
-    # Get parameters
-    nfrms = recblk.shape[0]
-
-    if nfrms % 2 == 0:
-        nfrms = nfrms-1
-        recblk = recblk[0:nfrms]
-
-    len_ser = int((nfrms-1)/2)
-    interv1 = np.arange(1, len_ser+1)
-    interv2 = np.arange(len_ser+1, nfrms)
-
-    # Fourier transform of the original dataset
-    fft_recblk = np.fft.fft(recblk)
-
-    surrblk = np.zeros((nfrms, nsurr))
-
-    #  for k in tqdm(np.arange(nsurr)):
-    for k in np.arange(nsurr):
-        ph_rnd = np.random.rand(len_ser)
-
-        # Create the random phases for all the time series
-        ph_interv1 = np.exp(2*np.pi*1j*ph_rnd)
-        ph_interv2 = np.conj(np.flipud(ph_interv1))
-
-        # Randomize all the time series simultaneously
-        fft_recblk_surr = np.copy(fft_recblk)
-        fft_recblk_surr[interv1] = fft_recblk[interv1] * ph_interv1
-        fft_recblk_surr[interv2] = fft_recblk[interv2] * ph_interv2
-
-        # Inverse transform
-        surrblk[:, k] = np.real(np.fft.ifft(fft_recblk_surr))
-
-    return surrblk
 
 ''' The FDR procedures translated from fdr.R by Dr. Chris Paciorek (https://www.stat.berkeley.edu/~paciorek/research/code/code.html)
 '''
