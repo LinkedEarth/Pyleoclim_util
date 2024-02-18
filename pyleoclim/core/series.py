@@ -3352,8 +3352,9 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, seed=None):
-        ''' Estimates the Pearson's correlation and associated significance between two non IID time series
+    def correlation(self, target_series, timespan=None, alpha=0.05, statistic = 'pearsonr',
+                    settings=None, common_time_kwargs=None, seed=None):
+        ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID).
 
         The significance of the correlation is assessed using one of the following methods:
 
@@ -3364,7 +3365,7 @@ class Series:
         The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
         The others are non-parametric, but their computational requirements scale with the number of simulations.
 
-        The choise of significance test and associated number of Monte-Carlo simulations are passed through the settings parameter.
+        The choise of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
 
         Parameters
         ----------
@@ -3374,6 +3375,12 @@ class Series:
 
         timespan : tuple
             The time interval over which to perform the calculation
+            
+        statistic : str
+            statistic being evaluated. Can use any of the SciPy-supported ones:
+                https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+            Default: 'pearsonr'        
+        
 
         alpha : float
             The significance level (default: 0.05)
@@ -3385,6 +3392,8 @@ class Series:
                 the number of simulations (default: 1000)
             method : str, {'ttest','isopersistent','isospectral' (default)}
                 method for significance testing
+            surr_settings : dict
+                Parameters for surrogate generator. See individual methods for details.
 
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
@@ -3456,17 +3465,35 @@ class Series:
             ms = ms.common_time(**ct_args)
 
         if timespan is None:
-            value1 = ms.series_list[0].value
-            value2 = ms.series_list[1].value
+            #value1 = ms.series_list[0].value
+            #value2 = ms.series_list[1].value
+            ts0 = ms.series_list[0]
+            ts1 = ms.series_list[1]
         else:
-            value1 = ms.series_list[0].slice(timespan).value
-            value2 = ms.series_list[1].slice(timespan).value
-
+            #value1 = ms.series_list[0].slice(timespan).value
+            #value2 = ms.series_list[1].slice(timespan).value
+            ts0 = ms.series_list[0].slice(timespan)
+            ts1 = ms.series_list[1].slice(timespan)
 
         if seed is not None:
             np.random.seed(seed)
 
-        corr_res = corrutils.corr_sig(value1, value2, **corr_args)
+        if corr_args.method == 'ttest':
+            (r, signif, p) = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+        else:  
+            number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
+            seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
+            method = corr_args['method'] if 'method' in corr_args.keys() else None
+            surr_settings = corr_args['surr_settings'] if 'surr_settings' in corr_args.keys() else None
+            
+            ts0_surr = ts0.timeseries.surrogates(number=number, seed=seed, 
+                                                 method=method, settings=surr_settings)
+            ts1_surr = ts1.timeseries.surrogates(number=number, seed=seed, 
+                                                 method=method, settings=surr_settings)
+            for i in range(number)
+            
+
+        #corr_res = corrutils.corr_sig(value1, value2, **corr_args)
         signif = True if corr_res['signif'] == 1 else False
         corr = Corr(corr_res['r'], corr_res['p'], signif, alpha)
 
@@ -3572,7 +3599,9 @@ class Series:
         return causal_res
 
     def surrogates(self, method='ar1sim', number=1, length=None, seed=None, settings=None):
-        ''' Generate surrogates with increasing time axis
+        ''' Generate surrogates of the Series object according to "method"
+            
+            For now, assumes uniform spacing and increasing time axis
 
         Parameters
         ----------
@@ -3590,7 +3619,7 @@ class Series:
             Control seed option for reproducibility
 
         settings : dict
-            Parameters for surogate generator. See individual methods for details.
+            Parameters for surrogate generator. See individual methods for details.
 
         Returns
         -------
@@ -3600,11 +3629,13 @@ class Series:
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
+        pyleoclim.utils.tsutils.phaseran : phase randomization
 
         '''
         settings = {} if settings is None else settings.copy()
         surrogate_func = {
             'ar1sim': tsmodel.ar1_sim,
+            'phaseran': tsutils.phaseran
         }
         args = {}
         args['ar1sim'] = {'t': self.time}

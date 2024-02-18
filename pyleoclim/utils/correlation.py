@@ -84,9 +84,11 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     if method == 'ttest':
         (r, signif, p) = corr_ttest(y1, y2, alpha=alpha)
     elif method == 'isopersistent':
-        (r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
+        
+        #(r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
     elif method == 'isospectral':
         (r, signif, p) = corr_isospec(y1, y2, alpha=alpha, nsim=nsim)
+        
         
     # apply this syntax:
     # wave_res = wave_func[method](self.value, self.time, **args[method])
@@ -323,41 +325,6 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     return r, signif, pval
 
-
-
-# def red_noise(N, M, g):
-#     ''' Produce M realizations of an AR1 process of length N with lag-1 autocorrelation g
-
-#     Parameters
-#     ----------
-
-#     N : int
-#         row dimensions
-        
-#     M : int
-#         column dimensions
-        
-#     g : float
-#         lag-1 autocorrelation coefficient
-
-#     Returns
-#     -------
-
-#     red : numpy array
-#         N rows by M columns matrix of an AR1 process
-
-#     Notes
-#     -----
-
-#     (Some Rights Reserved) Hepta Technologies, 2008
-#     J.E.G., GaTech, Oct 20th 2008
-#     '''
-#     red = np.zeros(shape=(N, M))
-#     red[0, :] = np.random.randn(1, M)
-#     for i in np.arange(1, N):
-#         red[i, :] = g * red[i-1, :] + np.random.randn(1, M)
-
-#     return red
 
 def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     ''' Estimates the significance of the correlation using phase randomization
