@@ -184,7 +184,7 @@ class MultivariateDecomp:
 
     def modeplot(self, index=0, figsize=[8, 8], fig=None, savefig_settings=None,gs=None,
                  title=None, title_kwargs=None, spec_method='mtm', cmap=None,
-                 hue='EOF', marker='archiveType', size=None, scatter_kwargs=None,
+                 hue='EOF', marker=None, size=None, scatter_kwargs=None,
                  flip = False, map_kwargs=None, gridspec_kwargs=None):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
@@ -263,7 +263,8 @@ class MultivariateDecomp:
 
         marker : string, optional
             (only applicable if using scatter map) Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
-            The default is 'archiveType'.
+            The default is None, which will produce circle markers. Alternatively, pass the name of a categorical variable, e.g. 'archiveType'. If 'archiveType' is specified, will attempt to use pyleoclim archiveType markers mapping, defaulting to '?' where values are unavailable.
+
             
         Returns
         -------
