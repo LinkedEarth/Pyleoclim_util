@@ -97,6 +97,27 @@ def ar1_fit(y, t=None):
 
     return g
 
+def ar1fit_ml(y, t=None):
+    '''
+    Does the same thing as ar1_fit, but BETTER
+
+    Parameters
+    ----------
+    y : TYPE
+        DESCRIPTION.
+    t : TYPE, optional
+        DESCRIPTION. The default is None.
+
+    Returns
+    -------
+    None.
+
+    '''
+    
+    #TODO: COPY YOUR CODE HERE
+    
+    return tau, sigma2
+
 def ar1_sim(y, p, t=None):
     '''Simulate AR(1) process(es) with sample autocorrelation value
 
@@ -403,7 +424,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         
         - colored_noise : colored noise with one scaling slope
         - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
-        - ar1 : AR(1) series
+        - ar1 : AR(1) series, with default autocorrelation of 0.5
 
     t : array
         the time axis
@@ -447,7 +468,6 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
     tsm_args[model].update(kwargs)
 
     v = tsm[model](t=t, **tsm_args[model])
-    #ts = Series(time=t, value=v)
 
     return t, v
 
