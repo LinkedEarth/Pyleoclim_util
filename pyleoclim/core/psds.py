@@ -283,7 +283,7 @@ class PSD:
         if method not in ['ar1sim', 'ar1asym']:
                 raise ValueError("The available methods are 'ar1sim' and 'ar1asym'")
 
-        if method == 'ar1sim':
+        if method in ['ar1sim', 'uar1']:
             signif_scals = None
             if scalogram:
                 try:
@@ -359,7 +359,7 @@ class PSD:
                 s = PSD(frequency=self.frequency, amplitude = item, label=label)
                 ms_base.append(s)
                 new.signif_qs = MultiplePSD(ms_base)
-
+            
         return new
 
     def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
