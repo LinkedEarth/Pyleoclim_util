@@ -11,6 +11,10 @@ import numpy as np
 from pyleoclim.utils import tsmodel
 
 
+def uneven_ar1(nt =100):  # define your function here
+
+    return t, v
+
 def test_ar1fit_ml_t0():
     '''
     Tests whether this method works well on an evenly-spaced AR(1) process
