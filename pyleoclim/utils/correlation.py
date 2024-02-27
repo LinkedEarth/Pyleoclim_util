@@ -85,7 +85,7 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
         (r, signif, p) = corr_ttest(y1, y2, alpha=alpha)
     elif method == 'isopersistent':
         
-        #(r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
+        (r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
     elif method == 'isospectral':
         (r, signif, p) = corr_isospec(y1, y2, alpha=alpha, nsim=nsim)
         

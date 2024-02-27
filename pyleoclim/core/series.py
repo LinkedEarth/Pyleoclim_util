@@ -3490,10 +3490,11 @@ class Series:
                                                  method=method, settings=surr_settings)
             ts1_surr = ts1.timeseries.surrogates(number=number, seed=seed, 
                                                  method=method, settings=surr_settings)
-            for i in range(number)
+            #for i in range(number):
             
+                # do something
 
-        #corr_res = corrutils.corr_sig(value1, value2, **corr_args)
+            #corr_res = corrutils.corr_sig(value1, value2, **corr_args)
         signif = True if corr_res['signif'] == 1 else False
         corr = Corr(corr_res['r'], corr_res['p'], signif, alpha)
 
@@ -3606,7 +3607,7 @@ class Series:
         Parameters
         ----------
 
-        method : {ar1sim}
+        method : {ar1sim, phaseran}
             Uses an AR1 model to generate surrogates of the timeseries
 
         number : int
@@ -3645,15 +3646,26 @@ class Series:
             np.random.seed(seed)
 
         surr_res = surrogate_func[method](self.value, number, **args[method])
+        # TODO: extract parameters for parametric methods
+        
         if len(np.shape(surr_res)) == 1:
             surr_res = surr_res[:, np.newaxis]
 
         s_list = []
-        for s in surr_res.T:
-            s_tmp = Series(time=self.time, value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit, verbose=False)
+        for i,s in enumerate(surr_res.T):
+            s_tmp = Series(time=self.time, value=s,  # will need reformation after ar1fit_ml pull
+                           time_name=self.time_name,  
+                           time_unit=self.time_unit, 
+                           value_name=self.value_name, 
+                           value_unit=self.value_unit, 
+                           label = self.label + " surrogate " + str(i),
+                           verbose=False, auto_time_params=True)
             s_list.append(s_tmp)
 
-        surr = SurrogateSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])
+        surr = SurrogateSeries(series_list=s_list, 
+                               name = self.label,
+                               surrogate_method=method, 
+                               surrogate_args=args[method])
 
         return surr
 
