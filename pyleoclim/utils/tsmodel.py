@@ -21,6 +21,10 @@ __all__ = [
     'gen_ts'
 ]
 
+
+# for MLE estimation of tau_0
+from scipy.optimize import minimize
+
 def ar1_model(t, tau, output_sigma=1):
     ''' Simulate AR(1) process with REDFIT
     
@@ -97,26 +101,10 @@ def ar1_fit(y, t=None):
 
     return g
 
-def ar1fit_ml(y, t=None):
-    '''
-    Does the same thing as ar1_fit, but BETTER
 
-    Parameters
-    ----------
-    y : TYPE
-        DESCRIPTION.
-    t : TYPE, optional
-        DESCRIPTION. The default is None.
 
-    Returns
-    -------
-    None.
 
-    '''
-    
-    #TODO: COPY YOUR CODE HERE
-    
-    return tau, sigma2
+
 
 def ar1_sim(y, p, t=None):
     '''Simulate AR(1) process(es) with sample autocorrelation value
