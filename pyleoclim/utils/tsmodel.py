@@ -9,21 +9,24 @@ from statsmodels.tsa.arima.model import ARIMA
 from .tsbase import (
     is_evenly_spaced
 )
-#from .tsutils import preprocess   # no longer used here
 from scipy import optimize
+from scipy.optimize import minimize # for MLE estimation of tau_0
+
 
 __all__ = [
     'ar1_sim',
     'ar1_fit',
+    'ar1_fit_ml',
     'colored_noise',
     'colored_noise_2regimes',
     'gen_ar1_evenly',
-    'gen_ts'
+    'gen_ts',
+    'tau_estimation'
 ]
 
 
-# for MLE estimation of tau_0
-from scipy.optimize import minimize
+
+
 
 def ar1_model(t, tau, output_sigma=1):
     ''' Simulate AR(1) process with REDFIT
@@ -169,6 +172,8 @@ def ar1_sim(y, p, t=None):
 
 def gen_ar1_evenly(t, g, scale=1, burnin=50):
     ''' Generate AR(1) series samples
+    
+    MARK FOR DEPRECATION once ar1fit_ml is adopted
 
     Wrapper for the function `statsmodels.tsa.arima_process.arma_generate_sample <https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_process.arma_generate_sample.html>`_.
     used to generate an ARMA
@@ -236,7 +241,6 @@ def ar1_fit_evenly(y):
     return g
 
 def tau_estimation(y, t):
-#  def tau_estimation(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
     ''' Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     Esimtates the temporal decay scale of an (un)evenly spaced time series. 
@@ -263,17 +267,12 @@ def tau_estimation(y, t):
         Comput. Geosci. 28, 69–72 (2002).
 
     '''
-    #  pd_y = preprocess(y, t, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
     dt = np.diff(t)
-    #  assert dt > 0, "The time point should be increasing!"
 
     def ar1_fun(a):
-        #  return np.sum((pd_y[1:] - pd_y[:-1]*a**dt)**2)
         return np.sum((y[1:] - y[:-1]*a**dt)**2)
 
     a_est = optimize.minimize_scalar(ar1_fun, bounds=[0, 1], method='bounded').x
-    #  a_est = optimize.minimize_scalar(ar1_fun, method='brent').x
-
     tau_est = -1 / np.log(a_est)
 
     return tau_est
@@ -458,6 +457,78 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
     v = tsm[model](t=t, **tsm_args[model])
 
     return t, v
+
+
+
+
+
+
+
+
+def n_ll_unevenly_spaced_ar1(theta, y, t):
+  """
+    Compute the negative log-likelihood of an evenly/unevenly spaced AR1 model.
+    It is assumed that the vector theta is initialized with log of tau and log of sigma 2.
+      
+    Parameters
+    ----------
+    theta: array, length 2 
+        the first value is tau_0, the second value sigma^2.
+    y: array,length n 
+        The vector of observations.
+        
+    t: array,length n,
+        the vector of time values.
+  
+    Returns:
+      float. The value of the negative log likelihood evalued with the arguments provided (theta, y, t).
+  """
+  # define n
+  n = len(y)
+  log_tau_0 = theta[0]
+  log_sigma_2_0 = theta[1]
+  tau_0 = np.exp(log_tau_0)
+  sigma_2 = np.exp(log_sigma_2_0)
+  delta = np.diff(t)
+  phi = np.exp((-delta / tau_0))
+  term_1 =  y[1:n] - (phi * y[0:(n-1)])
+  term_2 = pow(term_1, 2)
+  term_3 = term_2 / (1- pow(phi, 2))
+  term_4 = 1/(sigma_2 * n) *sum(term_3)
+  term_5 = 1/n * sum(np.log(1-pow(phi,2)))
+  nll = np.log(2*np.pi) + np.log(sigma_2) + term_5 + term_4
+  return(nll)
+
+
+
+def ar1_fit_ml(y, t):
+    '''
+   Estimate parameters tau_0 and sigma_2_0 based on the MLE
+
+    Parameters
+    ----------
+    y : An array of the values of the time series
+        Values of the times series.
+    t : An array of the time index values of the time series
+        Time index values of the time series
+
+    Returns:
+        An array containing the estimated parameters tau_0_hat and sigma_2_hat, first entry is tau_0_hat, second entry is sigma_2_hat
+    -------
+    None.
+
+    '''
+    # obtain initial value for tau_0
+    tau_initial_value = tau_estimation(y= y, t = t)
+    # obtain initial value for sifma_2_0
+    sigma_2_initial_value = np.var(y)
+    # obtain MLE 
+    optim_res = minimize(n_ll_unevenly_spaced_ar1, x0=[np.log(tau_initial_value), np.log(sigma_2_initial_value)], args=(y,t), method='nelder-mead', options={'xatol': 1e-10, 'disp': False, 'maxiter': 1000})
+    # transform back parameters
+    theta_hat = np.exp(optim_res.x)
+    
+    return theta_hat
+
 
 # def fBMsim(N=128, H=0.25):
 #     '''Simple method to generate fractional Brownian Motion
