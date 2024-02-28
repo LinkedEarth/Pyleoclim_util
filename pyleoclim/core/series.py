@@ -3634,26 +3634,43 @@ class Series:
 
         '''
         settings = {} if settings is None else settings.copy()
-        surrogate_func = {
-            'ar1sim': tsmodel.ar1_sim,
-            'phaseran': tsutils.phaseran
-        }
+        # surrogate_func = {
+        #     'ar1sim': tsmodel.ar1_sim,
+        #     'phaseran': tsutils.phaseran
+        # }
         args = {}
-        args['ar1sim'] = {'t': self.time}
+        time = self.time
+        args['ar1sim'] = {'t': time}
+        args['phaseran'] = {}
         args[method].update(settings)
 
         if seed is not None:
             np.random.seed(seed)
 
-        surr_res = surrogate_func[method](self.value, number, **args[method])
+        if method == 'ar1sim':
+            surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
+        elif method == 'phaseran':
+            surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
+            #if len(time) % 2 == 0:
+            #    time = time[0:-1]
+        # elif method == 'ar1_ml':
+        #     # TODO : implement Lionel's ML method
+        # elif method == 'power-law':
+        #     # TODO : implement Stochastic
+        # elif method == 'fBm':
+        #      # TODO : implement Stochastic
+            
+        #surr_res = surrogate_func[method](self.value, number, **args[method])
         # TODO: extract parameters for parametric methods
         
         if len(np.shape(surr_res)) == 1:
             surr_res = surr_res[:, np.newaxis]
 
         s_list = []
-        for i,s in enumerate(surr_res.T):
-            s_tmp = Series(time=self.time, value=s,  # will need reformation after ar1fit_ml pull
+        for i, s in enumerate(surr_res.T):
+            print(len(s),len(time))
+                
+            s_tmp = Series(time=time, value=s,  # will need reformation after ar1fit_ml pull
                            time_name=self.time_name,  
                            time_unit=self.time_unit, 
                            value_name=self.value_name, 
@@ -3663,7 +3680,7 @@ class Series:
             s_list.append(s_tmp)
 
         surr = SurrogateSeries(series_list=s_list, 
-                               name = self.label,
+                               label = self.label,
                                surrogate_method=method, 
                                surrogate_args=args[method])
 
