@@ -17,7 +17,7 @@ __all__ = [
     'ar1_fit',
     'ar1_fit_ml',
     'ar1_sim',
-    'ar1_sim_frankenstein',
+    'ar1_sim_geneva',
     'colored_noise',
     'colored_noise_2regimes',
     'gen_ar1_evenly',
