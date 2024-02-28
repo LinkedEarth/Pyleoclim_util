@@ -14,18 +14,16 @@ from scipy.optimize import minimize # for MLE estimation of tau_0
 
 
 __all__ = [
-    'ar1_sim',
     'ar1_fit',
     'ar1_fit_ml',
+    'ar1_sim',
+    'ar1_sim_frankenstein',
     'colored_noise',
     'colored_noise_2regimes',
     'gen_ar1_evenly',
     'gen_ts',
     'tau_estimation'
 ]
-
-
-
 
 
 def ar1_model(t, tau, output_sigma=1):
@@ -106,13 +104,62 @@ def ar1_fit(y, t=None):
 
 
 
+def ar1_sim_geneva(n=200, tau_0=5, sigma_2_0=2, seed=123, scale_parameter_delta_t=1, evenly_spaced = False):
+  """
+  Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
+  In case parameter evenly_spaced is True, delta_t  (spacing between time points) is a vector of 1, if evenly_spaced is False, delta_t are generated from an exponential distribution.
+  
+  Parameters
+  ----------
+  n: integer. 
+      The length of the time series, 
+  tau_0: float
+      Parameter of the unevenly AR1 model.
+  sigma_0: float
+      Parameter of the unevenly AR1 model.
+  seed: integer
+      Random seed for reproducible results.
+  scale_parameter_delta_t: parameter of the exponential distribution for generating the delta_t.
 
+  Returns
+  -------
+    
+      A tuple with three arrays (the data y, the time index t and the delta_t of the generated time series).
+  
+  """
+  # generate delta-t depending on the parameter evenly_spaced
+  if evenly_spaced:
+      t_delta = [1]*n
+  else:
+      np.random.seed(seed)
+      # consider generation of the delta_t from an exponential distribution
+      t_delta= np.random.exponential(scale = scale_parameter_delta_t, size=n)
+  # obtain the time index from the delta_t distribution
+  t = np.cumsum(t_delta)
+    
+  # create empty vector
+  y = np.empty(n)
+  
+  # generate unevenly spaced AR1
+  np.random.seed(seed)
+  z = np.random.normal(loc=0, scale=1, size=n)
+  y[0] = z[0]
+  for i in range(1,n):
+    delta_i = t[i] - t[i-1] 
+    phi_i = np.exp(-delta_i / tau_0)
+    sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
+    sigma_i = np.sqrt(sigma_2_i)
+    y[i] = phi_i * y[i-1] + sigma_i * z[i]
+  return y, t, t_delta
 
 
 def ar1_sim(y, p, t=None):
     '''Simulate AR(1) process(es) with sample autocorrelation value
-
+    
     Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
+
+    Will be replaced by ar1_sim_geneva in a future release
+
 
     Parameters
     ----------
