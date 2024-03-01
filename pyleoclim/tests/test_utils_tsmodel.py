@@ -16,15 +16,26 @@ def test_ar1fit_ml(evenly_spaced):
     Tests whether this method works well on an AR(1) process with known parameters
 
     '''
+    # define tolerance
     tol = .3
     
-    y, t, t_delta  = tsmodel.ar1_sim_geneva(evenly_spaced=evenly_spaced)
-    theta_hat = tsmodel.ar1_fit_ml(y, t)
+    # create p=50 time series
+    y_sim, t_sim = tsmodel.ar1_sim_geneva(evenly_spaced=evenly_spaced, p = 100)
+
+    # Create an empty matrix to store estimated parameters
+    theta_hat_matrix = np.empty((y_sim.shape[1], 2))
+    
+    # estimate parameters for each time series
+    for j in range(y_sim.shape[1]):
+        theta_hat_matrix[j,:]  = tsmodel.ar1_fit_ml(y_sim[:, j], t_sim[:, j])
+    
+    # compute mean of estimated param for each simulate ts
+    theta_hat_bar = np.mean(theta_hat_matrix, axis=0)
     
     # test that 
     
-    assert np.abs(theta_hat[0]-5) < tol
-    assert np.abs(theta_hat[1]-2) < tol
+    assert np.abs(theta_hat_bar[0]-5) < tol
+    assert np.abs(theta_hat_bar[1]-2) < tol
     
     
 

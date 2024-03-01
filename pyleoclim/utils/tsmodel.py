@@ -104,10 +104,11 @@ def ar1_fit(y, t=None):
 
 
 
-def ar1_sim_geneva(n=200, tau_0=5, sigma_2_0=2, seed=123, scale_parameter_delta_t=1, evenly_spaced = False):
+def ar1_sim_geneva(n=200, tau_0=5, sigma_2_0=2, seed=123, p=1, delta_t_dist = "exponential", scale_exp_delta_t=1, lambda_poisson_delta_t= 1, scale_pareto_delta_t = 1, shape_pareto_delta_t=1, value_random_choice=[1,2], prob_random_choice=[.95,.05], evenly_spaced = False):
   """
   Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
-  In case parameter evenly_spaced is True, delta_t  (spacing between time points) is a vector of 1, if evenly_spaced is False, delta_t are generated from an exponential distribution.
+  In case parameter evenly_spaced is True, delta_t  (spacing between time points) is a vector of 1, 
+  if evenly_spaced is False, delta_t can be generated from various distribution (exponential, pareto, poisson and random choice).
   
   Parameters
   ----------
@@ -119,38 +120,93 @@ def ar1_sim_geneva(n=200, tau_0=5, sigma_2_0=2, seed=123, scale_parameter_delta_
       Parameter of the unevenly AR1 model.
   seed: integer
       Random seed for reproducible results.
-  scale_parameter_delta_t: parameter of the exponential distribution for generating the delta_t.
+  p: integer
+      Parameter specifying the number of time series to generate
+  delta_t_dist: string
+                parameter specifying the distribution that generate the delta_t
+  scale_exp_delta_t: float
+                     Scale parameter for the exponential distribution
+  lambda_poisson_delta_t: float
+                       parameter for the Poisson distribution                   
+  scale_pareto_delta_t: float 
+                        Scale parameter for the Pareto distribution, see https://numpy.org/doc/stable/reference/random/generated/numpy.random.pareto.html
+  shape_pareto_delta_t: float 
+                        Shape parameter for the Pareto distribution, see https://numpy.org/doc/stable/reference/random/generated/numpy.random.pareto.html
+  value_random_choice: 1-D array-like 
+                       elements from which the random sample is generated 
+  prob_random_choice= 1-D array-like 
+                      probabilities associated with each entry value_random_choice
 
   Returns
   -------
-    
-      A tuple with three arrays (the data y, the time index t and the delta_t of the generated time series).
+  A tuple of 2 arrays  
+    y_sim : array
+    n by p matrix of simulated AR(1) vector
+    t_sim : array
+    n by p matrix of t vector
   
   """
-  # generate delta-t depending on the parameter evenly_spaced
-  if evenly_spaced:
-      t_delta = [1]*n
-  else:
-      np.random.seed(seed)
-      # consider generation of the delta_t from an exponential distribution
-      t_delta= np.random.exponential(scale = scale_parameter_delta_t, size=n)
-  # obtain the time index from the delta_t distribution
-  t = np.cumsum(t_delta)
-    
-  # create empty vector
-  y = np.empty(n)
   
-  # generate unevenly spaced AR1
-  np.random.seed(seed)
-  z = np.random.normal(loc=0, scale=1, size=n)
-  y[0] = z[0]
-  for i in range(1,n):
-    delta_i = t[i] - t[i-1] 
-    phi_i = np.exp(-delta_i / tau_0)
-    sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
-    sigma_i = np.sqrt(sigma_2_i)
-    y[i] = phi_i * y[i-1] + sigma_i * z[i]
-  return y, t, t_delta
+  # checks
+  
+  # check for a valid distribution if not evenly spaced
+  valid_distributions = ["exponential", "poisson", "pareto", "random_choice"]
+  if delta_t_dist not in valid_distributions and evenly_spaced == False :
+      raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', or 'random_choice'.")
+
+  # check that parameters are correclty provided when specifying a distribution (for now I have put some default value, but these checks may be useful if we define their initial value as None)
+  if delta_t_dist == "exponential" and scale_exp_delta_t is None:
+      raise ValueError("scale_exp_delta_t must be provided for exponential distribution.")
+  elif delta_t_dist == "poisson" and lambda_poisson_delta_t is None:
+      raise ValueError("lambda_poisson_delta_t must be provided for Poisson distribution.")
+  elif delta_t_dist == "pareto" and (shape_pareto_delta_t is None or scale_pareto_delta_t is None):
+      raise ValueError("shape_pareto_delta_t and scale_pareto_delta_t must be provided for Pareto distribution.")
+  elif delta_t_dist == "random_choice" and (value_random_choice is None or prob_random_choice is None):
+      raise ValueError("value_random_choice and prob_random_choice must be provided for random choice distribution.")
+  # check for same length in the parameters of random choice (values and parameters)
+  if delta_t_dist == "random_choice"  and len(value_random_choice) != len(prob_random_choice):
+        raise ValueError("value_random_choice and prob_random_choice must have the same size.")
+        
+  
+  # declare two array to save the values and the time index
+  y_sim = np.empty(shape=(n, p)) 
+  t_sim = np.empty(shape=(n, p)) 
+
+  # generate p time series
+  for j in np.arange(p): 
+      if evenly_spaced: 
+          t_delta = [1]*n # for now we assume delta_t = 1 if evenly sampled, potentially to improve with a parameter that specify the time spacing
+      else:
+          np.random.seed(seed+j)
+          if delta_t_dist == "exponential":
+              # generation of the delta_t from an exponential distribution
+              t_delta= np.random.exponential(scale = scale_exp_delta_t, size=n)
+          elif delta_t_dist == "poisson":
+              t_delta = np.random.poisson(lam = lambda_poisson_delta_t,size = n) + 1
+          elif delta_t_dist == "pareto":
+              t_delta = (np.random.pareto(shape_pareto_delta_t, n) + 1) * scale_pareto_delta_t
+          else :
+              t_delta = np.random.choice(value_random_choice, size=n, p=prob_random_choice)
+      
+      # obtain the time index from the delta_t distribution
+      t = np.cumsum(t_delta)
+        
+      # create empty vector
+      y = np.empty(n)
+      
+      # generate unevenly spaced AR1
+      np.random.seed(seed+j)
+      z = np.random.normal(loc=0, scale=1, size=n)
+      y[0] = z[0] 
+      for i in range(1,n): 
+          delta_i = t[i] - t[i-1] 
+          phi_i = np.exp(-delta_i / tau_0)
+          sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
+          sigma_i = np.sqrt(sigma_2_i)
+          y[i] = phi_i * y[i-1] + sigma_i * z[i]
+      t_sim[:, j] = t
+      y_sim[:, j] = y
+  return y_sim, t_sim
 
 
 def ar1_sim(y, p, t=None):
