@@ -3,6 +3,7 @@ The EnsembleSeries class is a child of MultipleSeries, designed for ensemble app
 In addition to a MultipleSeries object, an EnsembleSeries object has the following properties:
 - All series members are assumed to share the same units and other metadata.
 - The class enables ensemble-oriented methods for computation (e.g., quantiles) and visualization (e.g., envelope plot).    
+
 """
 
 from ..utils import plotting
@@ -1193,5 +1194,4 @@ class EnsembleSeries(MultipleSeries):
         else:
             return vals
             
-        
         

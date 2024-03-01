@@ -58,7 +58,7 @@ class MultipleSeries:
         soi = pyleo.utils.load_dataset('SOI')
         nino = pyleo.utils.load_dataset('NINO3')
         ms = soi & nino
-        ms.name = 'ENSO'
+        ms.label = 'ENSO'
         ms
                 
     '''

@@ -5,13 +5,12 @@ SurrogateSeries is a child of MultipleSeries, designed for Monte Carlo tests
 """
 
 from ..core.multipleseries import MultipleSeries
-#from ..core.ensembleseries import EnsembleSeries
 
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR(1))
 
     Surrogate Series is a child of MultipleSeries. All methods available for MultipleSeries are available for surrogate series.
-    EnsembleSeries would be a more logical choice
+    EnsembleSeries would be a more logical choice, but it creates circular imports that break the package. 
     '''
     def __init__(self, series_list, label, surrogate_method=None, surrogate_args=None): 
         self.series_list = series_list

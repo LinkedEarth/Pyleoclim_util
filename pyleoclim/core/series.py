@@ -8,7 +8,6 @@ How to create and manipulate such objects is described in a short example below,
 """
 
 import datetime as dt
-#import operator
 import re
 
 from ..utils import tsutils, plotting, tsmodel, tsbase, lipdutils, jsonutils
@@ -30,11 +29,9 @@ from ..core.resolution import Resolution
 
 import seaborn as sns
 import matplotlib.pyplot as plt
-#import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
 import numpy as np
 import pandas as pd
 
-#from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 import matplotlib.colors as mcolors
@@ -3650,9 +3647,9 @@ class Series:
         if method == 'ar1sim':
             surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
         elif method == 'phaseran':
-            surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
-            #if len(time) % 2 == 0:
-            #    time = time[0:-1]
+            surr_res = tsutils.phaseran(self.value, number, **args[method])
+            if len(time) % 2 == 0:
+                time = time[0:-1]
         # elif method == 'ar1_ml':
         #     # TODO : implement Lionel's ML method
         # elif method == 'power-law':
@@ -3668,7 +3665,6 @@ class Series:
 
         s_list = []
         for i, s in enumerate(surr_res.T):
-            print(len(s),len(time))
                 
             s_tmp = Series(time=time, value=s,  # will need reformation after ar1fit_ml pull
                            time_name=self.time_name,  
