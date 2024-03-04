@@ -248,8 +248,9 @@ class MultivariateDecomp:
             - gridspec_kwargs: dict; Optional values for adjusting the arrangement of the colorbar, map and legend in the map subplot
             - legend: bool; Whether to draw a legend on the figure. Default is True
             - colorbar: bool; Whether to draw a colorbar on the figure if the data associated with hue are numeric. Default is True
-            The default is None.
-            
+            - color_scale_type : str; Setting to "discrete" will force a discrete color scale with a default bin number of max(11, n) where n=number of unique values$^{\frac{1}{2}}$. Default is None
+            - scalar_mappable: matplotlib.cm.ScalarMappable; can be used to pass a matplotlib scalar mappable. See pyleoclim.utils.plotting.make_scalar_mappable for documentation on using the Pyleoclim utility, or the `Matplotlib tutorial on customizing colorbars <https://matplotlib.org/stable/users/explain/colors/colorbar_only.html>`_.
+
         scatter_kwargs : dict, optional
             Optional arguments configuring how data are plotted on a map. See description of scatter_kwargs in pyleoclim.utils.mapping.scatter_map
 
@@ -275,6 +276,7 @@ class MultivariateDecomp:
         ax : dict
             dictionary of matplotlib ax
 
+
         See also
         --------
 
@@ -285,6 +287,50 @@ class MultivariateDecomp:
         pyleoclim.utils.tsutils.eff_sample_size : Effective sample size
 
         pyleoclim.utils.mapping.scatter_map : mapping
+
+        pyleoclim.utils.plotting.make_scalar_mappable : Custom scalar mappable
+
+
+
+        Examples
+        --------
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+            from pylipd.utils.dataset import load_dir
+            lipd = load_dir(name='Pages2k') # this loads a small subset of the PAGES 2k database
+            lipd_euro = lipd.filter_by_geo_bbox(-20,20,40,80)
+            df = lipd_euro.get_timeseries_essentials()
+            dfs = df.query("archiveType in ('tree') & paleoData_variableName not in ('year')")
+            # place in a MultipleGeoSeries object
+            ts_list = []
+            for _, row in dfs.iterrows():
+                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
+                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                               elevation = row['geo_meanElev'], observationType = row['paleoData_proxy'],
+                                               archiveType = row['archiveType'], verbose = False,
+                                               label=row['dataSetName']+'_'+row['paleoData_variableName']))
+
+            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')
+
+            res = Euro2k.common_time().pca() # carry out PCA
+
+            # Dashboard with hue as a legend category
+            res.modeplot(index=1, marker='observationType', size='elevation', scatter_kwargs= dict(marker_var='observationType'),
+                map_kwargs= dict(colorbar=False))
+
+            # Dashboard with discrete colorbar
+            res.modeplot(index=1, marker='observationType', size='elevation', scatter_kwargs= dict(marker_var='observationType'),
+                map_kwargs= dict(color_scale_type='discrete'))
+
+            # Dashboard with custom scalar mappable
+            sm = pyleo.utils.mapping.make_scalar_mappable(cmap='vlag', hue_vect=res.eigvecs[:, 1], n=21,norm_kwargs={'vcenter': -.5})
+            res.modeplot(index=1, marker='observationType', size='elevation', scatter_kwargs= dict(marker_var='observationType'),
+                 map_kwargs= dict(scalar_mappable=sm))
+
+
         
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
@@ -358,6 +404,7 @@ class MultivariateDecomp:
 
         legend = map_kwargs.pop('legend', True)
         colorbar = map_kwargs.pop('colorbar', True)
+        color_scale_type = map_kwargs.pop('color_scale_type', None)
 
         if isinstance(self.orig, MultipleGeoSeries):
             # This makes a bare bones dataframe from a MultipleGeoSeries object
@@ -374,9 +421,9 @@ class MultivariateDecomp:
                                                rivers=rivers, lakes=lakes,
                                                ocean=ocean, land=land, extent=extent,
                                                figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
-                                               gridspec_kwargs=map_gridspec_kwargs, colorbar=colorbar,
+                                               gridspec_kwargs=map_gridspec_kwargs, colorbar=colorbar, color_scale_type=color_scale_type,
                                                legend=legend, cmap=cmap,
-                                               fig=fig, gs_slot=gs[-1, :]) #label rf'$EOF_{index + 1}$'
+                                               fig=fig, gs_slot=gs[-1, :], **map_kwargs) #label rf'$EOF_{index + 1}$'
             
         else: # it must be a plain old MultipleSeries. No map for you! Just a spaghetti plot with the standardizes series
             ax['map'] = fig.add_subplot(gs[1:, :])

@@ -85,7 +85,7 @@ class MultipleGeoSeries(MultipleSeries):
 
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
             edgecolor='k', projection='auto',
-            proj_default=True, crit_dist=5000, colorbar=True,
+            proj_default=True, crit_dist=5000, colorbar=True,color_scale_type=None,
             background=True, borders=False, coastline=True,rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, scatter_kwargs=None, gridspec_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
@@ -179,6 +179,10 @@ class MultipleGeoSeries(MultipleSeries):
         colorbar : bool, optional
             Whether to draw a colorbar on the figure if the data associated with hue are numeric.
             Default is True.
+
+        color_scale_type : str, optional
+            Setting to "discrete" will force a discrete color scale with a default bin number of max(11, n) where n=number of unique values$^{\frac{1}{2}}$
+            Default is None
 
         lgd_kwargs : dict, optional
             Dictionary of arguments for `matplotlib.pyplot.legend <https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html>`_.
