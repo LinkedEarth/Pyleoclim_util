@@ -186,6 +186,7 @@ class MultivariateDecomp:
                  title=None, title_kwargs=None, spec_method='mtm', cmap=None,
                  hue='EOF', marker=None, size=None, scatter_kwargs=None,
                  flip = False, map_kwargs=None, gridspec_kwargs=None):
+
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -291,47 +292,6 @@ class MultivariateDecomp:
         pyleoclim.utils.plotting.make_scalar_mappable : Custom scalar mappable
 
 
-
-        Examples
-        --------
-        .. jupyter-execute::
-
-            import pyleoclim as pyleo
-            from pylipd.utils.dataset import load_dir
-            lipd = load_dir(name='Pages2k') # this loads a small subset of the PAGES 2k database
-            lipd_euro = lipd.filter_by_geo_bbox(-20,20,40,80)
-            df = lipd_euro.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree') & paleoData_variableName not in ('year')")
-            # place in a MultipleGeoSeries object
-            ts_list = []
-            for _, row in dfs.iterrows():
-                ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
-                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
-                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
-                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
-                                               elevation = row['geo_meanElev'], observationType = row['paleoData_proxy'],
-                                               archiveType = row['archiveType'], verbose = False,
-                                               label=row['dataSetName']+'_'+row['paleoData_variableName']))
-
-            Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')
-
-            res = Euro2k.common_time().pca() # carry out PCA
-
-            # Dashboard with hue as a legend category
-            res.modeplot(index=1, marker='observationType', size='elevation', scatter_kwargs= dict(marker_var='observationType'),
-                map_kwargs= dict(colorbar=False))
-
-            # Dashboard with discrete colorbar
-            res.modeplot(index=1, marker='observationType', size='elevation', scatter_kwargs= dict(marker_var='observationType'),
-                map_kwargs= dict(color_scale_type='discrete'))
-
-            # Dashboard with custom scalar mappable
-            sm = pyleo.utils.mapping.make_scalar_mappable(cmap='vlag', hue_vect=res.eigvecs[:, 1], n=21,norm_kwargs={'vcenter': -.5})
-            res.modeplot(index=1, marker='observationType', size='elevation', scatter_kwargs= dict(marker_var='observationType'),
-                 map_kwargs= dict(scalar_mappable=sm))
-
-
-        
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
         
@@ -405,6 +365,13 @@ class MultivariateDecomp:
         legend = map_kwargs.pop('legend', True)
         colorbar = map_kwargs.pop('colorbar', True)
         color_scale_type = map_kwargs.pop('color_scale_type', None)
+
+        if marker is None:
+            marker = scatter_kwargs.pop('marker', None)
+        if hue is None:
+            hue = scatter_kwargs.pop('hue', None)
+        if size is None:
+            size = scatter_kwargs.pop('size', None)
 
         if isinstance(self.orig, MultipleGeoSeries):
             # This makes a bare bones dataframe from a MultipleGeoSeries object

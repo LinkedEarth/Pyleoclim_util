@@ -782,11 +782,19 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             scatter_kwargs['edgecolor'] = edgecolor
 
         hue_var = hue_var if hue_var in _df.columns else None
-        hue_var_type_numeric = pd.to_numeric(_df[hue_var], errors='coerce').notnull().all()
+        hue_var_type_numeric=False
+        if hue_var is not None:
+            hue_var_type_numeric = pd.to_numeric(_df[hue_var], errors='coerce').notnull().all()
+
         marker_var = marker_var if marker_var in _df.columns else None
-        marker_var_type_numeric = pd.to_numeric(_df[marker_var], errors='coerce').notnull().all()
+        marker_var_type_numeric=False
+        if marker_var is not None:
+            marker_var_type_numeric = pd.to_numeric(_df[marker_var], errors='coerce').notnull().all()
+
         size_var = size_var if size_var in _df.columns else None
-        size_var_type_numeric = pd.to_numeric(_df[size_var], errors='coerce').notnull().all()
+        size_var_type_numeric = False
+        if size_var is not None:
+            size_var_type_numeric = pd.to_numeric(_df[size_var], errors='coerce').notnull().all()
 
         trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if
                       ((trait_var != None) and (trait_var in _df.columns))]

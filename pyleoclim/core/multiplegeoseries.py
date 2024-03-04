@@ -410,6 +410,33 @@ class MultipleGeoSeries(MultipleSeries):
                                     'gridspec_kwargs': {'width_ratios': [.5, 1,14, 4], 'wspace':-.065},
                                     'lgd_kwargs':{'bbox_to_anchor':[-.015,1]}})
 
+
+        One can also configure how hue information gets displayed:
+
+        .. jupyter-execute::
+
+            # Dashboard with hue as a legend category
+            res.modeplot(index=1, size='elevation', map_kwargs= dict(colorbar=False))
+
+            # Dashboard with discrete colorbar
+            res.modeplot(index=1, size='elevation', map_kwargs= dict(color_scale_type='discrete'))
+
+            # Dashboard with custom scalar mappable
+            sm = pyleo.utils.mapping.make_scalar_mappable(cmap='vlag', hue_vect=res.eigvecs[:, 1], n=21,norm_kwargs={'vcenter': -.5})
+            res.modeplot(index=1, size='elevation', map_kwargs= dict(scalar_mappable=sm))
+
+
+        and customize the marker variable:
+
+        .. jupyter-execute::
+
+            # Dashboard with marker set to archiveType
+            res.modeplot(index=1, marker='archiveType', size='elevation', map_kwargs= dict(colorbar=True))
+
+            # Dashboard with marker set to archiveType
+            res.modeplot(index=1, marker='observationType', size='elevation', map_kwargs= dict(colorbar=True))
+
+
         '''
         # apply PCA fom parent class
         pca_res = super().pca(weights=weights,missing=missing,tol_em=tol_em,
