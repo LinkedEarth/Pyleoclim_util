@@ -731,10 +731,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
         scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
         lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
+        kwargs = {} if type(kwargs) != dict else kwargs
         norm_kwargs = kwargs.pop('norm_kwargs', {})
         ax_sm = kwargs.pop('scalar_mappable', None)
-        print(ax_sm)
 
+        palette = None
+        hue_norm = None
         # if (color_scale_type is not None) and (colorbar is None):
         #         colorbar = True
 
@@ -876,15 +878,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             palette = {key: value[0] for key, value in plot_defaults.items()}
         elif type(hue_var) == str:
             hue_data = _df[_df[hue_var] != missing_val]
-
-            palette = None
-            hue_norm = None
             # If scalar mappable was passed, try to extract components.
             if ax_sm is not None:
                 try:
                     palette = ax_sm.cmap
                 except:
-                    palette = None
                     ax_sm = None # if can't extract a palette, the scalar mappable is not helpful so set to None to trigger normal flow
                 try:
                     hue_norm = ax_sm.norm
@@ -946,6 +944,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             hue_data = _df[_df[hue_var] != missing_val]
             if hue_norm is not None:
                 scatter_kwargs['hue_norm'] = hue_norm
+
             sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var, transform=transform,
                             # change to transform=scatter_kwargs['transform']
                             style=marker_var, palette=palette, ax=ax, **scatter_kwargs)
