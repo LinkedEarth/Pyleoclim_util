@@ -3605,7 +3605,10 @@ class Series:
         ----------
 
         method : {ar1sim, phaseran}
-            Uses an AR1 model to generate surrogates of the timeseries
+            The method used to generate surrogates of the timeseries
+            
+            Note that phaseran assumes an odd number of samples. If the series 
+            has even length, the last point is dropped to satisfy this requirement
 
         number : int
             The number of surrogates to generate
@@ -3650,7 +3653,7 @@ class Series:
             surr_res = tsutils.phaseran(self.value, number, **args[method])
             if len(time) % 2 == 0:
                 time = time[0:-1]
-        # elif method == 'ar1_ml':
+        # elif method == 'ar1sim_geneva':
         #     # TODO : implement Lionel's ML method
         # elif method == 'power-law':
         #     # TODO : implement Stochastic
