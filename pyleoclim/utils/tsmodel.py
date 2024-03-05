@@ -104,47 +104,71 @@ def ar1_fit(y, t=None):
 
 
 
-def ar1_sim_geneva(n=200, tau_0=5, sigma_2_0=2, seed=123, p=1, delta_t_dist = "exponential", scale_exp_delta_t=1, lambda_poisson_delta_t= 1, scale_pareto_delta_t = 1, shape_pareto_delta_t=1, value_random_choice=[1,2], prob_random_choice=[.95,.05], evenly_spaced = False):
+def ar1_sim_geneva(n=200, tau_0=5, sigma_2_0=2, seed=123, p=1, 
+                   evenly_spaced = False, delta_t_dist = "exponential", 
+                   scale_exp_delta_t=1, lambda_poisson_delta_t= 1, 
+                   scale_pareto_delta_t = 1, shape_pareto_delta_t=1, 
+                   value_random_choice=[1,2], prob_random_choice=[.95,.05]):
   """
   Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
-  In case parameter evenly_spaced is True, delta_t  (spacing between time points) is a vector of 1, 
-  if evenly_spaced is False, delta_t can be generated from various distribution (exponential, pareto, poisson and random choice).
   
   Parameters
   ----------
-  n: integer. 
-      The length of the time series, 
+  n: integer
+      The length of the time series 
+      
   tau_0: float
-      Parameter of the unevenly AR1 model.
-  sigma_0: float
-      Parameter of the unevenly AR1 model.
+      Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
+      
+  sigma_2_0: float
+      Variance of the innovations 
+      
   seed: integer
       Random seed for reproducible results.
+      
   p: integer
       Parameter specifying the number of time series to generate
-  delta_t_dist: string
-                parameter specifying the distribution that generate the delta_t
+      
+  evenly_spaced: boolean     
+      if True, delta_t  (spacing between time points) is a vector of 1, 
+      if False, delta_t is generated from various distribution (exponential, pareto, poisson and random choice).  
+      
+  delta_t_dist: str
+      the distribution that generates the delta_t
+      possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
+      
   scale_exp_delta_t: float
-                     Scale parameter for the exponential distribution
+      Scale parameter for the exponential distribution
+      
   lambda_poisson_delta_t: float
-                       parameter for the Poisson distribution                   
+      parameter for the Poisson distribution    
+               
   scale_pareto_delta_t: float 
-                        Scale parameter for the Pareto distribution, see https://numpy.org/doc/stable/reference/random/generated/numpy.random.pareto.html
+      Scale parameter for the Pareto distribution, see https://numpy.org/doc/stable/reference/random/generated/numpy.random.pareto.html
+      
   shape_pareto_delta_t: float 
-                        Shape parameter for the Pareto distribution, see https://numpy.org/doc/stable/reference/random/generated/numpy.random.pareto.html
-  value_random_choice: 1-D array-like 
-                       elements from which the random sample is generated 
-  prob_random_choice= 1-D array-like 
-                      probabilities associated with each entry value_random_choice
+      Shape parameter for the Pareto distribution, see https://numpy.org/doc/stable/reference/random/generated/numpy.random.pareto.html
+      
+  value_random_choice: 2-list 
+      elements from which the random sample is generated # PLEASE EXPLAIN
+      
+  prob_random_choice: 2-list 
+      probabilities associated with each entry value_random_choice # PLEASE EXPLAIN                   
+       
 
   Returns
   -------
   A tuple of 2 arrays  
-    y_sim : array
-    n by p matrix of simulated AR(1) vector
-    t_sim : array
-    n by p matrix of t vector
-  
+    y_sim : n x p NumPy array 
+        matrix of simulated AR(1) vectors
+    t_sim : n x p NumPy array 
+        matrix of corresponding time axes
+        
+  See also
+  --------
+
+  pyleoclim.utils.tsmodel.ar1_fit_ml : Maximumum likelihood estimate of AR(1) parameters 
+      
   """
   
   # checks
@@ -189,7 +213,7 @@ def ar1_sim_geneva(n=200, tau_0=5, sigma_2_0=2, seed=123, p=1, delta_t_dist = "e
               t_delta = np.random.choice(value_random_choice, size=n, p=prob_random_choice)
       
       # obtain the time index from the delta_t distribution
-      t = np.cumsum(t_delta)
+      t = np.cumsum(t_delta)-1
         
       # create empty vector
       y = np.empty(n)
