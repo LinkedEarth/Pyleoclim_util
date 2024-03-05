@@ -612,7 +612,7 @@ def ar1_sim_geneva(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = Fals
 
 def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
     '''
-    Generate time increment vector according to a specific probability model
+    Generate a time increment vector according to a specific probability model
 
     Parameters
     ----------
@@ -623,24 +623,23 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
         Random seed for reproducible results.
         
     delta_t_dist: str
-        the distribution that generates the delta_t
+        the probability distribution of delta_t
         possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
         
         if 'exponential', `param` is expected to be a single scale parameter (traditionally denoted \lambda)
         if 'poisson', `param` is expected to be a single parameter (rate)
-        if 'pareto', expects a 2-list with the shape & scale parameters (in that order)
-        if 'random_choice', expects a 2-list containing the arrays:
-            
-            value_random_choice: ?
-                elements from which the random sample is generated # PLEASE EXPLAIN
-                
-            prob_random_choice: ?
-                probabilities associated with each entry value_random_choice # PLEASE EXPLAIN           
+        if 'pareto', expects a 2-list with 2 scalar shape & scale parameters (in that order)
+        if 'random_choice', expects a 2-list containing the arrays:      
+            value_random_choice: 
+                elements from which the random sample is generated (e.g. [1,2])
+            prob_random_choice: 
+                probabilities associated with each entry value_random_choice  (e.g. [.95,.05])
+            (These two arrays must be of the same size)
         
     Returns:
     -------
     
-    delta_t : n-array of time increments
+    delta_t : 1D array of time increments, length n
 
     '''
     # check for a valid distribution 
