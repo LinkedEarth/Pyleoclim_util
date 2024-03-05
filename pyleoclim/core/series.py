@@ -4125,6 +4125,9 @@ class Series:
 
         resolution = Resolution(
             resolution = res,
+            time = self.time,
+            resolution_unit=self.time_unit,
+            label=self.label,
             timeseries = copy
         )
 
