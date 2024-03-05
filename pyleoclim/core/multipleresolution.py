@@ -27,5 +27,6 @@ class MultipleResolution:
 
     '''
 
-    def __init__(self,resolution_list):
+    def __init__(self,resolution_list,time_unit):
         self.resolution_list = resolution_list
+        self.time_unit = time_unit
