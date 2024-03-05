@@ -17,10 +17,12 @@ def test_ar1fit_ml(evenly_spaced):
 
     '''
     # define tolerance
-    tol = .3
+    tol = .2
+    tau = 2
+    sigma_2 = 1
     
     # create p=50 time series
-    y_sim, t_sim = tsmodel.ar1_sim_geneva(evenly_spaced=evenly_spaced, p = 100)
+    y_sim, t_sim = tsmodel.ar1_sim_geneva(tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=evenly_spaced, p = 10)
 
     # Create an empty matrix to store estimated parameters
     theta_hat_matrix = np.empty((y_sim.shape[1], 2))
@@ -34,8 +36,8 @@ def test_ar1fit_ml(evenly_spaced):
     
     # test that 
     
-    assert np.abs(theta_hat_bar[0]-5) < tol
-    assert np.abs(theta_hat_bar[1]-2) < tol
+    assert np.abs(theta_hat_bar[0]-tau) < tol
+    assert np.abs(theta_hat_bar[1]-sigma_2) < tol
     
     
 
