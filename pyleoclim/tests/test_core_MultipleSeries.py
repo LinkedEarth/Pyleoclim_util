@@ -689,8 +689,25 @@ class TestSel:
 class TestUIMultipleSeriesTimeCoveragePlot:
     def test_time_coverage_plot_t0(self,multipleseries_basic):
         '''
-        test PCA output
+        test coverage plot
         '''
         ms = multipleseries_basic
         fig,ax = ms.time_coverage_plot()
         pyleo.closefig(fig)
+
+class TestUIMultipleSeriesResolution:
+    def test_time_coverage_plot_t0(self,multipleseries_basic):
+        '''
+        test resolution class
+        '''
+        ms = multipleseries_basic
+        ms.resolution()
+    def test_time_coverage_plot_t1(self):
+        '''
+        test resolution class with time unit
+        '''
+        co2ts = pyleo.utils.load_dataset('AACO2')
+        lr04 = pyleo.utils.load_dataset('LR04')
+        edc = pyleo.utils.load_dataset('EDC-dD')
+        ms = lr04.flip() & edc & co2ts # create MS object
+        ms.resolution(time_unit='kyr BP')
