@@ -2657,11 +2657,12 @@ class MultipleSeries:
         else:
             return ax
         
-    def resolution(self):
+    def resolution(self,time_unit=None,verbose=True):
         """Generate a MultipleResolution object
 
         Increments are assigned to the preceding time value.
-        E.g. for time_axis = [0,1,3], resolution.resolution = [1,2] resolution.time = [0,1]
+        E.g. for time_axis = [0,1,3], resolution.resolution = [1,2] resolution.time = [0,1].
+        Note that the MultipleResolution class requires a shared time unit. If the time_unit parameter is not passed, a time unit will be automatically determined.
 
         Returns
         -------
@@ -2669,10 +2670,18 @@ class MultipleSeries:
         multipleresolution : pyleoclim.MultipleResolution
             MultipleResolution object
 
+        time_unit : str
+            Time unit to convert objects to. See pyleo.Series.convert_time_unit for options.
+
+        verbose : bool
+            Whether or not to print messages warning the user about automated decisions.
+
         See Also
         --------
         
         pyleoclim.core.multipleresolution.MultipleResolution
+
+        pyleoclim.core.series.Series.convert_time_unit
 
         Examples
         --------
@@ -2718,8 +2727,27 @@ class MultipleSeries:
         
         resolution_list = []
 
-        for series in self.series_list:
-            resolution = series.resolution()
-            resolution_list.append(resolution)
+        if time_unit:
+            series_list = self.series_list
+            for series in series_list:
+                resolution = series.convert_time_unit(time_unit).resolution()
+                resolution_list.append(resolution)
+        else:
+            if self.time_unit:
+                series_list = self.series_list
+                for series in series_list:
+                    resolution = series.resolution()
+                    resolution_list.append(resolution)
+            else:
+                if verbose:
+                    print('Time unit not found, attempting conversion.')
+                new_ms = self.convert_time_unit()
+                time_unit = new_ms.time_unit
+                series_list = new_ms.series_list
+                if verbose:
+                    print(f'Converted to {time_unit}')
+                for series in series_list:
+                    resolution = series.resolution()
+                    resolution_list.append(resolution)
 
-        return MultipleResolution(resolution_list=resolution_list)
+        return MultipleResolution(resolution_list=resolution_list,time_unit=time_unit)
