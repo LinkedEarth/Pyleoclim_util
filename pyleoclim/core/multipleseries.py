@@ -11,6 +11,7 @@ from ..core.correns import CorrEns
 from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
 from ..core.multivardecomp import MultivariateDecomp
+from ..core.multipleresolution import MultipleResolution
 
 import warnings
 import numpy as np
@@ -2655,3 +2656,70 @@ class MultipleSeries:
             return fig, ax
         else:
             return ax
+        
+    def resolution(self):
+        """Generate a MultipleResolution object
+
+        Increments are assigned to the preceding time value.
+        E.g. for time_axis = [0,1,3], resolution.resolution = [1,2] resolution.time = [0,1]
+
+        Returns
+        -------
+
+        multipleresolution : pyleoclim.MultipleResolution
+            MultipleResolution object
+
+        See Also
+        --------
+        
+        pyleoclim.core.multipleresolution.MultipleResolution
+
+        Examples
+        --------
+
+        To create a resolution object, apply the .resolution() method to a Series object
+
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            lr04 = pyleo.utils.load_dataset('LR04')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = lr04.flip() & edc & co2ts # create MS object
+            ms_resolution = ms.resolution()
+
+        Several methods are then available:
+
+        Summary statistics can be obtained via .describe()
+
+        .. jupyter-execute::
+
+            resolution.describe()
+
+        A simple plot can be created using .plot()
+
+        .. jupyter-execute::
+
+            resolution.plot()
+
+        The distribution of resolution
+
+        .. jupyter-execute::
+
+            resolution.histplot()
+
+        Or a dashboard combining plot() and histplot() side by side:
+
+        .. jupyter-execute::
+
+            resolution.dashboard()
+            """
+        
+        resolution_list = []
+
+        for series in self.series_list:
+            resolution = series.resolution()
+            resolution_list.append(resolution)
+
+        return MultipleResolution(resolution_list=resolution_list)
