@@ -5,6 +5,11 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6999279.svg)](https://doi.org/10.5281/zenodo.6999279)
 [![NSF-1541029](https://img.shields.io/badge/NSF-1541029-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1541029)
 
+
+[![Downloads](https://static.pepy.tech/badge/pyleoclim)](https://pepy.tech/project/pyleoclim)
+[![Downloads](https://static.pepy.tech/badge/pyleoclim/month)](https://pepy.tech/project/pyleoclim)
+[![Downloads](https://static.pepy.tech/badge/pyleoclim/week)](https://pepy.tech/project/pyleoclim)
+
 ![](https://github.com/LinkedEarth/Logos/raw/master/pyleoclim_logo_full_white.png)
 
 **Python Package for the Analysis of Paleoclimate Data**
