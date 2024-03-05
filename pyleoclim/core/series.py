@@ -4073,6 +4073,11 @@ class Series:
         resolution : Resolution
             Resolution object
 
+        See Also
+        --------
+        
+        pyleoclim.core.resolution.Resolution
+
         Examples
         --------
 
