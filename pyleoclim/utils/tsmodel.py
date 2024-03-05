@@ -104,134 +104,6 @@ def ar1_fit(y, t=None):
 
 
 
-def ar1_sim_geneva(n=200, tau_0=5, sigma_2_0=2, seed=123, p=1, 
-                   evenly_spaced = False, delta_t_dist = "exponential", 
-                   scale_exp_delta_t=1, lambda_poisson_delta_t= 1, 
-                   scale_pareto_delta_t = 1, shape_pareto_delta_t=1, 
-                   value_random_choice=[1,2], prob_random_choice=[.95,.05]):
-  """
-  Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
-  
-  Parameters
-  ----------
-  n: integer
-      The length of the time series 
-      
-  tau_0: float
-      Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
-      
-  sigma_2_0: float
-      Variance of the innovations 
-      
-  seed: integer
-      Random seed for reproducible results.
-      
-  p: integer
-      Parameter specifying the number of time series to generate
-      
-  evenly_spaced: boolean     
-      if True, delta_t  (spacing between time points) is a vector of 1, 
-      if False, delta_t is generated from various distribution (exponential, pareto, poisson and random choice).  
-      
-  delta_t_dist: str
-      the distribution that generates the delta_t
-      possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
-      
-  scale_exp_delta_t: float
-      Scale parameter for the exponential distribution
-      
-  lambda_poisson_delta_t: float
-      parameter for the Poisson distribution    
-               
-  scale_pareto_delta_t: float 
-      Scale parameter for the Pareto distribution, see https://numpy.org/doc/stable/reference/random/generated/numpy.random.pareto.html
-      
-  shape_pareto_delta_t: float 
-      Shape parameter for the Pareto distribution, see https://numpy.org/doc/stable/reference/random/generated/numpy.random.pareto.html
-      
-  value_random_choice: 2-list 
-      elements from which the random sample is generated # PLEASE EXPLAIN
-      
-  prob_random_choice: 2-list 
-      probabilities associated with each entry value_random_choice # PLEASE EXPLAIN                   
-       
-
-  Returns
-  -------
-  A tuple of 2 arrays  
-    y_sim : n x p NumPy array 
-        matrix of simulated AR(1) vectors
-    t_sim : n x p NumPy array 
-        matrix of corresponding time axes
-        
-  See also
-  --------
-
-  pyleoclim.utils.tsmodel.ar1_fit_ml : Maximumum likelihood estimate of AR(1) parameters 
-      
-  """
-  
-  # checks
-  
-  # check for a valid distribution if not evenly spaced
-  valid_distributions = ["exponential", "poisson", "pareto", "random_choice"]
-  if delta_t_dist not in valid_distributions and evenly_spaced == False :
-      raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', or 'random_choice'.")
-
-  # check that parameters are correclty provided when specifying a distribution (for now I have put some default value, but these checks may be useful if we define their initial value as None)
-  if delta_t_dist == "exponential" and scale_exp_delta_t is None:
-      raise ValueError("scale_exp_delta_t must be provided for exponential distribution.")
-  elif delta_t_dist == "poisson" and lambda_poisson_delta_t is None:
-      raise ValueError("lambda_poisson_delta_t must be provided for Poisson distribution.")
-  elif delta_t_dist == "pareto" and (shape_pareto_delta_t is None or scale_pareto_delta_t is None):
-      raise ValueError("shape_pareto_delta_t and scale_pareto_delta_t must be provided for Pareto distribution.")
-  elif delta_t_dist == "random_choice" and (value_random_choice is None or prob_random_choice is None):
-      raise ValueError("value_random_choice and prob_random_choice must be provided for random choice distribution.")
-  # check for same length in the parameters of random choice (values and parameters)
-  if delta_t_dist == "random_choice"  and len(value_random_choice) != len(prob_random_choice):
-        raise ValueError("value_random_choice and prob_random_choice must have the same size.")
-        
-  
-  # declare two array to save the values and the time index
-  y_sim = np.empty(shape=(n, p)) 
-  t_sim = np.empty(shape=(n, p)) 
-
-  # generate p time series
-  for j in np.arange(p): 
-      if evenly_spaced: 
-          t_delta = [1]*n # for now we assume delta_t = 1 if evenly sampled, potentially to improve with a parameter that specify the time spacing
-      else:
-          np.random.seed(seed+j)
-          if delta_t_dist == "exponential":
-              # generation of the delta_t from an exponential distribution
-              t_delta= np.random.exponential(scale = scale_exp_delta_t, size=n)
-          elif delta_t_dist == "poisson":
-              t_delta = np.random.poisson(lam = lambda_poisson_delta_t,size = n) + 1
-          elif delta_t_dist == "pareto":
-              t_delta = (np.random.pareto(shape_pareto_delta_t, n) + 1) * scale_pareto_delta_t
-          else :
-              t_delta = np.random.choice(value_random_choice, size=n, p=prob_random_choice)
-      
-      # obtain the time index from the delta_t distribution
-      t = np.cumsum(t_delta)-1
-        
-      # create empty vector
-      y = np.empty(n)
-      
-      # generate unevenly spaced AR1
-      np.random.seed(seed+j)
-      z = np.random.normal(loc=0, scale=1, size=n)
-      y[0] = z[0] 
-      for i in range(1,n): 
-          delta_i = t[i] - t[i-1] 
-          phi_i = np.exp(-delta_i / tau_0)
-          sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
-          sigma_i = np.sqrt(sigma_2_i)
-          y[i] = phi_i * y[i-1] + sigma_i * z[i]
-      t_sim[:, j] = t
-      y_sim[:, j] = y
-  return y_sim, t_sim
-
 
 def ar1_sim(y, p, t=None):
     '''Simulate AR(1) process(es) with sample autocorrelation value
@@ -655,6 +527,145 @@ def ar1_fit_ml(y, t):
     theta_hat = np.exp(optim_res.x)
     
     return theta_hat
+
+def ar1_sim_geneva(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False, 
+                   delta_t_dist = "exponential",  param = 1):  
+                               
+  """
+  Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
+  
+  Parameters
+  ----------
+  n : integer
+      The length of the time series 
+      
+  tau_0 : float
+      Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
+      
+  sigma_2_0 : float
+      Variance of the innovations 
+      
+  seed : integer
+      Random seed for reproducible results.
+      
+  p : integer
+      Parameter specifying the number of time series to generate
+      
+  evenly_spaced : boolean     
+      if True, delta_t  (spacing between time points) is a vector of 1, 
+      if False, delta_t is generated from various distribution (exponential, pareto, poisson and random choice).  
+      
+  delta_t_dist : str
+      the distribution that generates the delta_t
+      possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
+      
+  param : distributional parameter(s)              
+
+  Returns
+  -------
+  A tuple of 2 arrays  
+    y_sim : n x p NumPy array 
+        matrix of simulated AR(1) vectors
+    t_sim : n x p NumPy array 
+        matrix of corresponding time axes
+        
+  See also
+  --------
+
+  pyleoclim.utils.tsmodel.ar1_fit_ml : Maximumum likelihood estimate of AR(1) parameters 
+  
+  pyleoclim.utils.tsmodel.time_increments : Generate time increment vector according to a specific probability model
+      
+  """
+  
+  # declare two array to save the values and the time index
+  y_sim = np.empty(shape=(n, p)) 
+  t_sim = np.empty(shape=(n, p)) 
+
+  # generate p time series
+  for j in np.arange(p): 
+      if evenly_spaced: 
+          delta_t = [1]*n # for now we assume delta_t = 1 if evenly sampled, potentially to improve with a parameter that specify the time spacing
+      else:
+          delta_t = time_increments(n, param, delta_t_dist = "exponential", seed = seed+j)
+                
+      # obtain the 0-based time index from the delta_t distribution
+      t = np.cumsum(delta_t)-1
+        
+      # create empty vector
+      y = np.empty(n)
+      
+      # generate unevenly spaced AR(1)
+      np.random.seed(seed+j)
+      z = np.random.normal(loc=0, scale=1, size=n)
+      y[0] = z[0] 
+      for i in range(1,n): 
+          delta_i = t[i] - t[i-1] 
+          phi_i = np.exp(-delta_i / tau_0)
+          sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
+          sigma_i = np.sqrt(sigma_2_i)
+          y[i] = phi_i * y[i-1] + sigma_i * z[i]
+      t_sim[:, j] = t
+      y_sim[:, j] = y
+  return y_sim, t_sim
+
+
+def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
+    '''
+    Generate time increment vector according to a specific probability model
+
+    Parameters
+    ----------
+    n: integer
+        The length of the time series 
+        
+    seed: integer
+        Random seed for reproducible results.
+        
+    delta_t_dist: str
+        the distribution that generates the delta_t
+        possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
+        
+        if 'exponential', `param` is expected to be a single scale parameter (traditionally denoted \lambda)
+        if 'poisson', `param` is expected to be a single parameter (rate)
+        if 'pareto', expects a 2-list with the shape & scale parameters (in that order)
+        if 'random_choice', expects a 2-list containing the arrays:
+            
+            value_random_choice: ?
+                elements from which the random sample is generated # PLEASE EXPLAIN
+                
+            prob_random_choice: ?
+                probabilities associated with each entry value_random_choice # PLEASE EXPLAIN           
+        
+    Returns:
+    -------
+    
+    delta_t : n-array of time increments
+
+    '''
+    # check for a valid distribution 
+    valid_distributions = ["exponential", "poisson", "pareto", "random_choice"]
+    if delta_t_dist not in valid_distributions:
+        raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', or 'random_choice'.")    
+    
+    np.random.seed(seed) 
+    param = np.array(param) # coerce array type
+    
+    if delta_t_dist == "exponential":
+        delta_t = np.random.exponential(scale = param, size=n)
+    elif delta_t_dist == "poisson":
+        delta_t = np.random.poisson(lam = param, size = n) + 1
+    elif delta_t_dist == "pareto":
+        if len(param) != 2:
+            raise ValueError('The Pareto law takes a shape and a scale parameter (in that order) ')
+        else:
+            delta_t = (np.random.pareto(param[0], n) + 1) * param[1]
+    elif delta_t_dist == "random_choice":
+        if len(param)<2 or len(param[0]) != len(param[1]):
+            raise ValueError("value_random_choice and prob_random_choice must have the same size.")
+        delta_t = np.random.choice(param[0], size=n, p=param[1])
+        
+    return delta_t
 
 
 # def fBMsim(N=128, H=0.25):
