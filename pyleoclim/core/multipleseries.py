@@ -2695,25 +2695,25 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            resolution.describe()
+            ms_resolution.describe()
 
         A simple plot can be created using .plot()
 
         .. jupyter-execute::
 
-            resolution.plot()
+            ms_resolution.plot()
 
         The distribution of resolution
 
         .. jupyter-execute::
 
-            resolution.histplot()
+            ms_resolution.histplot()
 
         Or a dashboard combining plot() and histplot() side by side:
 
         .. jupyter-execute::
 
-            resolution.dashboard()
+            ms_resolution.dashboard()
             """
         
         resolution_list = []
