@@ -283,7 +283,7 @@ class PSD:
         if method not in ['ar1sim', 'ar1asym']:
                 raise ValueError("The available methods are 'ar1sim' and 'ar1asym'")
 
-        if method in ['ar1sim', 'uar1']:
+        if method in ['ar1sim', 'ar1old']: # fix later in Series.surrogates()
             signif_scals = None
             if scalogram:
                 try:
