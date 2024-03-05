@@ -22,6 +22,25 @@ class Resolution:
     Resolution objects store time axis resolution information derived from Series objects.
     They are generated via the resolution method applied to a Series object and contain methods relevant to the analysis of resolution information.
 
+    Parameters
+    ----------
+
+    resolution : list or numpy.array
+        An array containing information on the time step between subsequent values in the original time series.
+
+    time : list or numpy.array
+        An array containing the time axis from the original series.
+        This should be same length as resolution, so removing one value from the original axis is required.
+
+    resolution_unit : str
+        Unit of resolution. This should be the same as the original time axis.
+
+    label : str
+        Label for the resolution object.
+
+    timeseries : pyleoclim.Series
+        Original pyleoclim timeseries object.
+
     See Also
     --------
 
