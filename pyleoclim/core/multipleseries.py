@@ -2692,9 +2692,8 @@ class MultipleSeries:
             import pyleoclim as pyleo
 
             co2ts = pyleo.utils.load_dataset('AACO2')
-            lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
-            ms = lr04.flip() & edc & co2ts # create MS object
+            ms = edc & co2ts # create MS object
             ms_resolution = ms.resolution()
 
         Several methods are then available:
@@ -2710,18 +2709,6 @@ class MultipleSeries:
         .. jupyter-execute::
 
             ms_resolution.plot()
-
-        The distribution of resolution
-
-        .. jupyter-execute::
-
-            ms_resolution.histplot()
-
-        Or a dashboard combining plot() and histplot() side by side:
-
-        .. jupyter-execute::
-
-            ms_resolution.dashboard()
             """
         
         resolution_list = []
