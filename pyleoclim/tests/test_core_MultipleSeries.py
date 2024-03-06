@@ -696,7 +696,9 @@ class TestUIMultipleSeriesTimeCoveragePlot:
         pyleo.closefig(fig)
 
 class TestUIMultipleSeriesResolution:
-    @pytest.mark.parametrize(('statistic','ms_fixture'),(['mean',None],['multipleseries_basic','multipleseries_nans']))
+    @pytest.mark.parametrize(
+            ('statistic','ms_fixture'),
+            (['mean','multipleseries_basic'],[None,'multipleseries_basic'],['mean','multipleseries_nans'],[None,'multipleseries_nans']))
     def test_resolution_t0(self,statistic,ms_fixture,request):
         '''
         test resolution class

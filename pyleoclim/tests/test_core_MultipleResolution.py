@@ -23,7 +23,7 @@ class TestUIMultipleResolutionSummaryPlot:
         test resolution plot
         '''
         ms = request.getfixturevalue(ms_fixture)
-        msr = ms.resolution()
+        msr = ms.resolution(statistic=None)
         fig,ax=msr.summary_plot()
         pyleo.closefig(fig)
     def test_plot_t1(self):
@@ -34,18 +34,20 @@ class TestUIMultipleResolutionSummaryPlot:
         lr04 = pyleo.utils.load_dataset('LR04')
         edc = pyleo.utils.load_dataset('EDC-dD')
         ms = lr04.flip() & edc & co2ts # create MS object
-        msr = ms.resolution(time_unit='kyr BP')
+        msr = ms.resolution(time_unit='kyr BP',statistic=None)
         fig,ax=msr.summary_plot()
         pyleo.closefig(fig)
 
 class TestUIMultipleResolutionDescribe:
-    @pytest.mark.parametrize('ms_fixture', ['multipleseries_basic','multipleseries_nans'])
+    @pytest.mark.parametrize(
+            ('statistic','ms_fixture'),
+            (['mean','multipleseries_basic'],[None,'multipleseries_basic'],['mean','multipleseries_nans'],[None,'multipleseries_nans']))
     def test_describe_t0(self,ms_fixture,request):
         '''
         test resolution describe
         '''
         ms = request.getfixturevalue(ms_fixture)
-        msr = ms.resolution()
+        msr = ms.resolution(statistic=None)
         msr.describe()
     def test_describe_t2(self):
         '''
@@ -55,5 +57,5 @@ class TestUIMultipleResolutionDescribe:
         lr04 = pyleo.utils.load_dataset('LR04')
         edc = pyleo.utils.load_dataset('EDC-dD')
         ms = lr04.flip() & edc & co2ts # create MS object
-        msr = ms.resolution(time_unit='kyr BP')
+        msr = ms.resolution(time_unit='kyr BP',statistic=None)
         msr.describe()
