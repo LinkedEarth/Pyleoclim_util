@@ -697,20 +697,20 @@ class TestUIMultipleSeriesTimeCoveragePlot:
 
 class TestUIMultipleSeriesResolution:
     @pytest.mark.parameterize('statistic',['mean',None])
-    def test_time_coverage_plot_t0(self,statistic,multipleseries_basic):
+    def test_resolution(self,statistic,multipleseries_basic):
         '''
         test resolution class
         '''
         ms = multipleseries_basic
         ms.resolution(statistic=statistic)
     @pytest.mark.parameterize('statistic',['mean',None])
-    def test_time_coverage_plot_t1(self,statistic,multipleseries_nans):
+    def test_resolution(self,statistic,multipleseries_nans):
         '''
         test resolution class with nans
         '''
         ms = multipleseries_nans # create MS object
         ms.resolution(statistic=statistic)
-    def test_time_coverage_plot_t2(self):
+    def test_resolution_t2(self):
         '''
         test resolution class with time unit
         '''
