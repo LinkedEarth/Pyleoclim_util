@@ -701,7 +701,7 @@ class TestUIMultipleSeriesResolution:
         '''
         test resolution class
         '''
-        ms = request.get(ms_fixture)
+        ms = request.getfixturevalue(ms_fixture)
         ms.resolution(statistic=statistic)
     def test_resolution_t1(self):
         '''

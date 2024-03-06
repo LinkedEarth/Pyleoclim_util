@@ -44,7 +44,7 @@ class TestUIMultipleResolutionDescribe:
         '''
         test resolution describe
         '''
-        ms = request.get(ms_fixture)
+        ms = request.getfixturevalue(ms_fixture)
         msr = ms.resolution()
         msr.describe()
     def test_describe_t2(self):
