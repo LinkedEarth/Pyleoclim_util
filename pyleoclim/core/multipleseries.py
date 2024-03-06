@@ -2714,10 +2714,12 @@ class MultipleSeries:
 
             ms_resolution.plot()
             """
-        
+         
         if statistic=='median':
+            warnings.warn('The statistic parameter will be deprecated in a future release. Statistic = None will become the default behavior.',DeprecationWarning)
             res = [np.median(ts.resolution().resolution) for ts in self.series_list]
         elif statistic=='mean':
+            warnings.warn('The statistic parameter will be deprecated in a future release. Statistic = None will become the default behavior.',DeprecationWarning)
             res = [np.mean(ts.resolution().resolution) for ts in self.series_list]
         elif statistic is None:
             resolution_list = []
