@@ -48,7 +48,6 @@ class Resolution:
 
     def __init__(self,resolution,time=None,resolution_unit=None,label=None,timeseries=None,):
         resolution = np.array(resolution)
-
         self.resolution = resolution
         self.timeseries = timeseries
 
@@ -57,6 +56,8 @@ class Resolution:
                 self.label = 'Resolution'
             else:
                 self.label = self.timeseries.label
+        else:
+            self.label = label
 
         if time is None:
             self.time = self.timeseries.time[1:]
@@ -69,12 +70,9 @@ class Resolution:
                 self.resolution_unit = timeseries.time_unit
             else:
                 self.resolution_unit = resolution_unit
-
         #Include time reasoning
-        elif resolution_unit is not None:
-            if timeseries is not None:
-                if timeseries.time_unit.lower().replace(' ','') != resolution_unit.lower().replace(' ',''):
-                    warnings.warn('Original series time unit and passed resolution unit do not match')
+        else:
+            self.resolution_unit = resolution_unit
         
 
     def describe(self):

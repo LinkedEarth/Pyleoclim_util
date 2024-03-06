@@ -4130,16 +4130,13 @@ class Series:
 
         resolution = Resolution(
             resolution = res,
-            time = self.time,
-            resolution_unit=self.time_unit,
-            label=self.label,
+            time = self.time[1:],
+            resolution_unit= self.time_unit,
+            label= self.label,
             timeseries = copy
         )
 
         return resolution
-
-
-
 
 class SeriesResampler:
     """

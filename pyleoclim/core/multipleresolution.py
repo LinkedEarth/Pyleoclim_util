@@ -30,3 +30,12 @@ class MultipleResolution:
     def __init__(self,resolution_list,time_unit):
         self.resolution_list = resolution_list
         self.time_unit = time_unit
+
+    def plot(self,ax=None,figsize=(10,8)):
+        """Boxplot showing distribution of resolutions from each resolution object"""
+
+        if ax is None:
+            fig,ax = plt.subplots(figsize=figsize)
+
+        df = pd.DataFrame(columns=['Resolution','Label'])
+        
