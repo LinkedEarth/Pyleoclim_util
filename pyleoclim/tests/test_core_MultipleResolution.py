@@ -17,24 +17,16 @@ import pytest
 import pyleoclim as pyleo
 
 class TestUIMultipleResolutionSummaryPlot:
-    def test_plot_t0(self,multipleseries_basic):
+    @pytest.mark.parametrize('ms_fixture', ['multipleseries_basic','multipleseries_nans'])
+    def test_plot_t0(self,ms_fixture,request):
         '''
         test resolution plot
         '''
-        ms = multipleseries_basic
+        ms = request.getfixturevalue(ms_fixture)
         msr = ms.resolution()
         fig,ax=msr.summary_plot()
         pyleo.closefig(fig)
-    def test_plot_t1(self,multipleseries_nans):
-        '''
-        test resolution plot with nans
-        '''
-        ms = multipleseries_nans # create MS object
-        ms.resolution()
-        msr = ms.resolutoin()
-        fig,ax=msr.summary_plot()
-        pyleo.closefig(fig)
-    def test_plot_t2(self):
+    def test_plot_t1(self):
         '''
         test resolution plot with time unit
         '''
@@ -47,20 +39,13 @@ class TestUIMultipleResolutionSummaryPlot:
         pyleo.closefig(fig)
 
 class TestUIMultipleResolutionDescribe:
-    def test_describe_t0(self,multipleseries_basic):
+    @pytest.mark.parametrize('ms_fixture', ['multipleseries_basic','multipleseries_nans'])
+    def test_describe_t0(self,ms_fixture,request):
         '''
         test resolution describe
         '''
-        ms = multipleseries_basic
+        ms = request.get(ms_fixture)
         msr = ms.resolution()
-        msr.describe()
-    def test_describe_t1(self,multipleseries_nans):
-        '''
-        test resolution describe with nans
-        '''
-        ms = multipleseries_nans # create MS object
-        ms.resolution()
-        msr = ms.resolutoin()
         msr.describe()
     def test_describe_t2(self):
         '''
