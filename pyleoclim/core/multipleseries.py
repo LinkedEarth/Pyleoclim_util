@@ -2331,7 +2331,7 @@ class MultipleSeries:
     #     Parameters
     #     ----------
     #     statistic : str, optional
-    #        The statistic applied to the res9lution array of each series. 
+    #        The statistic applied to the resolution array of each series. 
     #        Possible values: 'mean' or 'median'. The default is 'median'.
 
     #     Returns
@@ -2656,7 +2656,7 @@ class MultipleSeries:
         else:
             return ax
         
-    def resolution(self,time_unit=None,verbose=True):
+    def resolution(self,time_unit=None,verbose=True,statistic='median'):
         """Generate a MultipleResolution object
 
         Increments are assigned to the preceding time value.
@@ -2674,6 +2674,10 @@ class MultipleSeries:
 
         verbose : bool
             Whether or not to print messages warning the user about automated decisions.
+
+        statistic : str; {'median','mean',None}
+            If a recognized statistic is passed, this function will simply output that statistic applied to the resolution of each series in the MulitipleSeries object. Options are 'mean' or 'median'.
+            If statistic is None, then the function will return a new MultipleResolution class with plotting capabilities.
 
         See Also
         --------
@@ -2711,29 +2715,37 @@ class MultipleSeries:
             ms_resolution.plot()
             """
         
-        resolution_list = []
+        if statistic=='median':
+            res = [np.median(ts.resolution().resolution) for ts in self.series_list]
+        elif statistic=='mean':
+            res = [np.mean(ts.resolution().resolution) for ts in self.series_list]
+        elif statistic is None:
+            resolution_list = []
 
-        if time_unit:
-            series_list = self.series_list
-            for series in series_list:
-                resolution = series.convert_time_unit(time_unit).resolution()
-                resolution_list.append(resolution)
-        else:
-            if self.time_unit:
+            if time_unit:
                 series_list = self.series_list
                 for series in series_list:
-                    resolution = series.resolution()
+                    resolution = series.convert_time_unit(time_unit).resolution()
                     resolution_list.append(resolution)
             else:
-                if verbose:
-                    print('Time unit not found, attempting conversion.')
-                new_ms = self.convert_time_unit()
-                time_unit = new_ms.time_unit
-                series_list = new_ms.series_list
-                if verbose:
-                    print(f'Converted to {time_unit}')
-                for series in series_list:
-                    resolution = series.resolution()
-                    resolution_list.append(resolution)
+                if self.time_unit:
+                    series_list = self.series_list
+                    for series in series_list:
+                        resolution = series.resolution()
+                        resolution_list.append(resolution)
+                else:
+                    if verbose:
+                        print('Time unit not found, attempting conversion.')
+                    new_ms = self.convert_time_unit()
+                    time_unit = new_ms.time_unit
+                    series_list = new_ms.series_list
+                    if verbose:
+                        print(f'Converted to {time_unit}')
+                    for series in series_list:
+                        resolution = series.resolution()
+                        resolution_list.append(resolution)
+                res = MultipleResolution(resolution_list=resolution_list,time_unit=time_unit)
+        else:
+            raise ValueError('Unrecognized statistic, please use "mean", "median", or None')
 
-        return MultipleResolution(resolution_list=resolution_list,time_unit=time_unit)
+        return res

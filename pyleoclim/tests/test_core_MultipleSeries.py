@@ -696,13 +696,21 @@ class TestUIMultipleSeriesTimeCoveragePlot:
         pyleo.closefig(fig)
 
 class TestUIMultipleSeriesResolution:
-    def test_time_coverage_plot_t0(self,multipleseries_basic):
+    @pytest.mark.parameterize('statistic',['mean',None])
+    def test_time_coverage_plot_t0(self,statistic,multipleseries_basic):
         '''
         test resolution class
         '''
         ms = multipleseries_basic
-        ms.resolution()
-    def test_time_coverage_plot_t1(self):
+        ms.resolution(statistic=statistic)
+    @pytest.mark.parameterize('statistic',['mean',None])
+    def test_time_coverage_plot_t1(self,statistic,multipleseries_nans):
+        '''
+        test resolution class with nans
+        '''
+        ms = multipleseries_nans # create MS object
+        ms.resolution(statistic=statistic)
+    def test_time_coverage_plot_t2(self):
         '''
         test resolution class with time unit
         '''
@@ -710,4 +718,4 @@ class TestUIMultipleSeriesResolution:
         lr04 = pyleo.utils.load_dataset('LR04')
         edc = pyleo.utils.load_dataset('EDC-dD')
         ms = lr04.flip() & edc & co2ts # create MS object
-        ms.resolution(time_unit='kyr BP')
+        ms.resolution(statistic=None,time_unit='kyr BP')
