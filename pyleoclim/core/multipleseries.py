@@ -2746,7 +2746,8 @@ class MultipleSeries:
                     for series in series_list:
                         resolution = series.resolution()
                         resolution_list.append(resolution)
-                res = MultipleResolution(resolution_list=resolution_list,time_unit=time_unit)
+                        
+            res = MultipleResolution(resolution_list=resolution_list,time_unit=time_unit)
         else:
             raise ValueError('Unrecognized statistic, please use "mean", "median", or None')
 

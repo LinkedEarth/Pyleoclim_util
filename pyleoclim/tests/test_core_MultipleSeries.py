@@ -697,7 +697,7 @@ class TestUIMultipleSeriesTimeCoveragePlot:
 
 class TestUIMultipleSeriesResolution:
     @pytest.mark.parametrize(('statistic','ms_fixture'),(['mean',None],['multipleseries_basic','multipleseries_nans']))
-    def test_resolution(self,statistic,ms_fixture,request):
+    def test_resolution_t0(self,statistic,ms_fixture,request):
         '''
         test resolution class
         '''
