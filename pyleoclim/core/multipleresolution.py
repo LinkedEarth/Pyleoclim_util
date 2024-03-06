@@ -31,11 +31,11 @@ class MultipleResolution:
         self.resolution_list = resolution_list
         self.time_unit = time_unit
 
-    def plot(self,figsize=(10,8),xlabel=None,ylabel=None,legend=False,ax=None,
+    def summary_plot(self,figsize=(10,8),xlabel=None,ylabel=None,legend=False,ax=None,
              boxplot_whis=[0,100], boxplot_width=.6, boxplot_dodge=False,boxplot_palette='viridis',
              stripplot_size=2,stripplot_color=".3",stripplot_alpha=.8,stripplot_dodge=False,
              boxplot_kwargs=None,stripplot_kwargs=None,savefig_settings=None):
-        """Boxplot showing distribution of resolutions from each resolution object
+        """Summary plot showing distribution of resolutions from each resolution object as box plots with overlaid strip plots.
 
         Parameters
         ----------
