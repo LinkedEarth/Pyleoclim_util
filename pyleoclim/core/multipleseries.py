@@ -11,7 +11,7 @@ from ..core.correns import CorrEns
 from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
 from ..core.multivardecomp import MultivariateDecomp
-from ..core.multipleresolution import MultipleResolution
+from ..core.resolutions import MultipleResolution
 
 import warnings
 import numpy as np
@@ -2324,42 +2324,6 @@ class MultipleSeries:
         
         return ms_new
     
-    # def resolution(self, statistic='median'):
-    #     '''
-    #     Extracts representative statistic for the resolution of each series in the object.
-
-    #     Parameters
-    #     ----------
-    #     statistic : str, optional
-    #        The statistic applied to the resolution array of each series. 
-    #        Possible values: 'mean' or 'median'. The default is 'median'.
-
-    #     Returns
-    #     -------
-    #     res: NumPy array
-    #         array containing the statistic of interest for all series.  
-
-    #     Examples
-    #     --------
-    #     .. jupyter-execute::
-
-    #         co2ts = pyleo.utils.load_dataset('AACO2')
-    #         edc = pyleo.utils.load_dataset('EDC-dD')
-    #         ms = edc & co2ts # create MS object
-    #         ms.convert_time_unit('kyr BP').resolution() 
-
-    #     Note that the output is only meaningful if all constituent series have the same units.
-    #     '''
-        
-    #     if statistic=='median':
-    #         res = [np.median(ts.resolution().resolution) for ts in self.series_list]
-    #     elif statistic=='mean':
-    #         res = [np.mean(ts.resolution().resolution) for ts in self.series_list]
-    #     else:
-    #         raise ValueError('Unknown statistic',stacklevel=2)
-            
-    #     return np.array(res)
-    
     def to_json(self, path=None):
         '''
         Export the pyleoclim.MultipleSeries object to a json file
@@ -2682,14 +2646,14 @@ class MultipleSeries:
         See Also
         --------
         
-        pyleoclim.core.multipleresolution.MultipleResolution
+        pyleoclim.core.resolutions.MultipleResolution
 
         pyleoclim.core.series.Series.convert_time_unit
 
         Examples
         --------
 
-        To create a resolution object, apply the .resolution() method to a Series object
+        To create a resolution object, apply the .resolution() method to a Series object with `statistic=None`.
 
         .. jupyter-execute::
 
@@ -2698,7 +2662,7 @@ class MultipleSeries:
             co2ts = pyleo.utils.load_dataset('AACO2')
             edc = pyleo.utils.load_dataset('EDC-dD')
             ms = edc & co2ts # create MS object
-            ms_resolution = ms.resolution()
+            ms_resolution = ms.resolution(statistic=None)
 
         Several methods are then available:
 
@@ -2708,11 +2672,11 @@ class MultipleSeries:
 
             ms_resolution.describe()
 
-        A simple plot can be created using .plot()
+        A simple plot can be created using .summary_plot()
 
         .. jupyter-execute::
 
-            ms_resolution.plot()
+            ms_resolution.summary_plot()
             """
          
         if statistic=='median':
@@ -2746,7 +2710,7 @@ class MultipleSeries:
                     for series in series_list:
                         resolution = series.resolution()
                         resolution_list.append(resolution)
-                        
+
             res = MultipleResolution(resolution_list=resolution_list,time_unit=time_unit)
         else:
             raise ValueError('Unrecognized statistic, please use "mean", "median", or None')

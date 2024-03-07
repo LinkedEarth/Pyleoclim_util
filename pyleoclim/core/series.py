@@ -26,7 +26,7 @@ from ..core.scalograms import Scalogram
 from ..core.coherence import Coherence
 from ..core.corr import Corr
 from ..core.surrogateseries import SurrogateSeries
-from ..core.resolution import Resolution
+from ..core.resolutions import Resolution
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -4076,7 +4076,7 @@ class Series:
         See Also
         --------
         
-        pyleoclim.core.resolution.Resolution
+        pyleoclim.core.resolutions.Resolution
 
         Examples
         --------
