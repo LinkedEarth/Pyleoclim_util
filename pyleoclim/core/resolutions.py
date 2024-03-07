@@ -479,7 +479,7 @@ class MultipleResolution:
 
     def summary_plot(self,figsize=(10,8),xlabel=None,ylabel=None,legend=False,ax=None,
              boxplot_whis=[0,100], boxplot_width=.6, boxplot_dodge=False,boxplot_palette='viridis',
-             stripplot_size=2,stripplot_color=".3",stripplot_alpha=.8,stripplot_dodge=False, log_scale = False,
+             stripplot_size=2,stripplot_color=".3",stripplot_alpha=.8,stripplot_dodge=False,
              boxplot_kwargs=None,stripplot_kwargs=None,savefig_settings=None):
         """Summary plot showing distribution of resolutions from each resolution object as box plots with overlaid strip plots.
 
@@ -528,11 +528,6 @@ class MultipleResolution:
         stripplot_dodge : bool
             Whether stripplot elements should be narrowed and shifted along the orient axis to eliminate overlap. Default is False.
 
-        log_scale : bool or number, or pair of bools or numbers
-            Set axis scale(s) to log. A single value sets the data axis for any numeric axes in the plot. 
-            A pair of values sets each axis independently. Numeric values are interpreted as the desired base (default 10). 
-            When None or False, seaborn defers to the existing Axes scale.
-
         boxplot_kwargs : dict
             Dictionary of arguments for seaborn.boxplot. Arguments that are passed here will overwrite explicit arguments (e.g. whis, width, etc.).
         
@@ -579,8 +574,8 @@ class MultipleResolution:
             boxplot_dodge = boxplot_kwargs.pop('dodge')
         if 'palette' in boxplot_kwargs:
             boxplot_palette = boxplot_kwargs.pop('palette')
-        if 'log_scale' in boxplot_kwargs:
-            log_scale = boxplot_kwargs.pop('log_scale')
+        # if 'log_scale' in boxplot_kwargs:
+        #     log_scale = boxplot_kwargs.pop('log_scale')
 
         if 'size' in stripplot_kwargs:
             stripplot_size = stripplot_kwargs.pop('size')
@@ -590,11 +585,11 @@ class MultipleResolution:
             stripplot_alpha = stripplot_kwargs.pop('alpha')
         if 'dodge' in stripplot_kwargs:
             stripplot_dodge = stripplot_kwargs.pop('dodge')
-        if 'log_scale' in stripplot_kwargs:
-            log_scale = stripplot_kwargs.pop('log_scale')
+        # if 'log_scale' in stripplot_kwargs:
+        #     log_scale = stripplot_kwargs.pop('log_scale')
 
-        sns.boxplot(data,x='Resolution',y='Label',hue='Label',whis=boxplot_whis,width=boxplot_width,dodge=boxplot_dodge,palette=boxplot_palette,log_scale=log_scale,ax=ax,**boxplot_kwargs)
-        sns.stripplot(data, x="Resolution", y="Label",size=stripplot_size,color=stripplot_color,alpha=stripplot_alpha,dodge=stripplot_dodge,ax=ax,log_scale=log_scale,**stripplot_kwargs)
+        sns.boxplot(data,x='Resolution',y='Label',hue='Label',whis=boxplot_whis,width=boxplot_width,dodge=boxplot_dodge,palette=boxplot_palette,ax=ax,**boxplot_kwargs)
+        sns.stripplot(data, x="Resolution", y="Label",size=stripplot_size,color=stripplot_color,alpha=stripplot_alpha,dodge=stripplot_dodge,ax=ax,**stripplot_kwargs)
 
         if ylabel:
             ax.set(ylabel=ylabel)

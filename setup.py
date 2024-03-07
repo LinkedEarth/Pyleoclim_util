@@ -31,7 +31,7 @@ setup(
         "pandas==2.1.4",
         "kneed>=0.7.0",
         "statsmodels>=0.13.2",
-        "seaborn==0.13.0",
+        "seaborn==0.12.2",
         "scikit-learn>=0.24.2",
         "pathos>=0.2.8",
         "tqdm>=4.61.2",
