@@ -9,8 +9,8 @@ from .geoseries import GeoSeries
 from .psds import PSD, MultiplePSD
 from .multipleseries import MultipleSeries
 from .multiplegeoseries import MultipleGeoSeries
-#from .surrogateseries import SurrogateSeries
-from .ensembleseries import EnsembleSeries, SurrogateSeries
+from .surrogateseries import SurrogateSeries
+from .ensembleseries import EnsembleSeries
 from .scalograms import Scalogram, MultipleScalogram
 from .coherence import Coherence
 from .corr import Corr

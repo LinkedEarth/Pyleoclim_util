@@ -3349,7 +3349,7 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, alpha=0.05, statistic = 'pearsonr',
+    def correlation(self, target_series, alpha=0.05, method = 'phaseran', timespan=None,  
                     settings=None, common_time_kwargs=None, seed=None):
         ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID).
 
@@ -3369,18 +3369,20 @@ class Series:
 
         target_series : Series
             A pyleoclim Series object
-
+        
+        alpha : float
+            The significance level (default: 0.05)
+        
+        method : str, {'ttest','ar1sim','phaseran'}
+            method for significance testing. Default is 'phaseran'
+        
         timespan : tuple
             The time interval over which to perform the calculation
             
-        statistic : str
+        statistic : str  [UNDER CONSTRUCTION]
             statistic being evaluated. Can use any of the SciPy-supported ones:
                 https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
             Default: 'pearsonr'        
-        
-
-        alpha : float
-            The significance level (default: 0.05)
 
         settings : dict
             Parameters for the correlation function, including:
@@ -3451,7 +3453,7 @@ class Series:
         '''
 
         settings = {} if settings is None else settings.copy()
-        corr_args = {'alpha': alpha}
+        corr_args = {'alpha': alpha, 'method': method}
         corr_args.update(settings)
 
         ms = MultipleSeries([self, target_series])
@@ -3475,9 +3477,9 @@ class Series:
         if seed is not None:
             np.random.seed(seed)
 
-        if corr_args.method == 'ttest':
-            (r, signif, p) = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
-        else:  
+        if method == 'ttest':
+            corr_res = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+        elif method == 'tte':  
             number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
             seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
             method = corr_args['method'] if 'method' in corr_args.keys() else None

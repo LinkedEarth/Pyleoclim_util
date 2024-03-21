@@ -247,7 +247,8 @@ class EnsembleSeries(MultipleSeries):
 
         return ens_qs
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, method = 'ttest',
+                    settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between an EnsembleSeries object to a target.
 
         If the target is not specified, then the 1st member of the ensemble will be the target
@@ -272,6 +273,9 @@ class EnsembleSeries(MultipleSeries):
         alpha : float
 
             The significance level (0.05 by default)
+       
+        method : str, {'ttest','ar1sim','phaseran'}
+            method for significance testing. Default is 'ttest'
 
         settings : dict
 
@@ -366,7 +370,7 @@ class EnsembleSeries(MultipleSeries):
                 value2 = target.value
                 time2 = target.time
 
-            ts2 = Series(time=time2, value=value2, verbose=idx==0)
+            ts2 = Series(time=time2, value=value2, verbose=idx==0, auto_time_params=False)
             corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res.r)
             signif_list.append(corr_res.signif)
