@@ -3648,9 +3648,7 @@ class Series:
         if method == 'ar1sim':
             surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
         elif method == 'phaseran':
-            surr_res = tsutils.phaseran(self.value, number, **args[method])
-            if len(time) % 2 == 0:
-                time = time[0:-1]
+            surr_res = tsutils.phaseran2(self.value, number, **args[method])
         # elif method == 'uar1':
         #     # TODO : implement Lionel's ML method
         # elif method == 'power-law':
@@ -3663,8 +3661,7 @@ class Series:
 
         s_list = []
         for i, s in enumerate(surr_res.T):
-                
-            s_tmp = Series(time=time, value=s,  # will need reformation after ar1fit_ml pull
+            s_tmp = Series(time=time, value=s,  # will need reformation after uar1 pull
                            time_name=self.time_name,  
                            time_unit=self.time_unit, 
                            value_name=self.value_name, 

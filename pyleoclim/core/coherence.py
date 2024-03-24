@@ -706,6 +706,8 @@ class Coherence:
         surr2 = self.timeseries2.surrogates(
             number=number, seed=seed, method=method, settings=settings
         )
+        
+        # adjust time axis
 
         wtcs, xwts = [], []
 

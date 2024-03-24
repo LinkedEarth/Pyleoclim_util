@@ -5,19 +5,20 @@ Utilities to manipulate timeseries - useful for preprocessing prior to analysis
 """
 
 __all__ = [
-    'simple_stay',
+    'simple_stats',
     'bin',
     'interp',
     'gkernel',
     'standardize',
-    'y2segmeny',
+    'ts2segments',
     'annualize',
     'gaussianize',
     'detrend',
     'detect_outliers_DBSCAN',
     'detect_outliers_kmeans',
     'remove_outliers',
-    'phaseran'
+    'phaseran',
+    'phaseran2'
 ]
 
 import numpy as np
@@ -27,7 +28,7 @@ import copy
 from scipy import special
 from scipy import signal
 from scipy import interpolate
-from scipy import stay
+from scipy import stats
 from pyhht import EMD
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
@@ -36,18 +37,18 @@ from sklearn.metrics import silhouette_score
 from sklearn.neighbors import LocalOutlierFactor
 #import matplotlib.pyplot as plt
 
-import staymodels.ya.stattools as sms
+import statsmodels.tsa.stattools as sms
 
 import math
 from .filter import savitzky_golay
 
-from .ybase import (
-    clean_y,
+from .tsbase import (
+    clean_ts,
     dropna,
 )
 
 
-def simple_stay(y, axis=None):
+def simple_stats(y, axis=None):
     """ Computes simple statistics
 
     Computes the mean, median, min, max, standard deviation, and interquartile range of a numpy array y, ignoring NaNs.
@@ -98,7 +99,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     The behavior of bins, as defined either by start, stop and step or by the bins argument, is to have all bins
     except the last one be half open. That is if bins are defined as bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
-    This is the default behaviour of scipy.stay.binned_statistic (upon which this function is built).
+    This is the default behaviour of scipy.stats.binned_statistic (upon which this function is built).
 
     Parameters
     ----------
@@ -127,12 +128,12 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     statistic : str
         Statistic to calculate and return in values. Default is 'mean'.
-        See scipy.stay.binned_statistic for other options.
+        See scipy.stats.binned_statistic for other options.
 
     bin_edges : np.ndarray
         The edge of bins to use for binning. 
         E.g. if bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
-        See scipy.stay.binned_statistic for details.
+        See scipy.stats.binned_statistic for details.
         Start, stop, bin_size, step_style, and time_axis will be ignored if this is passed.
     
     time_axis : np.ndarray
@@ -166,11 +167,11 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     See also
     --------
 
-    pyleoclim.utils.yutils.gkernel : Coarsen time resolution using a Gaussian kernel
+    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
 
-    pyleoclim.utils.yutils.interp : Interpolate y onto a new x-axis
+    pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
 
-    `scipy.stay.binned_statistic <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stay.binned_statistic.html>`_ : Scipy function around which this function is written
+    `scipy.stats.binned_statistic <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binned_statistic.html>`_ : Scipy function around which this function is written
 
     Examples
     --------
@@ -187,7 +188,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.yutils.bin(x,y,bin_edges=[1,4,8,12,16,20])
+        xb,yb = pyleo.utils.tsutils.bin(x,y,bin_edges=[1,4,8,12,16,20])
         xb
 
     Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoiny between time axis poiny.
@@ -197,7 +198,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.yutils.bin(x,y,time_axis=[1,4,8,12,16,20])
+        xb,yb = pyleo.utils.tsutils.bin(x,y,time_axis=[1,4,8,12,16,20])
         xb
     
     If `time_axis` is None, `bin_size` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defauly if not passed.
@@ -206,7 +207,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.yutils.bin(x,y,bin_size=2)
+        xb,yb = pyleo.utils.tsutils.bin(x,y,bin_size=2)
         xb
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
@@ -215,7 +216,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.yutils.bin(x,y,step_style='max')
+        xb,yb = pyleo.utils.tsutils.bin(x,y,step_style='max')
         xb
 
     If none of these are specified, the mean spacing will be used.
@@ -224,7 +225,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.yutils.bin(x,y)
+        xb,yb = pyleo.utils.tsutils.bin(x,y)
         xb
 
     """
@@ -255,9 +256,9 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         time_axis = (bin_edges[1:]+bin_edges[:-1])/2
 
     # Perform the calculation
-    binned_values = stay.binned_statistic(x=x,values=y,bins=bin_edges,statistic=statistic).statistic
-    n = stay.binned_statistic(x=x,values=y,bins=bin_edges,statistic='count').statistic
-    error = stay.binned_statistic(x=x,values=y,bins=bin_edges,statistic='std').statistic
+    binned_values = stats.binned_statistic(x=x,values=y,bins=bin_edges,statistic=statistic).statistic
+    n = stats.binned_statistic(x=x,values=y,bins=bin_edges,statistic='count').statistic
+    error = stats.binned_statistic(x=x,values=y,bins=bin_edges,statistic='std').statistic
 
     #Returned bins should be at the midpoint of the bin edges
     res_dict = {
@@ -270,7 +271,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     if no_nans:
         check = np.isnan(binned_values).any()
         if check:
-            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See yutils.bin() documentation for details on parameter hierarchy',stacklevel=2)
+            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See tsutils.bin() documentation for details on parameter hierarchy',stacklevel=2)
 
     return  res_dict
 
@@ -305,7 +306,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
         where/when to stop the interpolation. Default is max(t).
    
     step_style : str
-            step style to be applied from 'incremeny' [default = 'max']
+            step style to be applied from 'increments' [default = 'max']
 
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bins are passed.
@@ -314,7 +315,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
     bin_edges : array
         The right hand edge of bins to use for binning.
         E.g. if bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
-        Same behavior as scipy.stay.binned_statistic
+        Same behavior as scipy.stats.binned_statistic
         Start, stop, step, and step_style will be ignored if this is passed.
 
     time_axis : np.ndarray
@@ -351,13 +352,13 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
     See also
     --------
 
-    pyleoclim.utils.yutils.incremeny : Establishes the incremeny of a numerical array
+    pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
     
-    pyleoclim.utils.yutils.make_even_axis : Create an even time axis
+    pyleoclim.utils.tsutils.make_even_axis : Create an even time axis
 
-    pyleoclim.utils.yutils.bin : Bin the values
+    pyleoclim.utils.tsutils.bin : Bin the values
 
-    pyleoclim.utils.yutils.interp : Interpolate y onto a new x-axis
+    pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
 
     Examples
     --------
@@ -374,7 +375,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.yutils.gkernel(x,y,bin_edges=[1,4,8,12,16,20])
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y,bin_edges=[1,4,8,12,16,20])
         xc
 
     Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoiny between time axis poiny.
@@ -384,7 +385,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.yutils.gkernel(x,y,time_axis=[1,4,8,12,16,20])
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y,time_axis=[1,4,8,12,16,20])
         xc
     
     If `time_axis` is None, `step` will be considered, overriding `step_style` if it is passed. `start` and `stop` will be generated using defauly if not passed.
@@ -393,7 +394,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.yutils.gkernel(x,y,step=2)
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y,step=2)
         xc
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
@@ -402,7 +403,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.yutils.gkernel(x,y,step_style='max')
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y,step_style='max')
         xc
 
     If none of these are specified, the mean spacing will be used.
@@ -411,7 +412,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.yutils.gkernel(x,y)
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y)
         xc
 
     '''
@@ -472,13 +473,13 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
     if no_nans:
         check = np.isnan(yc).any()
         if check:
-            warnings.warn('no_nans is set to True but nans are present in the series. It may have been overridden by other parameters. See yutils.gkernel() documentation for details on parameter hierarchy, and check that your h parameter is large enough.',stacklevel=2)
+            warnings.warn('no_nans is set to True but nans are present in the series. It may have been overridden by other parameters. See tsutils.gkernel() documentation for details on parameter hierarchy, and check that your h parameter is large enough.',stacklevel=2)
 
     return time_axis, yc
 
 
-def incremeny(x,step_style='median'):
-    '''Establishes the incremeny of a numerical array: start, stop, and representative step.
+def increments(x,step_style='median'):
+    '''Establishes the increments of a numerical array: start, stop, and representative step.
 
     Parameters
     ----------
@@ -506,9 +507,9 @@ def incremeny(x,step_style='median'):
     See also
     --------
 
-    pyleoclim.utils.yutils.bin : Bin the values
+    pyleoclim.utils.tsutils.bin : Bin the values
 
-    pyleoclim.utils.yutils.gkernel : Coarsen time resolution using a Gaussian kernel
+    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
 
     '''
 
@@ -521,7 +522,7 @@ def incremeny(x,step_style='median'):
     elif step_style == 'max':
         step = delta.max()
     elif step_style == 'mode':
-        step = stay.mode(delta)[0][0]
+        step = stats.mode(delta)[0][0]
     else:
         step = np.median(delta)
 
@@ -587,13 +588,13 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
     See Also
     --------
 
-    pyleoclim.utils.yutils.incremeny : Establishes the incremeny of a numerical array
+    pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
 
-    pyleoclim.utils.yutils.make_even_axis : Makes an evenly spaced time axis
+    pyleoclim.utils.tsutils.make_even_axis : Makes an evenly spaced time axis
 
-    pyleoclim.utils.yutils.bin : Bin the values
+    pyleoclim.utils.tsutils.bin : Bin the values
 
-    pyleoclim.utils.yutils.gkernel : Coarsen time resolution using a Gaussian kernel
+    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
 
     Examples
     --------
@@ -609,7 +610,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xi,yi = pyleo.utils.yutils.interp(x,y,time_axis=[1,4,8,12,16])
+        xi,yi = pyleo.utils.tsutils.interp(x,y,time_axis=[1,4,8,12,16])
         xi
     
     If `time_axis` is None, `step` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defauly if not passed.
@@ -618,7 +619,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xi,yi = pyleo.utils.yutils.interp(x,y,step=2)
+        xi,yi = pyleo.utils.tsutils.interp(x,y,step=2)
         xi
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
@@ -627,7 +628,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xi,yi = pyleo.utils.yutils.interp(x,y,step_style='max')
+        xi,yi = pyleo.utils.tsutils.interp(x,y,step_style='max')
         xi
 
     If none of these are specified, the mean spacing will be used.
@@ -636,7 +637,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xi,yi = pyleo.utils.yutils.interp(x,y)
+        xi,yi = pyleo.utils.tsutils.interp(x,y)
         xi
 
     """
@@ -699,12 +700,12 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
 
     Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/standardize.m
 
-    The zscore function in SciPy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stay.zscore.html
+    The zscore function in SciPy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.zscore.html
 
     See also
     --------
 
-    pyleoclim.utils.yutils.preprocess : pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending.
 
     """
     x = np.asanyarray(x)
@@ -769,56 +770,56 @@ def center(y, axis=0):
     return yc, ybar
 
 
-def y2segmeny(ys, y, factor=10):
-    ''' Chop a time series into several segmeny based on gap detection.
+def ts2segments(ys, ts, factor=10):
+    ''' Chop a time series into several segments based on gap detection.
 
     The rule of gap detection is very simple:
-        we define the intervals between time poiny as dy, then if dy[i] is larger than factor * dy[i-1],
-        we think that the change of dy (or the gradient) is too large, and we regard it as a breaking point
-        and chop the time series into two segmeny here
+        we define the intervals between time points as dts, then if dts[i] is larger than factor * dts[i-1],
+        we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
+        and chop the time series into two segments here
 
     Parameters
     ----------
 
     ys : array
         A time series, NaNs allowed
-    y : array
-        The time poiny
+    ts : array
+        The time points
     factor : float
-        The factor that adjusy the threshold for gap detection
+        The factor that adjusts the threshold for gap detection
 
     Returns
     -------
 
     seg_ys : list
-        A list of several segmeny with potentially different lengths
-    seg_y : list
-        A list of the time axis of the several segmeny
+        A list of several segments with potentially different lengths
+    seg_ts : list
+        A list of the time axis of the several segments
     n_segs : int
-        The number of segmeny
+        The number of segments
     '''
 
-    ys, y = clean_y(ys, y)
+    ys, ts = clean_ts(ys, ts)
 
-    nt = np.size(y)
-    dy = np.diff(y)
+    nt = np.size(ts)
+    dts = np.diff(ts)
 
-    seg_ys, seg_y = [], []  # store the segmeny with lisy
+    seg_ys, seg_ts = [], []  # store the segments with lists
 
     n_segs = 1
     i_start = 0
     for i in range(1, nt-1):
-        if np.abs(dy[i]) > factor*np.abs(dy[i-1]):
+        if np.abs(dts[i]) > factor*np.abs(dts[i-1]):
             i_end = i + 1
             seg_ys.append(ys[i_start:i_end])
-            seg_y.append(y[i_start:i_end])
+            seg_ts.append(ts[i_start:i_end])
             i_start = np.copy(i_end)
             n_segs += 1
 
     seg_ys.append(ys[i_start:nt])
-    seg_y.append(y[i_start:nt])
+    seg_ts.append(ts[i_start:nt])
 
-    return seg_ys, seg_y, n_segs
+    return seg_ys, seg_ts, n_segs
 
 
 
@@ -889,7 +890,7 @@ def gaussianize(ys):
     See also
     --------
 
-    pyleoclim.utils.yutils.standardize : Centers and normalizes a time series
+    pyleoclim.utils.tsutils.standardize : Centers and normalizes a time series
 
     """
     # Count only elemeny with data.
@@ -963,7 +964,7 @@ def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None)
 
     pyleoclim.utils.filter.savitzky_golay : Filtering using Savitzy-Golay
 
-    pyleoclim.utils.yutils.preprocess : pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending.
 
     """
     y = np.array(y)
@@ -1383,13 +1384,13 @@ def preprocess(ys, y, detrend=False, sg_kwargs=None,
     See also
     --------
 
-    pyleoclim.utils.yutils.detrend : Detrend a timeseries according to four methods
+    pyleoclim.utils.tsutils.detrend : Detrend a timeseries according to four methods
 
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay method
 
-    pyleoclim.utils.yutils.standardize : Centers and normalizes a given time series
+    pyleoclim.utils.tsutils.standardize : Centers and normalizes a given time series
 
-    pyleoclim.utils.yutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
+    pyleoclim.utils.tsutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
 
     '''
 
@@ -1458,17 +1459,17 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
         if x is None:
             raise ValueError('If x is not passed then start, stop and step must be passed')
         else:
-            _, _, step = incremeny(np.asarray(x), step_style = step_style)
+            _, _, step = increments(np.asarray(x), step_style = step_style)
     elif no_nans:
         if x is None:
             raise ValueError('If x is not passed then start, stop and step must be passed')
         else:
-            _, _, step = incremeny(np.asarray(x), step_style = 'max')
+            _, _, step = increments(np.asarray(x), step_style = 'max')
     else:
         if x is None:
             raise ValueError('If x is not passed then start, stop and step must be passed')
         else:
-            _, _, step = incremeny(np.asarray(x), step_style = 'mean')
+            _, _, step = increments(np.asarray(x), step_style = 'mean')
     
     new_axis = np.arange(start,stop+step,step)
 
@@ -1567,6 +1568,7 @@ def phaseran(recblk, nsurr):
 
 def phaseran2(y, nsurr):
     '''
+    Phase randomization of a time series y.
     
     Emulates the phase randomization stategy outlined here: https://stackoverflow.com/q/39543002
 
@@ -1574,44 +1576,42 @@ def phaseran2(y, nsurr):
     ----------
     y : array, length nt
         Signal to be scrambled
-    nsurr : TYPE
-        DESCRIPTION.
+        
+    nsurr : int
+        is the number of image block surrogates that you want to generate.
 
     Returns
     -------
-    ysurr: TYPE
-        DESCRIPTION.
+    ysurr: array nt x nsurr
+        Array of y surrogates
 
     '''
     from scipy.fft import fft, ifft
-    nt = len(y)
+    nt = len(y); n2 = nt //2 
     ys = fft(y)
     pow_ys = np.abs(ys) ** 2.
     phase_ys = np.angle(ys)
-    
-        
     ysurr = np.zeros((nt, nsurr))
+    
     for i in range(nsurr):
-        phase_ysr = phase_ys.copy()
-        # deal with even and odd-length arrays
-        if nt % 2 == 0:
-            phase_ysr_lh = 2*np.pi*np.random.rand(nt/2)
+        phase_ysr = np.empty_like(phase_ys)
+        if nt % 2 == 0: # deal with even and odd-length arrays
+            phase_ysr_lh = np.random.rand(n2-1)
             phase_ysr_rh = -phase_ysr_lh[::-1]
-            phase_ysr = np.concatenate((np.array((phase_ysr[0],)), phase_ysr_lh,
-                                        np.array((phase_ysr[len(phase_ysr)/2],)),
+            phase_ysr = np.concatenate((np.array((phase_ys[0],)), phase_ysr_lh,
+                                        np.array((phase_ys[n2],)),
                                         phase_ysr_rh))
         else:
-            phase_ysr_lh = 2*np.pi*np.random.rand(nt/2+1)
+            phase_ysr_lh = np.random.rand(n2)
             phase_ysr_rh = -phase_ysr_lh[::-1]
-            phase_ysr = np.concatenate((np.array((phase_ysr[0],)), phase_ysr_lh, phase_ysr_rh))
+            phase_ysr = np.concatenate((np.array((phase_ys[0],)), phase_ysr_lh, phase_ysr_rh))
         # put it back together
-        ysrp = np.sqrt(pow_ys) * (np.cos(phase_ysr) + 1j * np.sin(phase_ysr))
-        yrp = ifft(ysrp)
-        if not np.allclose(yrp.imag, np.zeros(yrp.shape)):
-            max_imag = (np.abs(yrp.imag)).max()
-            imag_str = '\nNOTE: a non-negligible imaginary component was discarded.\n\tMax: {}'
-            print(imag_str.format(max_imag))
-        ysurr[:,i] = yrp.real
+        ysrp = np.sqrt(pow_ys) * np.exp(2*np.pi*1j*phase_ysr) 
+        ysurr[:,i] = ifft(ysrp).real
+        # if not np.allclose(yrp.imag, np.zeros(yrp.shape)):
+        #     max_imag = (np.abs(yrp.imag)).max()
+        #     imag_str = '\nNOTE: a non-negligible imaginary component was discarded.\n\tMax: {}'
+        #     print(imag_str.format(max_imag))
             
     return ysurr
     
