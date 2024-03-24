@@ -19,9 +19,9 @@ class SurrogateSeries(MultipleSeries):
         
         # refine the display name
         if surrogate_method == 'ar1sim':
-            self.label = label + " surrogates [AR(1)]"
+            self.label = str(label or "series") + " surrogates [AR(1)]"
         elif surrogate_method == 'phaseran':
-            self.label = label + " surrogates [phase-randomized]"
+            self.label = str(label or "series") + " surrogates [phase-randomized]"
         else:
             raise ValueError('Surrogate method should either be "ar1sim" or "phaseran"')
         

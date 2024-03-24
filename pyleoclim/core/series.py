@@ -3666,7 +3666,7 @@ class Series:
                            time_unit=self.time_unit, 
                            value_name=self.value_name, 
                            value_unit=self.value_unit, 
-                           label = self.label + " surrogate " + str(i),
+                           label = str(self.label or '') + " surr #" + str(i+1),
                            verbose=False, auto_time_params=True)
             s_list.append(s_tmp)
 
