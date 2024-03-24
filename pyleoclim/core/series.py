@@ -3636,10 +3636,6 @@ class Series:
 
         '''
         settings = {} if settings is None else settings.copy()
-        # surrogate_func = {
-        #     'ar1sim': tsmodel.ar1_sim,
-        #     'phaseran': tsutils.phaseran
-        # }
         args = {}
         time = self.time
         args['ar1sim'] = {'t': time}
@@ -3655,16 +3651,13 @@ class Series:
             surr_res = tsutils.phaseran(self.value, number, **args[method])
             if len(time) % 2 == 0:
                 time = time[0:-1]
-        # elif method == 'ar1sim_geneva':
+        # elif method == 'uar1':
         #     # TODO : implement Lionel's ML method
         # elif method == 'power-law':
         #     # TODO : implement Stochastic
         # elif method == 'fBm':
         #      # TODO : implement Stochastic
-            
-        #surr_res = surrogate_func[method](self.value, number, **args[method])
-        # TODO: extract parameters for parametric methods
-        
+                    
         if len(np.shape(surr_res)) == 1:
             surr_res = surr_res[:, np.newaxis]
 

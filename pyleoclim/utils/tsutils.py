@@ -5,12 +5,12 @@ Utilities to manipulate timeseries - useful for preprocessing prior to analysis
 """
 
 __all__ = [
-    'simple_stats',
+    'simple_stay',
     'bin',
     'interp',
     'gkernel',
     'standardize',
-    'ts2segments',
+    'y2segmeny',
     'annualize',
     'gaussianize',
     'detrend',
@@ -27,7 +27,7 @@ import copy
 from scipy import special
 from scipy import signal
 from scipy import interpolate
-from scipy import stats
+from scipy import stay
 from pyhht import EMD
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
@@ -36,18 +36,18 @@ from sklearn.metrics import silhouette_score
 from sklearn.neighbors import LocalOutlierFactor
 #import matplotlib.pyplot as plt
 
-import statsmodels.tsa.stattools as sms
+import staymodels.ya.stattools as sms
 
 import math
 from .filter import savitzky_golay
 
-from .tsbase import (
-    clean_ts,
+from .ybase import (
+    clean_y,
     dropna,
 )
 
 
-def simple_stats(y, axis=None):
+def simple_stay(y, axis=None):
     """ Computes simple statistics
 
     Computes the mean, median, min, max, standard deviation, and interquartile range of a numpy array y, ignoring NaNs.
@@ -57,10 +57,10 @@ def simple_stats(y, axis=None):
 
     y: array
         A Numpy array
-    axis : int, tuple of ints
+    axis : int, tuple of iny
         Axis or Axes along which the means
         are computed, the default is to compute the mean of the flattened
-        array. If a tuple of ints, performed over multiple axes
+        array. If a tuple of iny, performed over multiple axes
 
     Returns
     -------
@@ -98,7 +98,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     The behavior of bins, as defined either by start, stop and step or by the bins argument, is to have all bins
     except the last one be half open. That is if bins are defined as bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
-    This is the default behaviour of scipy.stats.binned_statistic (upon which this function is built).
+    This is the default behaviour of scipy.stay.binned_statistic (upon which this function is built).
 
     Parameters
     ----------
@@ -119,7 +119,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         When/where to stop binning. Default is the maximum.
 
     step_style : str; {'min','mean','median','max'}
-        Step style to use when determining the size of the interval between points. Default is None.
+        Step style to use when determining the size of the interval between poiny. Default is None.
 
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bin_size is set to float.
@@ -127,21 +127,21 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     statistic : str
         Statistic to calculate and return in values. Default is 'mean'.
-        See scipy.stats.binned_statistic for other options.
+        See scipy.stay.binned_statistic for other options.
 
     bin_edges : np.ndarray
         The edge of bins to use for binning. 
         E.g. if bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
-        See scipy.stats.binned_statistic for details.
+        See scipy.stay.binned_statistic for details.
         Start, stop, bin_size, step_style, and time_axis will be ignored if this is passed.
     
     time_axis : np.ndarray
-        The time axis to use for binning. If passed, bin_edges will be set as the midpoints between times.
+        The time axis to use for binning. If passed, bin_edges will be set as the midpoiny between times.
         The first time will be used as the left most edge, the last time will be used as the right most edge.
         Start, stop, bin_size, and step_style will be ignored if this is passed.
 
     no_nans : bool; {True,False}
-        Sets the step_style to max, ensuring that the resulting series contains no empty values (nans).
+        Sey the step_style to max, ensuring that the resulting series contains no empty values (nans).
         Default is True.
 
     Returns
@@ -152,7 +152,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     bins : array
         The bins (centered on the median, i.e., the 100-200 bin is 150)
     n : array
-        Number of data points in each bin
+        Number of data poiny in each bin
     error : array
         The standard error on the mean in each bin
 
@@ -161,24 +161,24 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     `start`, `stop`, `bin_size`, and `step_style` are interpreted as defining the `bin_edges` for this function.
     This differs from the `interp` interpretation, which uses these to define the time axis over which interpolation is applied.
-    For `bin`, the time axis will be specified as the midpoints between `bin_edges`, unless `time_axis` is explicitly passed.
+    For `bin`, the time axis will be specified as the midpoiny between `bin_edges`, unless `time_axis` is explicitly passed.
 
     See also
     --------
 
-    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
+    pyleoclim.utils.yutils.gkernel : Coarsen time resolution using a Gaussian kernel
 
-    pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
+    pyleoclim.utils.yutils.interp : Interpolate y onto a new x-axis
 
-    `scipy.stats.binned_statistic <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binned_statistic.html>`_ : Scipy function around which this function is written
+    `scipy.stay.binned_statistic <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stay.binned_statistic.html>`_ : Scipy function around which this function is written
 
     Examples
     --------
 
     There are several ways to specify the way binning is conducted via this function. Within these there is a hierarchy which we demonstrate below.
 
-    Top priority is given to `bin_edges` if it is not None. All other arguments will be ignored (except for x and y).
-    The resulting time axis will be comprised of the midpoints between bin edges.
+    Top priority is given to `bin_edges` if it is not None. All other argumeny will be ignored (except for x and y).
+    The resulting time axis will be comprised of the midpoiny between bin edges.
 
     .. jupyter-execute::
 
@@ -187,26 +187,26 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.tsutils.bin(x,y,bin_edges=[1,4,8,12,16,20])
+        xb,yb = pyleo.utils.yutils.bin(x,y,bin_edges=[1,4,8,12,16,20])
         xb
 
-    Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoints between time axis points.
+    Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoiny between time axis poiny.
     The first and last time point will be used as the left most and right most bin edges.
 
     .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.tsutils.bin(x,y,time_axis=[1,4,8,12,16,20])
+        xb,yb = pyleo.utils.yutils.bin(x,y,time_axis=[1,4,8,12,16,20])
         xb
     
-    If `time_axis` is None, `bin_size` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defaults if not passed.
+    If `time_axis` is None, `bin_size` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defauly if not passed.
 
     .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.tsutils.bin(x,y,bin_size=2)
+        xb,yb = pyleo.utils.yutils.bin(x,y,bin_size=2)
         xb
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
@@ -215,7 +215,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.tsutils.bin(x,y,step_style='max')
+        xb,yb = pyleo.utils.yutils.bin(x,y,step_style='max')
         xb
 
     If none of these are specified, the mean spacing will be used.
@@ -224,7 +224,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xb,yb = pyleo.utils.tsutils.bin(x,y)
+        xb,yb = pyleo.utils.yutils.bin(x,y)
         xb
 
     """
@@ -240,12 +240,12 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     # Set the bin edges
     if bin_edges is not None:
         if start is not None or stop is not None or bin_size is not None or step_style is not None or time_axis is not None:
-            warnings.warn('Bins have been passed with other bin relevant arguments {start,stop,bin_size,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=2)
+            warnings.warn('Bins have been passed with other bin relevant argumeny {start,stop,bin_size,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=2)
         time_axis = (bin_edges[1:] + bin_edges[:-1])/2
     # A bit of wonk is required to get the proper bin edges from the time axis
     elif time_axis is not None:
         if start is not None or stop is not None or bin_size is not None or step_style is not None:
-            warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,bin_size,step_style}. Time_axis takes priority and will be used.',stacklevel=2)
+            warnings.warn('The time axis has been passed with other time axis relevant argumeny {start,stop,bin_size,step_style}. Time_axis takes priority and will be used.',stacklevel=2)
         bin_edges = np.zeros(len(time_axis)+1)
         bin_edges[0] = time_axis[0]
         bin_edges[-1] = time_axis[-1]
@@ -255,9 +255,9 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         time_axis = (bin_edges[1:]+bin_edges[:-1])/2
 
     # Perform the calculation
-    binned_values = stats.binned_statistic(x=x,values=y,bins=bin_edges,statistic=statistic).statistic
-    n = stats.binned_statistic(x=x,values=y,bins=bin_edges,statistic='count').statistic
-    error = stats.binned_statistic(x=x,values=y,bins=bin_edges,statistic='std').statistic
+    binned_values = stay.binned_statistic(x=x,values=y,bins=bin_edges,statistic=statistic).statistic
+    n = stay.binned_statistic(x=x,values=y,bins=bin_edges,statistic='count').statistic
+    error = stay.binned_statistic(x=x,values=y,bins=bin_edges,statistic='std').statistic
 
     #Returned bins should be at the midpoint of the bin edges
     res_dict = {
@@ -270,7 +270,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     if no_nans:
         check = np.isnan(binned_values).any()
         if check:
-            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See tsutils.bin() documentation for details on parameter hierarchy',stacklevel=2)
+            warnings.warn('no_nans is set to True but nans are present in the series. It has likely been overridden by other parameters. See yutils.bin() documentation for details on parameter hierarchy',stacklevel=2)
 
     return  res_dict
 
@@ -292,11 +292,11 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
         
     h  : float 
         kernel e-folding scale. Default value is None, in which case the median time step will be used.
-        If the median time step results in a series with nan values, the maximum time step will be used.
-        Note that if this variable is too small, this method may return nan values in parts of the series.
+        If the median time step resuly in a series with nan values, the maximum time step will be used.
+        Note that if this variable is too small, this method may return nan values in pary of the series.
     
     step : float
-        The interpolation step. Default is max spacing between consecutive points.
+        The interpolation step. Default is max spacing between consecutive poiny.
 
     start : float
         where/when to start the interpolation. Default is min(t).
@@ -305,7 +305,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
         where/when to stop the interpolation. Default is max(t).
    
     step_style : str
-            step style to be applied from 'increments' [default = 'max']
+            step style to be applied from 'incremeny' [default = 'max']
 
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bins are passed.
@@ -314,16 +314,16 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
     bin_edges : array
         The right hand edge of bins to use for binning.
         E.g. if bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
-        Same behavior as scipy.stats.binned_statistic
+        Same behavior as scipy.stay.binned_statistic
         Start, stop, step, and step_style will be ignored if this is passed.
 
     time_axis : np.ndarray
-        The time axis to use for binning. If passed, bin_edges will be set as the midpoints between times.
+        The time axis to use for binning. If passed, bin_edges will be set as the midpoiny between times.
         The first time will be used as the left most edge, the last time will be used as the right most edge.
         Start, stop, bin_size, and step_style will be ignored if this is passed.
 
     no_nans : bool; {True,False}
-        Sets the step_style to max, ensuring that the resulting series contains no empty values (nans).
+        Sey the step_style to max, ensuring that the resulting series contains no empty values (nans).
         Default is True.
 
     Returns
@@ -339,7 +339,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
     `start`, `stop`, `step`, and `step_style` are interpreted as defining the `bin_edges` for this function.
     This differs from the `interp` interpretation, which uses these to define the time axis over which interpolation is applied.
-    For `gkernel`, the time axis will be specified as the midpoints between `bin_edges`, unless `time_axis` is explicitly passed.
+    For `gkernel`, the time axis will be specified as the midpoiny between `bin_edges`, unless `time_axis` is explicitly passed.
 
     References
     ----------
@@ -351,21 +351,21 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
     See also
     --------
 
-    pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
+    pyleoclim.utils.yutils.incremeny : Establishes the incremeny of a numerical array
     
-    pyleoclim.utils.tsutils.make_even_axis : Create an even time axis
+    pyleoclim.utils.yutils.make_even_axis : Create an even time axis
 
-    pyleoclim.utils.tsutils.bin : Bin the values
+    pyleoclim.utils.yutils.bin : Bin the values
 
-    pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
+    pyleoclim.utils.yutils.interp : Interpolate y onto a new x-axis
 
     Examples
     --------
 
     There are several ways to specify the way coarsening is done via this function. Within these there is a hierarchy which we demonstrate below.
 
-    Top priority is given to `bin_edges` if it is not None. All other arguments will be ignored (except for x and y).
-    The resulting time axis will be comprised of the midpoints between bin edges.
+    Top priority is given to `bin_edges` if it is not None. All other argumeny will be ignored (except for x and y).
+    The resulting time axis will be comprised of the midpoiny between bin edges.
 
     .. jupyter-execute::
 
@@ -374,26 +374,26 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.tsutils.gkernel(x,y,bin_edges=[1,4,8,12,16,20])
+        xc,yc = pyleo.utils.yutils.gkernel(x,y,bin_edges=[1,4,8,12,16,20])
         xc
 
-    Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoints between time axis points.
+    Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoiny between time axis poiny.
     The first and last time point will be used as the left most and right most bin edges.
 
     .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.tsutils.gkernel(x,y,time_axis=[1,4,8,12,16,20])
+        xc,yc = pyleo.utils.yutils.gkernel(x,y,time_axis=[1,4,8,12,16,20])
         xc
     
-    If `time_axis` is None, `step` will be considered, overriding `step_style` if it is passed. `start` and `stop` will be generated using defaults if not passed.
+    If `time_axis` is None, `step` will be considered, overriding `step_style` if it is passed. `start` and `stop` will be generated using defauly if not passed.
 
     .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.tsutils.gkernel(x,y,step=2)
+        xc,yc = pyleo.utils.yutils.gkernel(x,y,step=2)
         xc
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
@@ -402,7 +402,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.tsutils.gkernel(x,y,step_style='max')
+        xc,yc = pyleo.utils.yutils.gkernel(x,y,step_style='max')
         xc
 
     If none of these are specified, the mean spacing will be used.
@@ -411,7 +411,7 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xc,yc = pyleo.utils.tsutils.gkernel(x,y)
+        xc,yc = pyleo.utils.yutils.gkernel(x,y)
         xc
 
     '''
@@ -431,13 +431,13 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
     if bin_edges is not None:
         bin_edges = np.array(bin_edges)
         if start is not None or stop is not None or step is not None or step_style is not None or time_axis is not None:
-            warnings.warn('Bins have been passed with other axis relevant arguments {start,stop,step,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=2)
+            warnings.warn('Bins have been passed with other axis relevant argumeny {start,stop,step,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=2)
         time_axis = (bin_edges[1:] + bin_edges[:-1])/2
     # A bit of wonk is required to get the proper bin edges from the time axis
     elif time_axis is not None:
         time_axis = np.array(time_axis)
         if start is not None or stop is not None or step is not None or step_style is not None:
-            warnings.warn('The time axis has been passed with other axis relevant arguments {start,stop,step,step_style}. Time_axis takes priority and will be used.',stacklevel=2)
+            warnings.warn('The time axis has been passed with other axis relevant argumeny {start,stop,step,step_style}. Time_axis takes priority and will be used.',stacklevel=2)
         bin_edges = np.zeros(len(time_axis)+1)
         bin_edges[0] = time_axis[0]
         bin_edges[-1] = time_axis[-1]
@@ -465,20 +465,20 @@ def gkernel(t,y, h = None, step=None,start=None,stop=None, step_style = None, ev
         if len(xslice)>0:
             d      = xslice-time_axis[i]
             weight = kernel(d,h)
-            yc[i]  = sum(weight*yslice)/sum(weight) # normalize by the sum of weights
+            yc[i]  = sum(weight*yslice)/sum(weight) # normalize by the sum of weighy
         else:
             yc[i] = np.nan
 
     if no_nans:
         check = np.isnan(yc).any()
         if check:
-            warnings.warn('no_nans is set to True but nans are present in the series. It may have been overridden by other parameters. See tsutils.gkernel() documentation for details on parameter hierarchy, and check that your h parameter is large enough.',stacklevel=2)
+            warnings.warn('no_nans is set to True but nans are present in the series. It may have been overridden by other parameters. See yutils.gkernel() documentation for details on parameter hierarchy, and check that your h parameter is large enough.',stacklevel=2)
 
     return time_axis, yc
 
 
-def increments(x,step_style='median'):
-    '''Establishes the increments of a numerical array: start, stop, and representative step.
+def incremeny(x,step_style='median'):
+    '''Establishes the incremeny of a numerical array: start, stop, and representative step.
 
     Parameters
     ----------
@@ -506,9 +506,9 @@ def increments(x,step_style='median'):
     See also
     --------
 
-    pyleoclim.utils.tsutils.bin : Bin the values
+    pyleoclim.utils.yutils.bin : Bin the values
 
-    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
+    pyleoclim.utils.yutils.gkernel : Coarsen time resolution using a Gaussian kernel
 
     '''
 
@@ -521,7 +521,7 @@ def increments(x,step_style='median'):
     elif step_style == 'max':
         step = delta.max()
     elif step_style == 'mode':
-        step = stats.mode(delta)[0][0]
+        step = stay.mode(delta)[0][0]
     else:
         step = np.median(delta)
 
@@ -549,7 +549,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
         Default is 'linear'.
 
     step : float
-        The interpolation step. Default is mean spacing between consecutive points.
+        The interpolation step. Default is mean spacing between consecutive poiny.
         Step_style will be ignored if this is passed.
 
     start : float
@@ -559,15 +559,15 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
         Where/when to stop the interpolation. Default is the maximum.
 
     step_style : str; {'min','mean','median','max'}
-        Step style to use when determining the size of the interval between points. Default is None.
+        Step style to use when determining the size of the interval between poiny. Default is None.
 
     time_axis : np.ndarray
         Time axis onto which the series will be interpolated.
         Start, stop, step, and step_style will be ignored if this is passed
 
     kwargs :  kwargs
-        Aguments specific to interpolate.interp1D.
-        If getting an error about extrapolation, you can use the arguments `bound_errors=False` and `fill_value="extrapolate"` to allow for extrapolation. 
+        Agumeny specific to interpolate.interp1D.
+        If getting an error about extrapolation, you can use the argumeny `bound_errors=False` and `fill_value="extrapolate"` to allow for extrapolation. 
 
     Returns
     -------
@@ -581,26 +581,26 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
     -----
 
     `start`, `stop`, `step` and `step_styl`e pertain to the creation of the time axis over which interpolation will be conducted.
-    This differs from the way that the functions `bin` and `gkernel` interpret these arguments, which is as defining
+    This differs from the way that the functions `bin` and `gkernel` interpret these argumeny, which is as defining
     the `bin_edges` parameter used in those functions.
 
     See Also
     --------
 
-    pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
+    pyleoclim.utils.yutils.incremeny : Establishes the incremeny of a numerical array
 
-    pyleoclim.utils.tsutils.make_even_axis : Makes an evenly spaced time axis
+    pyleoclim.utils.yutils.make_even_axis : Makes an evenly spaced time axis
 
-    pyleoclim.utils.tsutils.bin : Bin the values
+    pyleoclim.utils.yutils.bin : Bin the values
 
-    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
+    pyleoclim.utils.yutils.gkernel : Coarsen time resolution using a Gaussian kernel
 
     Examples
     --------
 
     There are several ways to specifiy a time axis for interpolation. Within these there is a hierarchy which we demonstrate below.
 
-    Top priority will always go to `time_axis` if it is passed. All other arguments will be overwritten (except for x,y, and interp_type).
+    Top priority will always go to `time_axis` if it is passed. All other argumeny will be overwritten (except for x,y, and interp_type).
 
     .. jupyter-execute::
 
@@ -609,16 +609,16 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xi,yi = pyleo.utils.tsutils.interp(x,y,time_axis=[1,4,8,12,16])
+        xi,yi = pyleo.utils.yutils.interp(x,y,time_axis=[1,4,8,12,16])
         xi
     
-    If `time_axis` is None, `step` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defaults if not passed.
+    If `time_axis` is None, `step` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defauly if not passed.
 
     .. jupyter-execute::
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xi,yi = pyleo.utils.tsutils.interp(x,y,step=2)
+        xi,yi = pyleo.utils.yutils.interp(x,y,step=2)
         xi
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
@@ -627,7 +627,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xi,yi = pyleo.utils.tsutils.interp(x,y,step_style='max')
+        xi,yi = pyleo.utils.yutils.interp(x,y,step_style='max')
         xi
 
     If none of these are specified, the mean spacing will be used.
@@ -636,7 +636,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(x))
-        xi,yi = pyleo.utils.tsutils.interp(x,y)
+        xi,yi = pyleo.utils.yutils.interp(x,y)
         xi
 
     """
@@ -652,7 +652,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
     # get the evenly spaced time axis if one is not passed.
     if time_axis is not None:
         if start is not None or stop is not None or step is not None or step_style is not None:
-            warnings.warn('A time axis has been passed with other time axis relevant arguments {start,stop,step,step_style}. The passed time axis takes priority and will be used.',stacklevel=3)
+            warnings.warn('A time axis has been passed with other time axis relevant argumeny {start,stop,step,step_style}. The passed time axis takes priority and will be used.',stacklevel=3)
         pass
     else:
         time_axis = make_even_axis(x=x,start=start,stop=stop,step=step,step_style=step_style)
@@ -661,7 +661,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
     data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
     time_axis = np.sort(time_axis)
 
-    # Add arguments
+    # Add argumeny
     yi = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(time_axis)
 
     return time_axis, yi
@@ -699,12 +699,12 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
 
     Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/standardize.m
 
-    The zscore function in SciPy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.zscore.html
+    The zscore function in SciPy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stay.zscore.html
 
     See also
     --------
 
-    pyleoclim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.yutils.preprocess : pre-processes a times series using standardization and detrending.
 
     """
     x = np.asanyarray(x)
@@ -769,67 +769,67 @@ def center(y, axis=0):
     return yc, ybar
 
 
-def ts2segments(ys, ts, factor=10):
-    ''' Chop a time series into several segments based on gap detection.
+def y2segmeny(ys, y, factor=10):
+    ''' Chop a time series into several segmeny based on gap detection.
 
     The rule of gap detection is very simple:
-        we define the intervals between time points as dts, then if dts[i] is larger than factor * dts[i-1],
-        we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
-        and chop the time series into two segments here
+        we define the intervals between time poiny as dy, then if dy[i] is larger than factor * dy[i-1],
+        we think that the change of dy (or the gradient) is too large, and we regard it as a breaking point
+        and chop the time series into two segmeny here
 
     Parameters
     ----------
 
     ys : array
         A time series, NaNs allowed
-    ts : array
-        The time points
+    y : array
+        The time poiny
     factor : float
-        The factor that adjusts the threshold for gap detection
+        The factor that adjusy the threshold for gap detection
 
     Returns
     -------
 
     seg_ys : list
-        A list of several segments with potentially different lengths
-    seg_ts : list
-        A list of the time axis of the several segments
+        A list of several segmeny with potentially different lengths
+    seg_y : list
+        A list of the time axis of the several segmeny
     n_segs : int
-        The number of segments
+        The number of segmeny
     '''
 
-    ys, ts = clean_ts(ys, ts)
+    ys, y = clean_y(ys, y)
 
-    nt = np.size(ts)
-    dts = np.diff(ts)
+    nt = np.size(y)
+    dy = np.diff(y)
 
-    seg_ys, seg_ts = [], []  # store the segments with lists
+    seg_ys, seg_y = [], []  # store the segmeny with lisy
 
     n_segs = 1
     i_start = 0
     for i in range(1, nt-1):
-        if np.abs(dts[i]) > factor*np.abs(dts[i-1]):
+        if np.abs(dy[i]) > factor*np.abs(dy[i-1]):
             i_end = i + 1
             seg_ys.append(ys[i_start:i_end])
-            seg_ts.append(ts[i_start:i_end])
+            seg_y.append(y[i_start:i_end])
             i_start = np.copy(i_end)
             n_segs += 1
 
     seg_ys.append(ys[i_start:nt])
-    seg_ts.append(ts[i_start:nt])
+    seg_y.append(y[i_start:nt])
 
-    return seg_ys, seg_ts, n_segs
+    return seg_ys, seg_y, n_segs
 
 
 
-def annualize(ys, ts):
+def annualize(ys, y):
     ''' Annualize a time series whose time resolution is finer than 1 year
 
     Parameters
     ----------
     ys : array
         A time series, NaNs allowed
-    ts : array
+    y : array
         The time axis of the time series, NaNs allowed
 
     Returns
@@ -841,10 +841,10 @@ def annualize(ys, ts):
 
     '''
     ys = np.asarray(ys, dtype=float)
-    ts = np.asarray(ts, dtype=float)
-    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+    y = np.asarray(y, dtype=float)
+    assert ys.size == y.size, 'The size of time axis and data value should be equal!'
 
-    year_int = list(set(np.floor(ts)))
+    year_int = list(set(np.floor(y)))
     year_int = np.sort(list(map(int, year_int)))
     n_year = len(year_int)
     year_int_pad = list(year_int)
@@ -854,7 +854,7 @@ def annualize(ys, ts):
     for i in range(n_year):
         t_start = year_int_pad[i]
         t_end = year_int_pad[i+1]
-        t_range = (ts >= t_start) & (ts < t_end)
+        t_range = (y >= t_start) & (y < t_end)
         ys_ann[i] = np.average(ys[t_range], axis=0)
 
     return ys_ann, year_int
@@ -889,10 +889,10 @@ def gaussianize(ys):
     See also
     --------
 
-    pyleoclim.utils.tsutils.standardize : Centers and normalizes a time series
+    pyleoclim.utils.yutils.standardize : Centers and normalizes a time series
 
     """
-    # Count only elements with data.
+    # Count only elemeny with data.
 
     n = ys[~np.isnan(ys)].shape[0]
 
@@ -963,7 +963,7 @@ def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None)
 
     pyleoclim.utils.filter.savitzky_golay : Filtering using Savitzy-Golay
 
-    pyleoclim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.yutils.preprocess : pre-processes a times series using standardization and detrending.
 
     """
     y = np.array(y)
@@ -996,11 +996,11 @@ def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None)
         trend = np.interp(x,x_interp,y_filt)
         ys = y - trend
     elif method == "emd":
-        imfs = EMD(y).decompose()
-        if np.shape(imfs)[0] == 1:
+        imys = EMD(y).decompose()
+        if np.shape(imys)[0] == 1:
             trend = np.zeros(np.size(y))
         else:
-            trend = np.sum(imfs[-n:], axis=0)  # remove the n smoothest modes
+            trend = np.sum(imys[-n:], axis=0)  # remove the n smoothest modes
 
         ys = y - trend
     else:
@@ -1014,7 +1014,7 @@ def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None)
 def calculate_distances(ys, n_neighbors=None, NN_kwargs=None):
     """
     
-    Uses the scikit-learn unsupervised learner for implementing neighbor searches and calculate the distance between a point and its nearest neighbors to estimate epsilon for DBSCAN. 
+    Uses the scikit-learn unsupervised learner for implementing neighbor searches and calculate the distance between a point and iy nearest neighbors to estimate epsilon for DBSCAN. 
     
 
     Parameters
@@ -1024,7 +1024,7 @@ def calculate_distances(ys, n_neighbors=None, NN_kwargs=None):
     n_neighbors : int, optional
         Number of neighbors to use by default for kneighbors queries. The default is None.
     NN_kwargs : dict, optional
-        Other arguments for sklearn.neighbors.NearestNeighbors. The default is None.
+        Other argumeny for sklearn.neighbors.NearestNeighbors. The default is None.
         See: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors
 
     Returns
@@ -1077,21 +1077,21 @@ def detect_outliers_DBSCAN(ys, nbr_clusters = None, eps=None, min_samples=None, 
     ys : numpy.array
         The y-values for the timeseries data.
     nbr_clusters : int, optional
-        Number of clusters. Note that the DBSCAN algorithm calculates the number of clusters automatically. This paramater affects the optimization over the silhouette score. The default is None.
+        Number of clusters. Note that the DBSCAN algorithm calculates the number of clusters automatically. This paramater affecy the optimization over the silhouette score. The default is None.
     eps : float or list, optional
-        epsilon. The default is None, which allows the algorithm to optimize for the best value of eps, using the silhouette score as the optimization criterion. The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is not a maximum bound on the distances of points within a cluster. This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.
+        epsilon. The default is None, which allows the algorithm to optimize for the best value of eps, using the silhouette score as the optimization criterion. The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is not a maximum bound on the distances of poiny within a cluster. This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.
     min_samples : int or list, optional
-        The number of samples (or total weight) in a neighborhood for a point to be considered as a core point. This includes the point itself.. The default is None and optimized using the silhouette score
+        The number of samples (or total weight) in a neighborhood for a point to be considered as a core point. This includes the point iyelf.. The default is None and optimized using the silhouette score
     n_neighbors : int, optional
         Number of neighbors to use by default for kneighbors queries, which can be used to calculate a range of plausible eps values. The default is None.
     metric : str, optional
         The metric to use when calculating distance between instances in a feature array. The default is 'euclidean'. See https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html for alternative values. 
     NN_kwargs : dict, optional
-        Other arguments for sklearn.neighbors.NearestNeighbors. The default is None.
+        Other argumeny for sklearn.neighbors.NearestNeighbors. The default is None.
         See: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors
 
     DBSCAN_kwargs : dict, optional
-        Other arguments for sklearn.cluster.DBSCAN. The default is None.
+        Other argumeny for sklearn.cluster.DBSCAN. The default is None.
         See: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
 
 
@@ -1100,7 +1100,7 @@ def detect_outliers_DBSCAN(ys, nbr_clusters = None, eps=None, min_samples=None, 
     indices : list
         list of indices that are considered outliers.
     res : pandas.DataFrame
-        Results of the clustering analysis. Contains information about eps value, min_samples value, number of clusters, the silhouette score, the indices of the outliers for each combination, and the cluster assignment for each point. 
+        Resuly of the clustering analysis. Contains information about eps value, min_samples value, number of clusters, the silhouette score, the indices of the outliers for each combination, and the cluster assignment for each point. 
 
     """
     
@@ -1198,11 +1198,11 @@ def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=
     max_cluster : int, optional
         The maximum number of clusters to consider in the optimization based on the Silhouette Score. The default is 10.
     threshold : int, optional
-        The algorithm uses the euclidean distance for each point in the cluster to identify the outliers. This parameter sets the threshold on the euclidean distance to define an outlier. The default is 3.
+        The algorithm uses the euclidean distance for each point in the cluster to identify the outliers. This parameter sey the threshold on the euclidean distance to define an outlier. The default is 3.
     LOF : bool, optional
         By default, detect_outliers_kmeans uses euclidean distance for outlier detection. Set LOF to True to use LocalOutlierFactor for outlier detection.
     n_frac : float, optional
-        The percentage of the time series length (the length, representing number of points) to be used to set the n_neighbors parameter for the LOF function in scikit-learn. 
+        The percentage of the time series length (the length, representing number of poiny) to be used to set the n_neighbors parameter for the LOF function in scikit-learn. 
         We recommend using at least 50% (n_frac=0.5) of the timeseries. You cannot use 100% (n_frac!=1)
     contamination : ('auto', float), optional
         Same as LOF parameter from scikit-learn. We recommend using the default mode of auto. See: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html for details.
@@ -1214,7 +1214,7 @@ def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=
     indices : list
         list of indices that are considered outliers.
     res : pandas.DataFrame
-        Results of the clustering analysis. Contains information about number of clusters, the silhouette score, the indices of the outliers for each combination, and the cluster assignment for each point. 
+        Resuly of the clustering analysis. Contains information about number of clusters, the silhouette score, the indices of the outliers for each combination, and the cluster assignment for each point. 
 
 
     """
@@ -1266,13 +1266,13 @@ def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=
     
     return indices, res
 
-def remove_outliers(ts,ys,indices):
+def remove_outliers(y,ys,indices):
     """
     Remove the outliers from timeseries data
 
     Parameters
     ----------
-    ts : numpy.array
+    y : numpy.array
         The time axis for the timeseries data.
     ys : numpy.array
         The y-values for the timeseries data.
@@ -1283,14 +1283,14 @@ def remove_outliers(ts,ys,indices):
     -------
     ys : numpy.array
         The time axis for the timeseries data after outliers removal
-    ts : numpy.array
+    y : numpy.array
         The y-values for the timeseries data after outliers removal
 
     """
     ys = np.delete(ys,indices)
-    ts = np.delete(ts,indices)
+    y = np.delete(y,indices)
 
-    return ys,ts
+    return ys,y
 
 def eff_sample_size(y, detrend_flag=False):
     '''Effective Sample Size of timeseries y
@@ -1338,7 +1338,7 @@ def eff_sample_size(y, detrend_flag=False):
 std = standardize
 gauss = gaussianize
 
-def preprocess(ys, ts, detrend=False, sg_kwargs=None,
+def preprocess(ys, y, detrend=False, sg_kwargs=None,
                gaussianize=False, standardize=True):
     ''' Return the processed time series using detrend and standardization.
 
@@ -1349,7 +1349,7 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
 
         a time series
 
-    ts : array
+    y : array
 
         The time axis for the timeseries. Necessary for use with
         the Savitzky-Golay filters method since the series should be evenly spaced.
@@ -1383,20 +1383,20 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
     See also
     --------
 
-    pyleoclim.utils.tsutils.detrend : Detrend a timeseries according to four methods
+    pyleoclim.utils.yutils.detrend : Detrend a timeseries according to four methods
 
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay method
 
-    pyleoclim.utils.tsutils.standardize : Centers and normalizes a given time series
+    pyleoclim.utils.yutils.standardize : Centers and normalizes a given time series
 
-    pyleoclim.utils.tsutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
+    pyleoclim.utils.yutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
 
     '''
 
     if detrend == 'none' or detrend is False or detrend is None:
         ys_d = ys
     else:
-        ys_d = detrend(ys, ts, method=detrend, sg_kwargs=sg_kwargs)
+        ys_d = detrend(ys, y, method=detrend, sg_kwargs=sg_kwargs)
 
     if standardize:
         res, _, _ = std(ys_d)
@@ -1458,17 +1458,17 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
         if x is None:
             raise ValueError('If x is not passed then start, stop and step must be passed')
         else:
-            _, _, step = increments(np.asarray(x), step_style = step_style)
+            _, _, step = incremeny(np.asarray(x), step_style = step_style)
     elif no_nans:
         if x is None:
             raise ValueError('If x is not passed then start, stop and step must be passed')
         else:
-            _, _, step = increments(np.asarray(x), step_style = 'max')
+            _, _, step = incremeny(np.asarray(x), step_style = 'max')
     else:
         if x is None:
             raise ValueError('If x is not passed then start, stop and step must be passed')
         else:
-            _, _, step = increments(np.asarray(x), step_style = 'mean')
+            _, _, step = incremeny(np.asarray(x), step_style = 'mean')
     
     new_axis = np.arange(start,stop+step,step)
 
@@ -1515,7 +1515,7 @@ def phaseran(recblk, nsurr):
     -------
 
     surrblk : numpy array
-        3D multidimensional array image block with the surrogate datasets along the third dimension
+        3D multidimensional array image block with the surrogate datasey along the third dimension
 
     See also
     --------
@@ -1563,5 +1563,56 @@ def phaseran(recblk, nsurr):
         surrblk[:, k] = np.real(np.fft.ifft(fft_recblk_surr))
 
     return surrblk
+
+
+def phaseran2(y, nsurr):
+    '''
+    
+    Emulates the phase randomization stategy outlined here: https://stackoverflow.com/q/39543002
+
+    Parameters
+    ----------
+    y : array, length nt
+        Signal to be scrambled
+    nsurr : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    ysurr: TYPE
+        DESCRIPTION.
+
+    '''
+    from scipy.fft import fft, ifft
+    nt = len(y)
+    ys = fft(y)
+    pow_ys = np.abs(ys) ** 2.
+    phase_ys = np.angle(ys)
+    
+        
+    ysurr = np.zeros((nt, nsurr))
+    for i in range(nsurr):
+        phase_ysr = phase_ys.copy()
+        # deal with even and odd-length arrays
+        if nt % 2 == 0:
+            phase_ysr_lh = 2*np.pi*np.random.rand(nt/2)
+            phase_ysr_rh = -phase_ysr_lh[::-1]
+            phase_ysr = np.concatenate((np.array((phase_ysr[0],)), phase_ysr_lh,
+                                        np.array((phase_ysr[len(phase_ysr)/2],)),
+                                        phase_ysr_rh))
+        else:
+            phase_ysr_lh = 2*np.pi*np.random.rand(nt/2+1)
+            phase_ysr_rh = -phase_ysr_lh[::-1]
+            phase_ysr = np.concatenate((np.array((phase_ysr[0],)), phase_ysr_lh, phase_ysr_rh))
+        # put it back together
+        ysrp = np.sqrt(pow_ys) * (np.cos(phase_ysr) + 1j * np.sin(phase_ysr))
+        yrp = ifft(ysrp)
+        if not np.allclose(yrp.imag, np.zeros(yrp.shape)):
+            max_imag = (np.abs(yrp.imag)).max()
+            imag_str = '\nNOTE: a non-negligible imaginary component was discarded.\n\tMax: {}'
+            print(imag_str.format(max_imag))
+        ysurr[:,i] = yrp.real
+            
+    return ysurr
     
 

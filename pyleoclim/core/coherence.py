@@ -664,6 +664,13 @@ class Coherence:
 
             coh_sig2 = coh.signif_test(number=100, qs=[.9,.95,.99])
             coh_sig2.plot()
+            
+        One can also specifiy a different method to obtain surrogates, e.g. phase randomization:
+            
+        .. jupyter-execute::
+
+            coh_sig3 = coh.signif_test(method='phaseran')
+            coh_sig3.plot()    
 
         The plot() function will represent the 95% level as contours by default.
         If you need to show 99%, say, use the `signif_thresh` argument:
@@ -685,6 +692,7 @@ class Coherence:
         (pseudo)random number at every execution, which may be important for marginal features
         in small ensembles. In general, however, we recommend increasing the
         number of draws to check that features are robust.
+        
 
         '''
 
