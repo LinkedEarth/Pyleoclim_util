@@ -6,6 +6,8 @@ SurrogateSeries is a child of MultipleSeries, designed for Monte Carlo tests
 
 from ..core.multipleseries import MultipleSeries
 
+SUPPORTED_SURROGATES = frozenset(['ar1sim','phaseran']) # broadcast all supported surrogates as global variable, for exception handling
+
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR(1))
 

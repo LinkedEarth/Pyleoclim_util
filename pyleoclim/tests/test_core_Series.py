@@ -610,8 +610,8 @@ class TestUISeriesCorrelation:
         v1 = ts.value + np.random.normal(loc=0, scale=1, size=nt)
         v2 = ts.value + np.random.normal(loc=0, scale=2, size=nt)
 
-        ts1 = pyleo.Series(time=ts.time, value=v1)
-        ts2 = pyleo.Series(time=ts.time, value=v2)
+        ts1 = pyleo.Series(time=ts.time, value=v1, verbose=False, auto_time_params=True)
+        ts2 = pyleo.Series(time=ts.time, value=v2, verbose=False, auto_time_params=True)
 
         corr_res = ts1.correlation(ts2, settings={'method': corr_method})
         r = corr_res.r

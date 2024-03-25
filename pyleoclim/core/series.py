@@ -40,6 +40,7 @@ import random
 import csv
 
 #from matplotlib import gridspec
+from tqdm import tqdm
 import warnings
 import collections
 from pprint import pprint
@@ -3349,8 +3350,8 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, alpha=0.05, method = 'phaseran', timespan=None,  
-                    settings=None, common_time_kwargs=None, seed=None):
+    def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran', timespan=None,  
+                    settings=None, common_time_kwargs=None, seed=None, mute_pbar=False):
         ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID).
 
         The significance of the correlation is assessed using one of the following methods:
@@ -3372,9 +3373,12 @@ class Series:
         
         alpha : float
             The significance level (default: 0.05)
+            
+        statistic : 
         
-        method : str, {'ttest','ar1sim','phaseran'}
+        method : str, {'ttest','built-in','ar1sim','phaseran'}
             method for significance testing. Default is 'phaseran'
+            'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in 
         
         timespan : tuple
             The time interval over which to perform the calculation
@@ -3389,7 +3393,7 @@ class Series:
 
             nsim : int
                 the number of simulations (default: 1000)
-            method : str, {'ttest','isopersistent','isospectral' (default)}
+            method : str, {'ttest','ar1sim','phaseran' (default)}
                 method for significance testing
             surr_settings : dict
                 Parameters for surrogate generator. See individual methods for details.
@@ -3399,6 +3403,9 @@ class Series:
 
         seed : float or int
             random seed for isopersistent and isospectral methods
+            
+        mute_pbar : bool, optional
+            Mute the progress bar. The default is False.
 
         Returns
         -------
@@ -3419,10 +3426,15 @@ class Series:
         See also
         --------
 
-        pyleoclim.utils.correlation.corr_sig : Correlation function
-
+        pyleoclim.utils.correlation.corr_sig : Correlation function (marked for deprecation)
+        
+        pyleoclim.utils.correlation.association : SciPy measures of association between variables
+        
         pyleoclim.multipleseries.common_time : Aligning time axes
-
+        
+        References
+        ----------
+        [1] Hu, J., J. Emile-Geay, and J. Partin (2017), Correlation-based interpretations of paleoclimate data – where statistics meet past climates, Earth and Planetary Science Letters, 459, 362–371, doi:10.1016/j.epsl.2016.11.048.
 
         Examples
         --------
@@ -3451,7 +3463,15 @@ class Series:
             print(corr_res)
 
         '''
-
+        if method == 'isospectral':
+            warnings.warn("isospectral is deprecated and was replaced by 'phaseran'",
+                          DeprecationWarning, stacklevel=2)
+            method = 'phaseran'
+        elif method == 'isopersistent':
+            warnings.warn("isopersistent is deprecated and was replaced by 'ar1sim'",
+                          DeprecationWarning, stacklevel=2)
+            method = 'ar1sim'
+            
         settings = {} if settings is None else settings.copy()
         corr_args = {'alpha': alpha, 'method': method}
         corr_args.update(settings)
@@ -3464,13 +3484,9 @@ class Series:
             ms = ms.common_time(**ct_args)
 
         if timespan is None:
-            #value1 = ms.series_list[0].value
-            #value2 = ms.series_list[1].value
             ts0 = ms.series_list[0]
             ts1 = ms.series_list[1]
         else:
-            #value1 = ms.series_list[0].slice(timespan).value
-            #value2 = ms.series_list[1].slice(timespan).value
             ts0 = ms.series_list[0].slice(timespan)
             ts1 = ms.series_list[1].slice(timespan)
 
@@ -3479,24 +3495,39 @@ class Series:
 
         if method == 'ttest':
             corr_res = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
-        elif method == 'tte':  
+            stat = corr_res['r']
+            pval = corr_res['p']
+            signif = True if corr_res['signif'] == 1 else False
+        elif method == 'built-in':
+            res = corrutils.association(ts0.value,ts1.value,statistic)
+            stat = res[0]
+            pval = res[1]
+            signif = pval <= alpha 
+        elif method in SurrogateSeries.SUPPORTED_SURROGATES:  
             number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
             seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
             method = corr_args['method'] if 'method' in corr_args.keys() else None
             surr_settings = corr_args['surr_settings'] if 'surr_settings' in corr_args.keys() else None
             
+            # compute correlation statistic
+            stat = corrutils.association(ts0.value,ts1.value,statistic)[0]
+            
             ts0_surr = ts0.timeseries.surrogates(number=number, seed=seed, 
                                                  method=method, settings=surr_settings)
             ts1_surr = ts1.timeseries.surrogates(number=number, seed=seed, 
                                                  method=method, settings=surr_settings)
-            #for i in range(number):
-            
-                # do something
+            stat_surr = np.empty((number))
+            for i in tqdm(range(number), desc='Evaluating correlations on surrogate pairs', total=number, disable=mute_pbar):
+                stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
+                                                     ts1_surr.series_list[i].value,statistic)[0]
+            # obtain p-value
+            pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
+            # establish significance
+            signif = pval <= alpha 
+        else:
+            raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
 
-            #corr_res = corrutils.corr_sig(value1, value2, **corr_args)
-        signif = True if corr_res['signif'] == 1 else False
-        corr = Corr(corr_res['r'], corr_res['p'], signif, alpha)
-
+        corr = Corr(stat, pval, signif, alpha) # assemble Correlation result object
         return corr
 
     def causality(self, target_series, method='liang', timespan=None, settings=None, common_time_kwargs=None):

@@ -10,10 +10,11 @@ __all__ = [
 ]
 
 import numpy as np
-from scipy.stats import pearsonr
-from scipy.stats.mstats import gmean
-from scipy.stats import t as stu
-from scipy.stats import gaussian_kde
+import scipy.stats as stats
+#from scipy.stats import pearsonr
+#from scipy.stats.mstats import gmean
+#from scipy.stats import t as stu
+#from scipy.stats import gaussian_kde
 from sklearn import preprocessing
 from .tsmodel import ar1_fit_evenly, isopersistent_rn
 from .tsutils import phaseran
@@ -79,7 +80,7 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     y1 = np.array(y1, dtype=float)
     y2 = np.array(y2, dtype=float)
 
-    assert np.size(y1) == np.size(y2), 'The size of X and the size of Y should be the same!'
+    assert np.size(y1) == np.size(y2), 'The size of y1 and y2 should be the same'
 
     if method == 'ttest':
         (r, signif, p) = corr_ttest(y1, y2, alpha=alpha)
@@ -222,7 +223,7 @@ def corr_ttest(y1, y2, alpha=0.05):
     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     """
-    r = pearsonr(y1, y2)[0]
+    r = stats.pearsonr(y1, y2)[0]
 
     g1 = ar1_fit_evenly(y1)
     g2 = ar1_fit_evenly(y2)
@@ -232,13 +233,13 @@ def corr_ttest(y1, y2, alpha=0.05):
     Ney1 = N * (1-g1) / (1+g1)
     Ney2 = N * (1-g2) / (1+g2)
 
-    Ne = gmean([Ney1+Ney2])
+    Ne = stats.mstats.gmean([Ney1+Ney2])
     assert Ne >= 10, 'Too few effective d.o.f. to apply this method!'
 
     df = Ne - 2
     t = np.abs(r) * np.sqrt(df/(1-r**2))
 
-    pval = 2 * stu.cdf(-np.abs(t), df)
+    pval = 2 * stats.t.cdf(-np.abs(t), df)
 
     signif = pval <= alpha
 
@@ -298,7 +299,7 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     '''
 
-    r = pearsonr(y1, y2)[0]
+    r = stats.pearsonr(y1, y2)[0]
     ra = np.abs(r)
 
     y1_red, g1 = isopersistent_rn(y1, nsim)
@@ -306,12 +307,12 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     rs = np.zeros(nsim)
     for i in np.arange(nsim):
-        rs[i] = pearsonr(y1_red[:, i], y2_red[:, i])[0]
+        rs[i] = stats.pearsonr(y1_red[:, i], y2_red[:, i])[0]
 
     rsa = np.abs(rs)
 
     xi = np.linspace(0, 1.1*np.max([ra, np.max(rsa)]), 200)
-    kde = gaussian_kde(rsa)
+    kde = stats.gaussian_kde(rsa)
     prob = kde(xi).T
 
     diff = np.abs(ra - xi)
@@ -376,7 +377,7 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     
     - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7 (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
     '''
-    r = pearsonr(y1, y2)[0]
+    r = stats.pearsonr(y1, y2)[0]
 
     # generate phase-randomized samples using the Theiler & Prichard method
     Y1surr = phaseran(y1, nsim)
@@ -670,3 +671,43 @@ def cov_shrink_rblw(S, n):
     F = (trace_S / p) * np.eye(p)
 
     return (1-rho)*np.asarray(S) + rho*F, rho
+
+def association(y1, y2, statistic='pearsonr',settings=None):
+    '''
+    
+
+    Parameters
+    ----------
+    y1 : array, length n
+        DESCRIPTION.
+    y2 : TYPE
+        DESCRIPTION.
+    statistic : TYPE, optional
+        DESCRIPTION. The default is 'pearsonr'.
+    settings : TYPE, optional
+        DESCRIPTION. The default is None.
+
+    Raises
+    ------
+    ValueError
+        DESCRIPTION.
+
+    Returns
+    -------
+    res : TYPE
+        DESCRIPTION.
+
+    '''
+    args = {} if settings is None else settings.copy()
+    acceptable_methods = ['pearsonr','spearmanr','kendalltau']
+    # https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+    if statistic in acceptable_methods:
+        func = getattr(stats, statistic) 
+        res = func(y1,y2,**args)
+    else:
+        raise ValueError(f'Wrong statistic: {statistic}; acceptble choices are {acceptable_methods}')
+       
+    return res
+        
+        
+        
