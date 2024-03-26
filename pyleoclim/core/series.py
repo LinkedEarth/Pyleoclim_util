@@ -26,6 +26,7 @@ from ..core.coherence import Coherence
 from ..core.corr import Corr
 from ..core.surrogateseries import SurrogateSeries
 from ..core.resolution import Resolution
+from ..core.surrogateseries import supported_surrogates
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -3378,12 +3379,13 @@ class Series:
         
         method : str, {'ttest','built-in','ar1sim','phaseran'}
             method for significance testing. Default is 'phaseran'
-            'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in 
+            'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
+            The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning. 
         
         timespan : tuple
             The time interval over which to perform the calculation
             
-        statistic : str  [UNDER CONSTRUCTION]
+        statistic : str  
             statistic being evaluated. Can use any of the SciPy-supported ones:
                 https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
             Default: 'pearsonr'        
@@ -3494,16 +3496,14 @@ class Series:
             np.random.seed(seed)
 
         if method == 'ttest':
-            corr_res = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
-            stat = corr_res['r']
-            pval = corr_res['p']
-            signif = True if corr_res['signif'] == 1 else False
+            stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+            signif = bool(signf)
         elif method == 'built-in':
             res = corrutils.association(ts0.value,ts1.value,statistic)
             stat = res[0]
-            pval = res[1]
+            pval = res[1] if len(res) > 1 else np.nan
             signif = pval <= alpha 
-        elif method in SurrogateSeries.SUPPORTED_SURROGATES:  
+        elif method in supported_surrogates:  
             number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
             seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
             method = corr_args['method'] if 'method' in corr_args.keys() else None
@@ -3512,12 +3512,12 @@ class Series:
             # compute correlation statistic
             stat = corrutils.association(ts0.value,ts1.value,statistic)[0]
             
-            ts0_surr = ts0.timeseries.surrogates(number=number, seed=seed, 
+            ts0_surr = ts0.surrogates(number=number, seed=seed, 
                                                  method=method, settings=surr_settings)
-            ts1_surr = ts1.timeseries.surrogates(number=number, seed=seed, 
+            ts1_surr = ts1.surrogates(number=number, seed=seed, 
                                                  method=method, settings=surr_settings)
             stat_surr = np.empty((number))
-            for i in tqdm(range(number), desc='Evaluating correlations on surrogate pairs', total=number, disable=mute_pbar):
+            for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
                 stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
                                                      ts1_surr.series_list[i].value,statistic)[0]
             # obtain p-value

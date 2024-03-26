@@ -7,6 +7,7 @@ Relevant functions for correlation analysis
 __all__ = [
     'corr_sig',
     'fdr',
+    'association'
 ]
 
 import numpy as np
@@ -674,33 +675,37 @@ def cov_shrink_rblw(S, n):
 
 def association(y1, y2, statistic='pearsonr',settings=None):
     '''
-    
+    Quantify the strength of a relationship (e.g. linear) between paired observations y1 and y2.
 
     Parameters
     ----------
     y1 : array, length n
-        DESCRIPTION.
-    y2 : TYPE
-        DESCRIPTION.
-    statistic : TYPE, optional
-        DESCRIPTION. The default is 'pearsonr'.
-    settings : TYPE, optional
-        DESCRIPTION. The default is None.
+        vector of (real) numbers of same length as y2, no NaNs allowed  
+    y2 : array, length n
+        vector of (real) numbers of same length as y1, no NaNs allowed
+    statistic : str, optional
+        The statistic used to measure the association, to be chosen from
+        https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+        The default is 'pearsonr'.
+    settings : dict, optional
+        optional arguments to modify the behavior of the SciPy association functions
 
     Raises
     ------
     ValueError
-        DESCRIPTION.
+        Complains loudly if the requested statistic is not from the list above. 
 
     Returns
     -------
-    res : TYPE
-        DESCRIPTION.
-
+    res : instance result class
+        structure containing the result. The first element (res[0]) is always the statistic.
     '''
+    y1 = np.array(y1, dtype=float)
+    y2 = np.array(y2, dtype=float)
+    assert np.size(y1) == np.size(y2), 'The size of y1 and y2 should be the same'
+    
     args = {} if settings is None else settings.copy()
     acceptable_methods = ['pearsonr','spearmanr','kendalltau']
-    # https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
     if statistic in acceptable_methods:
         func = getattr(stats, statistic) 
         res = func(y1,y2,**args)
