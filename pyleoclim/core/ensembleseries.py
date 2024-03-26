@@ -371,7 +371,9 @@ class EnsembleSeries(MultipleSeries):
                 time2 = target.time
 
             ts2 = Series(time=time2, value=value2, verbose=idx==0, auto_time_params=False)
-            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
+            corr_res = ts1.correlation(ts2, timespan=timespan, method=method, 
+                                       settings=settings, mute_pbar=True,
+                                       common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res.r)
             signif_list.append(corr_res.signif)
             p_list.append(corr_res.p)
