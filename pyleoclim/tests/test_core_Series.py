@@ -602,7 +602,7 @@ class TestUISeriesCorrelation:
     '''
     @pytest.mark.parametrize('corr_method', ['ttest','built-in','ar1sim','phaseran'])
     def test_correlation_t0a(self, corr_method, eps=0.1):
-        ''' Generate two series from a same basic series and calculate their correlation
+        ''' Test various correlation methods
         '''
         nt = 100
         rho = 0.4 # target correlation
@@ -616,7 +616,7 @@ class TestUISeriesCorrelation:
         
     @pytest.mark.parametrize('corr_method', ['isopersistent', 'isospectral'])
     def test_correlation_t0b(self, corr_method,eps=0.1):
-        ''' Generate two series from a same basic series and calculate their correlation
+        ''' Test that deprecated method names get a proper warning
         '''
         nt = 100
         rho = 0.4 # target correlation
@@ -674,6 +674,22 @@ class TestUISeriesCorrelation:
         corr_res = ts1.correlation(ts2, method=corr_method, common_time_kwargs={'method': 'interp'})
         r = corr_res.r
         assert np.abs(r-r_evenly) < eps
+    
+    @pytest.mark.parametrize('stat', ['linregress','pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau'])
+    def test_correlation_t3(self, stat, eps=0.2):
+        ''' Test that various statistics can be used
+        https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+        '''
+        nt = 100
+        rho = 0.6 # target correlation
+        ts1 = gen_ts(nt=nt,alpha=1,seed=333).standardize()
+        # generate series whose correlation with ts1 should be close to rho:
+        v = rho*ts1.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
+        ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
+
+        corr_res = ts1.correlation(ts2, statistic=stat, method='built-in')
+        assert np.abs(rho-corr_res.r) < eps
+        
 
 class TestUISeriesCausality:
     ''' Test Series.causality()

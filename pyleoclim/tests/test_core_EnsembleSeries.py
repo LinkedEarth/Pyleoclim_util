@@ -172,7 +172,54 @@ class TestUIEnsembleSeriesCorrelation():
         signif_list = corr_res.signif
         for signif in signif_list:
             assert signif == True
+            
+    @pytest.mark.parametrize('stat', ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau'])
+    def test_correlation_t5(self, stat):
+        ''' Test that various statistics can be used
+        https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+        '''
+        nt = 200
+        rho = 0.8
+        t0, v0 = gen_colored_noise(nt=nt)
+        t0, noise = gen_normal(nt=nt)
 
+        ts0 = pyleo.Series(time=t0, value=v0, verbose=False, auto_time_params=True)
+        
+        ts_list = []
+        for k in range(2):
+            v = rho*ts0.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
+            ts = pyleo.Series(time=ts0.time, value=v, verbose=False, auto_time_params=True)
+            ts_list.append(ts)
+
+        ts_ens = pyleo.EnsembleSeries(ts_list)
+
+        corr_res = ts_ens.correlation(ts0, statistic=stat, method='phaseran')
+        signif_list = corr_res.signif
+        for signif in signif_list:
+            assert signif == True
+
+    
+
+class TestUIEnsembleSeriesPlots():
+    def test_histplot_t0(self):
+        '''Test for EnsembleSeries.histplot()
+        '''
+        nn = 30 # number of noise realizations
+        nt = 500
+        series_list = []
+
+        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
+        noise = np.random.randn(nt, nn)
+
+        for idx in range(nn):  # noise
+            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+            series_list.append(ts)
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        ts_ens.histplot()
+        pyleo.closefig()
+        
     def test_plot_envelope_t0(self):
         ''' Test EnsembleSeries.plot_envelope() on a list of colored noise
         '''
@@ -211,26 +258,6 @@ class TestUIEnsembleSeriesCorrelation():
 
         fig, ax = ts_ens.plot_traces(alpha=0.2, num_traces=8)
         pyleo.closefig(fig)
-
-class TestUIEnsembleSeriesHistplot():
-    def test_histplot_t0(self):
-        '''Test for EnsembleSeries.histplot()
-        '''
-        nn = 30 # number of noise realizations
-        nt = 500
-        series_list = []
-
-        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
-        noise = np.random.randn(nt, nn)
-
-        for idx in range(nn):  # noise
-            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
-            series_list.append(ts)
-
-        ts_ens = pyleo.EnsembleSeries(series_list)
-
-        ts_ens.histplot()
-        pyleo.closefig()
 
 class TestUIEnsembleSeriesQuantiles():
     def test_quantiles_t0(self):

@@ -684,8 +684,9 @@ def association(y1, y2, statistic='pearsonr',settings=None):
     y2 : array, length n
         vector of (real) numbers of same length as y1, no NaNs allowed
     statistic : str, optional
-        The statistic used to measure the association, to be chosen from
+        The statistic used to measure the association, to be chosen from a subset of
         https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+        ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
         The default is 'pearsonr'.
     settings : dict, optional
         optional arguments to modify the behavior of the SciPy association functions
@@ -705,7 +706,7 @@ def association(y1, y2, statistic='pearsonr',settings=None):
     assert np.size(y1) == np.size(y2), 'The size of y1 and y2 should be the same'
     
     args = {} if settings is None else settings.copy()
-    acceptable_methods = ['pearsonr','spearmanr','kendalltau']
+    acceptable_methods = ['linregress','pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
     if statistic in acceptable_methods:
         func = getattr(stats, statistic) 
         res = func(y1,y2,**args)

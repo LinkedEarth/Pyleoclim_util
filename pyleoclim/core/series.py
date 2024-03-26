@@ -3375,20 +3375,23 @@ class Series:
         alpha : float
             The significance level (default: 0.05)
             
-        statistic : 
-        
+        statistic : str  
+            statistic being evaluated. Can use any of the SciPy-supported ones:
+                https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+                Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
+            Default: 'pearsonr'.    
+            
         method : str, {'ttest','built-in','ar1sim','phaseran'}
             method for significance testing. Default is 'phaseran'
             'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
+            'built-in' uses the p-value that ships with the statistic. 
             The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning. 
+            Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.   
         
         timespan : tuple
             The time interval over which to perform the calculation
             
-        statistic : str  
-            statistic being evaluated. Can use any of the SciPy-supported ones:
-                https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
-            Default: 'pearsonr'        
+          
 
         settings : dict
             Parameters for the correlation function, including:
@@ -3432,6 +3435,8 @@ class Series:
         
         pyleoclim.utils.correlation.association : SciPy measures of association between variables
         
+        pyleoclim.series.surrogates : parametric and non-parametric surrogates of any Series object
+        
         pyleoclim.multipleseries.common_time : Aligning time axes
         
         References
@@ -3449,19 +3454,23 @@ class Series:
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
-            # with `nsim=20` and default `method='isospectral'`
+            # with `nsim=20` and default `method='phaseran'`
             # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
             print(corr_res)
-
-            # using a simple t-test
-            # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, settings={'method': 'ttest'})
+            
+            # changing the statistic
+            corr_res = ts_nino.correlation(ts_air, statistic='kendalltau')
             print(corr_res)
 
-            # using the method "isopersistent"
+            # using a simple t-test with DOFs adjusted for autocorrelation
             # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'}, seed=2333)
+            corr_res = ts_nino.correlation(ts_air, method='ttest')
+            print(corr_res)
+
+            # using  "isopersistent" surrogates (AR(1) simulation)
+            # set an arbitrary random seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, method = 'ar1sim', settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
         '''
@@ -3499,10 +3508,13 @@ class Series:
             stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
             signif = bool(signf)
         elif method == 'built-in':
-            res = corrutils.association(ts0.value,ts1.value,statistic)
-            stat = res[0]
-            pval = res[1] if len(res) > 1 else np.nan
-            signif = pval <= alpha 
+            if statistic == 'weightedtau':
+                raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
+            else:
+                res = corrutils.association(ts0.value,ts1.value,statistic)
+                stat = res[0]
+                pval = res.pvalue if len(res) > 1 else np.nan
+                signif = pval <= alpha 
         elif method in supported_surrogates:  
             number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
             seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
