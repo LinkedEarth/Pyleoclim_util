@@ -422,7 +422,7 @@ class Coherence:
     def dashboard(self, title=None, figsize=[9,12], overlap = True, phase_style = {}, 
                   line_colors = ['tab:blue','tab:orange'], savefig_settings={},
                   ts_plot_kwargs = None, wavelet_plot_kwargs= None):
-         ''' Cross-wavelet dashboard, including the two series, WTC and XWT.
+         ''' Cross-wavelet dashboard, including the two series, their WTC and XWT.
 
              Note: this design balances many considerations, and is not easily customizable.
 
@@ -595,7 +595,7 @@ class Coherence:
         
             Number of surrogate series to create for significance testing. The default is 200.
         
-        method : {'ar1sim'}, optional
+        method : {'ar1sim','phaseran'}, optional
         
             Method through which to generate the surrogate series. The default is 'ar1sim'.
        
@@ -664,13 +664,6 @@ class Coherence:
 
             coh_sig2 = coh.signif_test(number=100, qs=[.9,.95,.99])
             coh_sig2.plot()
-            
-        One can also specifiy a different method to obtain surrogates, e.g. phase randomization:
-            
-        .. jupyter-execute::
-
-            coh_sig3 = coh.signif_test(method='phaseran')
-            coh_sig3.plot()    
 
         The plot() function will represent the 95% level as contours by default.
         If you need to show 99%, say, use the `signif_thresh` argument:
@@ -693,12 +686,16 @@ class Coherence:
         in small ensembles. In general, however, we recommend increasing the
         number of draws to check that features are robust.
         
+        One can also specifiy a different method to obtain surrogates, e.g. phase randomization:
+            
+        .. jupyter-execute::
 
+            coh.signif_test(method='phaseran').plot() 
         '''
 
         if number == 0:
             return self
-
+        
         new = self.copy()
         surr1 = self.timeseries1.surrogates(
             number=number, seed=seed, method=method, settings=settings

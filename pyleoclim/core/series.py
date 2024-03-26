@@ -3691,7 +3691,11 @@ class Series:
         if method == 'ar1sim':
             surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
         elif method == 'phaseran':
-            surr_res = tsutils.phaseran2(self.value, number, **args[method])
+            if self.is_evenly_spaced():
+                surr_res = tsutils.phaseran2(self.value, number, **args[method])
+            else:
+                raise ValueError("Phase-randomization presently requires evenly-spaced series.")
+
         # elif method == 'uar1':
         #     # TODO : implement Lionel's ML method
         # elif method == 'power-law':
