@@ -25,7 +25,7 @@ from ..core.scalograms import Scalogram
 from ..core.coherence import Coherence
 from ..core.corr import Corr
 from ..core.surrogateseries import SurrogateSeries
-from ..core.resolution import Resolution
+from ..core.resolutions import Resolution
 from ..core.surrogateseries import supported_surrogates
 
 import seaborn as sns

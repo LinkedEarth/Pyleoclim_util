@@ -686,8 +686,11 @@ class TestUISeriesCorrelation:
         # generate series whose correlation with ts1 should be close to rho:
         v = rho*ts1.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
         ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
-
-        corr_res = ts1.correlation(ts2, statistic=stat, method='built-in')
+        
+        if stat == 'weightedtau':
+            corr_res = ts1.correlation(ts2, statistic=stat,settings={'nsim':20})
+        else:
+            corr_res = ts1.correlation(ts2, statistic=stat, method='built-in')
         assert np.abs(rho-corr_res.r) < eps
         
 
