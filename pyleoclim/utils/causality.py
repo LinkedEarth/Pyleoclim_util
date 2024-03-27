@@ -12,8 +12,8 @@ __all__ = [
 import numpy as np
 from statsmodels.tsa.stattools import grangercausalitytests
 from tqdm import tqdm
-from .tsmodel import ar1_fit_evenly
-from .correlation import sm_ar1_sim, phaseran
+from .tsmodel import ar1_fit_evenly, sm_ar1_sim
+from .tsutils import phaseran
 from scipy.stats.mstats import mquantiles
 
 #-------

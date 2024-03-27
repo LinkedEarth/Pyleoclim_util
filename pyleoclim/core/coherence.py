@@ -422,7 +422,7 @@ class Coherence:
     def dashboard(self, title=None, figsize=[9,12], overlap = True, phase_style = {}, 
                   line_colors = ['tab:blue','tab:orange'], savefig_settings={},
                   ts_plot_kwargs = None, wavelet_plot_kwargs= None):
-         ''' Cross-wavelet dashboard, including the two series, WTC and XWT.
+         ''' Cross-wavelet dashboard, including the two series, their WTC and XWT.
 
              Note: this design balances many considerations, and is not easily customizable.
 
@@ -595,7 +595,7 @@ class Coherence:
         
             Number of surrogate series to create for significance testing. The default is 200.
         
-        method : {'ar1sim'}, optional
+        method : {'ar1sim','phaseran'}, optional
         
             Method through which to generate the surrogate series. The default is 'ar1sim'.
        
@@ -685,12 +685,17 @@ class Coherence:
         (pseudo)random number at every execution, which may be important for marginal features
         in small ensembles. In general, however, we recommend increasing the
         number of draws to check that features are robust.
+        
+        One can also specifiy a different method to obtain surrogates, e.g. phase randomization:
+            
+        .. jupyter-execute::
 
+            coh.signif_test(method='phaseran').plot() 
         '''
 
         if number == 0:
             return self
-
+        
         new = self.copy()
         surr1 = self.timeseries1.surrogates(
             number=number, seed=seed, method=method, settings=settings
@@ -698,6 +703,8 @@ class Coherence:
         surr2 = self.timeseries2.surrogates(
             number=number, seed=seed, method=method, settings=settings
         )
+        
+        # adjust time axis
 
         wtcs, xwts = [], []
 

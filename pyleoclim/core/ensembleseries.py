@@ -3,6 +3,7 @@ The EnsembleSeries class is a child of MultipleSeries, designed for ensemble app
 In addition to a MultipleSeries object, an EnsembleSeries object has the following properties:
 - All series members are assumed to share the same units and other metadata.
 - The class enables ensemble-oriented methods for computation (e.g., quantiles) and visualization (e.g., envelope plot).    
+
 """
 
 from ..utils import plotting
@@ -246,7 +247,8 @@ class EnsembleSeries(MultipleSeries):
 
         return ens_qs
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, method = 'ttest', statistic = 'pearsonr',
+                    settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between an EnsembleSeries object to a target.
 
         If the target is not specified, then the 1st member of the ensemble will be the target
@@ -271,6 +273,15 @@ class EnsembleSeries(MultipleSeries):
         alpha : float
 
             The significance level (0.05 by default)
+       
+        method : str, {'ttest','built-in','ar1sim','phaseran'}
+            method for significance testing. Default is 'ttest'
+            
+        statistic : str
+            The name of the statistic used to measure the association, to be chosen from a subset of
+            https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+            Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
+            The default is 'pearsonr'.
 
         settings : dict
 
@@ -332,9 +343,13 @@ class EnsembleSeries(MultipleSeries):
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
-
-            # set an arbitrary random seed to fix the result
+              
+            # to set an arbitrary random seed to fix the result
             corr_res = ts_ens.correlation(ts, seed=2333)
+            print(corr_res)
+            
+            # to change the statistic: 
+            corr_res = ts_ens.correlation(ts, statistic='kendalltau', method='phaseran', settings = {'nsim':20})
             print(corr_res)
             
         The `print` function tabulates the output, and conveys the p-value according
@@ -365,8 +380,11 @@ class EnsembleSeries(MultipleSeries):
                 value2 = target.value
                 time2 = target.time
 
-            ts2 = Series(time=time2, value=value2, verbose=idx==0)
-            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
+            ts2 = Series(time=time2, value=value2, verbose=idx==0, auto_time_params=False)
+            corr_res = ts1.correlation(ts2, timespan=timespan, method=method,
+                                       statistic=statistic,
+                                       settings=settings, mute_pbar=True,
+                                       common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res.r)
             signif_list.append(corr_res.signif)
             p_list.append(corr_res.p)
@@ -1193,5 +1211,4 @@ class EnsembleSeries(MultipleSeries):
         else:
             return vals
             
-        
         

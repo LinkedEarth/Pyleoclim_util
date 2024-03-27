@@ -21,7 +21,6 @@ import pytest
 
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
-    ar1_sim,
     colored_noise,
 )
 
@@ -31,7 +30,7 @@ def gen_ts(model, nt, alpha):
     'wrapper for gen_ts in pyleoclim'
 
     t, v = pyleo.utils.gen_ts(model=model, nt=nt, alpha=alpha)
-    ts = pyleo.Series(t, v)
+    ts = pyleo.Series(t, v, verbose=False, auto_time_params=True)
     return ts
 
 
@@ -59,9 +58,9 @@ class TestUIEnsembleSeriesCorrelation():
         t0, v0 = gen_colored_noise(nt=nt)
         t0, noise = gen_normal(nt=nt)
 
-        ts0 = pyleo.Series(time=t0, value=v0)
-        ts1 = pyleo.Series(time=t0, value=v0+noise)
-        ts2 = pyleo.Series(time=t0, value=v0+2*noise)
+        ts0 = pyleo.Series(time=t0, value=v0, verbose=False, auto_time_params=True)
+        ts1 = pyleo.Series(time=t0, value=v0+noise, verbose=False, auto_time_params=True)
+        ts2 = pyleo.Series(time=t0, value=v0+2*noise, verbose=False, auto_time_params=True)
 
         ts_list = [ts1, ts2]
 
@@ -70,7 +69,7 @@ class TestUIEnsembleSeriesCorrelation():
         corr_res = ts_ens.correlation(ts0)
         signif_list = corr_res.signif
         for signif in signif_list:
-            assert signif is True
+            assert signif == True
 
 
     def test_correlation_t1(self):
@@ -80,10 +79,10 @@ class TestUIEnsembleSeriesCorrelation():
         t0, v0 = gen_colored_noise(nt=nt)
         t0, noise = gen_normal(nt=nt)
 
-        ts0 = pyleo.Series(time=t0, value=v0)
-        ts1 = pyleo.Series(time=t0, value=v0+noise)
-        ts2 = pyleo.Series(time=t0, value=v0+2*noise)
-        ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
+        ts0 = pyleo.Series(time=t0, value=v0, verbose=False, auto_time_params=True)
+        ts1 = pyleo.Series(time=t0, value=v0+noise, verbose=False, auto_time_params=True)
+        ts2 = pyleo.Series(time=t0, value=v0+2*noise, verbose=False, auto_time_params=True)
+        ts3 = pyleo.Series(time=t0, value=v0+1/2*noise, verbose=False, auto_time_params=True)
 
         ts_list1 = [ts0, ts1]
         ts_list2 = [ts2, ts3]
@@ -94,7 +93,7 @@ class TestUIEnsembleSeriesCorrelation():
         corr_res = ts_ens.correlation(ts_target)
         signif_list = corr_res.signif
         for signif in signif_list:
-            assert signif is True
+            assert signif == True
 
         assert np.size(corr_res.p) == np.size(ts_list1)
 
@@ -106,11 +105,11 @@ class TestUIEnsembleSeriesCorrelation():
         t0, v0 = gen_colored_noise(nt=nt)
         t0, noise = gen_normal(nt=nt)
 
-        ts0 = pyleo.Series(time=t0, value=v0)
-        ts1 = pyleo.Series(time=t0, value=v0+noise)
-        ts2 = pyleo.Series(time=t0, value=v0+2*noise)
-        ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
-        ts4 = pyleo.Series(time=t0, value=v0+3/2*noise)
+        ts0 = pyleo.Series(time=t0, value=v0, verbose=False, auto_time_params=True)
+        ts1 = pyleo.Series(time=t0, value=v0+noise, verbose=False, auto_time_params=True)
+        ts2 = pyleo.Series(time=t0, value=v0+2*noise, verbose=False, auto_time_params=True)
+        ts3 = pyleo.Series(time=t0, value=v0+1/2*noise, verbose=False, auto_time_params=True)
+        ts4 = pyleo.Series(time=t0, value=v0+3/2*noise, verbose=False, auto_time_params=True)
 
         ts_list1 = [ts0, ts1, ts4]
         ts_list2 = [ts2, ts3]
@@ -121,7 +120,7 @@ class TestUIEnsembleSeriesCorrelation():
         corr_res = ts_ens.correlation(ts_target)
         signif_list = corr_res.signif
         for signif in signif_list:
-            assert signif is True
+            assert signif == True
 
         assert np.size(corr_res.p) == np.size(ts_list1)
 
@@ -133,11 +132,11 @@ class TestUIEnsembleSeriesCorrelation():
         t0, v0 = gen_colored_noise(nt=nt)
         t0, noise = gen_normal(nt=nt)
 
-        ts0 = pyleo.Series(time=t0, value=v0)
-        ts1 = pyleo.Series(time=t0, value=v0+noise)
-        ts2 = pyleo.Series(time=t0, value=v0+2*noise)
-        ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
-        ts4 = pyleo.Series(time=t0, value=v0+3/2*noise)
+        ts0 = pyleo.Series(time=t0, value=v0, verbose=False, auto_time_params=True)
+        ts1 = pyleo.Series(time=t0, value=v0+noise, verbose=False, auto_time_params=True)
+        ts2 = pyleo.Series(time=t0, value=v0+2*noise, verbose=False, auto_time_params=True)
+        ts3 = pyleo.Series(time=t0, value=v0+1/2*noise, verbose=False, auto_time_params=True)
+        ts4 = pyleo.Series(time=t0, value=v0+3/2*noise, verbose=False, auto_time_params=True)
 
         ts_list1 = [ts0, ts1]
         ts_list2 = [ts2, ts3, ts4]
@@ -148,10 +147,79 @@ class TestUIEnsembleSeriesCorrelation():
         corr_res = ts_ens.correlation(ts_target)
         signif_list = corr_res.signif
         for signif in signif_list:
-            assert signif is True
+            assert signif == True
 
         assert np.size(corr_res.p) == np.size(ts_list1)
+        
+    @pytest.mark.parametrize('corr_method', ['ttest','built-in','ar1sim','phaseran'])
+    def test_correlation_t4(self,corr_method):
+        '''Test for EnsembleSeries.correlation() when the target is a Series
+           Test that all allowable methods are passed.  
+        '''
+        nt = 100
+        t0, v0 = gen_colored_noise(nt=nt)
+        t0, noise = gen_normal(nt=nt)
 
+        ts0 = pyleo.Series(time=t0, value=v0, verbose=False, auto_time_params=True)
+        ts1 = pyleo.Series(time=t0, value=v0+noise, verbose=False, auto_time_params=True)
+        ts2 = pyleo.Series(time=t0, value=v0+2*noise, verbose=False, auto_time_params=True)
+
+        ts_list = [ts1, ts2]
+
+        ts_ens = pyleo.EnsembleSeries(ts_list)
+
+        corr_res = ts_ens.correlation(ts0, method=corr_method)
+        signif_list = corr_res.signif
+        for signif in signif_list:
+            assert signif == True
+            
+    @pytest.mark.parametrize('stat', ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau'])
+    def test_correlation_t5(self, stat):
+        ''' Test that various statistics can be used
+        https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+        '''
+        nt = 200
+        rho = 0.8
+        t0, v0 = gen_colored_noise(nt=nt)
+        t0, noise = gen_normal(nt=nt)
+
+        ts0 = pyleo.Series(time=t0, value=v0, verbose=False, auto_time_params=True)
+        
+        ts_list = []
+        for k in range(2):
+            v = rho*ts0.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
+            ts = pyleo.Series(time=ts0.time, value=v, verbose=False, auto_time_params=True)
+            ts_list.append(ts)
+
+        ts_ens = pyleo.EnsembleSeries(ts_list)
+
+        corr_res = ts_ens.correlation(ts0, statistic=stat, method='phaseran')
+        signif_list = corr_res.signif
+        for signif in signif_list:
+            assert signif == True
+
+    
+
+class TestUIEnsembleSeriesPlots():
+    def test_histplot_t0(self):
+        '''Test for EnsembleSeries.histplot()
+        '''
+        nn = 30 # number of noise realizations
+        nt = 500
+        series_list = []
+
+        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
+        noise = np.random.randn(nt, nn)
+
+        for idx in range(nn):  # noise
+            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+            series_list.append(ts)
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        ts_ens.histplot()
+        pyleo.closefig()
+        
     def test_plot_envelope_t0(self):
         ''' Test EnsembleSeries.plot_envelope() on a list of colored noise
         '''
@@ -190,26 +258,6 @@ class TestUIEnsembleSeriesCorrelation():
 
         fig, ax = ts_ens.plot_traces(alpha=0.2, num_traces=8)
         pyleo.closefig(fig)
-
-class TestUIEnsembleSeriesHistplot():
-    def test_histplot_t0(self):
-        '''Test for EnsembleSeries.histplot()
-        '''
-        nn = 30 # number of noise realizations
-        nt = 500
-        series_list = []
-
-        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
-        noise = np.random.randn(nt, nn)
-
-        for idx in range(nn):  # noise
-            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
-            series_list.append(ts)
-
-        ts_ens = pyleo.EnsembleSeries(series_list)
-
-        ts_ens.histplot()
-        pyleo.closefig()
 
 class TestUIEnsembleSeriesQuantiles():
     def test_quantiles_t0(self):

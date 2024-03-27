@@ -38,7 +38,7 @@ def metadata():
 def gen_ts():
     """ Generate realistic-ish Series for testing """
     t,v = pyleo.utils.gen_ts(model='colored_noise',nt=50)
-    ts = pyleo.Series(t,v, verbose=False)
+    ts = pyleo.Series(t,v, verbose=False, auto_time_params=True)
     return ts
 
 @pytest.fixture
@@ -47,7 +47,7 @@ def unevenly_spaced_series():
     length = 10
     t = np.linspace(1,length,length) ** 2
     v = np.ones(length)
-    series = pyleo.Series(time=t, value =v, verbose=False)
+    series = pyleo.Series(time=t, value =v, verbose=False, auto_time_params=True)
     return series
 
 @pytest.fixture

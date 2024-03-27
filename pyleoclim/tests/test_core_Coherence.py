@@ -31,15 +31,16 @@ class TestUiCoherencePlot:
         coh = ts2.wavelet_coherence(ts1)
         fig,ax = coh.plot()
         pyleo.closefig(fig)
-    
-    def test_plot_t1(self, gen_ts):
+        
+    @pytest.mark.parametrize('method', ['ar1sim','phaseran'])
+    def test_plot_t1(self, gen_ts, method):
         ''' Test Coherence.plot WTC with significance
         '''
         ts1 = gen_ts
         ts2 = gen_ts
         coh = ts2.wavelet_coherence(ts1)
         
-        coh_signif = coh.signif_test(number=10,qs = [0.8, 0.9, .95])
+        coh_signif = coh.signif_test(number=10, method=method, qs = [0.8, 0.9, .95])
         fig,ax = coh_signif.plot(signif_thresh=0.99)
         pyleo.closefig(fig)
         

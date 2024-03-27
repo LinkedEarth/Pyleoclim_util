@@ -8,7 +8,6 @@ How to create and manipulate such objects is described in a short example below,
 """
 
 import datetime as dt
-#import operator
 import re
 
 from ..utils import tsutils, plotting, tsmodel, tsbase, lipdutils, jsonutils
@@ -27,14 +26,13 @@ from ..core.coherence import Coherence
 from ..core.corr import Corr
 from ..core.surrogateseries import SurrogateSeries
 from ..core.resolutions import Resolution
+from ..core.surrogateseries import supported_surrogates
 
 import seaborn as sns
 import matplotlib.pyplot as plt
-#import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
 import numpy as np
 import pandas as pd
 
-#from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 import matplotlib.colors as mcolors
@@ -43,6 +41,7 @@ import random
 import csv
 
 #from matplotlib import gridspec
+from tqdm import tqdm
 import warnings
 import collections
 from pprint import pprint
@@ -3352,8 +3351,9 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, seed=None):
-        ''' Estimates the Pearson's correlation and associated significance between two non IID time series
+    def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran', timespan=None,  
+                    settings=None, common_time_kwargs=None, seed=None, mute_pbar=False):
+        ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID).
 
         The significance of the correlation is assessed using one of the following methods:
 
@@ -3364,33 +3364,53 @@ class Series:
         The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
         The others are non-parametric, but their computational requirements scale with the number of simulations.
 
-        The choise of significance test and associated number of Monte-Carlo simulations are passed through the settings parameter.
+        The choise of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
 
         Parameters
         ----------
 
         target_series : Series
             A pyleoclim Series object
-
-        timespan : tuple
-            The time interval over which to perform the calculation
-
+        
         alpha : float
             The significance level (default: 0.05)
+            
+        statistic : str  
+            statistic being evaluated. Can use any of the SciPy-supported ones:
+                https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+                Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
+            Default: 'pearsonr'.    
+            
+        method : str, {'ttest','built-in','ar1sim','phaseran'}
+            method for significance testing. Default is 'phaseran'
+            'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
+            'built-in' uses the p-value that ships with the statistic. 
+            The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning. 
+            Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.   
+        
+        timespan : tuple
+            The time interval over which to perform the calculation
+            
+          
 
         settings : dict
             Parameters for the correlation function, including:
 
             nsim : int
                 the number of simulations (default: 1000)
-            method : str, {'ttest','isopersistent','isospectral' (default)}
+            method : str, {'ttest','ar1sim','phaseran' (default)}
                 method for significance testing
+            surr_settings : dict
+                Parameters for surrogate generator. See individual methods for details.
 
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
 
         seed : float or int
             random seed for isopersistent and isospectral methods
+            
+        mute_pbar : bool, optional
+            Mute the progress bar. The default is False.
 
         Returns
         -------
@@ -3411,10 +3431,17 @@ class Series:
         See also
         --------
 
-        pyleoclim.utils.correlation.corr_sig : Correlation function
-
+        pyleoclim.utils.correlation.corr_sig : Correlation function (marked for deprecation)
+        
+        pyleoclim.utils.correlation.association : SciPy measures of association between variables
+        
+        pyleoclim.series.surrogates : parametric and non-parametric surrogates of any Series object
+        
         pyleoclim.multipleseries.common_time : Aligning time axes
-
+        
+        References
+        ----------
+        [1] Hu, J., J. Emile-Geay, and J. Partin (2017), Correlation-based interpretations of paleoclimate data – where statistics meet past climates, Earth and Planetary Science Letters, 459, 362–371, doi:10.1016/j.epsl.2016.11.048.
 
         Examples
         --------
@@ -3427,25 +3454,37 @@ class Series:
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
-            # with `nsim=20` and default `method='isospectral'`
+            # with `nsim=20` and default `method='phaseran'`
             # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
             print(corr_res)
-
-            # using a simple t-test
-            # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, settings={'method': 'ttest'})
+            
+            # changing the statistic
+            corr_res = ts_nino.correlation(ts_air, statistic='kendalltau')
             print(corr_res)
 
-            # using the method "isopersistent"
+            # using a simple t-test with DOFs adjusted for autocorrelation
             # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'}, seed=2333)
+            corr_res = ts_nino.correlation(ts_air, method='ttest')
+            print(corr_res)
+
+            # using  "isopersistent" surrogates (AR(1) simulation)
+            # set an arbitrary random seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, method = 'ar1sim', settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
         '''
-
+        if method == 'isospectral':
+            warnings.warn("isospectral is deprecated and was replaced by 'phaseran'",
+                          DeprecationWarning, stacklevel=2)
+            method = 'phaseran'
+        elif method == 'isopersistent':
+            warnings.warn("isopersistent is deprecated and was replaced by 'ar1sim'",
+                          DeprecationWarning, stacklevel=2)
+            method = 'ar1sim'
+            
         settings = {} if settings is None else settings.copy()
-        corr_args = {'alpha': alpha}
+        corr_args = {'alpha': alpha, 'method': method}
         corr_args.update(settings)
 
         ms = MultipleSeries([self, target_series])
@@ -3456,20 +3495,51 @@ class Series:
             ms = ms.common_time(**ct_args)
 
         if timespan is None:
-            value1 = ms.series_list[0].value
-            value2 = ms.series_list[1].value
+            ts0 = ms.series_list[0]
+            ts1 = ms.series_list[1]
         else:
-            value1 = ms.series_list[0].slice(timespan).value
-            value2 = ms.series_list[1].slice(timespan).value
-
+            ts0 = ms.series_list[0].slice(timespan)
+            ts1 = ms.series_list[1].slice(timespan)
 
         if seed is not None:
             np.random.seed(seed)
 
-        corr_res = corrutils.corr_sig(value1, value2, **corr_args)
-        signif = True if corr_res['signif'] == 1 else False
-        corr = Corr(corr_res['r'], corr_res['p'], signif, alpha)
+        if method == 'ttest':
+            stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+            signif = bool(signf)
+        elif method == 'built-in':
+            if statistic == 'weightedtau':
+                raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
+            else:
+                res = corrutils.association(ts0.value,ts1.value,statistic)
+                stat = res[0]
+                pval = res.pvalue if len(res) > 1 else np.nan
+                signif = pval <= alpha 
+        elif method in supported_surrogates:  
+            number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
+            seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
+            method = corr_args['method'] if 'method' in corr_args.keys() else None
+            surr_settings = corr_args['surr_settings'] if 'surr_settings' in corr_args.keys() else None
+            
+            # compute correlation statistic
+            stat = corrutils.association(ts0.value,ts1.value,statistic)[0]
+            
+            ts0_surr = ts0.surrogates(number=number, seed=seed, 
+                                                 method=method, settings=surr_settings)
+            ts1_surr = ts1.surrogates(number=number, seed=seed, 
+                                                 method=method, settings=surr_settings)
+            stat_surr = np.empty((number))
+            for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
+                stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
+                                                     ts1_surr.series_list[i].value,statistic)[0]
+            # obtain p-value
+            pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
+            # establish significance
+            signif = pval <= alpha 
+        else:
+            raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
 
+        corr = Corr(stat, pval, signif, alpha) # assemble Correlation result object
         return corr
 
     def causality(self, target_series, method='liang', timespan=None, settings=None, common_time_kwargs=None):
@@ -3572,13 +3642,18 @@ class Series:
         return causal_res
 
     def surrogates(self, method='ar1sim', number=1, length=None, seed=None, settings=None):
-        ''' Generate surrogates with increasing time axis
+        ''' Generate surrogates of the Series object according to "method"
+            
+            For now, assumes uniform spacing and increasing time axis
 
         Parameters
         ----------
 
-        method : {ar1sim}
-            Uses an AR1 model to generate surrogates of the timeseries
+        method : {ar1sim, phaseran}
+            The method used to generate surrogates of the timeseries
+            
+            Note that phaseran assumes an odd number of samples. If the series 
+            has even length, the last point is dropped to satisfy this requirement
 
         number : int
             The number of surrogates to generate
@@ -3590,7 +3665,7 @@ class Series:
             Control seed option for reproducibility
 
         settings : dict
-            Parameters for surogate generator. See individual methods for details.
+            Parameters for surrogate generator. See individual methods for details.
 
         Returns
         -------
@@ -3600,29 +3675,52 @@ class Series:
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
+        pyleoclim.utils.tsutils.phaseran : phase randomization
 
         '''
         settings = {} if settings is None else settings.copy()
-        surrogate_func = {
-            'ar1sim': tsmodel.ar1_sim,
-        }
         args = {}
-        args['ar1sim'] = {'t': self.time}
+        time = self.time
+        args['ar1sim'] = {'t': time}
+        args['phaseran'] = {}
         args[method].update(settings)
 
         if seed is not None:
             np.random.seed(seed)
 
-        surr_res = surrogate_func[method](self.value, number, **args[method])
+        if method == 'ar1sim':
+            surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
+        elif method == 'phaseran':
+            if self.is_evenly_spaced():
+                surr_res = tsutils.phaseran2(self.value, number, **args[method])
+            else:
+                raise ValueError("Phase-randomization presently requires evenly-spaced series.")
+
+        # elif method == 'uar1':
+        #     # TODO : implement Lionel's ML method
+        # elif method == 'power-law':
+        #     # TODO : implement Stochastic
+        # elif method == 'fBm':
+        #      # TODO : implement Stochastic
+                    
         if len(np.shape(surr_res)) == 1:
             surr_res = surr_res[:, np.newaxis]
 
         s_list = []
-        for s in surr_res.T:
-            s_tmp = Series(time=self.time, value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit, verbose=False)
+        for i, s in enumerate(surr_res.T):
+            s_tmp = Series(time=time, value=s,  # will need reformation after uar1 pull
+                           time_name=self.time_name,  
+                           time_unit=self.time_unit, 
+                           value_name=self.value_name, 
+                           value_unit=self.value_unit, 
+                           label = str(self.label or '') + " surr #" + str(i+1),
+                           verbose=False, auto_time_params=True)
             s_list.append(s_tmp)
 
-        surr = SurrogateSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])
+        surr = SurrogateSeries(series_list=s_list, 
+                               label = self.label,
+                               surrogate_method=method, 
+                               surrogate_args=args[method])
 
         return surr
 

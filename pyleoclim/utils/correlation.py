@@ -7,16 +7,18 @@ Relevant functions for correlation analysis
 __all__ = [
     'corr_sig',
     'fdr',
+    'association'
 ]
 
 import numpy as np
-from scipy.stats import pearsonr
-from scipy.stats.mstats import gmean
-from scipy.stats import t as stu
-from scipy.stats import gaussian_kde
-import statsmodels.api as sm
+import scipy.stats as stats
+#from scipy.stats import pearsonr
+#from scipy.stats.mstats import gmean
+#from scipy.stats import t as stu
+#from scipy.stats import gaussian_kde
 from sklearn import preprocessing
-from .tsmodel import ar1_fit_evenly
+from .tsmodel import ar1_fit_evenly, isopersistent_rn
+from .tsutils import phaseran
 
 
 def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
@@ -79,14 +81,19 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     y1 = np.array(y1, dtype=float)
     y2 = np.array(y2, dtype=float)
 
-    assert np.size(y1) == np.size(y2), 'The size of X and the size of Y should be the same!'
+    assert np.size(y1) == np.size(y2), 'The size of y1 and y2 should be the same'
 
     if method == 'ttest':
         (r, signif, p) = corr_ttest(y1, y2, alpha=alpha)
     elif method == 'isopersistent':
+        
         (r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
     elif method == 'isospectral':
         (r, signif, p) = corr_isospec(y1, y2, alpha=alpha, nsim=nsim)
+        
+        
+    # apply this syntax:
+    # wave_res = wave_func[method](self.value, self.time, **args[method])
 
     res={'r':r,'signif':signif,'p':p}    
     
@@ -217,7 +224,7 @@ def corr_ttest(y1, y2, alpha=0.05):
     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     """
-    r = pearsonr(y1, y2)[0]
+    r = stats.pearsonr(y1, y2)[0]
 
     g1 = ar1_fit_evenly(y1)
     g2 = ar1_fit_evenly(y2)
@@ -227,13 +234,13 @@ def corr_ttest(y1, y2, alpha=0.05):
     Ney1 = N * (1-g1) / (1+g1)
     Ney2 = N * (1-g2) / (1+g2)
 
-    Ne = gmean([Ney1+Ney2])
+    Ne = stats.mstats.gmean([Ney1+Ney2])
     assert Ne >= 10, 'Too few effective d.o.f. to apply this method!'
 
     df = Ne - 2
     t = np.abs(r) * np.sqrt(df/(1-r**2))
 
-    pval = 2 * stu.cdf(-np.abs(t), df)
+    pval = 2 * stats.t.cdf(-np.abs(t), df)
 
     signif = pval <= alpha
 
@@ -293,7 +300,7 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     '''
 
-    r = pearsonr(y1, y2)[0]
+    r = stats.pearsonr(y1, y2)[0]
     ra = np.abs(r)
 
     y1_red, g1 = isopersistent_rn(y1, nsim)
@@ -301,12 +308,12 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     rs = np.zeros(nsim)
     for i in np.arange(nsim):
-        rs[i] = pearsonr(y1_red[:, i], y2_red[:, i])[0]
+        rs[i] = stats.pearsonr(y1_red[:, i], y2_red[:, i])[0]
 
     rsa = np.abs(rs)
 
     xi = np.linspace(0, 1.1*np.max([ra, np.max(rsa)]), 200)
-    kde = gaussian_kde(rsa)
+    kde = stats.gaussian_kde(rsa)
     prob = kde(xi).T
 
     diff = np.abs(ra - xi)
@@ -320,124 +327,6 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     return r, signif, pval
 
-def isopersistent_rn(X, p):
-    ''' Generates p realization of a red noise [i.e. AR(1)] process
-    with same persistence properties as X (Mean and variance are also preserved).
-
-    Parameters
-    ----------
-
-    X : array
-        vector of (real) numbers as a time series, no NaNs allowed
-    p : int
-        number of simulations
-
-    Returns
-    -------
-
-    red : numpy array
-        n rows by p columns matrix of an AR1 process, where n is the size of X
-    g :float
-        lag-1 autocorrelation coefficient
-    
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
-
-    Notes
-    -----
-
-    (Some Rights Reserved) Hepta Technologies, 2008
-
-    '''
-    n = np.size(X)
-    sig = np.std(X, ddof=1)
-
-    g = ar1_fit_evenly(X)
-    #  red = red_noise(N, M, g)
-    red = sm_ar1_sim(n, p, g, sig)
-
-    return red, g
-
-
-def sm_ar1_sim(n, p, g, sig):
-    ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g using statsmodels
-
-    Parameters
-    ----------
-
-    n : int
-        row dimensions
-    p : int
-        column dimensions
-
-    g : float
-        lag-1 autocorrelation coefficient
-        
-    sig : float
-        the standard deviation of the original time series
-
-    Returns
-    -------
-
-    red : numpy matrix
-        n rows by p columns matrix of an AR1 process
-
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
-
-    '''
-    # specify model parameters (statsmodel wants lag0 coefficents as unity)
-    ar = np.r_[1, -g]  # AR model parameter
-    ma = np.r_[1, 0.0] # MA model parameters
-    sig_n = sig*np.sqrt(1-g**2) # theoretical noise variance for red to achieve the same variance as X
-
-    red = np.empty(shape=(n, p)) # declare array
-
-    # simulate AR(1) model for each column
-    for i in np.arange(p):
-        red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, scale=sig_n)
-
-    return red
-
-# def red_noise(N, M, g):
-#     ''' Produce M realizations of an AR1 process of length N with lag-1 autocorrelation g
-
-#     Parameters
-#     ----------
-
-#     N : int
-#         row dimensions
-        
-#     M : int
-#         column dimensions
-        
-#     g : float
-#         lag-1 autocorrelation coefficient
-
-#     Returns
-#     -------
-
-#     red : numpy array
-#         N rows by M columns matrix of an AR1 process
-
-#     Notes
-#     -----
-
-#     (Some Rights Reserved) Hepta Technologies, 2008
-#     J.E.G., GaTech, Oct 20th 2008
-#     '''
-#     red = np.zeros(shape=(N, M))
-#     red[0, :] = np.random.randn(1, M)
-#     for i in np.arange(1, N):
-#         red[i, :] = g * red[i-1, :] + np.random.randn(1, M)
-
-#     return red
 
 def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     ''' Estimates the significance of the correlation using phase randomization
@@ -489,7 +378,7 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     
     - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7 (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
     '''
-    r = pearsonr(y1, y2)[0]
+    r = stats.pearsonr(y1, y2)[0]
 
     # generate phase-randomized samples using the Theiler & Prichard method
     Y1surr = phaseran(y1, nsim)
@@ -511,81 +400,6 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
 
     return r, signif, F
 
-def phaseran(recblk, nsurr):
-    ''' Simultaneous phase randomization of a set of time series
-    
-    It creates blocks of surrogate data with the same second order properties as the original
-    time series dataset by transforming the oriinal data into the frequency domain, randomizing the
-    phases simultaneoulsy across the time series and converting the data back into the time domain. 
-    
-    Written by Carlos Gias for MATLAB
-
-    http://www.mathworks.nl/matlabcentral/fileexchange/32621-phase-randomization/content/phaseran.m
-
-    Parameters
-    ----------
-
-    recblk : numpy array
-        2D array , Row: time sample. Column: recording.
-        An odd number of time samples (height) is expected.
-        If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
-        The class must be double and it must be nonsparse.
-    
-    nsurr : int
-        is the number of image block surrogates that you want to generate.
-
-    Returns
-    -------
-
-    surrblk : numpy array
-        3D multidimensional array image block with the surrogate datasets along the third dimension
-
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
-
-    References
-    ----------
-
-    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7
-    
-    - Carlos Gias (2020). Phase randomization, MATLAB Central File Exchange
-    '''
-    # Get parameters
-    nfrms = recblk.shape[0]
-
-    if nfrms % 2 == 0:
-        nfrms = nfrms-1
-        recblk = recblk[0:nfrms]
-
-    len_ser = int((nfrms-1)/2)
-    interv1 = np.arange(1, len_ser+1)
-    interv2 = np.arange(len_ser+1, nfrms)
-
-    # Fourier transform of the original dataset
-    fft_recblk = np.fft.fft(recblk)
-
-    surrblk = np.zeros((nfrms, nsurr))
-
-    #  for k in tqdm(np.arange(nsurr)):
-    for k in np.arange(nsurr):
-        ph_rnd = np.random.rand(len_ser)
-
-        # Create the random phases for all the time series
-        ph_interv1 = np.exp(2*np.pi*1j*ph_rnd)
-        ph_interv2 = np.conj(np.flipud(ph_interv1))
-
-        # Randomize all the time series simultaneously
-        fft_recblk_surr = np.copy(fft_recblk)
-        fft_recblk_surr[interv1] = fft_recblk[interv1] * ph_interv1
-        fft_recblk_surr[interv2] = fft_recblk[interv2] * ph_interv2
-
-        # Inverse transform
-        surrblk[:, k] = np.real(np.fft.ifft(fft_recblk_surr))
-
-    return surrblk
 
 ''' The FDR procedures translated from fdr.R by Dr. Chris Paciorek (https://www.stat.berkeley.edu/~paciorek/research/code/code.html)
 '''
@@ -858,3 +672,48 @@ def cov_shrink_rblw(S, n):
     F = (trace_S / p) * np.eye(p)
 
     return (1-rho)*np.asarray(S) + rho*F, rho
+
+def association(y1, y2, statistic='pearsonr',settings=None):
+    '''
+    Quantify the strength of a relationship (e.g. linear) between paired observations y1 and y2.
+
+    Parameters
+    ----------
+    y1 : array, length n
+        vector of (real) numbers of same length as y2, no NaNs allowed  
+    y2 : array, length n
+        vector of (real) numbers of same length as y1, no NaNs allowed
+    statistic : str, optional
+        The statistic used to measure the association, to be chosen from a subset of
+        https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+        ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
+        The default is 'pearsonr'.
+    settings : dict, optional
+        optional arguments to modify the behavior of the SciPy association functions
+
+    Raises
+    ------
+    ValueError
+        Complains loudly if the requested statistic is not from the list above. 
+
+    Returns
+    -------
+    res : instance result class
+        structure containing the result. The first element (res[0]) is always the statistic.
+    '''
+    y1 = np.array(y1, dtype=float)
+    y2 = np.array(y2, dtype=float)
+    assert np.size(y1) == np.size(y2), 'The size of y1 and y2 should be the same'
+    
+    args = {} if settings is None else settings.copy()
+    acceptable_methods = ['linregress','pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
+    if statistic in acceptable_methods:
+        func = getattr(stats, statistic) 
+        res = func(y1,y2,**args)
+    else:
+        raise ValueError(f'Wrong statistic: {statistic}; acceptble choices are {acceptable_methods}')
+       
+    return res
+        
+        
+        
