@@ -19,9 +19,9 @@ from scipy.optimize import minimize # for MLE estimation of tau_0
 
 __all__ = [
     'ar1_fit',
-    'ar1_fit_ml',
+    'uar1_fit',
+    'uar1_sim',
     'ar1_sim',
-    'ar1_sim_geneva',
     'colored_noise',
     'colored_noise_2regimes',
     'gen_ar1_evenly',
@@ -650,7 +650,7 @@ def n_ll_unevenly_spaced_ar1(theta, y, t):
   nll = np.log(2*np.pi) + np.log(sigma_2) + term_5 + term_4
   return(nll)
 
-def ar1_fit_ml(y, t):
+def uar1_fit(y, t):
     '''
     Maximum Likelihood Estimation of parameters tau_0 and sigma_2_0
 
@@ -678,7 +678,7 @@ def ar1_fit_ml(y, t):
     
     return theta_hat
 
-def ar1_sim_geneva(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False, 
+def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False, 
                    delta_t_dist = "exponential",  param = 1):  
                                
   """

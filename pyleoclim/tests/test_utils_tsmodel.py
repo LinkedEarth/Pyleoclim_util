@@ -34,7 +34,7 @@ def test_time_increments_2():
     assert all(np.cumsum(delta_t)>0)
 
 @pytest.mark.parametrize('evenly_spaced', [True, False])
-def test_ar1fit_ml(evenly_spaced):
+def test_uar1_fit(evenly_spaced):
     '''
     Tests whether this method works well on an AR(1) process with known parameters
 
@@ -45,7 +45,7 @@ def test_ar1fit_ml(evenly_spaced):
     sigma_2 = 1
     
     # create p=50 time series
-    y_sim, t_sim = tsmodel.ar1_sim_geneva(n=200, tau_0=tau, sigma_2_0=sigma_2, 
+    y_sim, t_sim = tsmodel.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, 
                                           evenly_spaced=evenly_spaced, p = 10)
 
     # Create an empty matrix to store estimated parameters
@@ -53,7 +53,7 @@ def test_ar1fit_ml(evenly_spaced):
     
     # estimate parameters for each time series
     for j in range(y_sim.shape[1]):
-        theta_hat_matrix[j,:]  = tsmodel.ar1_fit_ml(y_sim[:, j], t_sim[:, j])
+        theta_hat_matrix[j,:]  = tsmodel.uar1_fit(y_sim[:, j], t_sim[:, j])
     
     # compute mean of estimated param for each simulate ts
     theta_hat_bar = np.mean(theta_hat_matrix, axis=0)
