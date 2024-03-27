@@ -44,7 +44,8 @@ setup(
         "cartopy>=0.22.0",
         "pyyaml",
         "beautifulsoup4", 
-        "scipy",       
+        "scipy", 
+        "stochastic"
     ],
     python_requires=">=3.9.0"
 )
