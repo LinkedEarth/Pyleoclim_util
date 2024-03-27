@@ -3675,40 +3675,55 @@ class Series:
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
-        pyleoclim.utils.tsutils.phaseran : phase randomization
+        pyleoclim.utils.tsutils.phaseran2 : phase randomization
 
         '''
         settings = {} if settings is None else settings.copy()
-        args = {}
-        time = self.time
-        args['ar1sim'] = {'t': time}
-        args['phaseran'] = {}
-        args[method].update(settings)
+        # args = {}
+        # args['ar1sim'] = {'t': self.time}
+        # args['phaseran'] = {}
+        
+        # args[method].update(settings)
 
         if seed is not None:
             np.random.seed(seed)
 
         if method == 'ar1sim':
-            surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
+            y_surr = tsmodel.ar1_sim(self.value, number, self.time)
+            times = np.tile(self.time, number) # TURN THIS INTO A MATRIX
         elif method == 'phaseran':
             if self.is_evenly_spaced():
-                surr_res = tsutils.phaseran2(self.value, number, **args[method])
+                y_surr = tsutils.phaseran2(self.value, number)
+                times = np.tile(self.time, number) # TURN THIS INTO A MATRIX
             else:
                 raise ValueError("Phase-randomization presently requires evenly-spaced series.")
-
-        # elif method == 'uar1':
-        #     # TODO : implement Lionel's ML method
+        elif method == 'uar1':
+            theta_hat = tsmodel.uar1_fit(self.value, self.time)
+            # 3 choices: 1) emulate self.time (use resolution())  TODO
+            #            2) generate unevenly at random
+            #            3) generate evenly spaced
+            #  grab the parameters from the settings dictionary (do exception handling on dictionary keys)
+            
+            # ys, ts = tsmodel.uar1_sim(len(self.value), tau_0=theta_hat[0], 
+            #                           sigma_2_0=theta_hat[1], 
+            #                           seed=seed, p=number,  evenly_spaced = False, 
+            #                           delta_t_dist = "exponential",  param = 1) 
+            y_surr, times = tsmodel.uar1_sim(len(self.value), tau_0=theta_hat[0], 
+                                      sigma_2_0=theta_hat[1], 
+                                      seed=seed, p=number,  **settings) 
+                                            
+            # TODO : implement Lionel's ML method
         # elif method == 'power-law':
         #     # TODO : implement Stochastic
         # elif method == 'fBm':
         #      # TODO : implement Stochastic
                     
-        if len(np.shape(surr_res)) == 1:
-            surr_res = surr_res[:, np.newaxis]
+        if len(np.shape(y_surr)) == 1:
+            y_surr = y_surr[:, np.newaxis]
 
         s_list = []
-        for i, s in enumerate(surr_res.T):
-            s_tmp = Series(time=time, value=s,  # will need reformation after uar1 pull
+        for i, s in enumerate(y_surr.T):
+            s_tmp = Series(time=times[:,i], value=s,  # will need reformation after uar1 pull
                            time_name=self.time_name,  
                            time_unit=self.time_unit, 
                            value_name=self.value_name, 
@@ -3720,7 +3735,7 @@ class Series:
         surr = SurrogateSeries(series_list=s_list, 
                                label = self.label,
                                surrogate_method=method, 
-                               surrogate_args=args[method])
+                               surrogate_args=settings)
 
         return surr
 
