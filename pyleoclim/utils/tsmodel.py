@@ -26,7 +26,8 @@ __all__ = [
     'colored_noise_2regimes',
     'gen_ar1_evenly',
     'gen_ts',
-    'tau_estimation'
+    'tau_estimation',
+    'parametric_surrogates'
 ]
 
 
