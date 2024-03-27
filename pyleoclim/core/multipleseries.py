@@ -11,6 +11,7 @@ from ..core.correns import CorrEns
 from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
 from ..core.multivardecomp import MultivariateDecomp
+from ..core.resolutions import MultipleResolution
 
 import warnings
 import numpy as np
@@ -2320,43 +2321,6 @@ class MultipleSeries:
         
         return ms_new
     
-    def resolution(self, statistic='median'):
-        '''
-        Extracts representative statistic for the resolution of each series in the object.
-
-        Parameters
-        ----------
-        statistic : str, optional
-           The statistic applied to the res9lution array of each series. 
-           Possible values: 'mean' or 'median'. The default is 'median'.
-
-
-        Returns
-        -------
-        res: NumPy array
-            array containing the statistic of interest for all series.  
-
-        Examples
-        --------
-        .. jupyter-execute::
-
-            co2ts = pyleo.utils.load_dataset('AACO2')
-            edc = pyleo.utils.load_dataset('EDC-dD')
-            ms = edc & co2ts # create MS object
-            ms.convert_time_unit('kyr BP').resolution() 
-
-        Note that the output is only meaningful if all constituent series have the same units.
-        '''
-        
-        if statistic=='median':
-            res = [np.median(ts.resolution().resolution) for ts in self.series_list]
-        elif statistic=='mean':
-            res = [np.mean(ts.resolution().resolution) for ts in self.series_list]
-        else:
-            raise ValueError('Unknown statistic',stacklevel=2)
-            
-        return np.array(res)
-    
     def to_json(self, path=None):
         '''
         Export the pyleoclim.MultipleSeries object to a json file
@@ -2652,3 +2616,100 @@ class MultipleSeries:
             return fig, ax
         else:
             return ax
+        
+    def resolution(self,time_unit=None,verbose=True,statistic='median'):
+        """Generate a MultipleResolution object
+
+        Increments are assigned to the preceding time value.
+        E.g. for time_axis = [0,1,3], resolution.resolution = [1,2] resolution.time = [0,1].
+        Note that the MultipleResolution class requires a shared time unit. If the time_unit parameter is not passed, a time unit will be automatically determined.
+
+        Returns
+        -------
+
+        multipleresolution : pyleoclim.MultipleResolution
+            MultipleResolution object
+
+        time_unit : str
+            Time unit to convert objects to. See pyleo.Series.convert_time_unit for options.
+
+        verbose : bool
+            Whether or not to print messages warning the user about automated decisions.
+
+        statistic : str; {'median','mean',None}
+            If a recognized statistic is passed, this function will simply output that statistic applied to the resolution of each series in the MulitipleSeries object. Options are 'mean' or 'median'.
+            If statistic is None, then the function will return a new MultipleResolution class with plotting capabilities.
+
+        See Also
+        --------
+        
+        pyleoclim.core.resolutions.MultipleResolution
+
+        pyleoclim.core.series.Series.convert_time_unit
+
+        Examples
+        --------
+
+        To create a resolution object, apply the .resolution() method to a Series object with `statistic=None`.
+
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+
+            co2ts = pyleo.utils.load_dataset('AACO2')
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            ms = edc & co2ts # create MS object
+            ms_resolution = ms.resolution(statistic=None)
+
+        Several methods are then available:
+
+        Summary statistics can be obtained via .describe()
+
+        .. jupyter-execute::
+
+            ms_resolution.describe()
+
+        A simple plot can be created using .summary_plot()
+
+        .. jupyter-execute::
+
+            ms_resolution.summary_plot()
+            """
+         
+        if statistic=='median':
+            warnings.warn('The statistic parameter will be deprecated in a future release. Statistic = None will become the default behavior.',DeprecationWarning)
+            res = [np.median(ts.resolution().resolution) for ts in self.series_list]
+        elif statistic=='mean':
+            warnings.warn('The statistic parameter will be deprecated in a future release. Statistic = None will become the default behavior.',DeprecationWarning)
+            res = [np.mean(ts.resolution().resolution) for ts in self.series_list]
+        elif statistic is None:
+            resolution_list = []
+
+            if time_unit:
+                series_list = self.series_list
+                for series in series_list:
+                    resolution = series.convert_time_unit(time_unit).resolution()
+                    resolution_list.append(resolution)
+            else:
+                if self.time_unit:
+                    series_list = self.series_list
+                    for series in series_list:
+                        resolution = series.resolution()
+                        resolution_list.append(resolution)
+                else:
+                    if verbose:
+                        print('Time unit not found, attempting conversion.')
+                    new_ms = self.convert_time_unit()
+                    time_unit = new_ms.time_unit
+                    series_list = new_ms.series_list
+                    if verbose:
+                        print(f'Converted to {time_unit}')
+                    for series in series_list:
+                        resolution = series.resolution()
+                        resolution_list.append(resolution)
+
+            res = MultipleResolution(resolution_list=resolution_list,time_unit=time_unit)
+        else:
+            raise ValueError('Unrecognized statistic, please use "mean", "median", or None')
+
+        return res

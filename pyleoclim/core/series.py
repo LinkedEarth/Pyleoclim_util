@@ -4171,6 +4171,11 @@ class Series:
         resolution : Resolution
             Resolution object
 
+        See Also
+        --------
+        
+        pyleoclim.core.resolutions.Resolution
+
         Examples
         --------
 
@@ -4223,13 +4228,13 @@ class Series:
 
         resolution = Resolution(
             resolution = res,
+            time = x[1:],
+            resolution_unit= self.time_unit,
+            label= self.label,
             timeseries = copy
         )
 
         return resolution
-
-
-
 
 class SeriesResampler:
     """
