@@ -109,6 +109,19 @@ def multipleseries_basic():
     return ms
 
 @pytest.fixture
+def multipleseries_nans():
+    t1 = np.arange(1,10)
+    v1 = np.ones(len(t1))
+    ts1 = pyleo.Series(time=t1, value=v1)
+    
+    t2 = np.arange(1,10)
+    v2 = np.ones(len(t1))
+    v2[2:4] = np.nan
+    ts2 = pyleo.Series(time=t2, value =v2, dropna=False, verbose=False)
+    ms = ts1 & ts2
+    return ms
+
+@pytest.fixture
 def multipleseries_science():
     soi = pyleo.utils.load_dataset('SOI')
     nino = pyleo.utils.load_dataset('NINO3')
