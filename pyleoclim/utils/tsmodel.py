@@ -7,6 +7,8 @@ from statsmodels.tsa.arima_process import arma_generate_sample
 from statsmodels.tsa.arima.model import ARIMA
 from tqdm import tqdm
 from .tsutils import standardize
+from stochastic.processes.noise import ColoredNoise
+from stochastic.processes.noise import FractionalGaussianNoise
 
 from .tsbase import (
     is_evenly_spaced
@@ -592,14 +594,12 @@ def parametric_surrogates(y, p, model, param, seed):
             paths[:,j] = z
 
     elif model == 'power-law':
-        from stochastic.processes.noise import ColoredNoise
         for j in tqdm(range(p)):
             CN = ColoredNoise(beta=param,t=N)
             z, _, _ = standardize(CN.sample(N-1))
             paths[:,j] = z
              
     elif model == 'fGn':
-        from stochastic.processes.noise import FractionalGaussianNoise
         for j in tqdm(range(p)):
             fgn = FractionalGaussianNoise(hurst=param, t=N)
             z, _, _ = standardize(fgn.sample(N, algorithm='daviesharte')) 
