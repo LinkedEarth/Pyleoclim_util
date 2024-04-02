@@ -19,9 +19,9 @@ from scipy.optimize import minimize # for MLE estimation of tau_0
 
 __all__ = [
     'ar1_fit',
+    'ar1_sim',
     'uar1_fit',
     'uar1_sim',
-    'ar1_sim',
     'colored_noise',
     'colored_noise_2regimes',
     'gen_ar1_evenly',
@@ -759,6 +759,8 @@ def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False,
       y_sim[:, j] = y
   return y_sim, t_sim
 
+def inverse_cumsum(arr):
+    return np.diff(np.concatenate(([0], arr)))
 
 def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
     '''
@@ -774,7 +776,7 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
         
     delta_t_dist: str
         the probability distribution of delta_t
-        possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
+        possible choices include 'exponential', 'poisson', 'pareto', 'random_choice' or `empirical`
         
         if 'exponential', `param` is expected to be a single scale parameter (traditionally denoted \lambda)
         if 'poisson', `param` is expected to be a single parameter (rate)
@@ -785,6 +787,7 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
             prob_random_choice: 
                 probabilities associated with each entry value_random_choice  (e.g. [.95,.05])
             (These two arrays must be of the same size)
+        if 'empirical', expect an array containing the time index of the original time series 
         
     Returns:
     -------
@@ -793,9 +796,9 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
 
     '''
     # check for a valid distribution 
-    valid_distributions = ["exponential", "poisson", "pareto", "random_choice"]
+    valid_distributions = ["exponential", "poisson", "pareto", "random_choice", "empirical"]
     if delta_t_dist not in valid_distributions:
-        raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', or 'random_choice'.")    
+        raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', 'random_choice' or 'empirical'.")    
     
     np.random.seed(seed) 
     param = np.array(param) # coerce array type
@@ -813,8 +816,16 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
         if len(param)<2 or len(param[0]) != len(param[1]):
             raise ValueError("value_random_choice and prob_random_choice must have the same size.")
         delta_t = np.random.choice(param[0], size=n, p=param[1])
-        
+    elif delta_t_dist == "empirical":
+        if len(param[0])!= n:
+            raise ValueError("Number of time index provided not equal to the n value provided")
+        delta_t = inverse_cumsum(param[0])
     return delta_t
+
+
+
+time_index = np.array([1, 2,3,4,5,6,7])
+time_increments(n=10,   param= , delta_t_dist = "empirical")
 
 # def fBMsim(N=128, H=0.25):
 #     '''Simple method to generate fractional Brownian Motion
