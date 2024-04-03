@@ -27,7 +27,8 @@ __all__ = [
     'gen_ar1_evenly',
     'gen_ts',
     'tau_estimation',
-    'parametric_surrogates'
+    'parametric_surrogates',
+    'time_increments'
 ]
 
 
@@ -737,7 +738,7 @@ def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False,
       if evenly_spaced: 
           delta_t = [1]*n # for now we assume delta_t = 1 if evenly sampled, potentially to improve with a parameter that specify the time spacing
       else:
-          delta_t = time_increments(n, param, delta_t_dist = "exponential", seed = seed+j)
+          delta_t = time_increments(n, param, delta_t_dist = delta_t_dist, seed = seed+j)
                 
       # obtain the 0-based time index from the delta_t distribution
       t = np.cumsum(delta_t)-1
@@ -804,8 +805,14 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
     param = np.array(param) # coerce array type
     
     if delta_t_dist == "exponential":
+        # make sure that param is of len 1
+        if len(param) != 1:
+            raise ValueError('The Exponential law takes a single scale parameter.')       
         delta_t = np.random.exponential(scale = param, size=n)
+        
     elif delta_t_dist == "poisson":
+        if len(param) != 1:
+            raise ValueError('The Poisson law takes a single parameter.')       
         delta_t = np.random.poisson(lam = param, size = n) + 1
     elif delta_t_dist == "pareto":
         if len(param) != 2:
@@ -824,8 +831,7 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
 
 
 
-time_index = np.array([1, 2,3,4,5,6,7])
-time_increments(n=10,   param= , delta_t_dist = "empirical")
+
 
 # def fBMsim(N=128, H=0.25):
 #     '''Simple method to generate fractional Brownian Motion

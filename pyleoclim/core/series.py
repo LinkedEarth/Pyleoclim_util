@@ -3698,7 +3698,40 @@ class Series:
             else:
                 raise ValueError("Phase-randomization presently requires evenly-spaced series.")
         elif method == 'uar1':
+            # Check if 'evenly_spaced' in the settings dictionary
+            required_keys = ['evenly_spaced'] # should alway be indicated
+            missing_keys = [key for key in required_keys if key not in settings]
+            if missing_keys:
+                raise ValueError("The following required key is missing from the settings dictionary: {missing_keys}")
+            # check now that if evenly spaced is set to False, the key delta_t_dist is provided
+            if settings["evenly_spaced"] == False:
+                required_keys = ['delta_t_dist']
+                missing_keys = [key for key in required_keys if key not in settings]
+                if missing_keys:
+                    raise ValueError(f"The following required keys are missing from the settings dictionary: {missing_keys}")
+            # check that param if evenly spaced is false and key delta t dist is not empirical, then param are provided
+            if settings["delta_t_dist"] != "empirical":
+                required_keys = ['param']
+                missing_keys = [key for key in required_keys if key not in settings]
+                if missing_keys:
+                    raise ValueError(f"The following required keys are missing from the settings dictionary: {missing_keys}")
+            
+            
+            # estimate theta with MLE
             theta_hat = tsmodel.uar1_fit(self.value, self.time)
+            
+            # the method `empirical` needs the time value provided as parameters 
+            if settings['delta_t_dist'] == "empirical":
+                y_surr, times = tsmodel.uar1_sim(n = len(self.value), tau_0=theta_hat[0], 
+                                          sigma_2_0=theta_hat[1], 
+                                          seed=seed, p=number, delta_t_dist = "empirical", param = [[self.time]]) 
+            # for other delta_t_dist, then the parameters are provided
+            else:
+                y_surr, times = tsmodel.uar1_sim(n = len(self.value), tau_0=theta_hat[0], 
+                                          sigma_2_0=theta_hat[1], 
+                                          seed=seed, p=number, **settings) 
+            
+            
             # 3 choices: 1) emulate self.time (use resolution())  TODO
             #            2) generate unevenly at random
             #            3) generate evenly spaced
@@ -3708,9 +3741,10 @@ class Series:
             #                           sigma_2_0=theta_hat[1], 
             #                           seed=seed, p=number,  evenly_spaced = False, 
             #                           delta_t_dist = "exponential",  param = 1) 
-            y_surr, times = tsmodel.uar1_sim(len(self.value), tau_0=theta_hat[0], 
-                                      sigma_2_0=theta_hat[1], 
-                                      seed=seed, p=number,  **settings) 
+            
+            #y_surr, times = tsmodel.uar1_sim(len(self.value), tau_0=theta_hat[0], 
+            #                          sigma_2_0=theta_hat[1], 
+            #                          seed=seed, p=number,  **settings) 
                                             
             # TODO : implement Lionel's ML method
         # elif method == 'power-law':

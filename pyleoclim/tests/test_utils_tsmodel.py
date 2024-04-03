@@ -9,13 +9,20 @@ Created on Mon Feb 26 10:36:37 2024
 import pytest
 import numpy as np
 from pyleoclim.utils import tsmodel
+import pyleoclim as pyleo
+
+
+
+
+
+
 
 @pytest.mark.parametrize('model', ["exponential", "poisson"])
 def test_time_increments_0(model):
     '''
     Generate time increments with 1-parameter models
     '''
-    delta_t = tsmodel.time_increments(n=20, param=1, delta_t_dist = model)
+    delta_t = tsmodel.time_increments(n=20, param=[1], delta_t_dist = model)
     assert all(np.cumsum(delta_t)>0)
 
 def test_time_increments_1():
@@ -32,6 +39,18 @@ def test_time_increments_2():
     delta_t = tsmodel.time_increments(n=20, delta_t_dist = "random_choice",
                                       param=[[1,2],[.95,.05]] )
     assert all(np.cumsum(delta_t)>0)
+    
+    
+def test_time_increments_3():
+    '''
+    Generate time increments with provided time vector
+    '''
+    delta_t = tsmodel.time_increments(n=20, delta_t_dist = "empirical", param=[range(1,21)] )
+    assert all(delta_t==1)
+    
+
+
+    
 
 @pytest.mark.parametrize('evenly_spaced', [True, False])
 def test_uar1_fit(evenly_spaced):
@@ -45,8 +64,14 @@ def test_uar1_fit(evenly_spaced):
     sigma_2 = 1
     
     # create p=50 time series
-    y_sim, t_sim = tsmodel.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, 
-                                          evenly_spaced=evenly_spaced, p = 10)
+    if evenly_spaced==True:
+        y_sim, t_sim = tsmodel.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, 
+                                              evenly_spaced=evenly_spaced, p = 10)
+    else:
+        y_sim, t_sim = tsmodel.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, 
+                                              evenly_spaced=evenly_spaced, p = 10,  delta_t_dist = "exponential",
+                                              param=[1])
+    
 
     # Create an empty matrix to store estimated parameters
     theta_hat_matrix = np.empty((y_sim.shape[1], 2))
@@ -64,6 +89,16 @@ def test_uar1_fit(evenly_spaced):
     assert np.abs(theta_hat_bar[1]-sigma_2) < tol
     
     
+def test_surrogates_1():
+    tau = 2
+    sigma_2 = 1
+    #y_sim, t_sim = uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
+    y_sim, t_sim = tsmodel.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
+    #pyleo.utils.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
+    ts = pyleo.Series(time = t_sim, value=  y_sim)
+   # surr = ts.surrogates(method = 'uar1')
+    surr =  ts.surrogates(method = 'uar1', settings={'delta_t_dist' :"empirical", 'evenly_spaced':False})
+    # nothing is working ! need to talk with julien!
+    return(len(surr))
 
 
-    
