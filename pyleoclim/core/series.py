@@ -3689,34 +3689,30 @@ class Series:
             np.random.seed(seed)
 
         if method == 'ar1sim':
-            y_surr = tsmodel.ar1_sim(self.value, number, self.time)
-            times = np.tile(self.time, number) # TURN THIS INTO A MATRIX
+            y_surr = tsmodel.ar1_sim(self.value, number, self.time)            
+            times = np.tile(self.time, (number, 1)).T 
             
         elif method == 'phaseran':
             if self.is_evenly_spaced():
                 y_surr = tsutils.phaseran2(self.value, number)
-                times = np.tile(self.time, number) # TURN THIS INTO A MATRIX
+                times = np.tile(self.time, (number, 1)).T 
             else:
                 raise ValueError("Phase-randomization presently requires evenly-spaced series.")
                 
         elif method == 'uar1':
             # Check if 'evenly_spaced' in the settings dictionary
-            required_keys = ['evenly_spaced'] # should alway be indicated
-            missing_keys = [key for key in required_keys if key not in settings]
-            if missing_keys:
-                raise ValueError("The following required key is missing from the settings dictionary: {missing_keys}")
+            if "evenly_spaced" not in settings:
+                raise ValueError("The following required key is missing from the settings dictionary: evenly_spaced")
             # check now that if evenly spaced is set to False, the key delta_t_dist is provided
             if settings["evenly_spaced"] == False:
-                required_keys = ['delta_t_dist']
-                missing_keys = [key for key in required_keys if key not in settings]
-                if missing_keys:
-                    raise ValueError(f"The following required keys are missing from the settings dictionary: {missing_keys}")
+                if "delta_t_dist" not in settings:
+                    raise ValueError("The following required keys are missing from the settings dictionary: delta_t_dist")
             # check that param if evenly spaced is false and key delta t dist is not empirical, then param are provided
-            if settings["delta_t_dist"] != "empirical":
+            if "delta_t_dist" in settings and settings["delta_t_dist"] != "empirical":
                 required_keys = ['param']
                 missing_keys = [key for key in required_keys if key not in settings]
                 if missing_keys:
-                    raise ValueError(f"The following required keys are missing from the settings dictionary: {missing_keys}")
+                    raise ValueError(f"The following required keys are missing from the settings dictionary: param")
             
             
             # estimate theta with MLE
