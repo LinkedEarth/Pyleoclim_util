@@ -3691,12 +3691,14 @@ class Series:
         if method == 'ar1sim':
             y_surr = tsmodel.ar1_sim(self.value, number, self.time)
             times = np.tile(self.time, number) # TURN THIS INTO A MATRIX
+            
         elif method == 'phaseran':
             if self.is_evenly_spaced():
                 y_surr = tsutils.phaseran2(self.value, number)
                 times = np.tile(self.time, number) # TURN THIS INTO A MATRIX
             else:
                 raise ValueError("Phase-randomization presently requires evenly-spaced series.")
+                
         elif method == 'uar1':
             # Check if 'evenly_spaced' in the settings dictionary
             required_keys = ['evenly_spaced'] # should alway be indicated
