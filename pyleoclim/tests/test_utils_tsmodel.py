@@ -12,11 +12,6 @@ from pyleoclim.utils import tsmodel
 import pyleoclim as pyleo
 
 
-
-
-
-
-
 @pytest.mark.parametrize('model', ["exponential", "poisson"])
 def test_time_increments_0(model):
     '''
@@ -40,13 +35,7 @@ def test_time_increments_2():
                                       param=[[1,2],[.95,.05]] )
     assert all(np.cumsum(delta_t)>0)
     
-    
-def test_time_increments_3():
-    '''
-    Generate time increments with provided time vector
-    '''
-    delta_t = tsmodel.time_increments(n=20, delta_t_dist = "empirical", param=[range(1,21)] )
-    assert all(delta_t==1)
+
     
 
 
@@ -89,6 +78,15 @@ def test_uar1_fit(evenly_spaced):
     assert np.abs(theta_hat_bar[1]-sigma_2) < tol
     
     
+        
+def test_time_increments_3():
+    '''
+    Generate time increments with provided time vector
+    '''
+    delta_t = tsmodel.time_increments(n=20, delta_t_dist = "empirical", param=[range(1,21)] )
+    assert all(delta_t==1)
+    
+    
 def test_surrogates_1():
     tau = 2
     sigma_2 = 1
@@ -98,7 +96,6 @@ def test_surrogates_1():
     ts = pyleo.Series(time = t_sim, value=  y_sim)
    # surr = ts.surrogates(method = 'uar1')
     surr =  ts.surrogates(method = 'uar1', settings={'delta_t_dist' :"empirical", 'evenly_spaced':False})
-    # nothing is working ! need to talk with julien!
     return(len(surr))
 
 
