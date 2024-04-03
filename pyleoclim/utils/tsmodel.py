@@ -28,7 +28,7 @@ __all__ = [
     'gen_ts',
     'tau_estimation',
     'parametric_surrogates',
-    'time_increments'
+    'random_time_increments'
 ]
 
 
@@ -725,7 +725,7 @@ def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False,
 
   pyleoclim.utils.tsmodel.ar1_fit_ml : Maximumum likelihood estimate of AR(1) parameters 
   
-  pyleoclim.utils.tsmodel.time_increments : Generate time increment vector according to a specific probability model
+  pyleoclim.utils.tsmodel.random_time_increments : Generate time increment vector according to a specific probability model
       
   """
   
@@ -738,7 +738,7 @@ def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False,
       if evenly_spaced: 
           delta_t = [1]*n # for now we assume delta_t = 1 if evenly sampled, potentially to improve with a parameter that specify the time spacing
       else:
-          delta_t = time_increments(n, param, delta_t_dist = delta_t_dist, seed = seed+j)
+          delta_t = random_time_increments(n, param, delta_t_dist = delta_t_dist, seed = seed+j)
                 
       # obtain the 0-based time index from the delta_t distribution
       t = np.cumsum(delta_t)-1
@@ -763,7 +763,7 @@ def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False,
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))
 
-def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
+def random_time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
     '''
     Generate a time increment vector according to a specific probability model
 

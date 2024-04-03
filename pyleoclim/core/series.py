@@ -3641,7 +3641,8 @@ class Series:
         causal_res = spec_func[method](value1, value2, **args[method])
         return causal_res
 
-    def surrogates(self, method='ar1sim', number=1, length=None, seed=None, settings=None):
+    def surrogates(self, method='ar1sim', number=1, time_pattern='match',
+                   length=None, seed=None, settings=None):
         ''' Generate surrogates of the Series object according to "method"
             
             For now, assumes uniform spacing and increasing time axis
@@ -3649,7 +3650,7 @@ class Series:
         Parameters
         ----------
 
-        method : {ar1sim, phaseran}
+        method : {ar1sim, phaseran, uar1}
             The method used to generate surrogates of the timeseries
             
             Note that phaseran assumes an odd number of samples. If the series 
@@ -3657,7 +3658,13 @@ class Series:
 
         number : int
             The number of surrogates to generate
-
+            
+        time_pattern : str {match, even, uneven}
+            The pattern used to generate the surrogate time axes
+            'match' uses the same pattern as the original Series
+            'even' uses an evenly-spaced time with spacing delta_t specified in settings (will return error if not specified)
+            'uneven' uses random_time_increments() with specified distribution and parameters (default: 'exponential' with parameter 1) 
+            
         length : int
             Length of the series
 
@@ -3675,7 +3682,9 @@ class Series:
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
+        pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
         pyleoclim.utils.tsutils.phaseran2 : phase randomization
+        pyleoclim.utils.tsutils.random_time_increments : 
 
         '''
         settings = {} if settings is None else settings.copy()
