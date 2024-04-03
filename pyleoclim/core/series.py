@@ -3712,14 +3712,14 @@ class Series:
                 required_keys = ['param']
                 missing_keys = [key for key in required_keys if key not in settings]
                 if missing_keys:
-                    raise ValueError(f"The following required keys are missing from the settings dictionary: param")
+                    raise ValueError("The following required keys are missing from the settings dictionary: param")
             
             
             # estimate theta with MLE
             theta_hat = tsmodel.uar1_fit(self.value, self.time)
             
             # the method `empirical` needs the time value provided as parameters 
-            if settings['delta_t_dist'] == "empirical":
+            if "delta_t_dist" in settings  and settings['delta_t_dist'] == "empirical":
                 y_surr, times = tsmodel.uar1_sim(n = len(self.value), tau_0=theta_hat[0], 
                                           sigma_2_0=theta_hat[1], 
                                           seed=seed, p=number, delta_t_dist = "empirical", param = [[self.time]]) 
