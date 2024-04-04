@@ -10,86 +10,84 @@ import pytest
 import numpy as np
 from pyleoclim.utils import tsmodel
 import pyleoclim as pyleo
-from pyleoclim.utils.tsmodel import ar1_sim
-from pyleoclim.utils.tsmodel import uar1_sim
-
 
 
 
 @pytest.mark.parametrize('model', ["exponential", "poisson"])
-def test_time_increments_0(model):
+def test_time_index_0(model):
     '''
     Generate time increments with 1-parameter models
     '''
-    delta_t = tsmodel.time_increments(n=20, param=[1], delta_t_dist = model)
+    delta_t = tsmodel.random_time_index(n=20, param=[1], delta_t_dist = model)
     assert all(np.cumsum(delta_t)>0)
 
-def test_time_increments_1():
+def test_time_index_1():
     '''
     Generate time increments with Pareto
     '''
-    delta_t = tsmodel.time_increments(n=20, param=[4.2,2.5], delta_t_dist = "pareto")
+    delta_t = tsmodel.random_time_index(n=20, param=[4.2,2.5], delta_t_dist = "pareto")
     assert all(np.cumsum(delta_t)>0)
     
-def test_time_increments_2():
+def test_time_index_2():
     '''
     Generate time increments with random choice
     '''
-    delta_t = tsmodel.time_increments(n=20, delta_t_dist = "random_choice",
+    delta_t = tsmodel.random_time_index(n=20, delta_t_dist = "random_choice",
                                       param=[[1,2],[.95,.05]] )
     assert all(np.cumsum(delta_t)>0)
     
 
     
 
-
-    
-
-@pytest.mark.parametrize('evenly_spaced', [True, False])
-def test_uar1_fit(evenly_spaced):
+@pytest.mark.parametrize(('p', 'evenly_spaced'), [(1, True), (50, True), (1, False), (50, False)])
+def test_uar1_fit(p, evenly_spaced):
     '''
-    Tests whether this method works well on an AR(1) process with known parameters
+    Tests whether this method works well on an AR(1) process with known parameters and evenly spaced time points
 
     '''
     # define tolerance
     tol = .4
     tau = 2
     sigma_2 = 1
+    n = 500
     
-    # create p=50 time series
-    if evenly_spaced==True:
-        y_sim, t_sim = tsmodel.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, 
-                                              evenly_spaced=evenly_spaced, p = 10)
-    else:
-        y_sim, t_sim = tsmodel.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, 
-                                              evenly_spaced=evenly_spaced, p = 10,  delta_t_dist = "exponential",
-                                              param=[1])
+    # create an array of evenly spaced points    
+    if p==1:
+        if evenly_spaced:
+            t_arr = np.arange(1, 500)
+        else:
+            t_arr= tsmodel.random_time_index(n = n, param=[1])
+        y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = tau, sigma_2_0=sigma_2)
+        theta_hat = tsmodel.uar1_fit(y_sim, t_sim)
+        assert np.abs(theta_hat[0]-tau) < tol
+        assert np.abs(theta_hat[1]-sigma_2) < tol
+    elif p>1:
+         if evenly_spaced:
+            t_arr = np.tile(range(1,n), (p, 1)).T 
+         else:
+             t_arr = np.zeros((n, p))  # Initialize matrix to store time increments
+             for i in range(p):
+                 # Generate random time increment
+                 t_arr[:, i] = tsmodel.random_time_index(n=n, param=[1])
+         y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = tau, sigma_2_0=sigma_2)
+         # Create an empty matrix to store estimated parameters
+         theta_hat_matrix = np.empty((y_sim.shape[1], 2))
+         # estimate parameters for each time series
+         for j in range(y_sim.shape[1]):
+             theta_hat_matrix[j,:]  = tsmodel.uar1_fit(y_sim[:, j], t_sim[:, j])
+         # compute mean of estimated param for each simulate ts
+         theta_hat_bar = np.mean(theta_hat_matrix, axis=0)
+        
+         # test that 
+         assert np.abs(theta_hat_bar[0]-tau) < tol
+         assert np.abs(theta_hat_bar[1]-sigma_2) < tol
+
+    
     
 
-    # Create an empty matrix to store estimated parameters
-    theta_hat_matrix = np.empty((y_sim.shape[1], 2))
-    
-    # estimate parameters for each time series
-    for j in range(y_sim.shape[1]):
-        theta_hat_matrix[j,:]  = tsmodel.uar1_fit(y_sim[:, j], t_sim[:, j])
-    
-    # compute mean of estimated param for each simulate ts
-    theta_hat_bar = np.mean(theta_hat_matrix, axis=0)
-    
-    # test that 
-    
-    assert np.abs(theta_hat_bar[0]-tau) < tol
-    assert np.abs(theta_hat_bar[1]-sigma_2) < tol
-    
-    
-        
-def test_time_increments_3():
-    '''
-    Generate time increments with provided time vector
-    '''
-    delta_t = tsmodel.time_increments(n=20, delta_t_dist = "empirical", param=[range(1,21)] )
-    assert all(delta_t==1)
-    
+
+
+
     
 def test_surrogates_1():
     tau = 2

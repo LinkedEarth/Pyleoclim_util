@@ -28,7 +28,7 @@ __all__ = [
     'gen_ts',
     'tau_estimation',
     'parametric_surrogates',
-    'random_time_increments'
+    'random_time_index'
 ]
 
 
@@ -668,6 +668,7 @@ def uar1_fit(y, t):
     None.
 
     '''
+    
     # obtain initial value for tau_0
     tau_initial_value = tau_estimation(y= y, t = t)
     # obtain initial value for sifma_2_0
@@ -679,38 +680,21 @@ def uar1_fit(y, t):
     
     return theta_hat
 
-def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False, 
-                   delta_t_dist = "exponential",  param = 1):  
+def uar1_sim(t_arr, tau_0=5, sigma_2_0=2):  
                                
   """
   Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
   
   Parameters
   ----------
-  n : integer
-      The length of the time series 
+  t: array
+      The vector of time indices of the signal, if multiple time series to be generated, an array of n*p where n is the length of the signal and p the number of surrogate to generate.
       
   tau_0 : float
       Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
       
   sigma_2_0 : float
-      Variance of the innovations 
-      
-  seed : integer
-      Random seed for reproducible results.
-      
-  p : integer
-      Parameter specifying the number of time series to generate
-      
-  evenly_spaced : boolean     
-      if True, delta_t  (spacing between time points) is a vector of 1, 
-      if False, delta_t is generated from various distribution (exponential, pareto, poisson and random choice).  
-      
-  delta_t_dist : str
-      the distribution that generates the delta_t
-      possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
-      
-  param : distributional parameter(s)              
+      Variance of the innovations      
 
   Returns
   -------
@@ -725,29 +709,35 @@ def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False,
 
   pyleoclim.utils.tsmodel.ar1_fit_ml : Maximumum likelihood estimate of AR(1) parameters 
   
-  pyleoclim.utils.tsmodel.random_time_increments : Generate time increment vector according to a specific probability model
+  pyleoclim.utils.tsmodel.random_time_index : Generate time increment vector according to a specific probability model
       
   """
   
+  # get value n and p from the object t
+  if t_arr.ndim == 1 or t_arr.shape[1] == 1:
+      p= 1
+      n= t_arr.shape[0]
+  elif t_arr.shape[1]!= 1:
+      n = t_arr.shape[0]
+      p = t_arr.shape[1]
+
   # declare two array to save the values and the time index
   y_sim = np.empty(shape=(n, p)) 
   t_sim = np.empty(shape=(n, p)) 
 
   # generate p time series
   for j in np.arange(p): 
-      if evenly_spaced: 
-          delta_t = [1]*n # for now we assume delta_t = 1 if evenly sampled, potentially to improve with a parameter that specify the time spacing
-      else:
-          delta_t = random_time_increments(n, param, delta_t_dist = delta_t_dist, seed = seed+j)
                 
-      # obtain the 0-based time index from the delta_t distribution
-      t = np.cumsum(delta_t)-1
+      # obtain the vector t from the provided t_arr
+      if p==1:
+          t = t_arr
+      elif p>1:
+          t = t_arr[:,j]
         
       # create empty vector
       y = np.empty(n)
       
       # generate unevenly spaced AR(1)
-      np.random.seed(seed+j)
       z = np.random.normal(loc=0, scale=1, size=n)
       y[0] = z[0] 
       for i in range(1,n): 
@@ -758,26 +748,28 @@ def uar1_sim(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False,
           y[i] = phi_i * y[i-1] + sigma_i * z[i]
       t_sim[:, j] = t
       y_sim[:, j] = y
+      
+      # reshape if p == 1
+      if p==1:
+          y_sim =  y_sim.reshape(y_sim.shape[0])
+          t_sim = t_sim.reshape(t_sim.shape[0])
   return y_sim, t_sim
 
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))
 
-def random_time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
+def random_time_index(n, delta_t_dist = "exponential", param = 1):
     '''
-    Generate a time increment vector according to a specific probability model
+    Generate a random time index vector according to a specific probability model
 
     Parameters
     ----------
     n: integer
         The length of the time series 
         
-    seed: integer
-        Random seed for reproducible results.
-        
     delta_t_dist: str
-        the probability distribution of delta_t
-        possible choices include 'exponential', 'poisson', 'pareto', 'random_choice' or `empirical`
+        the probability distribution of the random time increments.
+        possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'.
         
         if 'exponential', `param` is expected to be a single scale parameter (traditionally denoted \lambda)
         if 'poisson', `param` is expected to be a single parameter (rate)
@@ -788,20 +780,20 @@ def random_time_increments(n, param, delta_t_dist = "exponential", seed = 12345)
             prob_random_choice: 
                 probabilities associated with each entry value_random_choice  (e.g. [.95,.05])
             (These two arrays must be of the same size)
-        if 'empirical', expect an array containing the time index of the original time series 
+   
         
     Returns:
     -------
     
-    delta_t : 1D array of time increments, length n
+    t : 1D array of random time index obtained by taking the cumulative sum of the sampled random time increments, length n
 
     '''
     # check for a valid distribution 
-    valid_distributions = ["exponential", "poisson", "pareto", "random_choice", "empirical"]
+    valid_distributions = ["exponential", "poisson", "pareto", "random_choice"]
     if delta_t_dist not in valid_distributions:
-        raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', 'random_choice' or 'empirical'.")    
+        raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', 'random_choice'.")    
     
-    np.random.seed(seed) 
+
     param = np.array(param) # coerce array type
     
     if delta_t_dist == "exponential":
@@ -823,11 +815,7 @@ def random_time_increments(n, param, delta_t_dist = "exponential", seed = 12345)
         if len(param)<2 or len(param[0]) != len(param[1]):
             raise ValueError("value_random_choice and prob_random_choice must have the same size.")
         delta_t = np.random.choice(param[0], size=n, p=param[1])
-    elif delta_t_dist == "empirical":
-        if len(param[0])!= n:
-            raise ValueError("Number of time index provided not equal to the n value provided")
-        delta_t = inverse_cumsum(param[0])
-    return delta_t
+    return np.cumsum(delta_t)
 
 
 
