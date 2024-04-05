@@ -82,29 +82,25 @@ def test_uar1_fit(p, evenly_spaced):
          assert np.abs(theta_hat_bar[0]-tau) < tol
          assert np.abs(theta_hat_bar[1]-sigma_2) < tol
 
-    
-    
-
-
-
-
-    
-def test_surrogates_1():
+  
+@pytest.mark.parametrize('p', [1, 50])
+def test_surrogates_uar1_match(p):
     tau = 2
     sigma_2 = 1
     # y_sim, t_sim = uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
-    y_sim, t_sim = tsmodel.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
-    # y_sim, t_sim = uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
+    n = 500
+    # generate time index
+    t_arr = np.arange(1,(n+1))
+    # create time series
+    y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0=tau, sigma_2_0=sigma_2)
+    ts = pyleo.Series(time = t_sim, value=y_sim)
+    # generate surrogates
+    surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="match")
+    if p ==1:
+        assert(all(surr.series_list[0].time == t_sim))
+    if p> 1:
+        for i in range(p):
+            assert(all(surr.series_list[i].time == t_sim))
 
-    #pyleo.utils.uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
-    ts = pyleo.Series(time = t_sim, value=  y_sim)
-    
-    surr = ts.surrogates(method = 'uar1', number = 2,   settings={"evenly_spaced" :True})
-    surr =  ts.surrogates(method = 'ar1sim', number = 10) 
-    surr.series_list[0].time
-    surr.series_list[0].value
-    surr
-    # surr =  ts.surrogates(method = 'uar1', settings={'delta_t_dist' :"empirical", 'evenly_spaced':False})
-    assert(1==1)
 
 
