@@ -3721,8 +3721,25 @@ class Series:
                     y_surr, times = tsmodel.uar1_sim(t_arr = self.time, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
 
           
-            
-            
+            if time_pattern == "even":
+                if "time_increment" not in settings:
+                    print("The parameter 'time_increment' is not present in the dictionary, default value is set to '1'.")
+                    time_increment = 1
+                else:
+                    time_increment = settings["time_increment"]
+                theta_hat = tsmodel.uar1_fit(self.value, self.time)
+                if length is None:
+                    delta_t = [time_increment]*len(self.value)
+                else:
+                    delta_t = [time_increment]*length
+                t = np.cumsum(delta_t)
+                if number >1:
+                   t_arr = np.tile(t , (number, 1)).T 
+                   y_surr, times = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
+                else:
+                   y_surr, times = tsmodel.uar1_sim(t_arr = t, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
+
+              
             
             
             

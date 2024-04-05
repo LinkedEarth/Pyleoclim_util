@@ -104,3 +104,24 @@ def test_surrogates_uar1_match(p):
 
 
 
+@pytest.mark.parametrize('p', [1, 50])
+def test_surrogates_uar1_even(p):
+    tau = 2
+    sigma_2 = 1
+    time_incr = 2
+    # y_sim, t_sim = uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
+    n = 500
+    # generate time index
+    t_arr = np.arange(1,(n+1))
+    # create time series
+    y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0=tau, sigma_2_0=sigma_2)
+    ts = pyleo.Series(time = t_sim, value=y_sim)
+    # generate surrogates
+    surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="even", settings={"time_increment" :time_incr})
+    if p ==1:
+        assert(all(tsmodel.inverse_cumsum(surr.series_list[0].time) == time_incr))
+    if p> 1:
+        for i in range(p):
+           assert(all(tsmodel.inverse_cumsum(surr.series_list[i].time) == time_incr))
+
+

@@ -28,7 +28,8 @@ __all__ = [
     'gen_ts',
     'tau_estimation',
     'parametric_surrogates',
-    'random_time_index'
+    'random_time_index',
+    'inverse_cumsum'
 ]
 
 
