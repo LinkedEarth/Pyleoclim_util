@@ -759,7 +759,7 @@ def uar1_sim(t_arr, tau_0=5, sigma_2_0=2):
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))
 
-def random_time_index(n, delta_t_dist = "exponential", param = 1):
+def random_time_index(n, delta_t_dist = "exponential", param = [1]):
     '''
     Generate a random time index vector according to a specific probability model
 

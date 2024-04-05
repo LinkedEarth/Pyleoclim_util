@@ -125,3 +125,21 @@ def test_surrogates_uar1_even(p):
            assert(all(tsmodel.inverse_cumsum(surr.series_list[i].time) == time_incr))
 
 
+@pytest.mark.parametrize('p', [1, 50])
+def test_surrogates_uar1_uneven(p):
+    tau = 2
+    sigma_2 = 1
+    n = 500
+    # generate time index
+    t_arr = np.arange(1,(n+1))
+    # create time series
+    y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0=tau, sigma_2_0=sigma_2)
+    ts = pyleo.Series(time = t_sim, value=y_sim)
+    # generate surrogates
+    surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="uneven")
+    #surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="uneven",settings={"delta_t_dist" :"poisson","param":[1]} )
+    if p ==1:
+        assert(len(surr.series_list[0].time)==n)
+    if p> 1:
+        for i in range(p):
+            assert(len(surr.series_list[i].time)==n)

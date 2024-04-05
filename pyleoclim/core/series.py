@@ -3740,6 +3740,25 @@ class Series:
                    y_surr, times = tsmodel.uar1_sim(t_arr = t, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
 
               
+            if time_pattern == "uneven":
+                if length is None:
+                    n = len(self.value)
+                else:
+                    n = length
+                # estimate paremeter on original time serie
+                theta_hat = tsmodel.uar1_fit(self.value, self.time)
+                if number == 1:
+                    t_arr = tsmodel.random_time_index(n = n, **settings)
+                    y_surr, times = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
+                elif number > 1:
+                    # create time array
+                    t_arr = np.zeros((n, number))
+                    # fill time array using random time index
+                    for col in range(number):
+                        t_arr[:, col] = tsmodel.random_time_index(n = n, **settings)
+                    # create surrogates
+                    y_surr, times = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
+
             
             
             
