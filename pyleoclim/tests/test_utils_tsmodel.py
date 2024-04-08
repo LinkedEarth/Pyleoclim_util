@@ -12,7 +12,7 @@ import numpy as np
 from pyleoclim.utils import tsmodel
 import pyleoclim as pyleo
 from scipy.stats import expon
-
+from scipy.stats import poisson
 
 @pytest.mark.parametrize('model', ["exponential", "poisson"])
 def test_time_index_0(model):
@@ -173,10 +173,4 @@ def test_surrogates_uar1_uneven(p):
             l2_norm = np.linalg.norm(empirical_cdf - theoretical_cdf)
 
             assert(l2_norm<tol)
-            
-            
-            
-            
-            
-            
             

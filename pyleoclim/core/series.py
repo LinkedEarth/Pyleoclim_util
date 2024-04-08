@@ -3710,6 +3710,8 @@ class Series:
                 
         elif method == 'uar1':
             
+            
+            # time pattern match
             if time_pattern == "match":
                 # estimate theta with MLE
                 theta_hat = tsmodel.uar1_fit(self.value, self.time)
@@ -3720,13 +3722,14 @@ class Series:
                 else:
                     y_surr, times = tsmodel.uar1_sim(t_arr = self.time, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
 
-          
+            # time pattern even
             if time_pattern == "even":
                 if "time_increment" not in settings:
                     print("The parameter 'time_increment' is not present in the dictionary, default value is set to '1'.")
                     time_increment = 1
                 else:
                     time_increment = settings["time_increment"]
+                # estimate parameters
                 theta_hat = tsmodel.uar1_fit(self.value, self.time)
                 if length is None:
                     delta_t = [time_increment]*len(self.value)
@@ -3759,31 +3762,14 @@ class Series:
                     # create surrogates
                     y_surr, times = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
 
-            
-            
-            
-
-            
-            # 3 choices: 1) emulate self.time (use resolution())  TODO
-            #            2) generate unevenly at random
-            #            3) generate evenly spaced
-            #  grab the parameters from the settings dictionary (do exception handling on dictionary keys)
-            
-            # ys, ts = tsmodel.uar1_sim(len(self.value), tau_0=theta_hat[0], 
-            #                           sigma_2_0=theta_hat[1], 
-            #                           seed=seed, p=number,  evenly_spaced = False, 
-            #                           delta_t_dist = "exponential",  param = 1) 
-            
-            #y_surr, times = tsmodel.uar1_sim(len(self.value), tau_0=theta_hat[0], 
-            #                          sigma_2_0=theta_hat[1], 
-            #                          seed=seed, p=number,  **settings) 
-                                            
-            # TODO : implement Lionel's ML method
+        # TODO : implement Lionel's ML method
         # elif method == 'power-law':
         #     # TODO : implement Stochastic
         # elif method == 'fBm':
         #      # TODO : implement Stochastic
-                    
+        
+        
+        # reshape
         if len(np.shape(y_surr)) == 1:
             y_surr = y_surr[:, np.newaxis]
             
