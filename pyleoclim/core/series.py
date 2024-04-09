@@ -3693,8 +3693,6 @@ class Series:
         if seed is not None:
             np.random.seed(seed)
 
-        if number < 2:
-            raise ValueError('Too few surrogates. At least 2 are needed for testing; many more for accurate uncertiany quantification')
         if length is None:
             n = len(self.value)
         else:
@@ -3715,7 +3713,7 @@ class Series:
         elif time_pattern == "random":
             times = np.zeros((n, number))
             for i in range(number):
-                times[:, i] = tsmodel.random_time_index(n = n, **settings)
+                times[:, i] = tsmodel.random_time_index(n = n, **settings) # TODO: check that this does not break when unexpected keywords are passed in `settings`
         else:
             raise ValueError(f"Unknown time pattern: {time_pattern}")
 
@@ -3758,7 +3756,7 @@ class Series:
         # wrap it all up with a bow
         s_list = []
         for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
-            ts = Series(time=t, value=y,  # will need reformation after uar1 pull
+            ts = Series(time=t, value=y,  
                            time_name=self.time_name,
                            time_unit=self.time_unit,
                            value_name=self.value_name,

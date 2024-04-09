@@ -556,13 +556,14 @@ class TestUISeriesSurrogates:
             g_surr = tsmodel.ar1_fit(ts_surr.value)
             assert np.abs(g_surr-g) < eps
             
-    def test_surrogates_uar1_match(self, p=5):
+    @pytest.mark.parametrize('number',[1,5])     
+    def test_surrogates_uar1_match(self, number):
         ts = gen_ts(nt=550, alpha=1.0)
         # generate surrogates
-        surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="match")
-        for i in range(p):
+        surr = ts.surrogates(method = 'uar1', number = number, time_pattern ="match")
+        for i in range(number):
             assert(np.allclose(surr.series_list[i].time, ts.time))
-
+            
     def test_surrogates_uar1_even(self, p=5):
         ts = gen_ts(nt=550, alpha=1.0)
         time_incr = np.median(np.diff(ts.time))
@@ -571,8 +572,7 @@ class TestUISeriesSurrogates:
         for i in range(p):
             assert(np.allclose(tsmodel.inverse_cumsum(surr.series_list[i].time),time_incr))
 
-    def test_surrogates_uar1_random(self, p=5):
-        tol = 0.5
+    def test_surrogates_uar1_random(self, p=5, tol = 0.5):
         tau = 2
         sigma_2 = 1
         n = 500
@@ -590,16 +590,12 @@ class TestUISeriesSurrogates:
             # Compute the empirical cumulative distribution function (CDF) of the generated data
             empirical_cdf, bins = np.histogram(delta_t, bins=100, density=True)
             empirical_cdf = np.cumsum(empirical_cdf) * np.diff(bins)
-
             # Compute the theoretical CDF of the Exponential distribution
             theoretical_cdf = expon.cdf(bins[1:], scale=1)
-
             # Trim theoretical_cdf to match the size of empirical_cdf
             theoretical_cdf = theoretical_cdf[:len(empirical_cdf)]
-
             # Compute the L2 norm (Euclidean distance) between empirical and theoretical CDFs
             l2_norm = np.linalg.norm(empirical_cdf - theoretical_cdf)
-
             assert(l2_norm<tol)
             
 
