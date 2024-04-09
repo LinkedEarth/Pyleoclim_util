@@ -3659,11 +3659,11 @@ class Series:
         number : int
             The number of surrogates to generate
             
-        time_pattern : str {match, even, uneven}
+        time_pattern : str {match, even, random}
             The pattern used to generate the surrogate time axes
             'match' uses the same pattern as the original Series
             'even' uses an evenly-spaced time with spacing delta_t specified in settings (will return error if not specified)
-            'uneven' uses random_time_increments() with specified distribution and parameters (default: 'exponential' with parameter 1) 
+            'random' uses random_time_increments() with specified distribution and parameters (default: 'exponential' with parameter 1) 
             
         length : int
             Length of the series
@@ -3688,96 +3688,70 @@ class Series:
 
         '''
         settings = {} if settings is None else settings.copy()
-        # args = {}
-        # args['ar1sim'] = {'t': self.time}
-        # args['phaseran'] = {}
-        
-        # args[method].update(settings)
 
         if seed is not None:
             np.random.seed(seed)
-
-        if method == 'ar1sim':
-            y_surr = tsmodel.ar1_sim(self.value, number, self.time)            
-            times = np.tile(self.time, (number, 1)).T 
             
+        if number < 2:
+            raise ValueError('Too few surrogates. At least 2 are needed for testing; many more for accurate uncertiany quantification')
+        if length is None:
+            n = len(self.value)
+        else:
+            n = length
+            
+        # generate time axes according to provided pattern
+        if time_pattern == "match":
+            times = np.tile(self.time, (number, 1)).T
+        elif time_pattern == "even":
+            if "time_increment" not in settings:
+                warnings.warn("'time_increment' not found in the dictionary, default set to 1.",stacklevel=2)
+                time_increment = 1
+            else:
+                time_increment = settings["time_increment"]
+                        
+            t = np.cumsum([time_increment]*n)
+            times = np.tile(t, (number, 1)).T
+        elif time_pattern == "random":
+            times = np.zeros((n, number))          
+            for i in range(number):
+                times[:, i] = tsmodel.random_time_index(n = n, **settings)
+            else:
+                raise ValueError(f"Unknown time pattern: {time_pattern}")
+            
+        # apply method     
+        if method == 'ar1sim':
+            y_surr = tsmodel.ar1_sim(self.value, number, self.time)  # CHECK: how does this handle the new time?          
+                
         elif method == 'phaseran':
-            if self.is_evenly_spaced():
+            if self.is_evenly_spaced() and time_pattern != "random":
                 y_surr = tsutils.phaseran2(self.value, number)
-                times = np.tile(self.time, (number, 1)).T 
             else:
                 raise ValueError("Phase-randomization presently requires evenly-spaced series.")
                 
         elif method == 'uar1':
-            
-            
-            # time pattern match
-            if time_pattern == "match":
-                # estimate theta with MLE
-                theta_hat = tsmodel.uar1_fit(self.value, self.time)
-                # create time index
-                if number >1:
-                    t_arr = np.tile(self.time, (number, 1)).T 
-                    y_surr, times = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
-                else:
-                    y_surr, times = tsmodel.uar1_sim(t_arr = self.time, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
+            # estimate theta with MLE
+            theta_hat = tsmodel.uar1_fit(self.value, self.time)
+            y_surr = np.empty_like(times) 
+            for j in range(number):
+                y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j], **theta_hat) 
+           
 
-            # time pattern even
-            if time_pattern == "even":
-                if "time_increment" not in settings:
-                    print("The parameter 'time_increment' is not present in the dictionary, default value is set to '1'.")
-                    time_increment = 1
-                else:
-                    time_increment = settings["time_increment"]
-                # estimate parameters
-                theta_hat = tsmodel.uar1_fit(self.value, self.time)
-                if length is None:
-                    delta_t = [time_increment]*len(self.value)
-                else:
-                    delta_t = [time_increment]*length
-                t = np.cumsum(delta_t)
-                if number >1:
-                   t_arr = np.tile(t , (number, 1)).T 
-                   y_surr, times = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
-                else:
-                   y_surr, times = tsmodel.uar1_sim(t_arr = t, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
-
-              
-            if time_pattern == "uneven":
-                if length is None:
-                    n = len(self.value)
-                else:
-                    n = length
-                # estimate paremeter on original time serie
-                theta_hat = tsmodel.uar1_fit(self.value, self.time)
-                if number == 1:
-                    t_arr = tsmodel.random_time_index(n = n, **settings)
-                    y_surr, times = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
-                elif number > 1:
-                    # create time array
-                    t_arr = np.zeros((n, number))
-                    # fill time array using random time index
-                    for col in range(number):
-                        t_arr[:, col] = tsmodel.random_time_index(n = n, **settings)
-                    # create surrogates
-                    y_surr, times = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = theta_hat[0],  sigma_2_0=theta_hat[1]) 
-
-        # TODO : implement Lionel's ML method
         # elif method == 'power-law':
         #     # TODO : implement Stochastic
         # elif method == 'fBm':
         #      # TODO : implement Stochastic
         
         
-        # reshape
-        if len(np.shape(y_surr)) == 1:
-            y_surr = y_surr[:, np.newaxis]
+        # THIS SHOULD BE UNNECESSARY
+        # # reshape
+        # if len(np.shape(y_surr)) == 1:
+        #     y_surr = y_surr[:, np.newaxis]
             
-        if len(np.shape(times)) == 1:
-            times = times[:, np.newaxis]
+        # if len(np.shape(times)) == 1:
+        #     times = times[:, np.newaxis]
 
         s_list = []
-        for i, s in enumerate(y_surr.T):
+        for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
             s_tmp = Series(time=times[:,i], value=s,  # will need reformation after uar1 pull
                            time_name=self.time_name,  
                            time_unit=self.time_unit, 

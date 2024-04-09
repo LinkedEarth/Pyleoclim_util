@@ -12,7 +12,7 @@ import numpy as np
 from pyleoclim.utils import tsmodel
 import pyleoclim as pyleo
 from scipy.stats import expon
-from scipy.stats import poisson
+#from scipy.stats import poisson
 
 @pytest.mark.parametrize('model', ["exponential", "poisson"])
 def test_time_index_0(model):
@@ -40,7 +40,7 @@ def test_time_index_2():
 
     
 
-@pytest.mark.parametrize(('p', 'evenly_spaced'), [(1, True), (50, True), (1, False), (50, False)])
+@pytest.mark.parametrize(('p', 'evenly_spaced'), [(1, True), (10, True), (1, False), (10, False)])
 def test_uar1_fit(p, evenly_spaced):
     '''
     Tests whether this method works well on an AR(1) process with known parameters and evenly spaced time points
@@ -53,48 +53,49 @@ def test_uar1_fit(p, evenly_spaced):
     n = 500
     
     # create an array of evenly spaced points    
-    if p==1:
-        if evenly_spaced:
-            t_arr = np.arange(1, 500)
-        else:
-            t_arr= tsmodel.random_time_index(n = n, param=[1])
-        y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = tau, sigma_2_0=sigma_2)
-        theta_hat = tsmodel.uar1_fit(y_sim, t_sim)
-        assert np.abs(theta_hat[0]-tau) < tol
-        assert np.abs(theta_hat[1]-sigma_2) < tol
-    elif p>1:
-         if evenly_spaced:
-            t_arr = np.tile(range(1,n), (p, 1)).T 
-         else:
-             t_arr = np.zeros((n, p))  # Initialize matrix to store time increments
-             for i in range(p):
-                 # Generate random time increment
-                 t_arr[:, i] = tsmodel.random_time_index(n=n, param=[1])
-         y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0 = tau, sigma_2_0=sigma_2)
-         # Create an empty matrix to store estimated parameters
-         theta_hat_matrix = np.empty((y_sim.shape[1], 2))
-         # estimate parameters for each time series
-         for j in range(y_sim.shape[1]):
-             theta_hat_matrix[j,:]  = tsmodel.uar1_fit(y_sim[:, j], t_sim[:, j])
-         # compute mean of estimated param for each simulate ts
-         theta_hat_bar = np.mean(theta_hat_matrix, axis=0)
-        
-         # test that 
-         assert np.abs(theta_hat_bar[0]-tau) < tol
-         assert np.abs(theta_hat_bar[1]-sigma_2) < tol
+    # if p==1:
+    #     if evenly_spaced:
+    #         t = np.arange(n)
+    #     else:
+    #         t = tsmodel.random_time_index(n = n, param=[1])
+    #     ys = tsmodel.uar1_sim(t, tau_0 = tau, sigma_2_0=sigma_2)
+    #     theta_hat = tsmodel.uar1_fit(ys, t)
+    #     assert np.abs(theta_hat[0]-tau) < tol
+    #     assert np.abs(theta_hat[1]-sigma_2) < tol
+    # elif p>1:
+    if evenly_spaced:
+       t_arr = np.tile(range(1,n), (p, 1)).T 
+    else:
+        t_arr = np.zeros((n, p))  # Initialize matrix to store time increments
+        for j in range(p):
+            # Generate random time increment
+            t_arr[:, j] = tsmodel.random_time_index(n=n, param=[1])
+   
+    # Create an empty matrix to store estimated parameters
+    theta_hat_matrix = np.empty((p, 2))
+    # estimate parameters for each time series
+    for j in range(p):
+        ys = tsmodel.uar1_sim(t = t_arr[:, j], tau_0 = tau, sigma_2_0=sigma_2)
+        theta_hat_matrix[j,:]  = tsmodel.uar1_fit(ys, t_arr[:, j])
+    # compute mean of estimated param for each simulate ts
+    theta_hat_bar = np.mean(theta_hat_matrix, axis=0)
+  
+    # test that 
+    assert np.abs(theta_hat_bar[0]-tau) < tol
+    assert np.abs(theta_hat_bar[1]-sigma_2) < tol
 
   
 @pytest.mark.parametrize('p', [1, 50])
 def test_surrogates_uar1_match(p):
     tau = 2
     sigma_2 = 1
-    # y_sim, t_sim = uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
+    # ys, t_sim = uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
     n = 500
     # generate time index
     t_arr = np.arange(1,(n+1))
     # create time series
-    y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0=tau, sigma_2_0=sigma_2)
-    ts = pyleo.Series(time = t_sim, value=y_sim)
+    ys, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0=tau, sigma_2_0=sigma_2)
+    ts = pyleo.Series(time = t_sim, value=ys)
     # generate surrogates
     surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="match")
     if p ==1:
@@ -110,13 +111,12 @@ def test_surrogates_uar1_even(p):
     tau = 2
     sigma_2 = 1
     time_incr = 2
-    # y_sim, t_sim = uar1_sim(n=200, tau_0=tau, sigma_2_0=sigma_2, evenly_spaced=True, p = 1)
     n = 500
     # generate time index
-    t_arr = np.arange(1,(n+1))
+    t = np.arange(1,(n+1))
     # create time series
-    y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0=tau, sigma_2_0=sigma_2)
-    ts = pyleo.Series(time = t_sim, value=y_sim)
+    ys = tsmodel.uar1_sim(t, tau_0=tau, sigma_2_0=sigma_2)
+    ts = pyleo.Series(time = t, value=ys)
     # generate surrogates
     surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="even", settings={"time_increment" :time_incr})
     if p ==1:
@@ -135,8 +135,8 @@ def test_surrogates_uar1_uneven(p):
     # generate time index
     t_arr = np.arange(1,(n+1))
     # create time series
-    y_sim, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0=tau, sigma_2_0=sigma_2)
-    ts = pyleo.Series(time = t_sim, value=y_sim)
+    ys, t_sim = tsmodel.uar1_sim(t_arr = t_arr, tau_0=tau, sigma_2_0=sigma_2)
+    ts = pyleo.Series(time = t_sim, value=ys)
     # generate surrogates default is exponential with parameter value 1
     surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="uneven")
     #surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="uneven",settings={"delta_t_dist" :"poisson","param":[1]} )

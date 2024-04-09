@@ -681,80 +681,48 @@ def uar1_fit(y, t):
     
     return theta_hat
 
-def uar1_sim(t_arr, tau_0=5, sigma_2_0=2):  
+def uar1_sim(t, tau_0=5, sigma_2_0=2):  
                                
-  """
-  Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
-  
-  Parameters
-  ----------
-  t: array
-      The vector of time indices of the signal, if multiple time series to be generated, an array of n*p where n is the length of the signal and p the number of surrogate to generate.
-      
-  tau_0 : float
-      Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
-      
-  sigma_2_0 : float
-      Variance of the innovations      
-
-  Returns
-  -------
-  A tuple of 2 arrays  
-    y_sim : n x p NumPy array 
-        matrix of simulated AR(1) vectors
-    t_sim : n x p NumPy array 
-        matrix of corresponding time axes
+    """
+    Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
+    
+    Parameters
+    ----------
+    t : array
+        Time axis 
         
-  See also
-  --------
-
-  pyleoclim.utils.tsmodel.ar1_fit_ml : Maximumum likelihood estimate of AR(1) parameters 
-  
-  pyleoclim.utils.tsmodel.random_time_index : Generate time increment vector according to a specific probability model
-      
-  """
-  
-  # get value n and p from the object t
-  if t_arr.ndim == 1 or t_arr.shape[1] == 1:
-      p= 1
-      n= t_arr.shape[0]
-  elif t_arr.shape[1]!= 1:
-      n = t_arr.shape[0]
-      p = t_arr.shape[1]
-
-  # declare two array to save the values and the time index
-  y_sim = np.empty(shape=(n, p)) 
-  t_sim = np.empty(shape=(n, p)) 
-
-  # generate p time series
-  for j in np.arange(p): 
-                
-      # obtain the vector t from the provided t_arr
-      if p==1:
-          t = t_arr
-      elif p>1:
-          t = t_arr[:,j]
+    tau_0 : float
+        Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
         
-      # create empty vector
-      y = np.empty(n)
+    sigma_2_0 : float
+        Variance of the innovations      
+  
+    Returns
+    -------
+    ys : n 
+        matrix of simulated AR(1) vector
       
-      # generate unevenly spaced AR(1)
-      z = np.random.normal(loc=0, scale=1, size=n)
-      y[0] = z[0] 
-      for i in range(1,n): 
-          delta_i = t[i] - t[i-1] 
-          phi_i = np.exp(-delta_i / tau_0)
-          sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
-          sigma_i = np.sqrt(sigma_2_i)
-          y[i] = phi_i * y[i-1] + sigma_i * z[i]
-      t_sim[:, j] = t
-      y_sim[:, j] = y
-      
-      # reshape if p == 1
-      if p==1:
-          y_sim =  y_sim.reshape(y_sim.shape[0])
-          t_sim = t_sim.reshape(t_sim.shape[0])
-  return y_sim, t_sim
+          
+    See also
+    --------
+  
+    pyleoclim.utils.tsmodel.uar1_fit : Maximumum likelihood estimate of AR(1) parameters 
+    pyleoclim.utils.tsmodel.random_time_index : Generate time increment vector according to a specific probability model
+        
+    """
+    n = len(t)    
+    ys = np.zeros(n) # create empty vector  
+    # generate unevenly spaced AR(1)
+    z = np.random.normal(loc=0, scale=1, size=n)
+    ys[0] = z[0] 
+    for i in range(n-1): 
+        delta_i = t[i+1] - t[i] 
+        phi_i = np.exp(-delta_i / tau_0)
+        sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
+        sigma_i = np.sqrt(sigma_2_i)
+        ys[i+1] = phi_i * ys[i] + sigma_i * z[i]  
+          
+    return ys
 
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))
