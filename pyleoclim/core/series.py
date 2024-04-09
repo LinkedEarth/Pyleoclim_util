@@ -3715,14 +3715,17 @@ class Series:
             times = np.zeros((n, number))          
             for i in range(number):
                 times[:, i] = tsmodel.random_time_index(n = n, **settings)
-            else:
-                raise ValueError(f"Unknown time pattern: {time_pattern}")
+        else:
+            raise ValueError(f"Unknown time pattern: {time_pattern}")
             
-        # apply method     
+        # apply surrogate method     
         if method == 'ar1sim':
-            y_surr = tsmodel.ar1_sim(self.value, number, self.time)  # CHECK: how does this handle the new time?          
+            if time_pattern != 'match':
+                raise ValueError('Only a matching time pattern is supported with this method')
+            else:
+                y_surr = tsmodel.ar1_sim(self.value, number, self.time)  # CHECK: how does this handle the new time?          
                 
-        elif method == 'phaseran':
+        elif method == 'phaseran':       
             if self.is_evenly_spaced() and time_pattern != "random":
                 y_surr = tsutils.phaseran2(self.value, number)
             else:
@@ -3731,11 +3734,12 @@ class Series:
         elif method == 'uar1':
             # estimate theta with MLE
             theta_hat = tsmodel.uar1_fit(self.value, self.time)
+            # generate surrogates
             y_surr = np.empty_like(times) 
             for j in range(number):
-                y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j], **theta_hat) 
+                y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j], 
+                                               tau_0=theta_hat[0],sigma_2_0=theta_hat[1]) 
            
-
         # elif method == 'power-law':
         #     # TODO : implement Stochastic
         # elif method == 'fBm':
@@ -3750,16 +3754,17 @@ class Series:
         # if len(np.shape(times)) == 1:
         #     times = times[:, np.newaxis]
 
+        # wrap it all up with a bow
         s_list = []
         for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
-            s_tmp = Series(time=times[:,i], value=s,  # will need reformation after uar1 pull
+            ts = Series(time=t, value=y,  # will need reformation after uar1 pull
                            time_name=self.time_name,  
                            time_unit=self.time_unit, 
                            value_name=self.value_name, 
                            value_unit=self.value_unit, 
                            label = str(self.label or '') + " surr #" + str(i+1),
                            verbose=False, auto_time_params=True)
-            s_list.append(s_tmp)
+            s_list.append(ts)
 
         surr = SurrogateSeries(series_list=s_list, 
                                label = self.label,
