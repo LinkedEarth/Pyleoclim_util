@@ -179,7 +179,7 @@ class PSD:
 
             Number of surrogate series to generate for significance testing. The default is None.
 
-        method : str; {'ar1asym','ar1sim'}
+        method : str; {'ar1asym','ar1sim','uar1'}
 
             Method to generate surrogates. AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution. The default is AR1sim
 

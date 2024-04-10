@@ -413,7 +413,7 @@ class Scalogram:
         Parameters
         ----------
 
-        method : {'ar1asym', 'ar1sim'}
+        method : {'ar1asym', 'ar1sim','uar1'}
 
             Method to use to generate the surrogates.  ar1sim uses simulated timeseries with similar persistence. 
             ar1asym represents the theoretical, closed-form solution. The default is ar1sim
@@ -485,10 +485,11 @@ class Scalogram:
         if self.wave_method == 'wwz' and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the wwz method')
 
-        if method not in ['ar1sim', 'ar1asym']:
-                raise ValueError("The available methods are ar1sim'and 'ar1asym'")
+        acceptable_methods = ['ar1sim', 'ar1asym', 'uar1']
+        if method not in acceptable_methods:
+                raise ValueError(f"The available methods are: {acceptable_methods}")
 
-        if method == 'ar1sim':
+        if method in ['ar1sim','uar1'] :
 
             if hasattr(self,'signif_scals'):
                 signif_scals = self.signif_scals

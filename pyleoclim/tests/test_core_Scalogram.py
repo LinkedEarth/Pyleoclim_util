@@ -20,8 +20,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
     
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v)
-    
+    ts=pyleo.Series(t,v, auto_time_params=True,verbose=False)
     return ts
 
 # Tests below
@@ -31,19 +30,20 @@ class TestUiScalogramSignifTest:
 
     @pytest.mark.parametrize('wave_method',['wwz','cwt'])
     def test_signif_test_t0(self, wave_method):
-        ''' Test scalogram.signif_test() with default parameters
+        ''' Test scalogram.signif_test() with differennt methods
         '''
-        ts = gen_ts(model='colored_noise',nt=500)
+        ts = gen_ts(model='colored_noise')
         scal = ts.wavelet(method=wave_method)
         scal_signif = scal.signif_test(number=5, qs = [0.8, 0.9, .95])
         fig,ax = scal_signif.plot(signif_thresh=0.99)
         pyleo.closefig(fig)
         
-
-    @pytest.mark.parametrize('ar1_method',['ar1asym', 'ar1sim'])
-    def test_signif_test_t1(self,ar1_method):
-        ''' Test scalogram.signif_test() with default parameters
+    @pytest.mark.parametrize('method',['ar1sim','uar1','ar1asym'])
+    def test_signif_test_t1(self,method):
+        ''' Test scalogram.signif_test() with various surrogates
         '''
-        ts = gen_ts(model='colored_noise',nt=500)
+        ts = gen_ts(model='colored_noise')
         scal = ts.wavelet(method='cwt')
-        scal_signif = scal.signif_test(method=ar1_method,number=1)
+        scal_signif = scal.signif_test(method=method,number=2)
+        fig,ax = scal_signif.plot(signif_thresh=0.99)
+        pyleo.closefig(fig)
