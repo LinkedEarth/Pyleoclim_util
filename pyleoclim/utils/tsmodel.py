@@ -19,15 +19,17 @@ from scipy.optimize import minimize # for MLE estimation of tau_0
 
 __all__ = [
     'ar1_fit',
-    'ar1_fit_ml',
     'ar1_sim',
-    'ar1_sim_geneva',
+    'uar1_fit',
+    'uar1_sim',
     'colored_noise',
     'colored_noise_2regimes',
     'gen_ar1_evenly',
     'gen_ts',
     'tau_estimation',
-    'parametric_surrogates'
+    'parametric_surrogates',
+    'random_time_index',
+    'inverse_cumsum'
 ]
 
 
@@ -650,7 +652,7 @@ def n_ll_unevenly_spaced_ar1(theta, y, t):
   nll = np.log(2*np.pi) + np.log(sigma_2) + term_5 + term_4
   return(nll)
 
-def ar1_fit_ml(y, t):
+def uar1_fit(y, t):
     '''
     Maximum Likelihood Estimation of parameters tau_0 and sigma_2_0
 
@@ -667,6 +669,7 @@ def ar1_fit_ml(y, t):
     None.
 
     '''
+    
     # obtain initial value for tau_0
     tau_initial_value = tau_estimation(y= y, t = t)
     # obtain initial value for sifma_2_0
@@ -678,103 +681,64 @@ def ar1_fit_ml(y, t):
     
     return theta_hat
 
-def ar1_sim_geneva(n, tau_0=5, sigma_2_0=2, seed=123, p=1,  evenly_spaced = False, 
-                   delta_t_dist = "exponential",  param = 1):  
+def uar1_sim(t, tau_0=5, sigma_2_0=2):  
                                
-  """
-  Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
-  
-  Parameters
-  ----------
-  n : integer
-      The length of the time series 
-      
-  tau_0 : float
-      Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
-      
-  sigma_2_0 : float
-      Variance of the innovations 
-      
-  seed : integer
-      Random seed for reproducible results.
-      
-  p : integer
-      Parameter specifying the number of time series to generate
-      
-  evenly_spaced : boolean     
-      if True, delta_t  (spacing between time points) is a vector of 1, 
-      if False, delta_t is generated from various distribution (exponential, pareto, poisson and random choice).  
-      
-  delta_t_dist : str
-      the distribution that generates the delta_t
-      possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
-      
-  param : distributional parameter(s)              
-
-  Returns
-  -------
-  A tuple of 2 arrays  
-    y_sim : n x p NumPy array 
-        matrix of simulated AR(1) vectors
-    t_sim : n x p NumPy array 
-        matrix of corresponding time axes
+    """
+    Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
+    
+    Parameters
+    ----------
+    t : array
+        Time axis 
         
-  See also
-  --------
-
-  pyleoclim.utils.tsmodel.ar1_fit_ml : Maximumum likelihood estimate of AR(1) parameters 
-  
-  pyleoclim.utils.tsmodel.time_increments : Generate time increment vector according to a specific probability model
-      
-  """
-  
-  # declare two array to save the values and the time index
-  y_sim = np.empty(shape=(n, p)) 
-  t_sim = np.empty(shape=(n, p)) 
-
-  # generate p time series
-  for j in np.arange(p): 
-      if evenly_spaced: 
-          delta_t = [1]*n # for now we assume delta_t = 1 if evenly sampled, potentially to improve with a parameter that specify the time spacing
-      else:
-          delta_t = time_increments(n, param, delta_t_dist = "exponential", seed = seed+j)
-                
-      # obtain the 0-based time index from the delta_t distribution
-      t = np.cumsum(delta_t)-1
+    tau_0 : float
+        Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
         
-      # create empty vector
-      y = np.empty(n)
+    sigma_2_0 : float
+        Variance of the innovations      
+  
+    Returns
+    -------
+    ys : n 
+        matrix of simulated AR(1) vector
       
-      # generate unevenly spaced AR(1)
-      np.random.seed(seed+j)
-      z = np.random.normal(loc=0, scale=1, size=n)
-      y[0] = z[0] 
-      for i in range(1,n): 
-          delta_i = t[i] - t[i-1] 
-          phi_i = np.exp(-delta_i / tau_0)
-          sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
-          sigma_i = np.sqrt(sigma_2_i)
-          y[i] = phi_i * y[i-1] + sigma_i * z[i]
-      t_sim[:, j] = t
-      y_sim[:, j] = y
-  return y_sim, t_sim
+          
+    See also
+    --------
+  
+    pyleoclim.utils.tsmodel.uar1_fit : Maximumum likelihood estimate of AR(1) parameters 
+    pyleoclim.utils.tsmodel.random_time_index : Generate time increment vector according to a specific probability model
+        
+    """
+    n = len(t)    
+    ys = np.zeros(n) # create empty vector  
+    # generate unevenly spaced AR(1)
+    z = np.random.normal(loc=0, scale=1, size=n)
+    ys[0] = z[0] 
+    for i in range(n-1): 
+        delta_i = t[i+1] - t[i] 
+        phi_i = np.exp(-delta_i / tau_0)
+        sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
+        sigma_i = np.sqrt(sigma_2_i)
+        ys[i+1] = phi_i * ys[i] + sigma_i * z[i]  
+          
+    return ys
 
+def inverse_cumsum(arr):
+    return np.diff(np.concatenate(([0], arr)))
 
-def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
+def random_time_index(n, delta_t_dist = "exponential", param = [1]):
     '''
-    Generate a time increment vector according to a specific probability model
+    Generate a random time index vector according to a specific probability model
 
     Parameters
     ----------
     n: integer
         The length of the time series 
         
-    seed: integer
-        Random seed for reproducible results.
-        
     delta_t_dist: str
-        the probability distribution of delta_t
-        possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'
+        the probability distribution of the random time increments.
+        possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'.
         
         if 'exponential', `param` is expected to be a single scale parameter (traditionally denoted \lambda)
         if 'poisson', `param` is expected to be a single parameter (rate)
@@ -785,24 +749,31 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
             prob_random_choice: 
                 probabilities associated with each entry value_random_choice  (e.g. [.95,.05])
             (These two arrays must be of the same size)
+   
         
     Returns:
     -------
     
-    delta_t : 1D array of time increments, length n
+    t : 1D array of random time index obtained by taking the cumulative sum of the sampled random time increments, length n
 
     '''
     # check for a valid distribution 
     valid_distributions = ["exponential", "poisson", "pareto", "random_choice"]
     if delta_t_dist not in valid_distributions:
-        raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', or 'random_choice'.")    
+        raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', 'random_choice'.")    
     
-    np.random.seed(seed) 
+
     param = np.array(param) # coerce array type
     
     if delta_t_dist == "exponential":
+        # make sure that param is of len 1
+        if len(param) != 1:
+            raise ValueError('The Exponential law takes a single scale parameter.')       
         delta_t = np.random.exponential(scale = param, size=n)
+        
     elif delta_t_dist == "poisson":
+        if len(param) != 1:
+            raise ValueError('The Poisson law takes a single parameter.')       
         delta_t = np.random.poisson(lam = param, size = n) + 1
     elif delta_t_dist == "pareto":
         if len(param) != 2:
@@ -813,8 +784,11 @@ def time_increments(n, param, delta_t_dist = "exponential", seed = 12345):
         if len(param)<2 or len(param[0]) != len(param[1]):
             raise ValueError("value_random_choice and prob_random_choice must have the same size.")
         delta_t = np.random.choice(param[0], size=n, p=param[1])
-        
-    return delta_t
+    return np.cumsum(delta_t)
+
+
+
+
 
 # def fBMsim(N=128, H=0.25):
 #     '''Simple method to generate fractional Brownian Motion

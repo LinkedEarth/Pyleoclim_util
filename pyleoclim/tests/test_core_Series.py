@@ -28,10 +28,12 @@ test_dirpath = pathlib.Path(__file__).parent.absolute()
 #from urllib.request import urlopen
 
 import pyleoclim as pyleo
-from pyleoclim.utils.tsmodel import ar1_fit
+import pyleoclim.utils.tsmodel as tsmodel
 import pyleoclim.utils.tsbase as tsbase
 
 from statsmodels.tsa.arima_process import arma_generate_sample
+from scipy.stats import expon
+
 
 # a collection of useful functions
 
@@ -538,7 +540,7 @@ class TestSel:
 class TestUISeriesSurrogates:
     ''' Test Series.surrogates()
     '''
-    def test_surrogates_t0(self, eps=0.2):
+    def test_surrogates_t0(self, p=2, eps=0.2):
         ''' Generate AR(1) surrogates based on a AR(1) series with certain parameters,
         and then evaluate and assert the parameters of the surrogates are correct
         '''
@@ -549,10 +551,53 @@ class TestUISeriesSurrogates:
         ar1 = arma_generate_sample(ar, ma, nsample=n, scale=1)
         ts = pyleo.Series(time=np.arange(1000), value=ar1)
 
-        ts_surrs = ts.surrogates(number=1)
+        ts_surrs = ts.surrogates(number=p)
         for ts_surr in ts_surrs.series_list:
-            g_surr = ar1_fit(ts_surr.value)
+            g_surr = tsmodel.ar1_fit(ts_surr.value)
             assert np.abs(g_surr-g) < eps
+            
+    @pytest.mark.parametrize('number',[1,5])     
+    def test_surrogates_uar1_match(self, number):
+        ts = gen_ts(nt=550, alpha=1.0)
+        # generate surrogates
+        surr = ts.surrogates(method = 'uar1', number = number, time_pattern ="match")
+        for i in range(number):
+            assert(np.allclose(surr.series_list[i].time, ts.time))
+            
+    def test_surrogates_uar1_even(self, p=5):
+        ts = gen_ts(nt=550, alpha=1.0)
+        time_incr = np.median(np.diff(ts.time))
+        # generate surrogates
+        surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="even", settings={"time_increment" :time_incr})
+        for i in range(p):
+            assert(np.allclose(tsmodel.inverse_cumsum(surr.series_list[i].time),time_incr))
+
+    def test_surrogates_uar1_random(self, p=5, tol = 0.5):
+        tau = 2
+        sigma_2 = 1
+        n = 500
+        # generate time index
+        t = np.arange(1,(n+1))
+        # create time series
+        ys = tsmodel.uar1_sim(t, tau_0=tau, sigma_2_0=sigma_2)
+        ts = pyleo.Series(time = t, value=ys, auto_time_params=True,verbose=False)
+        # generate surrogates default is exponential with parameter value 1
+        surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="random")
+        #surr = ts.surrogates(method = 'uar1', number = p, time_pattern ="uneven",settings={"delta_t_dist" :"poisson","param":[1]} )
+    
+        for i in range(p):
+            delta_t = tsmodel.inverse_cumsum(surr.series_list[i].time)
+            # Compute the empirical cumulative distribution function (CDF) of the generated data
+            empirical_cdf, bins = np.histogram(delta_t, bins=100, density=True)
+            empirical_cdf = np.cumsum(empirical_cdf) * np.diff(bins)
+            # Compute the theoretical CDF of the Exponential distribution
+            theoretical_cdf = expon.cdf(bins[1:], scale=1)
+            # Trim theoretical_cdf to match the size of empirical_cdf
+            theoretical_cdf = theoretical_cdf[:len(empirical_cdf)]
+            # Compute the L2 norm (Euclidean distance) between empirical and theoretical CDFs
+            l2_norm = np.linalg.norm(empirical_cdf - theoretical_cdf)
+            assert(l2_norm<tol)
+            
 
 class TestUISeriesSummaryPlot:
     ''' Test Series.summary_plot()
@@ -1116,17 +1161,6 @@ class TestUISeriesSsa():
         miss_ssa = soi_m.ssa()
         assert all(miss_ssa.eigvals >= 0)
         assert np.square(miss_ssa.RCseries.value - soi.value).mean() < 0.3
-
-
-
-    # def test_ssa_t5(self):
-    #     '''Test Series.ssa() on Allen&Smith dataset
-    #     '''
-    #     df = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
-    #     mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
-    #     mraSsa = mra.ssa(nMC=10)
-    #     fig, ax = mraSsa.screeplot()
-    #     pyleo.closefig(fig)
 
 class TestUISeriesPlot:
     '''Test for Series.plot()

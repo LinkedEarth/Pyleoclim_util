@@ -179,7 +179,7 @@ class PSD:
 
             Number of surrogate series to generate for significance testing. The default is None.
 
-        method : str; {'ar1asym','ar1sim'}
+        method : str; {'ar1asym','ar1sim','uar1'}
 
             Method to generate surrogates. AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution. The default is AR1sim
 
@@ -280,10 +280,10 @@ class PSD:
         if self.spec_method == 'lomb_scargle' and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the Lomb-Scargle method')
 
-        if method not in ['ar1sim', 'ar1asym']:
+        if method not in ['ar1sim', 'uar1','ar1asym']:
                 raise ValueError("The available methods are 'ar1sim' and 'ar1asym'")
 
-        if method in ['ar1sim', 'ar1old']: # fix later in Series.surrogates()
+        if method in ['ar1sim', 'uar1']:
             signif_scals = None
             if scalogram:
                 try:
@@ -760,7 +760,8 @@ class PSD:
         # plot significance levels
         if self.signif_qs is not None:
             signif_method_label = {
-                'ar1sim': 'AR(1) simulations',
+                'ar1sim': 'AR(1) simulations (MoM)',
+                'uar1': 'AR(1) simulations (MLE)',
                 'ar1asym': 'AR(1) asymptotic solution'
             }
             nqs = np.size(self.signif_qs.psd_list)

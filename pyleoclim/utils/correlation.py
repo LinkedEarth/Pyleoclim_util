@@ -711,7 +711,7 @@ def association(y1, y2, statistic='pearsonr',settings=None):
         func = getattr(stats, statistic) 
         res = func(y1,y2,**args)
     else:
-        raise ValueError(f'Wrong statistic: {statistic}; acceptble choices are {acceptable_methods}')
+        raise ValueError(f'Wrong statistic: {statistic}; acceptable choices are {acceptable_methods}')
        
     return res
         

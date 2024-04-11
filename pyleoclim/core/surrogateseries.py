@@ -6,7 +6,7 @@ SurrogateSeries is a child of MultipleSeries, designed for Monte Carlo tests
 
 from ..core.multipleseries import MultipleSeries
 
-supported_surrogates = frozenset(['ar1sim','phaseran']) # broadcast all supported surrogates as global variable, for exception handling
+supported_surrogates = frozenset(['ar1sim','phaseran', 'uar1']) # broadcast all supported surrogates as global variable, for exception handling
 
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR(1))
@@ -24,8 +24,10 @@ class SurrogateSeries(MultipleSeries):
             self.label = str(label or "series") + " surrogates [AR(1)]"
         elif surrogate_method == 'phaseran':
             self.label = str(label or "series") + " surrogates [phase-randomized]"
+        elif surrogate_method == 'uar1':
+            self.label = str(label or "series") + " surrogates [uar1]"
         else:
-            raise ValueError('Surrogate method should either be "ar1sim" or "phaseran"')
+            raise ValueError('Surrogate method should either be "ar1sim", "phaseran" or "uar1"')
         
          
        

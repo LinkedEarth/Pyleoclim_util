@@ -12,7 +12,6 @@ Notes on how to test:
 4. after `pip install pytest-xdist`, one may execute "pytest -n 4" to test in parallel with number of workers specified by `-n`
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
-import numpy as np
 import pytest
 import pyleoclim as pyleo
 
@@ -20,17 +19,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
     
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v)
-    return ts
-
-# a collection of useful functions
-
-def gen_normal(loc=0, scale=1, nt=100):
-    ''' Generate random data with a Gaussian distribution
-    '''
-    t = np.arange(nt)
-    v = np.random.normal(loc=loc, scale=scale, size=nt)
-    ts = pyleo.Series(t,v)
+    ts=pyleo.Series(t,v, auto_time_params=True,verbose=False)
     return ts
 
 
@@ -50,12 +39,13 @@ class TestUiPsdPlot:
 class TestUiPsdSignifTest:
     ''' Tests for PSD.signif_test()
     '''
-
-    def test_signif_test_t0(self):
+    @pytest.mark.parametrize('method',['ar1sim','uar1','ar1asym'])
+    def test_signif_test_t0(self,method):
         ''' Test PSD.signif_test() with default parameters
         '''
         ts = gen_ts(nt=500)
         psd = ts.spectral(method='mtm')
-        psd_signif = psd.signif_test(number=10)
+        psd_signif = psd.signif_test(number=10,method=method)
         fig, ax = psd_signif.plot()
         pyleo.closefig(fig)
+    

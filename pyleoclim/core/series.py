@@ -105,14 +105,14 @@ class Series:
         source of the dataset. If it came from a LiPD file, this could be the datasetID property
 
     archiveType : string
-        climate archive, one of 'Borehole', 'Coral', 'FluvialSediment', 'GlacierIce', 'GroundIce', 'LakeSediment', 'MarineSediment', 'Midden', 'MolluskShell', 'Peat', 'Sclerosponge', 'Shoreline', 'Speleothem', 'TerrestrialSediment', 'Wood'                                                                                   
+        climate archive, one of 'Borehole', 'Coral', 'FluvialSediment', 'GlacierIce', 'GroundIce', 'LakeSediment', 'MarineSediment', 'Midden', 'MolluskShell', 'Peat', 'Sclerosponge', 'Shoreline', 'Speleothem', 'TerrestrialSediment', 'Wood'
         Reference: https://lipdverse.org/vocabulary/archivetype/
-    
+
     control_archiveType  : [True, False]
-        Whether to standardize the name of the archiveType agains the vocabulary from: https://lipdverse.org/vocabulary/paleodata_proxy/. 
-        If set to True, will only allow for these terms and automatically convert known synonyms to the standardized name. Only standardized variable names will be automatically assigned a color scheme.  
-        Default is False. 
-        
+        Whether to standardize the name of the archiveType agains the vocabulary from: https://lipdverse.org/vocabulary/paleodata_proxy/.
+        If set to True, will only allow for these terms and automatically convert known synonyms to the standardized name. Only standardized variable names will be automatically assigned a color scheme.
+        Default is False.
+
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
         defaults to True
@@ -128,10 +128,10 @@ class Series:
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
          Default is None (marked for deprecation)
 
-    auto_time_params : bool, 
-        If True, uses tsbase.disambiguate_time_metadata to ensure that time_name and time_unit are usable by Pyleoclim. This may override the provided metadata. 
+    auto_time_params : bool,
+        If True, uses tsbase.disambiguate_time_metadata to ensure that time_name and time_unit are usable by Pyleoclim. This may override the provided metadata.
         If False, the provided time_name and time_unit are used. This may break some functionalities (e.g. common_time and convert_time_unit), so use at your own risk.
-        If not provided, code will set to True for internal consistency.  
+        If not provided, code will set to True for internal consistency.
 
     Examples
     --------
@@ -265,16 +265,16 @@ class Series:
         self.control_archiveType = control_archiveType
         if archiveType is not None:
             #Deal with archiveType
-            
+
             #Get the possible list of archiveTyp
-            
-            
+
+
             if control_archiveType == True:
-                
+
                 res = lipdutils.get_archive_type()
                 std_var = list(res.keys())
                 std_var_lower = [key.lower() for key in res.keys()]
-                
+
                 data = []
                 for key, values in res.items():
                     if values:  # Check if the list is not empty
@@ -288,10 +288,10 @@ class Series:
                 synonym = df[df['Value'].isin([archiveType.lower().replace(" ", "")])]['Key']
                 if synonym.empty == True:
                     synonym = None
-                else: 
+                else:
                     synonym = synonym.to_string(header=False, index=False)
-            
-                
+
+
                 if archiveType.lower().replace(" ", "") in std_var_lower:
                     index = std_var_lower.index(archiveType.lower().replace(" ", ""))
                     self.archiveType = std_var[index]
@@ -561,7 +561,7 @@ class Series:
         b = jsonutils.iterate_through_dict(a, 'Series')
 
         return cls(**b)
-    
+
     def pandas_method(self, method):
         ser = self.to_pandas()
         result = method(ser)
@@ -3239,19 +3239,19 @@ class Series:
 
         As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
         For instance, one can adjust the resolution of the time axis on which coherence is evaluated:
-            
+
         .. jupyter-execute::
 
              coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz', settings = {'ntau':20})
              coh_wwz.plot()
-             
+
         The frequency (scale) axis can also be customized, e.g. to focus on scales from 1 to 20y, with 24 scales:
-        
+
         .. jupyter-execute::
-            
+
              coh = ts_air.wavelet_coherence(ts_nino, freq_kwargs={'fmin':1/20,'fmax':1,'nf':24})
              coh.plot()
-        
+
         Significance is assessed similarly to PSD or Scalogram objects:
 
         .. jupyter-execute::
@@ -3270,8 +3270,8 @@ class Series:
             cwt_sig.dashboard()
 
         Note: this design balances many considerations, and is not easily customizable.
-        
-        
+
+
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -3290,7 +3290,7 @@ class Series:
         args = {}
         args['wwz'] = {'freq': freq, 'verbose': verbose}
         args['cwt'] = {'freq': freq}
-        
+
 
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):
@@ -3326,7 +3326,7 @@ class Series:
 
                 tau = np.linspace(lb, ub, ntau)
             settings.update({'tau': tau})
-            
+
         args[method].update(settings)
 
         # Apply WTC method
@@ -3358,8 +3358,11 @@ class Series:
         The significance of the correlation is assessed using one of the following methods:
 
         1) 'ttest': T-test adjusted for effective sample size.
-        2) 'isopersistent': AR(1) modeling of x and y.
-        3) 'isospectral': phase randomization of original inputs. (default)
+        2) 'ar1sim': AR(1) modeling of x and y.
+        3) 'phaseran': phase randomization of original inputs. (default)
+        4) 'built-in': uses built-in method
+
+        Note: Up to version v0.14.0. ar1sim was called "isopersistent",  phaseran was called "isospectral"
 
         The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
         The others are non-parametric, but their computational requirements scale with the number of simulations.
@@ -3371,27 +3374,25 @@ class Series:
 
         target_series : Series
             A pyleoclim Series object
-        
+
         alpha : float
             The significance level (default: 0.05)
-            
-        statistic : str  
+
+        statistic : str
             statistic being evaluated. Can use any of the SciPy-supported ones:
                 https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
                 Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
-            Default: 'pearsonr'.    
-            
+            Default: 'pearsonr'.
+
         method : str, {'ttest','built-in','ar1sim','phaseran'}
             method for significance testing. Default is 'phaseran'
             'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
-            'built-in' uses the p-value that ships with the statistic. 
-            The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning. 
-            Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.   
-        
+            'built-in' uses the p-value that ships with the SciPy function.
+            The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning.
+            Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.
+
         timespan : tuple
             The time interval over which to perform the calculation
-            
-          
 
         settings : dict
             Parameters for the correlation function, including:
@@ -3408,7 +3409,7 @@ class Series:
 
         seed : float or int
             random seed for isopersistent and isospectral methods
-            
+
         mute_pbar : bool, optional
             Mute the progress bar. The default is False.
 
@@ -3432,13 +3433,13 @@ class Series:
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function (marked for deprecation)
-        
+
         pyleoclim.utils.correlation.association : SciPy measures of association between variables
-        
+
         pyleoclim.series.surrogates : parametric and non-parametric surrogates of any Series object
-        
+
         pyleoclim.multipleseries.common_time : Aligning time axes
-        
+
         References
         ----------
         [1] Hu, J., J. Emile-Geay, and J. Partin (2017), Correlation-based interpretations of paleoclimate data – where statistics meet past climates, Earth and Planetary Science Letters, 459, 362–371, doi:10.1016/j.epsl.2016.11.048.
@@ -3458,7 +3459,7 @@ class Series:
             # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
             print(corr_res)
-            
+
             # changing the statistic
             corr_res = ts_nino.correlation(ts_air, statistic='kendalltau')
             print(corr_res)
@@ -3482,7 +3483,7 @@ class Series:
             warnings.warn("isopersistent is deprecated and was replaced by 'ar1sim'",
                           DeprecationWarning, stacklevel=2)
             method = 'ar1sim'
-            
+
         settings = {} if settings is None else settings.copy()
         corr_args = {'alpha': alpha, 'method': method}
         corr_args.update(settings)
@@ -3514,19 +3515,19 @@ class Series:
                 res = corrutils.association(ts0.value,ts1.value,statistic)
                 stat = res[0]
                 pval = res.pvalue if len(res) > 1 else np.nan
-                signif = pval <= alpha 
-        elif method in supported_surrogates:  
+                signif = pval <= alpha
+        elif method in supported_surrogates:
             number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
             seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
-            method = corr_args['method'] if 'method' in corr_args.keys() else None
+            #method = corr_args['method'] if 'method' in corr_args.keys() else None
             surr_settings = corr_args['surr_settings'] if 'surr_settings' in corr_args.keys() else None
-            
+
             # compute correlation statistic
             stat = corrutils.association(ts0.value,ts1.value,statistic)[0]
-            
-            ts0_surr = ts0.surrogates(number=number, seed=seed, 
+
+            ts0_surr = ts0.surrogates(number=number, seed=seed,
                                                  method=method, settings=surr_settings)
-            ts1_surr = ts1.surrogates(number=number, seed=seed, 
+            ts1_surr = ts1.surrogates(number=number, seed=seed,
                                                  method=method, settings=surr_settings)
             stat_surr = np.empty((number))
             for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
@@ -3535,7 +3536,7 @@ class Series:
             # obtain p-value
             pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
             # establish significance
-            signif = pval <= alpha 
+            signif = pval <= alpha
         else:
             raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
 
@@ -3641,22 +3642,29 @@ class Series:
         causal_res = spec_func[method](value1, value2, **args[method])
         return causal_res
 
-    def surrogates(self, method='ar1sim', number=1, length=None, seed=None, settings=None):
+    def surrogates(self, method='ar1sim', number=1, time_pattern='match',
+                   length=None, seed=None, settings=None):
         ''' Generate surrogates of the Series object according to "method"
-            
+
             For now, assumes uniform spacing and increasing time axis
 
         Parameters
         ----------
 
-        method : {ar1sim, phaseran}
+        method : {ar1sim, phaseran, uar1}
             The method used to generate surrogates of the timeseries
-            
-            Note that phaseran assumes an odd number of samples. If the series 
+
+            Note that phaseran assumes an odd number of samples. If the series
             has even length, the last point is dropped to satisfy this requirement
 
         number : int
             The number of surrogates to generate
+
+        time_pattern : str {match, even, random}
+            The pattern used to generate the surrogate time axes
+            'match' uses the same pattern as the original Series
+            'even' uses an evenly-spaced time with spacing delta_t specified in settings (will return error if not specified)
+            'random' uses random_time_index() with specified distribution and parameters (default: 'exponential' with parameter 1)
 
         length : int
             Length of the series
@@ -3675,52 +3683,92 @@ class Series:
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
-        pyleoclim.utils.tsutils.phaseran : phase randomization
+        pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
+        pyleoclim.utils.tsutils.phaseran2 : phase randomization
+        pyleoclim.utils.tsutils.random_time_index : random time index vector according to a specific probability model
 
         '''
         settings = {} if settings is None else settings.copy()
-        args = {}
-        time = self.time
-        args['ar1sim'] = {'t': time}
-        args['phaseran'] = {}
-        args[method].update(settings)
 
         if seed is not None:
             np.random.seed(seed)
 
+        if length is None:
+            n = len(self.value)
+        else:
+            n = length
+
+        # generate time axes according to provided pattern
+        if time_pattern == "match":
+            times = np.tile(self.time, (number, 1)).T
+        elif time_pattern == "even":
+            if "time_increment" not in settings:
+                warnings.warn("'time_increment' not found in the dictionary, default set to 1.",stacklevel=2)
+                time_increment = 1
+            else:
+                time_increment = settings["time_increment"]
+
+            t = np.cumsum([time_increment]*n)
+            times = np.tile(t, (number, 1)).T
+        elif time_pattern == "random":
+            times = np.zeros((n, number))
+            for i in range(number):
+                times[:, i] = tsmodel.random_time_index(n = n, **settings) # TODO: check that this does not break when unexpected keywords are passed in `settings`
+        else:
+            raise ValueError(f"Unknown time pattern: {time_pattern}")
+
+        # apply surrogate method
         if method == 'ar1sim':
-            surr_res = tsmodel.ar1_sim(self.value, number, **args[method])
+            if time_pattern != 'match':
+                raise ValueError('Only a matching time pattern is supported with this method')
+            else:
+                y_surr = tsmodel.ar1_sim(self.value, number, self.time)  # CHECK: how does this handle the new time?
+
         elif method == 'phaseran':
-            if self.is_evenly_spaced():
-                surr_res = tsutils.phaseran2(self.value, number, **args[method])
+            if self.is_evenly_spaced() and time_pattern != "random":
+                y_surr = tsutils.phaseran2(self.value, number)
             else:
                 raise ValueError("Phase-randomization presently requires evenly-spaced series.")
 
-        # elif method == 'uar1':
-        #     # TODO : implement Lionel's ML method
+        elif method == 'uar1':
+            # estimate theta with MLE
+            theta_hat = tsmodel.uar1_fit(self.value, self.time)
+            # generate surrogates
+            y_surr = np.empty_like(times)
+            for j in range(number):
+                y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j],
+                                               tau_0=theta_hat[0],sigma_2_0=theta_hat[1])
+
         # elif method == 'power-law':
         #     # TODO : implement Stochastic
         # elif method == 'fBm':
         #      # TODO : implement Stochastic
-                    
-        if len(np.shape(surr_res)) == 1:
-            surr_res = surr_res[:, np.newaxis]
 
+
+        # THIS SHOULD BE UNNECESSARY
+        # # reshape
+        # if len(np.shape(y_surr)) == 1:
+        #     y_surr = y_surr[:, np.newaxis]
+
+        # if len(np.shape(times)) == 1:
+        #     times = times[:, np.newaxis]
+
+        # wrap it all up with a bow
         s_list = []
-        for i, s in enumerate(surr_res.T):
-            s_tmp = Series(time=time, value=s,  # will need reformation after uar1 pull
-                           time_name=self.time_name,  
-                           time_unit=self.time_unit, 
-                           value_name=self.value_name, 
-                           value_unit=self.value_unit, 
+        for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
+            ts = Series(time=t, value=y,  
+                           time_name=self.time_name,
+                           time_unit=self.time_unit,
+                           value_name=self.value_name,
+                           value_unit=self.value_unit,
                            label = str(self.label or '') + " surr #" + str(i+1),
                            verbose=False, auto_time_params=True)
-            s_list.append(s_tmp)
+            s_list.append(ts)
 
-        surr = SurrogateSeries(series_list=s_list, 
+        surr = SurrogateSeries(series_list=s_list,
                                label = self.label,
-                               surrogate_method=method, 
-                               surrogate_args=args[method])
+                               surrogate_method=method,
+                               surrogate_args=settings)
 
         return surr
 
@@ -4173,7 +4221,7 @@ class Series:
 
         See Also
         --------
-        
+
         pyleoclim.core.resolutions.Resolution
 
         Examples
