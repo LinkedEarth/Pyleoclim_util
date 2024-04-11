@@ -3399,8 +3399,6 @@ class Series:
 
             nsim : int
                 the number of simulations (default: 1000)
-            method : str, {'ttest','ar1sim','phaseran' (default)}
-                method for significance testing
             surr_settings : dict
                 Parameters for surrogate generator. See individual methods for details.
 
@@ -3485,8 +3483,8 @@ class Series:
             method = 'ar1sim'
 
         settings = {} if settings is None else settings.copy()
-        corr_args = {'alpha': alpha, 'method': method}
-        corr_args.update(settings)
+        #corr_args = {'alpha': alpha, 'method': method}
+        #corr_args.update(settings)
 
         ms = MultipleSeries([self, target_series])
         if list(self.time) != list(target_series.time):
@@ -3517,18 +3515,25 @@ class Series:
                 pval = res.pvalue if len(res) > 1 else np.nan
                 signif = pval <= alpha
         elif method in supported_surrogates:
-            number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
-            seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
+            if 'nsim' in settings.keys():
+                number = settings['nsim']
+                settings.pop('nsim')
+            else:
+                number = 1000
+                
+            settings['seed'] = seed
+            settings['method'] = method
+            settings['number'] = number
+            #number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
+            #seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
             #method = corr_args['method'] if 'method' in corr_args.keys() else None
-            surr_settings = corr_args['surr_settings'] if 'surr_settings' in corr_args.keys() else None
+            #surr_settings = corr_args['surr_settings'] if 'surr_settings' in corr_args.keys() else None
 
             # compute correlation statistic
             stat = corrutils.association(ts0.value,ts1.value,statistic)[0]
 
-            ts0_surr = ts0.surrogates(number=number, seed=seed,
-                                                 method=method, settings=surr_settings)
-            ts1_surr = ts1.surrogates(number=number, seed=seed,
-                                                 method=method, settings=surr_settings)
+            ts0_surr = ts0.surrogates(**settings)
+            ts1_surr = ts1.surrogates(**settings)
             stat_surr = np.empty((number))
             for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
                 stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
