@@ -22,8 +22,6 @@ from matplotlib.ticker import FormatStrFormatter
 import matplotlib.transforms as transforms
 import matplotlib as mpl
 from tqdm import tqdm
-#import warnings
-#from scipy.stats.mstats import mquantiles
 
 class EnsembleSeries(MultipleSeries):
     ''' EnsembleSeries object
@@ -972,7 +970,7 @@ class EnsembleSeries(MultipleSeries):
                  ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
         """ Plots the distribution of the timeseries across ensembles
 
-        Reuses seaborn [histplot](https://seaborn.pydata.org/generated/seaborn.histplot.html) function.
+        Reuses the seaborn [histplot](https://seaborn.pydata.org/generated/seaborn.histplot.html) function.
 
         Parameters
         ----------

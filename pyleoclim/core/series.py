@@ -24,9 +24,7 @@ from ..core.multipleseries import MultipleSeries
 from ..core.scalograms import Scalogram
 from ..core.coherence import Coherence
 from ..core.corr import Corr
-from ..core.surrogateseries import SurrogateSeries
 from ..core.resolutions import Resolution
-from ..core.surrogateseries import supported_surrogates
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -3656,14 +3654,7 @@ class Series:
         Parameters
         ----------
 
-        method : {ar1sim, phaseran, uar1}
-            The method used to generate surrogates of the timeseries
-
-            Note that phaseran assumes an odd number of samples. If the series
-            has even length, the last point is dropped to satisfy this requirement
-
-        number : int
-            The number of surrogates to generate
+        
 
         time_pattern : str {match, even, random}
             The pattern used to generate the surrogate time axes
@@ -3709,7 +3700,7 @@ class Series:
         elif time_pattern == "even":
             if "time_increment" not in settings:
                 warnings.warn("'time_increment' not found in the dictionary, default set to 1.",stacklevel=2)
-                time_increment = 1
+                time_increment = np.median(np.diff(self.time))
             else:
                 time_increment = settings["time_increment"]
 
@@ -3748,15 +3739,6 @@ class Series:
         #     # TODO : implement Stochastic
         # elif method == 'fBm':
         #      # TODO : implement Stochastic
-
-
-        # THIS SHOULD BE UNNECESSARY
-        # # reshape
-        # if len(np.shape(y_surr)) == 1:
-        #     y_surr = y_surr[:, np.newaxis]
-
-        # if len(np.shape(times)) == 1:
-        #     times = times[:, np.newaxis]
 
         # wrap it all up with a bow
         s_list = []
