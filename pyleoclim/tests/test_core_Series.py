@@ -28,11 +28,11 @@ test_dirpath = pathlib.Path(__file__).parent.absolute()
 #from urllib.request import urlopen
 
 import pyleoclim as pyleo
-import pyleoclim.utils.tsmodel as tsmodel
+#import pyleoclim.utils.tsmodel as tsmodel
 import pyleoclim.utils.tsbase as tsbase
 
-from statsmodels.tsa.arima_process import arma_generate_sample
-from scipy.stats import expon
+#from statsmodels.tsa.arima_process import arma_generate_sample
+#from scipy.stats import expon
 
 
 # a collection of useful functions
