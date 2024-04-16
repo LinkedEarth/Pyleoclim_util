@@ -151,7 +151,7 @@ def ar1_sim(y, p, t=None):
     n = np.size(y)
     ysim = np.empty(shape=(n, p))  # declare array
 
-    sig = np.std(y)
+    sig = np.std(y) # Not MLE estimate in any case
     if is_evenly_spaced(t):
         g = ar1_fit_evenly(y)
 
@@ -179,7 +179,7 @@ def ar1_sim(y, p, t=None):
 def gen_ar1_evenly(t, g, scale=1, burnin=50):
     ''' Generate AR(1) series samples
     
-    MARK FOR DEPRECATION once ar1fit_ml is adopted
+    MARK FOR DEPRECATION once uar1_fit is adopted
 
     Wrapper for the function `statsmodels.tsa.arima_process.arma_generate_sample <https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_process.arma_generate_sample.html>`_.
     used to generate an ARMA
@@ -194,7 +194,7 @@ def gen_ar1_evenly(t, g, scale=1, burnin=50):
         lag-1 autocorrelation
 
     scale : float
-        The standard deviation of noise.
+        The standard deviation of the noise.
 
     burnin : int
         Number of observation at the beginning of the sample to drop. Used to reduce dependence on initial values.
@@ -681,7 +681,7 @@ def uar1_fit(y, t):
     
     return theta_hat
 
-def uar1_sim(t, tau=5, sigma_2=2):  
+def uar1_sim(t, tau, sigma_2=1):  
                                
     """
     Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
@@ -707,21 +707,27 @@ def uar1_sim(t, tau=5, sigma_2=2):
     --------
   
     pyleoclim.utils.tsmodel.uar1_fit : Maximumum likelihood estimate of AR(1) parameters 
-    pyleoclim.utils.tsmodel.random_time_index : Generate time increment vector according to a specific probability model
         
     """
-    n = len(t)    
-    ys = np.zeros(n) # create empty vector  
-    # generate unevenly spaced AR(1)
-    z = np.random.normal(loc=0, scale=1, size=n)
-    ys[0] = z[0] 
-    for i in range(n-1): 
-        delta_i = t[i+1] - t[i] 
-        phi_i = np.exp(-delta_i / tau)
-        sigma_i = np.sqrt(sigma_2 * (1-pow(phi_i, 2)))
-        ys[i+1] = phi_i * ys[i] + sigma_i * z[i]  
-          
-    return ys
+    if t.ndim == 1: # add extraneous dimension if t is 1d, to write only one loop. 
+        n = len(t); p = 1
+        t = t[:,np.newaxis]
+    else:
+        n, p = t.shape
+    
+    # generate innovations
+    z = np.random.normal(loc=0, scale=1, size=(n,p))
+    y = np.copy(z) # initialize AR(1) vectors
+    # fill the array
+    for j in range(p):  # Note: this shouldn't work but it does!
+        for i in range(1, n): 
+            delta_i = t[i] - t[i-1] 
+            phi = np.exp(-delta_i / tau)
+            sigma_i = np.sqrt(sigma_2 * (1-phi**2))
+            y[i] = phi * y[i-1] + sigma_i * z[i]  
+    
+    y = np.squeeze(y) # squeeze superfluous dimensions
+    return y
 
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))

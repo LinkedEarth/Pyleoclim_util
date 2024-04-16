@@ -85,8 +85,12 @@ class SurrogateSeries(EnsembleSeries):
         --------
         
         SOI = pyleo.utils.load_dataset('SOI')
-        SOI_surr = pyleo.SurrogateSeries(method='phaseran', number=10) 
+        SOI_surr = pyleo.SurrogateSeries(method='phaseran', number=4) 
         SOI_surr.from_series(SOI)
+        fig, ax = SOI_surr.plot_traces()
+        SOI.plot(ax=ax,color='black',linewidth=1, ylim=[-6,3])
+        ax.legend(loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2)
+        ax.set_title(SOI_surr.label)
 
         '''    
         #settings = {} if settings is None else settings.copy()
@@ -112,13 +116,9 @@ class SurrogateSeries(EnsembleSeries):
 
         elif self.method == 'uar1':
             # estimate theta with MLE
-            theta_hat = tsmodel.uar1_fit(target_series.value, target_series.time)
-            # generate surrogates
-            y_surr = np.empty_like(times)
-            for j in range(self.number):
-                y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j],
-                                               tau_0=theta_hat[0],sigma_2_0=theta_hat[1])         
-            
+            tau, sigma_2 = tsmodel.uar1_fit(target_series.value, target_series.time)
+            y_surr = tsmodel.uar1_sim(t = times, tau=tau, sigma_2=sigma_2)
+
         s_list = []
         for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
             ts = Series(time=t, value=y,  
@@ -144,11 +144,13 @@ class SurrogateSeries(EnsembleSeries):
         length : int
             Length of the series. Default: 50
             
-        time_pattern : str {match, even, random}
+        time_pattern : str {even, random, specified}
             The pattern used to generate the surrogate time axes
-            'even' uses an evenly-spaced time with spacing `delta_t` specified in settings (if not specified, defaults to 1)
-            'random' uses random_time_index() with specified distribution and parameters (default: 'exponential' with parameter 1)
-            'custom' 
+            * 'even' uses an evenly-spaced time with spacing `delta_t` specified in settings (if not specified, defaults to 1.0)
+            * 'random' uses random_time_index() with specified distribution and parameters 
+               Relevant settings are `delta_t_dist` and `param`. (default: 'exponential' with parameter = 1)
+            * 'specified': uses time axis `time` from `settings`.  
+            
         seed : int
             Control random seed option for reproducibility
 
@@ -164,14 +166,18 @@ class SurrogateSeries(EnsembleSeries):
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
         pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
+        pyleoclim.utils.tsmodel.random_time_index : Generate time increment vector according to a specific probability model
         
         Examples
         --------
         ar1 = pyleo.SurrogateSeries(method='ar1sim', number=10) 
-        ar1.from_process(length=100)
+        ar1.from_params(length=100, params = [2,2])
+        ar1.plot_envelope(title=rf'AR(1) synthetic series ($\tau={2},\sigma^2={2}$)')
 
         '''    
-        params = list(params) # coerce params into a list, no matter the original format
+        params = list(params) if params is not None else [] # coerce params into a list, no matter the original format
+        nparams = len(params)
+        
         settings = {} if settings is None else settings.copy()
         
         if seed is not None:
@@ -179,8 +185,8 @@ class SurrogateSeries(EnsembleSeries):
         
         # generate time axes according to provided pattern
         if time_pattern == "even":
-            time_increment = settings["time_increment"] if "time_increment" in settings else 1
-            t = np.cumsum([time_increment]*length)
+            delta_t = settings["delta_t"] if "delta_t" in settings else 1.0
+            t = np.cumsum([float(delta_t)]*length)
             times = np.tile(t, (self.number, 1)).T     
         elif time_pattern == "random":
             times = np.zeros((length, self.number))
@@ -195,16 +201,17 @@ class SurrogateSeries(EnsembleSeries):
                 times =  np.tile(settings["time"], (self.number, 1)).T  
         else:
             raise ValueError(f"Unknown time pattern: {time_pattern}")
-       
+        
+         
         # apply surrogate method
-        if self.method == 'ar1sim' or 'uar1':
-            y_surr = np.empty_like(times)
-            if len(params)<2:
-                raise ValueError('The AR(1) model needs 2 paramaters, tau and sigma2')
-            # generate surrogates
-            for j in range(self.number):
-                y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j],
-                                               tau=params[0],sigma_2=params[1])       
+        y_surr = np.empty_like(times)                 
+        
+        if self.method == 'uar1' or 'ar1sim':
+            if nparams<2:
+                warnings.warn(f'The AR(1) model needs 2 parameters, tau and sigma2 (in that order); {nparams} provided. default values used',UserWarning, stacklevel=2)
+                params = [5,0.5]
+            y_surr = tsmodel.uar1_sim(t = times, tau=params[0], sigma_2=params[1])
+                
         elif self.method == 'phaseran':
             raise ValueError("Phase-randomization is only available in from_series().")
 
@@ -213,7 +220,7 @@ class SurrogateSeries(EnsembleSeries):
         for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
             ts = Series(time=t, value=y,  
                            label = str(self.label or '') + " surr #" + str(i+1),
-                           verbose=False, auto_time_params=False)
+                           verbose=False, auto_time_params=True)
             s_list.append(ts)
 
         self.series_list = s_list

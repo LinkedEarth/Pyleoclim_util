@@ -522,6 +522,8 @@ class EnsembleSeries(MultipleSeries):
             '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+        
+        num_traces = min(num_traces, len(self.series_list)) # restrict to the smaller of the two
 
         # generate default axis labels
         time_label, value_label = self.make_labels()
