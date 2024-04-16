@@ -3645,119 +3645,119 @@ class Series:
         causal_res = spec_func[method](value1, value2, **args[method])
         return causal_res
 
-    def surrogates(self, method='ar1sim', number=1, time_pattern='match',
-                   length=None, seed=None, settings=None):
-        ''' Generate surrogates of the Series object according to "method"
+    # def surrogates(self, method='ar1sim', number=1, time_pattern='match',
+    #                length=None, seed=None, settings=None):
+    #     ''' Generate surrogates of the Series object according to "method"
 
-            For now, assumes uniform spacing and increasing time axis
+    #         For now, assumes uniform spacing and increasing time axis
 
-        Parameters
-        ----------
+    #     Parameters
+    #     ----------
 
         
 
-        time_pattern : str {match, even, random}
-            The pattern used to generate the surrogate time axes
-            'match' uses the same pattern as the original Series
-            'even' uses an evenly-spaced time with spacing delta_t specified in settings (will return error if not specified)
-            'random' uses random_time_index() with specified distribution and parameters (default: 'exponential' with parameter 1)
+    #     time_pattern : str {match, even, random}
+    #         The pattern used to generate the surrogate time axes
+    #         'match' uses the same pattern as the original Series
+    #         'even' uses an evenly-spaced time with spacing delta_t specified in settings (will return error if not specified)
+    #         'random' uses random_time_index() with specified distribution and parameters (default: 'exponential' with parameter 1)
 
-        length : int
-            Length of the series
+    #     length : int
+    #         Length of the series
 
-        seed : int
-            Control seed option for reproducibility
+    #     seed : int
+    #         Control seed option for reproducibility
 
-        settings : dict
-            Parameters for surrogate generator. See individual methods for details.
+    #     settings : dict
+    #         Parameters for surrogate generator. See individual methods for details.
 
-        Returns
-        -------
-        surr : SurrogateSeries
+    #     Returns
+    #     -------
+    #     surr : SurrogateSeries
 
-        See also
-        --------
+    #     See also
+    #     --------
 
-        pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
-        pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
-        pyleoclim.utils.tsutils.phaseran2 : phase randomization
-        pyleoclim.utils.tsutils.random_time_index : random time index vector according to a specific probability model
+    #     pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
+    #     pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
+    #     pyleoclim.utils.tsutils.phaseran2 : phase randomization
+    #     pyleoclim.utils.tsutils.random_time_index : random time index vector according to a specific probability model
 
-        '''
-        settings = {} if settings is None else settings.copy()
+    #     '''
+    #     settings = {} if settings is None else settings.copy()
 
-        if seed is not None:
-            np.random.seed(seed)
+    #     if seed is not None:
+    #         np.random.seed(seed)
 
-        if length is None:
-            n = len(self.value)
-        else:
-            n = length
+    #     if length is None:
+    #         n = len(self.value)
+    #     else:
+    #         n = length
 
-        # generate time axes according to provided pattern
-        if time_pattern == "match":
-            times = np.tile(self.time, (number, 1)).T
-        elif time_pattern == "even":
-            if "time_increment" not in settings:
-                warnings.warn("'time_increment' not found in the dictionary, default set to 1.",stacklevel=2)
-                time_increment = np.median(np.diff(self.time))
-            else:
-                time_increment = settings["time_increment"]
+    #     # generate time axes according to provided pattern
+    #     if time_pattern == "match":
+    #         times = np.tile(self.time, (number, 1)).T
+    #     elif time_pattern == "even":
+    #         if "time_increment" not in settings:
+    #             warnings.warn("'time_increment' not found in the dictionary, default set to 1.",stacklevel=2)
+    #             time_increment = np.median(np.diff(self.time))
+    #         else:
+    #             time_increment = settings["time_increment"]
 
-            t = np.cumsum([time_increment]*n)
-            times = np.tile(t, (number, 1)).T
-        elif time_pattern == "random":
-            times = np.zeros((n, number))
-            for i in range(number):
-                times[:, i] = tsmodel.random_time_index(n = n, **settings) # TODO: check that this does not break when unexpected keywords are passed in `settings`
-        else:
-            raise ValueError(f"Unknown time pattern: {time_pattern}")
+    #         t = np.cumsum([time_increment]*n)
+    #         times = np.tile(t, (number, 1)).T
+    #     elif time_pattern == "random":
+    #         times = np.zeros((n, number))
+    #         for i in range(number):
+    #             times[:, i] = tsmodel.random_time_index(n = n, **settings) # TODO: check that this does not break when unexpected keywords are passed in `settings`
+    #     else:
+    #         raise ValueError(f"Unknown time pattern: {time_pattern}")
 
-        # apply surrogate method
-        if method == 'ar1sim':
-            if time_pattern != 'match':
-                raise ValueError('Only a matching time pattern is supported with this method')
-            else:
-                y_surr = tsmodel.ar1_sim(self.value, number, self.time)  # CHECK: how does this handle the new time?
+    #     # apply surrogate method
+    #     if method == 'ar1sim':
+    #         if time_pattern != 'match':
+    #             raise ValueError('Only a matching time pattern is supported with this method')
+    #         else:
+    #             y_surr = tsmodel.ar1_sim(self.value, number, self.time)  # CHECK: how does this handle the new time?
 
-        elif method == 'phaseran':
-            if self.is_evenly_spaced() and time_pattern != "random":
-                y_surr = tsutils.phaseran2(self.value, number)
-            else:
-                raise ValueError("Phase-randomization presently requires evenly-spaced series.")
+    #     elif method == 'phaseran':
+    #         if self.is_evenly_spaced() and time_pattern != "random":
+    #             y_surr = tsutils.phaseran2(self.value, number)
+    #         else:
+    #             raise ValueError("Phase-randomization presently requires evenly-spaced series.")
 
-        elif method == 'uar1':
-            # estimate theta with MLE
-            theta_hat = tsmodel.uar1_fit(self.value, self.time)
-            # generate surrogates
-            y_surr = np.empty_like(times)
-            for j in range(number):
-                y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j],
-                                               tau_0=theta_hat[0],sigma_2_0=theta_hat[1])
+    #     elif method == 'uar1':
+    #         # estimate theta with MLE
+    #         theta_hat = tsmodel.uar1_fit(self.value, self.time)
+    #         # generate surrogates
+    #         y_surr = np.empty_like(times)
+    #         for j in range(number):
+    #             y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j],
+    #                                            tau_0=theta_hat[0],sigma_2_0=theta_hat[1])
 
-        # elif method == 'power-law':
-        #     # TODO : implement Stochastic
-        # elif method == 'fBm':
-        #      # TODO : implement Stochastic
+    #     # elif method == 'power-law':
+    #     #     # TODO : implement Stochastic
+    #     # elif method == 'fBm':
+    #     #      # TODO : implement Stochastic
 
-        # wrap it all up with a bow
-        s_list = []
-        for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
-            ts = Series(time=t, value=y,  
-                           time_name=self.time_name,
-                           time_unit=self.time_unit,
-                           value_name=self.value_name,
-                           value_unit=self.value_unit,
-                           label = str(self.label or '') + " surr #" + str(i+1),
-                           verbose=False, auto_time_params=True)
-            s_list.append(ts)
+    #     # wrap it all up with a bow
+    #     s_list = []
+    #     for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
+    #         ts = Series(time=t, value=y,  
+    #                        time_name=self.time_name,
+    #                        time_unit=self.time_unit,
+    #                        value_name=self.value_name,
+    #                        value_unit=self.value_unit,
+    #                        label = str(self.label or '') + " surr #" + str(i+1),
+    #                        verbose=False, auto_time_params=True)
+    #         s_list.append(ts)
 
-        surr = SurrogateSeries(series_list=s_list,
-                               label = self.label,
-                               surrogate_method=method,
-                               surrogate_args=settings)
+    #     surr = SurrogateSeries(series_list=s_list,
+    #                            label = self.label,
+    #                            surrogate_method=method,
+    #                            surrogate_args=settings)
 
-        return surr
+    #     return surr
 
     def outliers(self,method='kmeans',remove=True, settings=None,
                  fig_outliers=True, figsize_outliers=[10,4], plotoutliers_kwargs=None, savefigoutliers_settings=None,
