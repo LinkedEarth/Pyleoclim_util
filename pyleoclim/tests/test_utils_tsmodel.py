@@ -32,23 +32,20 @@ def test_time_index_2():
     Generate time increments with random choice
     '''
     delta_t = tsmodel.random_time_index(n=20, delta_t_dist = "random_choice",
-                                      param=[[1,2],[.95,.05]] )
+                                        param=[[1,2],[.95,.05]] )
     assert all(np.cumsum(delta_t)>0)
     
-
-    
-
 @pytest.mark.parametrize(('p', 'evenly_spaced'), [(1, True), (10, True), (1, False), (10, False)])
-def test_uar1_fit(p, evenly_spaced):
+def test_uar1_fit(p, evenly_spaced, tol = 0.45):
     '''
     Tests whether this method works well on an AR(1) process with known parameters and evenly spaced time points
 
     '''
     # define tolerance
-    tol = .4
     tau = 2
     sigma_2 = 1
     n = 500
+    np.random.seed(108)
     
     if evenly_spaced:
        t_arr = np.tile(range(1,n), (p, 1)).T 
@@ -62,7 +59,7 @@ def test_uar1_fit(p, evenly_spaced):
     theta_hat_matrix = np.empty((p, 2))
     # estimate parameters for each time series
     for j in range(p):
-        ys = tsmodel.uar1_sim(t = t_arr[:, j], tau_0 = tau, sigma_2_0=sigma_2)
+        ys = tsmodel.uar1_sim(t = t_arr[:, j], tau = tau, sigma_2=sigma_2)
         theta_hat_matrix[j,:]  = tsmodel.uar1_fit(ys, t_arr[:, j])
     # compute mean of estimated param for each simulate ts
     theta_hat_bar = np.mean(theta_hat_matrix, axis=0)

@@ -721,10 +721,10 @@ def uar1_sim(t, tau, sigma_2=1):
     # fill the array
     for j in range(p):  # Note: this shouldn't work but it does!
         for i in range(1, n): 
-            delta_i = t[i] - t[i-1] 
+            delta_i = t[i,j] - t[i-1,j] 
             phi = np.exp(-delta_i / tau)
             sigma_i = np.sqrt(sigma_2 * (1-phi**2))
-            y[i] = phi * y[i-1] + sigma_i * z[i]  
+            y[i,j] = phi * y[i-1,j] + sigma_i * z[i,j]  
     
     y = np.squeeze(y) # squeeze superfluous dimensions
     return y
@@ -732,7 +732,7 @@ def uar1_sim(t, tau, sigma_2=1):
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))
 
-def random_time_index(n, delta_t_dist = "exponential", param = [1]):
+def random_time_index(n, delta_t_dist = "exponential", param = [1.0]):
     '''
     Generate a random time index vector according to a specific probability model
 

@@ -14,7 +14,8 @@ import warnings
 supported_surrogates = frozenset(['ar1sim','phaseran', 'uar1']) # broadcast all supported surrogates as global variable, for exception handling
 
 class SurrogateSeries(EnsembleSeries):
-    ''' Object containing surrogate timeseries, obtained by emulating an existing series, or more a statistical model
+    ''' Object containing surrogate timeseries, obtained either by emulating an 
+    existing series (see `from_series()`) or from a parametric model (see `from_params()`)
 
     Surrogate Series is a child of EnsembleSeries. All methods available for EnsembleSeries are available for surrogate series.
     
@@ -49,15 +50,16 @@ class SurrogateSeries(EnsembleSeries):
         self.number = number
         
         # refine the display name
-        if method == 'ar1sim':
-            self.label = str(label or "series") + " surrogates [AR(1) MoM]"
-        elif method == 'phaseran':
-            self.label = str(label or "series") + " surrogates [phase-randomized]"
-        elif method == 'uar1':
-            self.label = str(label or "series") + " surrogates [AR(1) MLE]"
-        else:
-            raise ValueError(f"Unknown method: {self.method}. Please use one of {supported_surrogates}")
-            
+        if label is None:
+            if method == 'ar1sim':
+                self.label =  "AR(1) surrogates (MoM)"
+            elif method == 'phaseran':
+                self.label = "phase-randomized surrogates"
+            elif method == 'uar1':
+                self.label = "AR(1) surrogates (MLE)"
+            else:
+                raise ValueError(f"Unknown method: {self.method}. Please use one of {supported_surrogates}")
+                
     def from_series(self, target_series, seed=None):
         '''
         Fashion the SurrogateSeries object after a target series
@@ -101,9 +103,6 @@ class SurrogateSeries(EnsembleSeries):
         if seed is not None:
             np.random.seed(seed)
         
-        # generate time axes according to provided pattern
-        times = np.tile(target_series.time, (self.number, 1)).T  
-        
         # apply surrogate method
         if self.method == 'ar1sim':
                 y_surr = tsmodel.ar1_sim(target_series.value, self.number, target_series.time)  
@@ -117,18 +116,23 @@ class SurrogateSeries(EnsembleSeries):
         elif self.method == 'uar1':
             # estimate theta with MLE
             tau, sigma_2 = tsmodel.uar1_fit(target_series.value, target_series.time)
+            # generate time axes according to provided pattern
+            times = np.squeeze(np.tile(target_series.time, (self.number, 1)).T)  
+            # generate matrix
             y_surr = tsmodel.uar1_sim(t = times, tau=tau, sigma_2=sigma_2)
-
-        s_list = []
-        for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
-            ts = Series(time=t, value=y,  
-                           time_name=target_series.time_name,
-                           time_unit=target_series.time_unit,
-                           value_name=target_series.value_name,
-                           value_unit=target_series.value_unit,
-                           label = str(target_series.label or '') + " surr #" + str(i+1),
-                           verbose=False, auto_time_params=False)
-            s_list.append(ts)
+        
+        if self.number > 1:
+            s_list = []
+            for i, y in enumerate(y_surr.T):
+                ts = target_series.copy() # copy Series
+                ts.value = y # replace value with y_surr column
+                ts.label = str(target_series.label or '') + " surr #" + str(i+1)
+                s_list.append(ts)
+        else:
+            ts = target_series.copy() # copy Series
+            ts.value = y_surr # replace value with y_surr column
+            ts.label = str(target_series.label or '') + " surr" 
+            s_list = [ts]
 
         self.series_list = s_list
                   
@@ -148,7 +152,7 @@ class SurrogateSeries(EnsembleSeries):
             The pattern used to generate the surrogate time axes
             * 'even' uses an evenly-spaced time with spacing `delta_t` specified in settings (if not specified, defaults to 1.0)
             * 'random' uses random_time_index() with specified distribution and parameters 
-               Relevant settings are `delta_t_dist` and `param`. (default: 'exponential' with parameter = 1)
+               Relevant settings are `delta_t_dist` and `param`. (default: 'exponential' with parameter = 1.0)
             * 'specified': uses time axis `time` from `settings`.  
             
         seed : int
@@ -201,20 +205,19 @@ class SurrogateSeries(EnsembleSeries):
                 times =  np.tile(settings["time"], (self.number, 1)).T  
         else:
             raise ValueError(f"Unknown time pattern: {time_pattern}")
-        
          
         # apply surrogate method
         y_surr = np.empty_like(times)                 
         
-        if self.method == 'uar1' or 'ar1sim':
+        if self.method in ['uar1','ar1sim']: #
             if nparams<2:
                 warnings.warn(f'The AR(1) model needs 2 parameters, tau and sigma2 (in that order); {nparams} provided. default values used',UserWarning, stacklevel=2)
                 params = [5,0.5]
             y_surr = tsmodel.uar1_sim(t = times, tau=params[0], sigma_2=params[1])
                 
-        elif self.method == 'phaseran':
+        elif self.method == 'phaseran':  
             raise ValueError("Phase-randomization is only available in from_series().")
-
+        
         # create the series_list    
         s_list = []
         for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
