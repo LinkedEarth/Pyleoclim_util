@@ -3349,9 +3349,10 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran', timespan=None,  
-                    settings=None, common_time_kwargs=None, seed=None, mute_pbar=False):
-        ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID).
+    def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran',
+                    number=1000, timespan=None,  settings=None, seed=None, 
+                    common_time_kwargs=None, mute_pbar=False):
+        ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID) as per [1]
 
         The significance of the correlation is assessed using one of the following methods:
 
@@ -3384,8 +3385,10 @@ class Series:
 
         method : str, {'ttest','built-in','ar1sim','phaseran'}
             method for significance testing. Default is 'phaseran'
-            'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
-            'built-in' uses the p-value that ships with the SciPy function.
+            * 'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
+            * 'built-in' uses the p-value that ships with the SciPy function.
+            * 'ar1sim' (formerly 'isopersistent') tests against an ensemble of AR(1) seires fitted to the originals  
+            * 'phaseran' (formerly 'isospectral') tests against phase-randomized surrogates (aka the method of Ebisuzaki [2])
             The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning.
             Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.
 
@@ -3394,12 +3397,9 @@ class Series:
 
         settings : dict
             Parameters for the correlation function, including:
-
-            nsim : int
-                the number of simulations (default: 1000)
-            surr_settings : dict
-                Parameters for surrogate generator. See individual methods for details.
-
+             * nsim (number of simulations)        
+             NB: this is superseded by `number`
+             
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
 
@@ -3439,11 +3439,15 @@ class Series:
         References
         ----------
         [1] Hu, J., J. Emile-Geay, and J. Partin (2017), Correlation-based interpretations of paleoclimate data – where statistics meet past climates, Earth and Planetary Science Letters, 459, 362–371, doi:10.1016/j.epsl.2016.11.048.
-
+        
+        [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correla- tion when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
+        
         Examples
         --------
 
-        Correlation between the Nino3.4 index and the Deasonalized All Indian Rainfall Index
+        Let us compute the correlation between the Nino3.4 index and the Deasonalized All Indian Rainfall Index.
+        For expendiency, we limit the Monte Carlo tests to 20 surrogates, which is not sufficient to obtain accurate p-values. 
+        The default number, 1000, is more respectable, though to avoid p-hacking, we recommend bumping it even higher if at all possible. 
 
         .. jupyter-execute::
 
@@ -3451,26 +3455,25 @@ class Series:
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
-            # with `nsim=20` and default `method='phaseran'`
-            # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
+            # with  20 surrogates and the default significance method, 'phaseran'`
+            corr_res = ts_nino.correlation(ts_air, number=20)
             print(corr_res)
 
-            # changing the statistic
-            corr_res = ts_nino.correlation(ts_air, statistic='kendalltau')
-            print(corr_res)
-
-            # using a simple t-test with DOFs adjusted for autocorrelation
-            # set an arbitrary random seed to fix the result
+            # using a simple t-test with DOFs adjusted for autocorrelation (only with Person's r')
             corr_res = ts_nino.correlation(ts_air, method='ttest')
             print(corr_res)
 
             # using  "isopersistent" surrogates (AR(1) simulation)
-            # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, method = 'ar1sim', settings={'nsim': 20}, seed=2333)
+            # and setting an arbitrary random seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, method = 'ar1sim', number=20, seed=2333)
+            print(corr_res)
+            
+            # changing the statistic works with all surrogate-based significance methods (but not the 'ttest' method, which only applies to a 'pearsonr' statistic)
+            corr_res = ts_nino.correlation(ts_air, statistic='kendalltau', method = 'phaseran', number=20)
             print(corr_res)
 
         '''
+        from ..core.surrogateseries import SurrogateSeries, supported_surrogates
         if method == 'isospectral':
             warnings.warn("isospectral is deprecated and was replaced by 'phaseran'",
                           DeprecationWarning, stacklevel=2)
@@ -3481,8 +3484,6 @@ class Series:
             method = 'ar1sim'
 
         settings = {} if settings is None else settings.copy()
-        #corr_args = {'alpha': alpha, 'method': method}
-        #corr_args.update(settings)
 
         ms = MultipleSeries([self, target_series])
         if list(self.time) != list(target_series.time):
@@ -3502,8 +3503,12 @@ class Series:
             np.random.seed(seed)
 
         if method == 'ttest':
-            stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
-            signif = bool(signf)
+            if statistic == 'pearsonr':
+                stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+                signif = bool(signf)
+            else:
+                raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
+                
         elif method == 'built-in':
             if statistic == 'weightedtau':
                 raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
@@ -3512,27 +3517,22 @@ class Series:
                 stat = res[0]
                 pval = res.pvalue if len(res) > 1 else np.nan
                 signif = pval <= alpha
-        elif method in supported_surrogates:
+        elif method in supported_surrogates:      
             if 'nsim' in settings.keys():
                 number = settings['nsim']
-                settings.pop('nsim')
+                #settings.pop('nsim')
             else:
-                number = 1000
+                number = number
                 
-            settings['seed'] = seed
-            settings['method'] = method
-            settings['number'] = number
-            #number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
-            #seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
-            #method = corr_args['method'] if 'method' in corr_args.keys() else None
-            #surr_settings = corr_args['surr_settings'] if 'surr_settings' in corr_args.keys() else None
-
             # compute correlation statistic
             stat = corrutils.association(ts0.value,ts1.value,statistic)[0]
-
-            ts0_surr = ts0.surrogates(**settings)
-            ts1_surr = ts1.surrogates(**settings)
+            
+            # establish significance against surrogates
             stat_surr = np.empty((number))
+            ts0_surr = SurrogateSeries(method=method,number=number)
+            ts0_surr.from_series(ts0)
+            ts1_surr = SurrogateSeries(method=method,number=number)
+            ts1_surr.from_series(ts1)
             for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
                 stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
                                                      ts1_surr.series_list[i].value,statistic)[0]

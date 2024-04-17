@@ -25,14 +25,10 @@ import os
 import pathlib
 test_dirpath = pathlib.Path(__file__).parent.absolute()
 
-#from urllib.request import urlopen
 
 import pyleoclim as pyleo
-#import pyleoclim.utils.tsmodel as tsmodel
 import pyleoclim.utils.tsbase as tsbase
 
-#from statsmodels.tsa.arima_process import arma_generate_sample
-#from scipy.stats import expon
 
 
 # a collection of useful functions
@@ -586,9 +582,10 @@ class TestUISeriesSummaryPlot:
 class TestUISeriesCorrelation:
     ''' Test Series.correlation()
     '''
-    @pytest.mark.parametrize('corr_method', ['ttest','built-in','ar1sim','phaseran'])
-    def test_correlation_t0a(self, corr_method, eps=0.1):
-        ''' Test various correlation methods
+    @pytest.mark.parametrize('sig_method', ['ttest','built-in','ar1sim','phaseran'])
+    @pytest.mark.parametrize('number', [2,5])
+    def test_correlation_t0a(self, sig_method, number, eps=0.1):
+        ''' Test the various significance methods
         '''
         nt = 100
         rho = 0.4 # target correlation
@@ -597,11 +594,11 @@ class TestUISeriesCorrelation:
         v = rho*ts1.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
         ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
 
-        corr_res = ts1.correlation(ts2, method= corr_method)
+        corr_res = ts1.correlation(ts2, method= sig_method, number=number)
         assert np.abs(rho-corr_res.r) < eps
         
-    @pytest.mark.parametrize('corr_method', ['isopersistent', 'isospectral'])
-    def test_correlation_t0b(self, corr_method,eps=0.1):
+    @pytest.mark.parametrize('sig_method', ['isopersistent', 'isospectral'])
+    def test_correlation_t0b(self, sig_method,eps=0.1):
         ''' Test that deprecated method names get a proper warning
         '''
         nt = 100
@@ -610,28 +607,11 @@ class TestUISeriesCorrelation:
         v = rho*ts1.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
         ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
         with pytest.deprecated_call():
-            corr_res = ts1.correlation(ts2, method= corr_method)
+            corr_res = ts1.correlation(ts2, method= sig_method, number=2)
         assert np.abs(rho-corr_res.r) < eps
 
-    # @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
-    # def test_correlation_t1(self, corr_method, eps=1):
-    #     ''' Generate two colored noise series calculate their correlation
-    #     '''
-    #     alpha = 1
-    #     nt = 1000
-    #     ts = gen_ts(nt=nt,alpha=alpha)
-    #     v1 = ts.value + np.random.normal(loc=0, scale=1, size=nt)
-    #     v2 = ts.value + np.random.normal(loc=0, scale=2, size=nt)
-
-    #     ts1 = pyleo.Series(time=ts.time, value=v1)
-    #     ts2 = pyleo.Series(time=ts.time, value=v2)
-
-    #     corr_res = ts1.correlation(ts2, settings={'method': corr_method})
-    #     r = corr_res.r
-    #     assert np.abs(r-0) < eps
-
-    @pytest.mark.parametrize('corr_method', ['ttest','built-in','ar1sim','phaseran'])
-    def test_correlation_t2(self, corr_method, eps=0.5):
+    @pytest.mark.parametrize('sig_method', ['ttest','built-in','ar1sim','phaseran'])
+    def test_correlation_t1(self, sig_method, eps=0.5):
         ''' Test correlation between two series with inconsistent time axis
         '''
         
@@ -651,18 +631,18 @@ class TestUISeriesCorrelation:
 
         ts1_evenly = pyleo.Series(time=t, value=air)
         ts2_evenly = pyleo.Series(time=t, value=nino)
-        corr_res_evenly = ts1_evenly.correlation(ts2_evenly, method=corr_method)
+        corr_res_evenly = ts1_evenly.correlation(ts2_evenly, method=sig_method,number=2)
         r_evenly = corr_res_evenly.r
 
-        ts1 = pyleo.Series(time=air_time_unevenly, value=air_value_unevenly)
-        ts2 = pyleo.Series(time=nino_time_unevenly, value=nino_value_unevenly)
+        ts1 = pyleo.Series(time=air_time_unevenly, value=air_value_unevenly, verbose=False, auto_time_params=True)
+        ts2 = pyleo.Series(time=nino_time_unevenly, value=nino_value_unevenly, verbose=False, auto_time_params=True)
 
-        corr_res = ts1.correlation(ts2, method=corr_method, common_time_kwargs={'method': 'interp'})
+        corr_res = ts1.correlation(ts2, method=sig_method, number=2, common_time_kwargs={'method': 'interp'})
         r = corr_res.r
         assert np.abs(r-r_evenly) < eps
     
     @pytest.mark.parametrize('stat', ['linregress','pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau'])
-    def test_correlation_t3(self, stat, eps=0.2):
+    def test_correlation_t2(self, stat, eps=0.2):
         ''' Test that various statistics can be used
         https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
         '''
@@ -674,10 +654,23 @@ class TestUISeriesCorrelation:
         ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
         
         if stat == 'weightedtau':
-            corr_res = ts1.correlation(ts2, statistic=stat,settings={'nsim':20})
+            corr_res = ts1.correlation(ts2, statistic=stat,number = 2)
         else:
             corr_res = ts1.correlation(ts2, statistic=stat, method='built-in')
         assert np.abs(rho-corr_res.r) < eps
+        
+    def test_correlation_t3(self, eps=0.1, nt=10):
+        ''' Test that t-test screams at the user if a non-pearson statistic is requested
+        '''
+        rho = 0.4 # target correlation
+        ts1 = gen_ts(nt=nt, alpha=1,seed=333).standardize()
+        # generate series whose correlation with ts1 should be close to rho:
+        v = rho*ts1.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
+        ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
+        with pytest.raises(ValueError):  
+            corr_res = ts1.correlation(ts2, statistic='kendalltau', method= 'ttest')
+                                       
+        
         
 
 class TestUISeriesCausality:
