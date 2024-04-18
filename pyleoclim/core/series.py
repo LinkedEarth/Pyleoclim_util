@@ -3396,9 +3396,7 @@ class Series:
             The time interval over which to perform the calculation
 
         settings : dict
-            Parameters for the correlation function, including:
-             * nsim (number of simulations)        
-             NB: this is superseded by `number`
+            optional parameters for the measures of association. See https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
              
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
@@ -3469,8 +3467,14 @@ class Series:
             print(corr_res)
             
             # changing the statistic works with all surrogate-based significance methods (but not the 'ttest' method, which only applies to a 'pearsonr' statistic)
-            corr_res = ts_nino.correlation(ts_air, statistic='kendalltau', method = 'phaseran', number=20)
+            corr_res = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'phaseran', number=20)
             print(corr_res)
+            
+            # To use the built-in signficance test:
+            corr_res2s = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'built-in')
+            # To modify the method, use `settings`. For instance, to specify a 1-sided test instead of a 2-sided one for Spearman's R:
+            corr_res1s = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'built-in', settings={'alternative':'less'})
+            print(corr_res1s.p-corr_res2s.p) # shows the difference in p-values
 
         '''
         from ..core.surrogateseries import SurrogateSeries, supported_surrogates
@@ -3513,19 +3517,20 @@ class Series:
             if statistic == 'weightedtau':
                 raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
             else:
-                res = corrutils.association(ts0.value,ts1.value,statistic)
+                res = corrutils.association(ts0.value,ts1.value,statistic, settings)
                 stat = res[0]
                 pval = res.pvalue if len(res) > 1 else np.nan
                 signif = pval <= alpha
         elif method in supported_surrogates:      
-            if 'nsim' in settings.keys():
+            if 'nsim' in settings.keys(): # for legacy reasons
+                raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
                 number = settings['nsim']
-                #settings.pop('nsim')
+                settings.pop('nsim')
             else:
                 number = number
                 
             # compute correlation statistic
-            stat = corrutils.association(ts0.value,ts1.value,statistic)[0]
+            stat = corrutils.association(ts0.value,ts1.value,statistic,settings)[0]
             
             # establish significance against surrogates
             stat_surr = np.empty((number))
@@ -3535,7 +3540,7 @@ class Series:
             ts1_surr.from_series(ts1)
             for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
                 stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
-                                                     ts1_surr.series_list[i].value,statistic)[0]
+                                                     ts1_surr.series_list[i].value,statistic, settings)[0]
             # obtain p-value
             pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
             # establish significance
