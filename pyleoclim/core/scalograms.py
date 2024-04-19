@@ -482,6 +482,7 @@ class Scalogram:
             scalogram = ts.wavelet().signif_test(number=2, export_scal=True)
 
         '''
+        
         if self.wave_method == 'wwz' and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the wwz method')
 
@@ -490,6 +491,7 @@ class Scalogram:
                 raise ValueError(f"The available methods are: {acceptable_methods}")
 
         if method in ['ar1sim','uar1'] :
+            from ..core.surrogateseries import SurrogateSeries
 
             if hasattr(self,'signif_scals'):
                 signif_scals = self.signif_scals
@@ -517,14 +519,14 @@ class Scalogram:
                     number -= len(scalogram_list)
                     surr_scal_tmp = []
                     surr_scal_tmp.extend(scalogram_list)
-                    surr = self.timeseries.surrogates(number=number, seed=seed,
-                                                      method=method, settings=settings)
+                    surr = SurrogateSeries(method=method,number=number, seed=seed)
+                    surr.from_series(self.timeseries)
 
                     surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args).scalogram_list)
                     surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
             else:
-                surr = self.timeseries.surrogates(number=number, seed=seed,
-                                                  method=method, settings=settings)
+                surr = SurrogateSeries(method=method,number=number, seed=seed)
+                surr.from_series(self.timeseries)
                 surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args)
 
             if type(qs) is not list:

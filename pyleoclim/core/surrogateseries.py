@@ -20,7 +20,7 @@ class SurrogateSeries(EnsembleSeries):
     Surrogate Series is a child of EnsembleSeries. All methods available for EnsembleSeries are available for surrogate series.
     
     '''
-    def __init__(self, series_list=[], number=1, method=None, label=None, param=[]): 
+    def __init__(self, series_list=[], number=1, method=None, label=None, param=None, seed=None): 
         '''
         Initiatlize a SurrogateSeries object. The parameters below are then used for series generation and labeling. 
 
@@ -52,6 +52,7 @@ class SurrogateSeries(EnsembleSeries):
         self.method = method
         self.param = param
         self.number = number
+        self.seed = seed
         
         if param is not None:
             nparam = len(param)
@@ -73,7 +74,7 @@ class SurrogateSeries(EnsembleSeries):
             else:
                 raise ValueError(f"Unknown method: {self.method}. Please use one of {supported_surrogates}")
                 
-    def from_series(self, target_series, seed=None):
+    def from_series(self, target_series):
         '''
         Fashion the SurrogateSeries object after a target series
 
@@ -113,8 +114,8 @@ class SurrogateSeries(EnsembleSeries):
         if not isinstance(target_series, Series):
             raise TypeError(f"Expected pyleo.Series, got: {type(target_series)}")
             
-        if seed is not None:
-            np.random.seed(seed)
+        if self.seed is not None:
+            np.random.default_rng(self.seed)
         
         # apply surrogate method
         if self.method == 'ar1sim':
@@ -150,7 +151,7 @@ class SurrogateSeries(EnsembleSeries):
 
         self.series_list = s_list
                   
-    def from_param(self, param, length=50, time_pattern = 'even', seed=None, settings=None):
+    def from_param(self, param, length=50, time_pattern = 'even', settings=None):
         '''
         Simulate the SurrogateSeries from a parametric model
 
@@ -198,8 +199,8 @@ class SurrogateSeries(EnsembleSeries):
         
         settings = {} if settings is None else settings.copy()
         
-        if seed is not None:
-            np.random.seed(seed)
+        if self.seed is not None:
+            np.random.default_rng(self.seed)
         
         # generate time axes according to provided pattern
         if time_pattern == "even":
@@ -225,7 +226,7 @@ class SurrogateSeries(EnsembleSeries):
         
         if self.method in ['uar1','ar1sim']: #
             if nparam<2:
-                warnings.warn(f'The AR(1) model needs 2 parameters, tau and sigma2 (in that order); {nparam} provided. default values used',UserWarning, stacklevel=2)
+                warnings.warn(f'The AR(1) model needs 2 parameters, tau and sigma2 (in that order); {nparam} provided. default values used, tau=5, sigma=0.5',UserWarning, stacklevel=2)
                 param = [5,0.5]
             y_surr = tsmodel.uar1_sim(t = times, tau=param[0], sigma_2=param[1])
                 
@@ -237,7 +238,7 @@ class SurrogateSeries(EnsembleSeries):
         for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
             ts = Series(time=t, value=y,  
                            label = str(self.label or '') + " surr #" + str(i+1),
-                           verbose=False, auto_time_param=True)
+                           verbose=False, auto_time_params=True)
             s_list.append(ts)
 
         self.series_list = s_list

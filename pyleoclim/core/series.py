@@ -3479,11 +3479,11 @@ class Series:
         '''
         from ..core.surrogateseries import SurrogateSeries, supported_surrogates
         if method == 'isospectral':
-            warnings.warn("isospectral is deprecated and was replaced by 'phaseran'",
+            warnings.warn("isospectral is now 'phaseran'",
                           DeprecationWarning, stacklevel=2)
             method = 'phaseran'
         elif method == 'isopersistent':
-            warnings.warn("isopersistent is deprecated and was replaced by 'ar1sim'",
+            warnings.warn("isopersistent is now 'ar1sim'",
                           DeprecationWarning, stacklevel=2)
             method = 'ar1sim'
 

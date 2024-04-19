@@ -1,10 +1,6 @@
 from ..utils import plotting
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
-#from ..utils import tsbase
-
-#from ..core.multiplepsd import *
-#import ..core.multiplepsd
 
 
 import matplotlib.pyplot as plt
@@ -15,28 +11,6 @@ from tqdm import tqdm
 import warnings
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
-
-
-# def infer_period_unit_from_time_unit(time_unit):
-#     ''' infer a period unit based on the given time unit
-
-#     '''
-#     if time_unit is None:
-#         period_unit = None
-#     else:
-#         unit_group = lipdutils.timeUnitsCheck(time_unit)
-#         if unit_group != 'unknown':
-#             if unit_group == 'kage_units':
-#                 period_unit = 'kyrs'
-#             else:
-#                 period_unit = 'yrs'
-#         else:
-#             if time_unit[-1] == 's':
-#                 period_unit = time_unit
-#             else:
-#                 period_unit = f'{time_unit}s'
-
-#     return period_unit
 
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
@@ -273,6 +247,7 @@ class PSD:
         pyleoclim.core.series.Series.wavelet : Performs wavelet analysis on Pyleoclim Series
 
         '''
+        from ..core.surrogateseries import SurrogateSeries
 
         if self.spec_method == 'wwz' and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the wwz method')
@@ -300,10 +275,9 @@ class PSD:
                 return self
 
             new = self.copy()
-            surr = self.timeseries.surrogates(
-                number=number, seed=seed, method=method, settings=settings
-            )
-
+            surr = SurrogateSeries(method=method,number=number, seed=seed)
+            surr.from_series(self.timeseries)
+            
             if signif_scals:
                 surr_psd = surr.spectral(
                     method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals

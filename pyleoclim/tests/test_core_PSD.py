@@ -15,23 +15,15 @@ Notes on how to test:
 import pytest
 import pyleoclim as pyleo
 
-def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
-    'wrapper for gen_ts in pyleoclim'
-    
-    t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v, auto_time_params=True,verbose=False)
-    return ts
-
-
 # Tests below
 class TestUiPsdPlot:
     ''' Tests for PSD.plot()
     '''
 
-    def test_plot_t0(self):
+    def test_plot_t0(self, gen_ts):
         ''' Test PSD.plot() with default parameters
         '''
-        ts = gen_ts(nt=500)
+        ts = gen_ts
         psd = ts.spectral(method='mtm')
         fig, ax = psd.plot()
         pyleo.closefig(fig)
@@ -40,10 +32,10 @@ class TestUiPsdSignifTest:
     ''' Tests for PSD.signif_test()
     '''
     @pytest.mark.parametrize('method',['ar1sim','uar1','ar1asym'])
-    def test_signif_test_t0(self,method):
+    def test_signif_test_t0(self,method,gen_ts):
         ''' Test PSD.signif_test() with default parameters
         '''
-        ts = gen_ts(nt=500)
+        ts = gen_ts
         psd = ts.spectral(method='mtm')
         psd_signif = psd.signif_test(number=10,method=method)
         fig, ax = psd_signif.plot()
