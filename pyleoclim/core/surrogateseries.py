@@ -200,7 +200,7 @@ class SurrogateSeries(EnsembleSeries):
         settings = {} if settings is None else settings.copy()
         
         if self.seed is not None:
-            np.random.default_rng(self.seed)
+            np.random.seed(self.seed)
         
         # generate time axes according to provided pattern
         if time_pattern == "even":
