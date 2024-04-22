@@ -24,9 +24,7 @@ from ..core.multipleseries import MultipleSeries
 from ..core.scalograms import Scalogram
 from ..core.coherence import Coherence
 from ..core.corr import Corr
-from ..core.surrogateseries import SurrogateSeries
 from ..core.resolutions import Resolution
-from ..core.surrogateseries import supported_surrogates
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -3351,9 +3349,10 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran', timespan=None,  
-                    settings=None, common_time_kwargs=None, seed=None, mute_pbar=False):
-        ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID).
+    def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran',
+                    number=1000, timespan=None,  settings=None, seed=None, 
+                    common_time_kwargs=None, mute_pbar=False):
+        ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID) as per [1]
 
         The significance of the correlation is assessed using one of the following methods:
 
@@ -3386,8 +3385,10 @@ class Series:
 
         method : str, {'ttest','built-in','ar1sim','phaseran'}
             method for significance testing. Default is 'phaseran'
-            'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
-            'built-in' uses the p-value that ships with the SciPy function.
+            * 'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
+            * 'built-in' uses the p-value that ships with the SciPy function.
+            * 'ar1sim' (formerly 'isopersistent') tests against an ensemble of AR(1) seires fitted to the originals  
+            * 'phaseran' (formerly 'isospectral') tests against phase-randomized surrogates (aka the method of Ebisuzaki [2])
             The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning.
             Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.
 
@@ -3395,15 +3396,8 @@ class Series:
             The time interval over which to perform the calculation
 
         settings : dict
-            Parameters for the correlation function, including:
-
-            nsim : int
-                the number of simulations (default: 1000)
-            method : str, {'ttest','ar1sim','phaseran' (default)}
-                method for significance testing
-            surr_settings : dict
-                Parameters for surrogate generator. See individual methods for details.
-
+            optional parameters for the measures of association. See https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+             
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
 
@@ -3443,11 +3437,15 @@ class Series:
         References
         ----------
         [1] Hu, J., J. Emile-Geay, and J. Partin (2017), Correlation-based interpretations of paleoclimate data – where statistics meet past climates, Earth and Planetary Science Letters, 459, 362–371, doi:10.1016/j.epsl.2016.11.048.
-
+        
+        [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correla- tion when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
+        
         Examples
         --------
 
-        Correlation between the Nino3.4 index and the Deasonalized All Indian Rainfall Index
+        Let us compute the correlation between the Nino3.4 index and the Deasonalized All Indian Rainfall Index.
+        For expendiency, we limit the Monte Carlo tests to 20 surrogates, which is not sufficient to obtain accurate p-values. 
+        The default number, 1000, is more respectable, though to avoid p-hacking, we recommend bumping it even higher if at all possible. 
 
         .. jupyter-execute::
 
@@ -3455,38 +3453,41 @@ class Series:
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
-            # with `nsim=20` and default `method='phaseran'`
-            # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
+            # with  20 surrogates and the default significance method, 'phaseran'`
+            corr_res = ts_nino.correlation(ts_air, number=20)
             print(corr_res)
 
-            # changing the statistic
-            corr_res = ts_nino.correlation(ts_air, statistic='kendalltau')
-            print(corr_res)
-
-            # using a simple t-test with DOFs adjusted for autocorrelation
-            # set an arbitrary random seed to fix the result
+            # using a simple t-test with DOFs adjusted for autocorrelation (only with Person's r')
             corr_res = ts_nino.correlation(ts_air, method='ttest')
             print(corr_res)
 
             # using  "isopersistent" surrogates (AR(1) simulation)
-            # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, method = 'ar1sim', settings={'nsim': 20}, seed=2333)
+            # and setting an arbitrary random seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, method = 'ar1sim', number=20, seed=2333)
             print(corr_res)
+            
+            # changing the statistic works with all surrogate-based significance methods (but not the 'ttest' method, which only applies to a 'pearsonr' statistic)
+            corr_res = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'phaseran', number=20)
+            print(corr_res)
+            
+            # To use the built-in signficance test:
+            corr_res2s = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'built-in')
+            # To modify the method, use `settings`. For instance, to specify a 1-sided test instead of a 2-sided one for Spearman's R:
+            corr_res1s = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'built-in', settings={'alternative':'less'})
+            print(corr_res1s.p-corr_res2s.p) # shows the difference in p-values
 
         '''
+        from ..core.surrogateseries import SurrogateSeries, supported_surrogates
         if method == 'isospectral':
-            warnings.warn("isospectral is deprecated and was replaced by 'phaseran'",
+            warnings.warn("isospectral is now 'phaseran'",
                           DeprecationWarning, stacklevel=2)
             method = 'phaseran'
         elif method == 'isopersistent':
-            warnings.warn("isopersistent is deprecated and was replaced by 'ar1sim'",
+            warnings.warn("isopersistent is now 'ar1sim'",
                           DeprecationWarning, stacklevel=2)
             method = 'ar1sim'
 
         settings = {} if settings is None else settings.copy()
-        corr_args = {'alpha': alpha, 'method': method}
-        corr_args.update(settings)
 
         ms = MultipleSeries([self, target_series])
         if list(self.time) != list(target_series.time):
@@ -3506,33 +3507,40 @@ class Series:
             np.random.seed(seed)
 
         if method == 'ttest':
-            stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
-            signif = bool(signf)
+            if statistic == 'pearsonr':
+                stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+                signif = bool(signf)
+            else:
+                raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
+                
         elif method == 'built-in':
             if statistic == 'weightedtau':
                 raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
             else:
-                res = corrutils.association(ts0.value,ts1.value,statistic)
+                res = corrutils.association(ts0.value,ts1.value,statistic, settings)
                 stat = res[0]
                 pval = res.pvalue if len(res) > 1 else np.nan
                 signif = pval <= alpha
-        elif method in supported_surrogates:
-            number = corr_args['nsim'] if 'nsim' in corr_args.keys() else 1000
-            seed = corr_args['seed'] if 'seed' in corr_args.keys() else None
-            #method = corr_args['method'] if 'method' in corr_args.keys() else None
-            surr_settings = corr_args['surr_settings'] if 'surr_settings' in corr_args.keys() else None
-
+        elif method in supported_surrogates:      
+            if 'nsim' in settings.keys(): # for legacy reasons
+                raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
+                number = settings['nsim']
+                settings.pop('nsim')
+            else:
+                number = number
+                
             # compute correlation statistic
-            stat = corrutils.association(ts0.value,ts1.value,statistic)[0]
-
-            ts0_surr = ts0.surrogates(number=number, seed=seed,
-                                                 method=method, settings=surr_settings)
-            ts1_surr = ts1.surrogates(number=number, seed=seed,
-                                                 method=method, settings=surr_settings)
+            stat = corrutils.association(ts0.value,ts1.value,statistic,settings)[0]
+            
+            # establish significance against surrogates
             stat_surr = np.empty((number))
+            ts0_surr = SurrogateSeries(method=method,number=number)
+            ts0_surr.from_series(ts0)
+            ts1_surr = SurrogateSeries(method=method,number=number)
+            ts1_surr.from_series(ts1)
             for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
                 stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
-                                                     ts1_surr.series_list[i].value,statistic)[0]
+                                                     ts1_surr.series_list[i].value,statistic, settings)[0]
             # obtain p-value
             pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
             # establish significance
@@ -3642,135 +3650,119 @@ class Series:
         causal_res = spec_func[method](value1, value2, **args[method])
         return causal_res
 
-    def surrogates(self, method='ar1sim', number=1, time_pattern='match',
-                   length=None, seed=None, settings=None):
-        ''' Generate surrogates of the Series object according to "method"
+    # def surrogates(self, method='ar1sim', number=1, time_pattern='match',
+    #                length=None, seed=None, settings=None):
+    #     ''' Generate surrogates of the Series object according to "method"
 
-            For now, assumes uniform spacing and increasing time axis
+    #         For now, assumes uniform spacing and increasing time axis
 
-        Parameters
-        ----------
+    #     Parameters
+    #     ----------
 
-        method : {ar1sim, phaseran, uar1}
-            The method used to generate surrogates of the timeseries
+        
 
-            Note that phaseran assumes an odd number of samples. If the series
-            has even length, the last point is dropped to satisfy this requirement
+    #     time_pattern : str {match, even, random}
+    #         The pattern used to generate the surrogate time axes
+    #         'match' uses the same pattern as the original Series
+    #         'even' uses an evenly-spaced time with spacing delta_t specified in settings (will return error if not specified)
+    #         'random' uses random_time_index() with specified distribution and parameters (default: 'exponential' with parameter 1)
 
-        number : int
-            The number of surrogates to generate
+    #     length : int
+    #         Length of the series
 
-        time_pattern : str {match, even, random}
-            The pattern used to generate the surrogate time axes
-            'match' uses the same pattern as the original Series
-            'even' uses an evenly-spaced time with spacing delta_t specified in settings (will return error if not specified)
-            'random' uses random_time_index() with specified distribution and parameters (default: 'exponential' with parameter 1)
+    #     seed : int
+    #         Control seed option for reproducibility
 
-        length : int
-            Length of the series
+    #     settings : dict
+    #         Parameters for surrogate generator. See individual methods for details.
 
-        seed : int
-            Control seed option for reproducibility
+    #     Returns
+    #     -------
+    #     surr : SurrogateSeries
 
-        settings : dict
-            Parameters for surrogate generator. See individual methods for details.
+    #     See also
+    #     --------
 
-        Returns
-        -------
-        surr : SurrogateSeries
+    #     pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
+    #     pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
+    #     pyleoclim.utils.tsutils.phaseran2 : phase randomization
+    #     pyleoclim.utils.tsutils.random_time_index : random time index vector according to a specific probability model
 
-        See also
-        --------
+    #     '''
+    #     settings = {} if settings is None else settings.copy()
 
-        pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
-        pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
-        pyleoclim.utils.tsutils.phaseran2 : phase randomization
-        pyleoclim.utils.tsutils.random_time_index : random time index vector according to a specific probability model
+    #     if seed is not None:
+    #         np.random.seed(seed)
 
-        '''
-        settings = {} if settings is None else settings.copy()
+    #     if length is None:
+    #         n = len(self.value)
+    #     else:
+    #         n = length
 
-        if seed is not None:
-            np.random.seed(seed)
+    #     # generate time axes according to provided pattern
+    #     if time_pattern == "match":
+    #         times = np.tile(self.time, (number, 1)).T
+    #     elif time_pattern == "even":
+    #         if "time_increment" not in settings:
+    #             warnings.warn("'time_increment' not found in the dictionary, default set to 1.",stacklevel=2)
+    #             time_increment = np.median(np.diff(self.time))
+    #         else:
+    #             time_increment = settings["time_increment"]
 
-        if length is None:
-            n = len(self.value)
-        else:
-            n = length
+    #         t = np.cumsum([time_increment]*n)
+    #         times = np.tile(t, (number, 1)).T
+    #     elif time_pattern == "random":
+    #         times = np.zeros((n, number))
+    #         for i in range(number):
+    #             times[:, i] = tsmodel.random_time_index(n = n, **settings) # TODO: check that this does not break when unexpected keywords are passed in `settings`
+    #     else:
+    #         raise ValueError(f"Unknown time pattern: {time_pattern}")
 
-        # generate time axes according to provided pattern
-        if time_pattern == "match":
-            times = np.tile(self.time, (number, 1)).T
-        elif time_pattern == "even":
-            if "time_increment" not in settings:
-                warnings.warn("'time_increment' not found in the dictionary, default set to 1.",stacklevel=2)
-                time_increment = 1
-            else:
-                time_increment = settings["time_increment"]
+    #     # apply surrogate method
+    #     if method == 'ar1sim':
+    #         if time_pattern != 'match':
+    #             raise ValueError('Only a matching time pattern is supported with this method')
+    #         else:
+    #             y_surr = tsmodel.ar1_sim(self.value, number, self.time)  # CHECK: how does this handle the new time?
 
-            t = np.cumsum([time_increment]*n)
-            times = np.tile(t, (number, 1)).T
-        elif time_pattern == "random":
-            times = np.zeros((n, number))
-            for i in range(number):
-                times[:, i] = tsmodel.random_time_index(n = n, **settings) # TODO: check that this does not break when unexpected keywords are passed in `settings`
-        else:
-            raise ValueError(f"Unknown time pattern: {time_pattern}")
+    #     elif method == 'phaseran':
+    #         if self.is_evenly_spaced() and time_pattern != "random":
+    #             y_surr = tsutils.phaseran2(self.value, number)
+    #         else:
+    #             raise ValueError("Phase-randomization presently requires evenly-spaced series.")
 
-        # apply surrogate method
-        if method == 'ar1sim':
-            if time_pattern != 'match':
-                raise ValueError('Only a matching time pattern is supported with this method')
-            else:
-                y_surr = tsmodel.ar1_sim(self.value, number, self.time)  # CHECK: how does this handle the new time?
+    #     elif method == 'uar1':
+    #         # estimate theta with MLE
+    #         theta_hat = tsmodel.uar1_fit(self.value, self.time)
+    #         # generate surrogates
+    #         y_surr = np.empty_like(times)
+    #         for j in range(number):
+    #             y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j],
+    #                                            tau_0=theta_hat[0],sigma_2_0=theta_hat[1])
 
-        elif method == 'phaseran':
-            if self.is_evenly_spaced() and time_pattern != "random":
-                y_surr = tsutils.phaseran2(self.value, number)
-            else:
-                raise ValueError("Phase-randomization presently requires evenly-spaced series.")
+    #     # elif method == 'power-law':
+    #     #     # TODO : implement Stochastic
+    #     # elif method == 'fBm':
+    #     #      # TODO : implement Stochastic
 
-        elif method == 'uar1':
-            # estimate theta with MLE
-            theta_hat = tsmodel.uar1_fit(self.value, self.time)
-            # generate surrogates
-            y_surr = np.empty_like(times)
-            for j in range(number):
-                y_surr[:,j] = tsmodel.uar1_sim(t = times[:,j],
-                                               tau_0=theta_hat[0],sigma_2_0=theta_hat[1])
+    #     # wrap it all up with a bow
+    #     s_list = []
+    #     for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
+    #         ts = Series(time=t, value=y,  
+    #                        time_name=self.time_name,
+    #                        time_unit=self.time_unit,
+    #                        value_name=self.value_name,
+    #                        value_unit=self.value_unit,
+    #                        label = str(self.label or '') + " surr #" + str(i+1),
+    #                        verbose=False, auto_time_params=True)
+    #         s_list.append(ts)
 
-        # elif method == 'power-law':
-        #     # TODO : implement Stochastic
-        # elif method == 'fBm':
-        #      # TODO : implement Stochastic
+    #     surr = SurrogateSeries(series_list=s_list,
+    #                            label = self.label,
+    #                            surrogate_method=method,
+    #                            surrogate_args=settings)
 
-
-        # THIS SHOULD BE UNNECESSARY
-        # # reshape
-        # if len(np.shape(y_surr)) == 1:
-        #     y_surr = y_surr[:, np.newaxis]
-
-        # if len(np.shape(times)) == 1:
-        #     times = times[:, np.newaxis]
-
-        # wrap it all up with a bow
-        s_list = []
-        for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
-            ts = Series(time=t, value=y,  
-                           time_name=self.time_name,
-                           time_unit=self.time_unit,
-                           value_name=self.value_name,
-                           value_unit=self.value_unit,
-                           label = str(self.label or '') + " surr #" + str(i+1),
-                           verbose=False, auto_time_params=True)
-            s_list.append(ts)
-
-        surr = SurrogateSeries(series_list=s_list,
-                               label = self.label,
-                               surrogate_method=method,
-                               surrogate_args=settings)
-
-        return surr
+    #     return surr
 
     def outliers(self,method='kmeans',remove=True, settings=None,
                  fig_outliers=True, figsize_outliers=[10,4], plotoutliers_kwargs=None, savefigoutliers_settings=None,

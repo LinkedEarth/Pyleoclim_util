@@ -14,7 +14,7 @@ from .tsbase import (
     is_evenly_spaced
 )
 from scipy import optimize
-from scipy.optimize import minimize # for MLE estimation of tau_0
+from scipy.optimize import minimize # for MLE estimation of tau
 
 
 __all__ = [
@@ -151,7 +151,7 @@ def ar1_sim(y, p, t=None):
     n = np.size(y)
     ysim = np.empty(shape=(n, p))  # declare array
 
-    sig = np.std(y)
+    sig = np.std(y) # Not MLE estimate in any case
     if is_evenly_spaced(t):
         g = ar1_fit_evenly(y)
 
@@ -179,7 +179,7 @@ def ar1_sim(y, p, t=None):
 def gen_ar1_evenly(t, g, scale=1, burnin=50):
     ''' Generate AR(1) series samples
     
-    MARK FOR DEPRECATION once ar1fit_ml is adopted
+    MARK FOR DEPRECATION once uar1_fit is adopted
 
     Wrapper for the function `statsmodels.tsa.arima_process.arma_generate_sample <https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_process.arma_generate_sample.html>`_.
     used to generate an ARMA
@@ -194,7 +194,7 @@ def gen_ar1_evenly(t, g, scale=1, burnin=50):
         lag-1 autocorrelation
 
     scale : float
-        The standard deviation of noise.
+        The standard deviation of the noise.
 
     burnin : int
         Number of observation at the beginning of the sample to drop. Used to reduce dependence on initial values.
@@ -626,7 +626,7 @@ def n_ll_unevenly_spaced_ar1(theta, y, t):
     Parameters
     ----------
     theta: array, length 2 
-        the first value is tau_0, the second value sigma^2.
+        the first value is tau, the second value sigma^2.
     y: array,length n 
         The vector of observations.
         
@@ -638,12 +638,12 @@ def n_ll_unevenly_spaced_ar1(theta, y, t):
   """
   # define n
   n = len(y)
-  log_tau_0 = theta[0]
-  log_sigma_2_0 = theta[1]
-  tau_0 = np.exp(log_tau_0)
-  sigma_2 = np.exp(log_sigma_2_0)
+  log_tau = theta[0]
+  log_sigma_2 = theta[1]
+  tau = np.exp(log_tau)
+  sigma_2 = np.exp(log_sigma_2)
   delta = np.diff(t)
-  phi = np.exp((-delta / tau_0))
+  phi = np.exp((-delta / tau))
   term_1 =  y[1:n] - (phi * y[0:(n-1)])
   term_2 = pow(term_1, 2)
   term_3 = term_2 / (1- pow(phi, 2))
@@ -654,7 +654,7 @@ def n_ll_unevenly_spaced_ar1(theta, y, t):
 
 def uar1_fit(y, t):
     '''
-    Maximum Likelihood Estimation of parameters tau_0 and sigma_2_0
+    Maximum Likelihood Estimation of parameters tau and sigma_2
 
     Parameters
     ----------
@@ -664,13 +664,13 @@ def uar1_fit(y, t):
         Time index values of the time series
 
     Returns:
-        An array containing the estimated parameters tau_0_hat and sigma_2_hat, first entry is tau_0_hat, second entry is sigma_2_hat
+        An array containing the estimated parameters tau_hat and sigma_2_hat, first entry is tau_hat, second entry is sigma_2_hat
     -------
     None.
 
     '''
     
-    # obtain initial value for tau_0
+    # obtain initial value for tau
     tau_initial_value = tau_estimation(y= y, t = t)
     # obtain initial value for sifma_2_0
     sigma_2_initial_value = np.var(y)
@@ -681,7 +681,7 @@ def uar1_fit(y, t):
     
     return theta_hat
 
-def uar1_sim(t, tau_0=5, sigma_2_0=2):  
+def uar1_sim(t, tau, sigma_2=1):  
                                
     """
     Generate a time series of length n from an autoregressive process of order 1 with evenly/unevenly spaced time points.
@@ -691,10 +691,10 @@ def uar1_sim(t, tau_0=5, sigma_2_0=2):
     t : array
         Time axis 
         
-    tau_0 : float
+    tau : float
         Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
         
-    sigma_2_0 : float
+    sigma_2 : float
         Variance of the innovations      
   
     Returns
@@ -707,27 +707,32 @@ def uar1_sim(t, tau_0=5, sigma_2_0=2):
     --------
   
     pyleoclim.utils.tsmodel.uar1_fit : Maximumum likelihood estimate of AR(1) parameters 
-    pyleoclim.utils.tsmodel.random_time_index : Generate time increment vector according to a specific probability model
         
     """
-    n = len(t)    
-    ys = np.zeros(n) # create empty vector  
-    # generate unevenly spaced AR(1)
-    z = np.random.normal(loc=0, scale=1, size=n)
-    ys[0] = z[0] 
-    for i in range(n-1): 
-        delta_i = t[i+1] - t[i] 
-        phi_i = np.exp(-delta_i / tau_0)
-        sigma_2_i = sigma_2_0 * (1-pow(phi_i, 2))
-        sigma_i = np.sqrt(sigma_2_i)
-        ys[i+1] = phi_i * ys[i] + sigma_i * z[i]  
-          
-    return ys
+    if t.ndim == 1: # add extraneous dimension if t is 1d, to write only one loop. 
+        n = len(t); p = 1
+        t = t[:,np.newaxis]
+    else:
+        n, p = t.shape
+    
+    # generate innovations
+    z = np.random.normal(loc=0, scale=1, size=(n,p))
+    y = np.copy(z) # initialize AR(1) vectors
+    # fill the array
+    for j in range(p):  # Note: this shouldn't work but it does!
+        for i in range(1, n): 
+            delta_i = t[i,j] - t[i-1,j] 
+            phi = np.exp(-delta_i / tau)
+            sigma_i = np.sqrt(sigma_2 * (1-phi**2))
+            y[i,j] = phi * y[i-1,j] + sigma_i * z[i,j]  
+    
+    y = np.squeeze(y) # squeeze superfluous dimensions
+    return y
 
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))
 
-def random_time_index(n, delta_t_dist = "exponential", param = [1]):
+def random_time_index(n, delta_t_dist = "exponential", param = [1.0]):
     '''
     Generate a random time index vector according to a specific probability model
 

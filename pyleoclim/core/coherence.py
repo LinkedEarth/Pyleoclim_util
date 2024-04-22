@@ -692,17 +692,17 @@ class Coherence:
 
             coh.signif_test(method='phaseran').plot() 
         '''
-
+        from ..core.surrogateseries import SurrogateSeries
+        
         if number == 0:
             return self
         
         new = self.copy()
-        surr1 = self.timeseries1.surrogates(
-            number=number, seed=seed, method=method, settings=settings
-        )
-        surr2 = self.timeseries2.surrogates(
-            number=number, seed=seed, method=method, settings=settings
-        )
+        
+        surr1 = SurrogateSeries(method=method,number=number, seed=seed)
+        surr1.from_series(self.timeseries1)
+        surr2 = SurrogateSeries(method=method,number=number, seed=seed)
+        surr2.from_series(self.timeseries2)
         
         # adjust time axis
 
@@ -729,11 +729,6 @@ class Coherence:
         nq = len(qs)
         wtc_qs = np.ndarray(shape=(nq, nf, nt))
         xwt_qs = np.empty_like(wtc_qs)
-
-        # for i in range(nf):
-        #     for j in range(nt):
-        #         wtc_qs[:,i,j] = mquantiles(wtcs[:,i,j], qs)
-        #         xwt_qs[:,i,j] = mquantiles(xwts[:,i,j], qs)
 
         # extract quantiles and reshape
         wtc_qs = mquantiles(wtcs_r, qs, axis=0)
