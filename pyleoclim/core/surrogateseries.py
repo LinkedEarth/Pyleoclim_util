@@ -166,7 +166,7 @@ class SurrogateSeries(EnsembleSeries):
         time_pattern : str {even, random, specified}
             The pattern used to generate the surrogate time axes
             * 'even' uses an evenly-spaced time with spacing `delta_t` specified in settings (if not specified, defaults to 1.0)
-            * 'random' uses random_time_index() with specified distribution and parameters 
+            * 'random' uses random_time_axis() with specified distribution and parameters 
                Relevant settings are `delta_t_dist` and `param`. (default: 'exponential' with parameter = 1.0)
             * 'specified': uses time axis `time` from `settings`.  
             
@@ -185,7 +185,7 @@ class SurrogateSeries(EnsembleSeries):
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
         pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
-        pyleoclim.utils.tsmodel.random_time_index : Generate time increment vector according to a specific probability model
+        pyleoclim.utils.tsmodel.random_time_axis : Generate time increment vector according to a specific probability model
         
         Examples
         --------
@@ -212,7 +212,7 @@ class SurrogateSeries(EnsembleSeries):
             for i in range(self.number):
                 dist_name = settings['delta_t_dist'] if "delta_t_dist" in settings else "exponential"
                 dist_param = settings['param'] if "param" in settings else [1]
-                times[:, i] = tsmodel.random_time_index(length, dist_name,dist_param) 
+                times[:, i] = tsmodel.random_time_axis(length, dist_name,dist_param) 
         elif time_pattern == 'specified':
             if "time" not in settings:
                 raise ValueError("'time' not found in settings")

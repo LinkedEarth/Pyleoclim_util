@@ -28,7 +28,7 @@ __all__ = [
     'gen_ts',
     'tau_estimation',
     'parametric_surrogates',
-    'random_time_index',
+    'random_time_axis',
     'inverse_cumsum'
 ]
 
@@ -732,9 +732,9 @@ def uar1_sim(t, tau, sigma_2=1):
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))
 
-def random_time_index(n, delta_t_dist = "exponential", param = [1.0]):
+def random_time_axis(n, delta_t_dist = "exponential", param = [1.0]):
     '''
-    Generate a random time index vector according to a specific probability model
+    Generate a random time axis according to a specific probability model
 
     Parameters
     ----------
@@ -759,7 +759,7 @@ def random_time_index(n, delta_t_dist = "exponential", param = [1.0]):
     Returns:
     -------
     
-    t : 1D array of random time index obtained by taking the cumulative sum of the sampled random time increments, length n
+    t : 1D array of random time axis obtained by taking the cumulative sum of the sampled random time increments, length n
 
     '''
     # check for a valid distribution 
