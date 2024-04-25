@@ -17,21 +17,21 @@ def test_time_index_0(model):
     '''
     Generate time increments with 1-parameter models
     '''
-    delta_t = tsmodel.random_time_index(n=20, param=[1], delta_t_dist = model)
+    delta_t = tsmodel.random_time_axis(n=20, param=[1], delta_t_dist = model)
     assert all(np.cumsum(delta_t)>0)
 
 def test_time_index_1():
     '''
     Generate time increments with Pareto
     '''
-    delta_t = tsmodel.random_time_index(n=20, param=[4.2,2.5], delta_t_dist = "pareto")
+    delta_t = tsmodel.random_time_axis(n=20, param=[4.2,2.5], delta_t_dist = "pareto")
     assert all(np.cumsum(delta_t)>0)
     
 def test_time_index_2():
     '''
     Generate time increments with random choice
     '''
-    delta_t = tsmodel.random_time_index(n=20, delta_t_dist = "random_choice",
+    delta_t = tsmodel.random_time_axis(n=20, delta_t_dist = "random_choice",
                                         param=[[1,2],[.95,.05]] )
     assert all(np.cumsum(delta_t)>0)
     
@@ -53,7 +53,7 @@ def test_uar1_fit(p, evenly_spaced, tol = 0.45):
         t_arr = np.zeros((n, p))  # Initialize matrix to store time increments
         for j in range(p):
             # Generate random time increment
-            t_arr[:, j] = tsmodel.random_time_index(n=n, param=[1])
+            t_arr[:, j] = tsmodel.random_time_axis(n=n, param=[1])
    
     # Create an empty matrix to store estimated parameters
     theta_hat_matrix = np.empty((p, 2))
