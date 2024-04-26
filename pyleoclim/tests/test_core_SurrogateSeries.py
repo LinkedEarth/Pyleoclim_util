@@ -125,7 +125,7 @@ class TestUISurrogatesSeries:
     def test_surrogates_specified_time(self, length, number=2):
         ''' Test AR(1) model with specified time axis
         '''
-        ti = tsmodel.random_time_index(n=length)
+        ti = tsmodel.random_time_axis(n=length)
         surr = pyleo.SurrogateSeries(method='ar1sim', number=number, seed=108) 
         surr.from_param(param = [5,1], time_pattern='specified',
                          settings={"time":ti})

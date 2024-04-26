@@ -3665,7 +3665,7 @@ class Series:
     #         The pattern used to generate the surrogate time axes
     #         'match' uses the same pattern as the original Series
     #         'even' uses an evenly-spaced time with spacing delta_t specified in settings (will return error if not specified)
-    #         'random' uses random_time_index() with specified distribution and parameters (default: 'exponential' with parameter 1)
+    #         'random' uses random_time_axis() with specified distribution and parameters (default: 'exponential' with parameter 1)
 
     #     length : int
     #         Length of the series
@@ -3686,7 +3686,7 @@ class Series:
     #     pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
     #     pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
     #     pyleoclim.utils.tsutils.phaseran2 : phase randomization
-    #     pyleoclim.utils.tsutils.random_time_index : random time index vector according to a specific probability model
+    #     pyleoclim.utils.tsutils.random_time_axis : random time index vector according to a specific probability model
 
     #     '''
     #     settings = {} if settings is None else settings.copy()
@@ -3714,7 +3714,7 @@ class Series:
     #     elif time_pattern == "random":
     #         times = np.zeros((n, number))
     #         for i in range(number):
-    #             times[:, i] = tsmodel.random_time_index(n = n, **settings) # TODO: check that this does not break when unexpected keywords are passed in `settings`
+    #             times[:, i] = tsmodel.random_time_axis(n = n, **settings) # TODO: check that this does not break when unexpected keywords are passed in `settings`
     #     else:
     #         raise ValueError(f"Unknown time pattern: {time_pattern}")
 
