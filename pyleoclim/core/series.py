@@ -2757,7 +2757,7 @@ class Series:
             new.log += ({len(new.log): 'detrend','method': method, 'args': kwargs, 'previous_trend': trend},)
         return new
 
-    def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
+    def spectral(self, method='lomb_scargle', freq_method='auto', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -2829,7 +2829,7 @@ class Series:
         .. jupyter-execute::
 
             psd_ls = ts_std.spectral(method='lomb_scargle')
-            psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations
+            psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR(1) simulations
             fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
 
         We may pass in method-specific arguments via "settings", which is a dictionary.
@@ -2879,7 +2879,7 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
-            psd_perio_signif = psd_perio.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
+            psd_perio_signif = psd_perio.signif_test(number=20, method='ar1sim') #in practice, need more AR(1) simulations
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
 
 
@@ -2888,7 +2888,7 @@ class Series:
         .. jupyter-execute::
 
             psd_welch = ts_interp.spectral(method='welch')
-            psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
+            psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR(1) simulations
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
 
 
@@ -2897,7 +2897,7 @@ class Series:
         .. jupyter-execute::
 
             psd_mtm = ts_interp.spectral(method='mtm', label='MTM, NW=4')
-            psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
+            psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR(1) simulations
             fig, ax = psd_mtm_signif.plot(title='PSD using the multitaper method')
 
 
@@ -2935,15 +2935,26 @@ class Series:
         }
         args = {}
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
-
+        
+        if freq_method == 'auto': # assign the frequency method automatically based on context
+            if method in ['wwz','cwt']:
+                freq = specutils.make_freq_vector(self.time, method='log', **freq_kwargs) 
+            elif method=='lomb_scargle':
+                freq = specutils.make_freq_vector(self.time, method='lomb_scargle', **freq_kwargs) 
+            else:
+                warnings.warn(f'frequency vector determined automatically by {method}')
+                freq = specutils.make_freq_vector(self.time, method='welch', **freq_kwargs) # dummy; not used for anything
+        else:        
+            freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs) 
+            
         args['wwz'] = {'freq': freq}
         args['cwt'] = {'freq': freq}
-        args['mtm'] = {}
         args['lomb_scargle'] = {'freq': freq}
+        args['mtm'] = {}
         args['welch'] = {}
         args['periodogram'] = {}
-        args[method].update(settings)
+        
+        args[method].update(settings) # this overrides the frequency vector
 
         if method == 'wwz' and scalogram is not None:
             args['wwz'].update(
