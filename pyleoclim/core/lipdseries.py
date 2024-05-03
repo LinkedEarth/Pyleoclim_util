@@ -871,11 +871,11 @@ class LipdSeries(Series):
             pass
         else:
             spectral_kwargs.update({'method': 'lomb_scargle'})
-        if 'freq_method' in spectral_kwargs.keys():
+        if 'freq' in spectral_kwargs.keys():
             pass
         else:
             if ensemble == False:
-                spectral_kwargs.update({'freq_method': 'lomb_scargle'})
+                spectral_kwargs.update({'freq': 'lomb_scargle'})
             elif ensemble == True:
                 pass
 
