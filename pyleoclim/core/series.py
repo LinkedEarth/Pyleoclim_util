@@ -2922,7 +2922,6 @@ class Series:
             psd_mtm2 = ts_interp.spectral(method='mtm', settings={'NW':2}, label='MTM, NW=2')
             fig, ax = psd_mtm2.plot(title='MTM with NW=2')
 
-
         - Continuous Wavelet Transform
 
         .. jupyter-execute::
@@ -2931,7 +2930,6 @@ class Series:
             psd_cwt = ts_interp.spectral(method='cwt')
             psd_cwt_signif = psd_cwt.signif_test(number=20)
             fig, ax = psd_cwt_signif.plot(title='PSD using the CWT method')
-
 
         '''
         if not verbose:
@@ -2949,25 +2947,28 @@ class Series:
         args = {}
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         
-        if freq is None: # assign the frequency method automatically based on context
-            if method in ['wwz','cwt']:
-                freq_vec = specutils.make_freq_vector(self.time, method='log', **freq_kwargs) 
-            elif method=='lomb_scargle':
-                freq_vec = specutils.make_freq_vector(self.time, method='lomb_scargle', **freq_kwargs) 
-            else:
-                warnings.warn(f'freq argument gnored; it is determined automatically by {method}')
-        elif isinstance(freq, str):   # apply the specified method     
-            freq_vec = specutils.make_freq_vector(self.time, method=freq, **freq_kwargs) 
-        elif isinstance(freq,np.ndarray): # use the specified vector if dimensions check out
-            freq_vec = np.squeeze(freq)
-            if freq.ndim != 1:
-                raise ValueError("freq should be a 1-dimensional array")
+        if 'freq' in settings.keys():
+            freq_vec = settings['freq']
+        else:
+            if freq is None: # assign the frequency method automatically based on context
+                if method in ['wwz','cwt']:
+                    freq_vec = specutils.make_freq_vector(self.time, method='log', **freq_kwargs) 
+                elif method=='lomb_scargle':
+                    freq_vec = specutils.make_freq_vector(self.time, method='lomb_scargle', **freq_kwargs) 
+                else:
+                    warnings.warn(f'freq argument ignored; it is determined automatically by {method}')
+            elif isinstance(freq, str):   # apply the specified method     
+                freq_vec = specutils.make_freq_vector(self.time, method=freq, **freq_kwargs) 
+            elif isinstance(freq,np.ndarray): # use the specified vector if dimensions check out
+                freq_vec = np.squeeze(freq)
+                if freq.ndim != 1:
+                    raise ValueError("freq should be a 1-dimensional array")
         
         # pass frequency
         if method in ['wwz','cwt','lomb_scargle']:
             args[method] = {'freq': freq_vec}
         else:
-            args[method] = {'freq': None}
+            args[method] = {}
             
         # args['mtm'] = {'freq': freq_vec}
         # args['welch'] = {}

@@ -214,35 +214,35 @@ class TestUISeriesSpectral:
         assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('freq', ['log', 'scale', 'nfft', 'lomb_scargle', 'welch'])
-    def test_spectral_t1(self, pinkseries, freq_method, eps=0.3):
-        ''' Test Series.spectral() with MTM using available `freq_method` options with other arguments being default
+    def test_spectral_t1(self, pinkseries, freq, eps=0.3):
+        ''' Test Series.spectral() with MTM using available `freq` options with other arguments being default
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         ts = pinkseries
-        psd = ts.spectral(method='mtm', freq_method=freq_method)
+        psd = ts.spectral(method='mtm', freq=freq)
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('nf', [10, 20, 30])
     def test_spectral_t2(self, pinkseries, nf, eps=0.3):
-        ''' Test Series.spectral() with MTM using `freq_method='log'` with different values for its keyword argument `nfreq`
+        ''' Test Series.spectral() with MTM using `freq='log'` with different values for its keyword argument `nfreq`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         ts = pinkseries
-        psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nf': nf})
+        psd = ts.spectral(method='mtm', freq='log', freq_kwargs={'nf': nf})
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
     @pytest.mark.parametrize('dj', [0.25, 0.5, 1])
     def test_spectral_t3(self, pinkseries, dj, eps=0.3):
-        ''' Test Series.spectral() with MTM using `freq_method='scale'` with different values for its keyword argument `nv`
+        ''' Test Series.spectral() with MTM using `freq='scale'` with different values for its keyword argument `nv`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         ts = pinkseries
-        psd = ts.spectral(method='mtm', freq_method='scale', freq_kwargs={'dj': dj})
+        psd = ts.spectral(method='mtm', freq='scale', freq_kwargs={'dj': dj})
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
@@ -258,7 +258,7 @@ class TestUISeriesSpectral:
         assert np.abs(beta-1.0) < eps
 
     def test_spectral_t5(self, pinkseries, eps=0.6):
-        ''' Test Series.spectral() with WWZ with specified frequency vector passed via `settings`
+        ''' Test Series.spectral() with LS with specified frequency vector passed via `settings`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         Note `asser_array_equal(psd.frequency, freq)` is used to make sure the specified frequency vector is really working.
@@ -266,7 +266,7 @@ class TestUISeriesSpectral:
         '''
         ts = pinkseries
         freq = np.linspace(1/500, 1/2, 100)
-        psd = ts.spectral(method='wwz', freq=freq, label='WWZ')
+        psd = ts.spectral(method='lomb_scargle', freq=freq)
         beta = psd.beta_est(fmin=1/200, fmax=1/10).beta_est_res['beta']
         assert_array_equal(psd.frequency, freq)
         assert np.abs(beta-1.0) < eps
@@ -284,7 +284,7 @@ class TestUISeriesSpectral:
         t_unevenly =  np.delete(ts.time, deleted_idx)
         v_unevenly =  np.delete(ts.value, deleted_idx)
 
-        ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly,auto_time_params=True)
         psd = ts2.spectral(method=spec_method)
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
