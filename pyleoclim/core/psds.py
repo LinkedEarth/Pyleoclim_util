@@ -283,7 +283,7 @@ class PSD:
                     method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
                 )
             else:
-                surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
+                surr_psd = surr.spectral(method=self.spec_method, freq=self.spec_args['freq'], settings=self.spec_args)
             new.signif_qs = surr_psd.quantiles(qs=qs)
             new.signif_method = method
 

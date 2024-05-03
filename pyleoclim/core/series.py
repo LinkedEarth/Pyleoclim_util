@@ -2757,7 +2757,7 @@ class Series:
             new.log += ({len(new.log): 'detrend','method': method, 'args': kwargs, 'previous_trend': trend},)
         return new
 
-    def spectral(self, method='lomb_scargle', freq_method='auto', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
+    def spectral(self, method='lomb_scargle', freq=None, freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -2765,12 +2765,20 @@ class Series:
 
         method : str;
             {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
-
-        freq_method : str
-            {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
-
+            Default is Lomb-Scargle, because it can handle unevenly spaced series, and is fast. 
+            However, for evenly spaced data mtm would almost surely be a better choice. 
+            
+        freq : str or array, optional
+           Information to produce the frequency vector. 
+           This can be 'log','scale', 'nfft', 'lomb_scargle' or 'welch' or a NumPy array.
+           If a string, will use make_freq_vector with the specified frequency-generating method.
+           If an array, this will be passed directly to the spectral method.
+           If None (default), will use 'log' for WWZ and 'lomb_scargle' for Lomb-Scargle. 
+           This parameter is highly consequential for the WWZ and Lomb-Scargle methods, 
+           but is otherwise ignored, as other spectral methods generate their frequency vector internally.
+            
         freq_kwargs : dict
-            Arguments for frequency vector
+            Arguments for frequency vector 
 
         settings : dict
             Arguments for the specific spectral method
@@ -2834,23 +2842,28 @@ class Series:
 
         We may pass in method-specific arguments via "settings", which is a dictionary.
         For instance, to adjust the number of overlapping segment for Lomb-Scargle, we may specify the method-specific argument "n50";
-        to adjust the frequency vector, we may modify the "freq_method" or modify the method-specific argument "freq".
+        to adjust the frequency vector, we may modify the "freq" or modify the method-specific argument "freq".
 
         .. jupyter-execute::
 
             import numpy as np
             psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
-            psd_LS_freq = ts_std.spectral(method='lomb_scargle', settings={'freq': np.linspace(1/20, 1/0.2, 51)})
-            psd_LS_LS = ts_std.spectral(method='lomb_scargle', freq_method='lomb_scargle')  # with frequency vector generated using REDFIT method
+            psd_LS_freq = ts_std.spectral(method='lomb_scargle',freq=np.linspace(1/20, 1/0.2, 51))
+            psd_LS_log = ts_std.spectral(method='lomb_scargle', freq='log')  # with frequency vector generated using REDFIT method
             fig, ax = psd_LS_n50.plot(
-                title='PSD using Lomb-Scargle method with 4 overlapping segments',
+                title='Lomb-Scargle PSD with 4 overlapping segments',
                 label='settings={"n50": 4}')
-            psd_ls.plot(ax=ax, label='settings={"n50": 3}', marker='o')
+            psd_ls.plot(ax=ax, label='settings={"n50": 3}', marker='o', alpha=.2)
 
             fig, ax = psd_LS_freq.plot(
-                title='PSD using Lomb-Scargle method with different frequency vectors',
+                title='Lomb-Scargle PSD with specified frequency vector',
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
-            psd_ls.plot(ax=ax, label='freq_method="log"', marker='o')
+            psd_ls.plot(ax=ax, label='Lomb-Scargle frequency vector', marker='o', alpha=.2)
+            
+            fig, ax = psd_LS_log.plot(
+                title='Lomb-Scargle PSD with different frequency vectors',
+                label='log frequency method', marker='o')
+            psd_ls.plot(ax=ax, label='Lomb-Scargle frequency vector', marker='o', alpha=.2)
 
         You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
 
@@ -2936,23 +2949,29 @@ class Series:
         args = {}
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         
-        if freq_method == 'auto': # assign the frequency method automatically based on context
+        if freq is None: # assign the frequency method automatically based on context
             if method in ['wwz','cwt']:
-                freq = specutils.make_freq_vector(self.time, method='log', **freq_kwargs) 
+                freq_vec = specutils.make_freq_vector(self.time, method='log', **freq_kwargs) 
             elif method=='lomb_scargle':
-                freq = specutils.make_freq_vector(self.time, method='lomb_scargle', **freq_kwargs) 
+                freq_vec = specutils.make_freq_vector(self.time, method='lomb_scargle', **freq_kwargs) 
             else:
-                warnings.warn(f'frequency vector determined automatically by {method}')
-                freq = specutils.make_freq_vector(self.time, method='welch', **freq_kwargs) # dummy; not used for anything
-        else:        
-            freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs) 
+                warnings.warn(f'freq argument gnored; it is determined automatically by {method}')
+        elif isinstance(freq, str):   # apply the specified method     
+            freq_vec = specutils.make_freq_vector(self.time, method=freq, **freq_kwargs) 
+        elif isinstance(freq,np.ndarray): # use the specified vector if dimensions check out
+            freq_vec = np.squeeze(freq)
+            if freq.ndim != 1:
+                raise ValueError("freq should be a 1-dimensional array")
+        
+        # pass frequency
+        if method in ['wwz','cwt','lomb_scargle']:
+            args[method] = {'freq': freq_vec}
+        else:
+            args[method] = {'freq': None}
             
-        args['wwz'] = {'freq': freq}
-        args['cwt'] = {'freq': freq}
-        args['lomb_scargle'] = {'freq': freq}
-        args['mtm'] = {}
-        args['welch'] = {}
-        args['periodogram'] = {}
+        # args['mtm'] = {'freq': freq_vec}
+        # args['welch'] = {}
+        # args['periodogram'] = {}
         
         args[method].update(settings) # this overrides the frequency vector
 
@@ -3017,9 +3036,9 @@ class Series:
                 is appropriate for unevenly-spaced series.
             Default is cwt, returning an error if the Series is unevenly-spaced.
 
-        freq_method : str
-            {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
-
+        freq_method : str, optional
+            Can be one of 'log', 'scale', 'nfft', 'lomb_scargle', 'welch'. 
+            
         freq_kwargs : dict
             Arguments for the frequency vector
 

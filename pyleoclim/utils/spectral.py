@@ -472,8 +472,6 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
 
-    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
-
     """
     
     if standardize == True:

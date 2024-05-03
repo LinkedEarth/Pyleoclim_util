@@ -1303,7 +1303,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', 
+    def spectral(self, method='lomb_scargle', freq=None, settings=None, mute_pbar=False, 
                 freq_kwargs=None, label=None, verbose=False, scalogram_list=None):
         ''' Perform spectral analysis on the timeseries
 
@@ -1312,7 +1312,14 @@ class MultipleSeries:
 
         method : str; {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
 
-        freq_method : str; {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
+        freq : str or array, optional
+           Information to produce the frequency vector. 
+           This can be 'log','scale', 'nfft', 'lomb_scargle' or 'welch' or a NumPy array.
+           If a string, will use make_freq_vector with the specified frequency-generating method.
+           If an array, this will be passed directly to the spectral method.
+           If None (default), will use 'log' for WWZ and 'lomb_scargle' for Lomb-Scargle. 
+           This parameter is highly consequential for the WWZ and Lomb-Scargle methods, 
+           but is otherwise ignored, as other spectral methods generate their frequency vector internally.
 
         freq_kwargs : dict
         
@@ -1395,20 +1402,20 @@ class MultipleSeries:
             #OR if the scalogram list is longer than the series list we use as many scalograms from the scalogram list as we need
             if scalogram_list_len >= series_len:
                 for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
-                    psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
+                    psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
                     psd_list.append(psd_tmp)
             #If the scalogram list isn't as long as the series list, we re-use all the scalograms we can and then calculate the rest
             elif scalogram_list_len < series_len:
                 for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
                     if idx < scalogram_list_len:
-                        psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
+                        psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
                         psd_list.append(psd_tmp)
                     else:
-                        psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
+                        psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
                         psd_list.append(psd_tmp)
         else:
             for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
-                psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
+                psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
                 psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)

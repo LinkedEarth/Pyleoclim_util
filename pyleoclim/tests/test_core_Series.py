@@ -213,7 +213,7 @@ class TestUISeriesSpectral:
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
-    @pytest.mark.parametrize('freq_method', ['log', 'scale', 'nfft', 'lomb_scargle', 'welch'])
+    @pytest.mark.parametrize('freq', ['log', 'scale', 'nfft', 'lomb_scargle', 'welch'])
     def test_spectral_t1(self, pinkseries, freq_method, eps=0.3):
         ''' Test Series.spectral() with MTM using available `freq_method` options with other arguments being default
 
@@ -248,12 +248,12 @@ class TestUISeriesSpectral:
 
     @pytest.mark.parametrize('dt, nf, ofac, hifac', [(None, 20, 1, 1), (None, None, 2, 0.5)])
     def test_spectral_t4(self, pinkseries, dt, nf, ofac, hifac, eps=0.5):
-        ''' Test Series.spectral() with Lomb_Scargle using `freq_method=lomb_scargle` with different values for its keyword arguments
+        ''' Test Series.spectral() with Lomb_Scargle using `freq=lomb_scargle` with different values for its keyword arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         ts = pinkseries
-        psd = ts.spectral(method='mtm', freq_method='lomb_scargle', freq_kwargs={'dt': dt, 'nf': nf, 'ofac': ofac, 'hifac': hifac})
+        psd = ts.spectral(method='mtm', freq='lomb_scargle', freq_kwargs={'dt': dt, 'nf': nf, 'ofac': ofac, 'hifac': hifac})
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-1.0) < eps
 
@@ -266,7 +266,7 @@ class TestUISeriesSpectral:
         '''
         ts = pinkseries
         freq = np.linspace(1/500, 1/2, 100)
-        psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
+        psd = ts.spectral(method='wwz', freq=freq, label='WWZ')
         beta = psd.beta_est(fmin=1/200, fmax=1/10).beta_est_res['beta']
         assert_array_equal(psd.frequency, freq)
         assert np.abs(beta-1.0) < eps
