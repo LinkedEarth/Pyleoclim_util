@@ -23,7 +23,7 @@ from matplotlib.colors import TwoSlopeNorm
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
-from .plotting import savefig, make_scalar_mappable, keep_center_colormap
+from .plotting import savefig, make_scalar_mappable, keep_center_colormap, consolidate_legends
 from .lipdutils import PLOT_DEFAULT, LipdToOntology, CaseInsensitiveDict
 
 
@@ -698,10 +698,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     '''
 
-
-
-
-
     # def make_df(geo_ms, hue=None, marker=None, size=None, cols=None):
     #     try:
     #         geo_series_list = geo_ms.series_list
@@ -726,7 +722,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     def plot_scatter(df=None, x=None, y=None, hue_var=None, size_var=None, marker_var=None, edgecolor='w',
                      ax=None, ax_d=None, proj=None, scatter_kwargs=None, legend=True, lgd_kwargs=None, colorbar=None,
-                     fig=None,  color_scale_type=None, # gs_slot=None,
+                     fig=None, color_scale_type=None,  # gs_slot=None,
                      cmap=None, **kwargs):
 
         scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
@@ -745,7 +741,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         plot_defaults = CaseInsensitiveDict()
         for key, value in f.items():
             plot_defaults[key] = value
-
 
         _df = df
         if len(_df) == 1:
@@ -784,19 +779,21 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             scatter_kwargs['edgecolor'] = edgecolor
 
         hue_var = hue_var if hue_var in _df.columns else None
-        hue_var_type_numeric=False
+        hue_var_type_numeric = False
         if hue_var is not None:
-            hue_var_type_numeric = pd.to_numeric(_df[hue_var], errors='coerce').notnull().all()
+            hue_var_type_numeric = all(isinstance(i, (int, float)) for i in _df[_df[hue_var] != missing_val][
+                hue_var])  # pd.to_numeric(_df[hue_var], errors='coerce').notnull().all()
 
         marker_var = marker_var if marker_var in _df.columns else None
-        marker_var_type_numeric=False
+        marker_var_type_numeric = False
         if marker_var is not None:
             marker_var_type_numeric = pd.to_numeric(_df[marker_var], errors='coerce').notnull().all()
 
         size_var = size_var if size_var in _df.columns else None
         size_var_type_numeric = False
         if size_var is not None:
-            size_var_type_numeric = pd.to_numeric(_df[size_var], errors='coerce').notnull().all()
+            size_var_type_numeric = all(isinstance(i, (int, float)) for i in _df[_df[size_var] != missing_val][
+                size_var])  # pd.to_numeric(_df[size_var], errors='coerce').notnull().all()
 
         trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if
                       ((trait_var != None) and (trait_var in _df.columns))]
@@ -876,14 +873,14 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         # there should be different control for discrete and continuous hue
         elif hue_var == 'archiveType':
             palette = {key: value[0] for key, value in plot_defaults.items()}
-        elif type(hue_var) == str:
+        elif isinstance(hue_var,str): #hue_var) == str:
             hue_data = _df[_df[hue_var] != missing_val]
             # If scalar mappable was passed, try to extract components.
             if ax_sm is not None:
                 try:
                     palette = ax_sm.cmap
                 except:
-                    ax_sm = None # if can't extract a palette, the scalar mappable is not helpful so set to None to trigger normal flow
+                    ax_sm = None  # if can't extract a palette, the scalar mappable is not helpful so set to None to trigger normal flow
                 try:
                     hue_norm = ax_sm.norm
                 except:
@@ -893,7 +890,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 if cmap != None:
                     palette = cmap
                 if len(hue_data[hue_var]) > 0:
-                    if hue_var_type_numeric is False:
+                    if hue_var_type_numeric is not True:
                         # trait_val_types = [True if type(val) in (np.str_, str) else False for val in hue_data[hue_var]]
                         # if True in trait_val_types:
                         colorbar = False
@@ -908,13 +905,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                     else:
                         if ((type(palette) in [str, list]) or (palette is None)):
                             if color_scale_type == 'discrete':
-                                print('color_scale_type', color_scale_type)
                                 n = max(10, int(np.ceil(np.sqrt(len(hue_data[hue_var].unique())))))
-                                ax_sm = make_scalar_mappable(cmap=palette, hue_vect=hue_data[hue_var],n=n,
+                                ax_sm = make_scalar_mappable(cmap=palette, hue_vect=hue_data[hue_var], n=n,
                                                              norm_kwargs=norm_kwargs)
                             else:
-                                print('color_scale_type', 'not')
-                                ax_sm = make_scalar_mappable(cmap=palette, hue_vect=hue_data[hue_var], norm_kwargs=norm_kwargs)
+                                ax_sm = make_scalar_mappable(cmap=palette, hue_vect=hue_data[hue_var],
+                                                             norm_kwargs=norm_kwargs)
                             palette = ax_sm.cmap
                             hue_norm = ax_sm.norm  # .autoscale(hue_data[hue_var])
 
@@ -957,6 +953,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                             style=marker_var, ax=ax, **scatter_kwargs)
             missing_handles, missing_labels = ax.get_legend_handles_labels()
 
+        # h, l= consolidate_legends([ax], hue=hue_var, style =marker_var, size=size_var, colorbar=colorbar)
         h, l = ax.get_legend_handles_labels()
 
         if ((len(l) == 2) and (l[-1] == 'missing')) or (len(l) < 2):
@@ -983,7 +980,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             # legend has one section for each trait but ax.get_legend_handles_labels() yields straight lists
             # This code reorganizes legend information hierarchically starting with available and adding values
             # from missing as needed
-
             for pair in [(available_handles, available_labels), (missing_handles, missing_labels)]:
                 pair_h, pair_l = pair[0], pair[1]
                 for ik, label in enumerate(pair_l):
@@ -1225,7 +1221,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     x = 'lon'
     y = 'lat'
     _, ax_d = plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax_d=ax_d, proj=None,
-                           edgecolor=edgecolor, colorbar=colorbar,color_scale_type=color_scale_type,
+                           edgecolor=edgecolor, colorbar=colorbar, color_scale_type=color_scale_type,
                            cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, lgd_kwargs=lgd_kwargs,
                            **kwargs)  # , **kwargs)
     return fig, ax_d
