@@ -358,6 +358,10 @@ class MultivariateDecomp:
         map_gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
         lgd_kwargs = map_kwargs.pop('lgd_kwargs', {})
 
+        if scatter_kwargs is None:
+            scatter_kwargs = {}
+        else:
+            scatter_kwargs = scatter_kwargs.copy()
 
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
