@@ -9,10 +9,13 @@ __all__ = ['set_style', 'closefig', 'savefig']
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
+from matplotlib import cm
 import numpy as np
 import pandas as pd
+import collections.abc
 
 from ..utils import lipdutils
+
 
 # import pandas as pd
 # from matplotlib.patches import Rectangle
@@ -605,12 +608,12 @@ def set_style(style='journal', font_scale=1.0, dpi=300):
             'xtick.minor.width': 0,
             'ytick.minor.width': 0,
         })
-    
+
     elif 'matplotlib' in style:
-        #mpl.rcParams.update(mpl.rcParamsDefault)
+        # mpl.rcParams.update(mpl.rcParamsDefault)
         style_dict.update({})
-        
-        
+
+
     else:
         raise ValueError(f'Style [{style}] not availabel!')
 
@@ -882,11 +885,11 @@ def get_label_width(ax, label, buffer=0., fontsize=10):
     """
     Helper function to find width of text when rendered in ax object
     """
-    
+
     text = ax.text(0, 0, label, size=fontsize)
     width = text.get_window_extent(renderer=ax.figure.canvas.get_renderer()).width
     text.remove()  # Remove the text used for measurement
-    
+
     return width + buffer
 
 
@@ -1113,3 +1116,313 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
         ax.plot([x_locs[i], x_locs[i]], [0, slot_height], **linestyle_kwargs)
 
     return ax
+
+
+def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
+    """
+        Create a ScalarMappable object for mapping scalar data to colors.
+
+        This function configures and returns a ScalarMappable object based on the provided colormap (`cmap`), the scalar values (`hue_vect`), the number of discrete colors (`n`), and normalization parameters (`norm_kwargs`). It supports dynamic selection of normalization and colormap based on the input parameters and the range of scalar values.
+
+        Parameters
+        ----------
+        cmap : str, list, or None, optional
+            The colormap to use for mapping scalar data to colors. Can be a name of a matplotlib colormap (str), a list of color names, or None. If None, defaults to 'vlag' if conditions for centered normalization are met, otherwise 'viridis'.
+        hue_vect : np.ndarray, pd.Series, list, or None, optional
+            An array-like object containing the scalar values to be mapped to colors. These values are used to determine the range and center for normalization.
+        n : int or None, optional
+            Specifies the number of discrete colors in the colormap if `cmap` is provided as a list. If None, the number of colors is not explicitly set.
+        norm_kwargs : dict or None, optional
+            A dictionary containing keyword arguments for the normalization process, specifically supporting 'vcenter' and 'clip'. Defaults to {'vcenter': 0, 'clip': False} if not provided or if provided keys are missing.
+
+
+        Returns:
+        -------
+        ax_sm : matplotlib.cm.ScalarMappable
+            The configured ScalarMappable object, which can be used to map scalar data to colors based on the specified colormap and normalization settings.
+
+
+        Examples
+        --------
+
+            .. jupyter-execute::
+
+                import pyleoclim as pyleo
+                import numpy as np
+
+                scalar_values = np.random.randn(100)
+                sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values)
+                # Now `sm` can be used with matplotlib plotting functions to map scalar values to colors.
+
+                sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values, n=10)
+                # This creates a ScalarMappable a discrete color scale.
+
+                sm = pyleo.utils.plotting.make_scalar_mappable(cmap=['blue', 'white', 'red'], hue_vect=scalar_values, norm_kwargs={'vcenter': 0})
+                # This creates a ScalarMappable with a custom linear segmented colormap and centered normalization.
+
+
+    """
+
+    # if type(hue_vect) in [np.ndarray, pd.Series, list]:
+    if isinstance(hue_vect, collections.abc.Iterable) and not isinstance(hue_vect, dict):
+        ax_cmap = None
+        ax_norm = None
+
+        if type(norm_kwargs) != dict:
+            norm_kwargs = {}
+        if 'vcenter' not in norm_kwargs.keys():
+            norm_kwargs['vcenter'] = 0
+        if 'clip' not in norm_kwargs.keys():
+            norm_kwargs['clip'] = False
+
+        if all(isinstance(i, (int, float)) for i in hue_vect):
+            if np.any((norm_kwargs['vcenter'] < max(hue_vect)) | (norm_kwargs['vcenter'] > min(hue_vect))) == True:
+                if cmap is None:
+                    cmap = 'vlag'
+                # ax_cmap = keep_center_colormap(cmap, min(hue_vect), max(hue_vect), center=0)
+                ax_norm = mpl.colors.CenteredNorm(
+                    **norm_kwargs)  # vcenter=0, clip=False)#TwoSlopeNorm(0, vmin=min(hue_vect), vmax=max(hue_vect)) #
+            else:
+                ax_norm = mpl.colors.Normalize(vmin=min(hue_vect), vmax=max(hue_vect), clip=False)
+                if cmap is None:
+                    cmap = 'viridis'
+
+        # if np.any((norm_kwargs['vcenter'] < max(hue_vect)) | (norm_kwargs['vcenter'] > min(hue_vect))) == True:
+        #     if cmap is None:
+        #         cmap = 'vlag'
+        #     # ax_cmap = keep_center_colormap(cmap, min(hue_vect), max(hue_vect), center=0)
+        #     ax_norm = mpl.colors.CenteredNorm(
+        #         **norm_kwargs)  # vcenter=0, clip=False)#TwoSlopeNorm(0, vmin=min(hue_vect), vmax=max(hue_vect)) #
+        # else:
+        #     ax_norm = mpl.colors.Normalize(vmin=min(hue_vect), vmax=max(hue_vect), clip=False)
+        #     if cmap is None:
+        #         cmap = 'viridis'
+
+    if ax_cmap is None:
+        if type(cmap) == list:
+            if n is None:
+                ax_cmap = mpl.colors.LinearSegmentedColormap.from_list("MyCmapName", cmap)
+            else:
+                ax_cmap = mpl.colors.LinearSegmentedColormap.from_list("MyCmapName", cmap, N=n)
+        elif type(cmap) == str:
+            if n is None:
+                ax_cmap = plt.get_cmap(cmap)
+            else:
+                ax_cmap = plt.get_cmap(cmap, n)
+        else:
+            print('what madness is this?')
+    ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
+
+    return ax_sm
+
+
+import copy
+
+
+def consolidate_legends(ax, split_btwn=True, hue='relation', style='exp_type', size=None, colorbar=False):
+    break_pts = []
+    hs, ls = [], []
+    for ip, _ax in enumerate(ax):
+        try:
+            legend = ax[ip].get_legend()
+            l2 = [_l._text for _l in legend.get_texts()]
+            h2 = legend.legendHandles
+        except:
+            ax[ip].legend()
+            h2, l2 = ax[ip].get_legend_handles_labels()
+        hs.append(h2)
+        ls.append(l2)
+
+        break_pts2 = []
+        for ib, _l in enumerate(l2):
+            if _l in [hue, style, size]:
+                break_pt2 = ib
+                break_pts2.append(ib)
+        break_pts2.append(len(l2))
+        break_pts.append(break_pts2)
+
+    labels = []
+    handles = []
+
+    print(break_pts, ls)
+    for iq, bp_lst in enumerate(break_pts):  # [1:]):
+        for ik, bp in enumerate(bp_lst):
+            if ik > 0:
+                if split_btwn is True:
+                    labels.append('')
+                    handles.append(copy.copy(hs[0][-1]))
+                    handles[-1].set_alpha(0)
+                for im, _l in enumerate(ls[iq][:bp]):
+                    if _l not in labels:
+                        labels.append(_l)
+                        handles.append(hs[iq][im])
+
+    if colorbar is True:
+        start = 0
+        end = 0
+        looking = True
+        for ib, _l in enumerate(labels):
+            if looking is True:
+                if _l == hue:
+                    start = ib
+                elif _l in [size, style]:
+                    end = ib
+                    looking = False
+
+        labels = labels[0:start] + labels[end:]  # [start:]
+        handles = handles[0:start] + handles[end:]
+
+    start = 0
+    looking = True
+    for ib, _l in enumerate(labels):
+        if looking is True:
+            if _l == '':
+                start = ib + 1
+            else:
+                looking = False
+
+    labels = labels[start:]
+    handles = handles[start:]
+
+    return handles, labels
+
+
+# def consolidate_legends(ax, split_btwn=True, hue='relation', style='exp_type', size=None):
+#     break_pts = []
+#     hs, ls = [], []
+#     for ip, _ax in enumerate(ax):
+#         try:
+#             legend = ax[ip].get_legend()
+#             l2 = [_l._text for _l in legend.get_texts()]
+#             h2 = legend.legendHandles
+#         except:
+#             ax[ip].legend()
+#             h2, l2 = ax[ip].get_legend_handles_labels()
+#         hs.append(h2)
+#         ls.append(l2)
+#
+#         break_pt2 = len(l2)
+#         for ib, _l in enumerate(l2):
+#             if _l in [hue, style, size]:
+#                 break_pts.append(ib)
+#
+#     labels = []
+#     handles = []
+#
+#     if break_pts[0] ==0:
+#         break_pt_start = 1
+#     else:
+#         break_pt_start = 0
+#
+#     handles += hs[0][:break_pts[break_pt_start]]
+#     labels += ls[0][:break_pts[break_pt_start]]
+#
+#     print(ls)
+#     if len(break_pts)>1:
+#         for ik, bp in enumerate(break_pts[break_pt_start:]):
+#             if split_btwn is True:
+#                 labels.append('')
+#                 handles.append(copy.copy(handles[-1]))
+#                 handles[-1].set_alpha(0)
+#             for im, _l in enumerate(ls[0][:bp]):
+#                 if _l not in labels:
+#                     labels.append(_l)
+#                     handles.append(hs[0][im])
+#     print(labels)
+
+#     labels.append('')
+#     handles.append(copy.copy(handles[-1]))
+#     handles[-1].set_alpha(0)
+#
+#     handles += hs[0][break_pts[break_pt_start]:]
+#     labels += ls[0][break_pts[break_pt_start]:]
+#
+# for ik, bp in enumerate(break_pts[1:]):
+#     ik += 1
+#     if split_btwn is True:
+#         labels.append('')
+#         handles.append(copy.copy(handles[-1]))
+#         handles[-1].set_alpha(0)
+#     for im, _l in enumerate(ls[ik][bp:]):
+#         if _l not in labels:
+#             labels.append(_l)
+#             handles.append(hs[ik][im])
+#
+# return handles, labels
+
+
+def keep_center_colormap(cmap, vmin, vmax, center=0):
+    """
+
+
+    Adjust a colormap so that a specific value remains centered, and extend its limits symmetrically.
+
+    This function modifies a given colormap such that the color representing the 'center' value
+    remains at the center of the colormap. It does this by adjusting the minimum and maximum values
+    symmetrically around the center and ensuring that the colormap covers a range that is at least
+    20% larger than the absolute range from the center to either the original minimum or maximum value.
+    This is particularly useful for visualizing data with a significant central value (e.g., zero in
+    anomaly maps) to ensure that the colormap visually represents deviations from this center in a balanced manner.
+
+
+    Parameters
+    ----------
+    cmap : str or Colormap
+        The name of the colormap or a Colormap instance to be adjusted.
+    vmin : float
+        The original minimum value in the data range that the colormap should cover.
+    vmax : float
+        The original maximum value in the data range that the colormap should cover.
+    center : float, optional
+        The value that should be centered in the adjusted colormap. Default is 0.
+
+
+    Returns
+    -------
+    newmap : matplotlib.colors.ListedColormap
+        A new colormap instance adjusted so that 'center' is in the middle of the colormap,
+        with its range symmetrically extended to ensure balanced representation of values around the center.
+
+
+    Notes
+    -----
+    The adjustment involves shifting the original `vmin` and `vmax` values to be symmetric around the `center`,
+    then expanding the range by at least 20% to ensure that the colormap's central part accurately represents
+    the centered value across the data. This adjusted colormap can then be used for data visualization tasks
+    where maintaining a perceptual 'zero' or central reference point is important.
+
+
+    Examples
+    --------
+
+        .. jupyter-execute::
+
+        import matplotlib.pyplot as plt
+
+        new_colormap = keep_center_colormap('RdBu', vmin=-300, vmax=300, center=0)
+        plt.imshow(data, cmap=new_colormap)
+        plt.colorbar()
+
+    This will create and use a colormap where the value 0 is centered, and the colormap is adjusted
+    to symmetrically represent deviations from this center, making it suitable for displaying anomalies
+    or differences from a baseline in a visually balanced manner.
+
+
+    """
+
+    vmin = vmin - center
+    vmax = vmax - center
+
+    vdelta = max([.2 * abs(vmin), .2 * abs(vmax)])
+    vmax = vmax + .2 * vdelta
+    vmin = vmin - .2 * vdelta
+
+    dv = max(-vmin, vmax) * 2
+    N = int(256 * dv / (vmax - vmin))
+    cont_map = cm.get_cmap(cmap, N)
+    newcolors = cont_map(np.linspace(0, 1, N))
+    beg = int((dv / 2 + vmin) * N / dv)
+    end = N - int((dv / 2 - vmax) * N / dv)
+    newmap = mpl.colors.ListedColormap(newcolors[beg:end])
+
+    return newmap

@@ -184,8 +184,9 @@ class MultivariateDecomp:
 
     def modeplot(self, index=0, figsize=[8, 8], fig=None, savefig_settings=None,gs=None,
                  title=None, title_kwargs=None, spec_method='mtm', cmap=None,
-                 hue='EOF', marker='archiveType', size=None, scatter_kwargs=None,
+                 hue='EOF', marker=None, size=None, scatter_kwargs=None,
                  flip = False, map_kwargs=None, gridspec_kwargs=None):
+
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -248,8 +249,9 @@ class MultivariateDecomp:
             - gridspec_kwargs: dict; Optional values for adjusting the arrangement of the colorbar, map and legend in the map subplot
             - legend: bool; Whether to draw a legend on the figure. Default is True
             - colorbar: bool; Whether to draw a colorbar on the figure if the data associated with hue are numeric. Default is True
-            The default is None.
-            
+            - color_scale_type : str; Setting to "discrete" will force a discrete color scale with a default bin number of max(11, n) where n=number of unique values$^{\frac{1}{2}}$. Default is None
+            - scalar_mappable: matplotlib.cm.ScalarMappable; can be used to pass a matplotlib scalar mappable. See pyleoclim.utils.plotting.make_scalar_mappable for documentation on using the Pyleoclim utility, or the `Matplotlib tutorial on customizing colorbars <https://matplotlib.org/stable/users/explain/colors/colorbar_only.html>`_.
+
         scatter_kwargs : dict, optional
             Optional arguments configuring how data are plotted on a map. See description of scatter_kwargs in pyleoclim.utils.mapping.scatter_map
 
@@ -263,7 +265,8 @@ class MultivariateDecomp:
 
         marker : string, optional
             (only applicable if using scatter map) Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
-            The default is 'archiveType'.
+            The default is None, which will produce circle markers. Alternatively, pass the name of a categorical variable, e.g. 'archiveType'. If 'archiveType' is specified, will attempt to use pyleoclim archiveType markers mapping, defaulting to '?' where values are unavailable.
+
             
         Returns
         -------
@@ -273,6 +276,7 @@ class MultivariateDecomp:
 
         ax : dict
             dictionary of matplotlib ax
+
 
         See also
         --------
@@ -284,7 +288,10 @@ class MultivariateDecomp:
         pyleoclim.utils.tsutils.eff_sample_size : Effective sample size
 
         pyleoclim.utils.mapping.scatter_map : mapping
-        
+
+        pyleoclim.utils.plotting.make_scalar_mappable : Custom scalar mappable
+
+
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
         
@@ -351,12 +358,24 @@ class MultivariateDecomp:
         map_gridspec_kwargs = map_kwargs.pop('gridspec_kwargs', {})
         lgd_kwargs = map_kwargs.pop('lgd_kwargs', {})
 
+        if scatter_kwargs is None:
+            scatter_kwargs = {}
+        else:
+            scatter_kwargs = scatter_kwargs.copy()
 
         if 'edgecolor' in map_kwargs.keys():
             scatter_kwargs.update({'edgecolor': map_kwargs['edgecolor']})
 
         legend = map_kwargs.pop('legend', True)
         colorbar = map_kwargs.pop('colorbar', True)
+        color_scale_type = map_kwargs.pop('color_scale_type', None)
+
+        if marker is None:
+            marker = scatter_kwargs.pop('marker', None)
+        if hue is None:
+            hue = scatter_kwargs.pop('hue', None)
+        if size is None:
+            size = scatter_kwargs.pop('size', None)
 
         if isinstance(self.orig, MultipleGeoSeries):
             # This makes a bare bones dataframe from a MultipleGeoSeries object
@@ -373,9 +392,9 @@ class MultivariateDecomp:
                                                rivers=rivers, lakes=lakes,
                                                ocean=ocean, land=land, extent=extent,
                                                figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
-                                               gridspec_kwargs=map_gridspec_kwargs, colorbar=colorbar,
+                                               gridspec_kwargs=map_gridspec_kwargs, colorbar=colorbar, color_scale_type=color_scale_type,
                                                legend=legend, cmap=cmap,
-                                               fig=fig, gs_slot=gs[-1, :]) #label rf'$EOF_{index + 1}$'
+                                               fig=fig, gs_slot=gs[-1, :], **map_kwargs) #label rf'$EOF_{index + 1}$'
             
         else: # it must be a plain old MultipleSeries. No map for you! Just a spaghetti plot with the standardizes series
             ax['map'] = fig.add_subplot(gs[1:, :])
