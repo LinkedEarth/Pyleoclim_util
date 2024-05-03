@@ -713,11 +713,11 @@ class GeoSeries(Series):
         if 'method' in spectral_kwargs.keys():
             pass
         else:
-            spectral_kwargs.update({'method': 'lomb_scargle'})
-        if 'freq_method' in spectral_kwargs.keys():
+            spectral_kwargs.update({'method': 'lomb_scargle'}) # unneeded as it is already the default 
+        if 'freq' in spectral_kwargs.keys():
             pass
         else:
-            spectral_kwargs.update({'freq_method': 'lomb_scargle'})
+            spectral_kwargs.update({'freq': 'lomb_scargle'})
 
         ax['spec'] = fig.add_subplot(gs[-1, -2:])
         spectralfig_kwargs = {} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
