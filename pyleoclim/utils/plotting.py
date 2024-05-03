@@ -12,8 +12,10 @@ import matplotlib as mpl
 from matplotlib import cm
 import numpy as np
 import pandas as pd
+import collections.abc
 
 from ..utils import lipdutils
+
 
 # import pandas as pd
 # from matplotlib.patches import Rectangle
@@ -606,12 +608,12 @@ def set_style(style='journal', font_scale=1.0, dpi=300):
             'xtick.minor.width': 0,
             'ytick.minor.width': 0,
         })
-    
+
     elif 'matplotlib' in style:
-        #mpl.rcParams.update(mpl.rcParamsDefault)
+        # mpl.rcParams.update(mpl.rcParamsDefault)
         style_dict.update({})
-        
-        
+
+
     else:
         raise ValueError(f'Style [{style}] not availabel!')
 
@@ -883,11 +885,11 @@ def get_label_width(ax, label, buffer=0., fontsize=10):
     """
     Helper function to find width of text when rendered in ax object
     """
-    
+
     text = ax.text(0, 0, label, size=fontsize)
     width = text.get_window_extent(renderer=ax.figure.canvas.get_renderer()).width
     text.remove()  # Remove the text used for measurement
-    
+
     return width + buffer
 
 
@@ -1155,13 +1157,14 @@ def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
                 sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values, n=10)
                 # This creates a ScalarMappable a discrete color scale.
 
-                sm = make_scalar_mappable(cmap=['blue', 'white', 'red'], hue_vect=scalar_values, norm_kwargs={'vcenter': 0})
+                sm = pyleo.utils.plotting.make_scalar_mappable(cmap=['blue', 'white', 'red'], hue_vect=scalar_values, norm_kwargs={'vcenter': 0})
                 # This creates a ScalarMappable with a custom linear segmented colormap and centered normalization.
 
 
     """
 
-    if type(hue_vect) in [np.ndarray, pd.Series, list]:
+    # if type(hue_vect) in [np.ndarray, pd.Series, list]:
+    if isinstance(hue_vect, collections.abc.Iterable) and not isinstance(hue_vect, dict):
         ax_cmap = None
         ax_norm = None
 
@@ -1172,16 +1175,28 @@ def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
         if 'clip' not in norm_kwargs.keys():
             norm_kwargs['clip'] = False
 
-        if np.any((norm_kwargs['vcenter'] < max(hue_vect)) | (norm_kwargs['vcenter'] > min(hue_vect))) == True:
-            if cmap is None:
-                cmap = 'vlag'
-            # ax_cmap = keep_center_colormap(cmap, min(hue_vect), max(hue_vect), center=0)
-            ax_norm = mpl.colors.CenteredNorm(
-                **norm_kwargs)  # vcenter=0, clip=False)#TwoSlopeNorm(0, vmin=min(hue_vect), vmax=max(hue_vect)) #
-        else:
-            ax_norm = mpl.colors.Normalize(vmin=min(hue_vect), vmax=max(hue_vect), clip=False)
-            if cmap is None:
-                cmap = 'viridis'
+        if all(isinstance(i, (int, float)) for i in hue_vect):
+            if np.any((norm_kwargs['vcenter'] < max(hue_vect)) | (norm_kwargs['vcenter'] > min(hue_vect))) == True:
+                if cmap is None:
+                    cmap = 'vlag'
+                # ax_cmap = keep_center_colormap(cmap, min(hue_vect), max(hue_vect), center=0)
+                ax_norm = mpl.colors.CenteredNorm(
+                    **norm_kwargs)  # vcenter=0, clip=False)#TwoSlopeNorm(0, vmin=min(hue_vect), vmax=max(hue_vect)) #
+            else:
+                ax_norm = mpl.colors.Normalize(vmin=min(hue_vect), vmax=max(hue_vect), clip=False)
+                if cmap is None:
+                    cmap = 'viridis'
+
+        # if np.any((norm_kwargs['vcenter'] < max(hue_vect)) | (norm_kwargs['vcenter'] > min(hue_vect))) == True:
+        #     if cmap is None:
+        #         cmap = 'vlag'
+        #     # ax_cmap = keep_center_colormap(cmap, min(hue_vect), max(hue_vect), center=0)
+        #     ax_norm = mpl.colors.CenteredNorm(
+        #         **norm_kwargs)  # vcenter=0, clip=False)#TwoSlopeNorm(0, vmin=min(hue_vect), vmax=max(hue_vect)) #
+        # else:
+        #     ax_norm = mpl.colors.Normalize(vmin=min(hue_vect), vmax=max(hue_vect), clip=False)
+        #     if cmap is None:
+        #         cmap = 'viridis'
 
     if ax_cmap is None:
         if type(cmap) == list:
@@ -1199,6 +1214,141 @@ def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
     ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
 
     return ax_sm
+
+
+import copy
+
+
+def consolidate_legends(ax, split_btwn=True, hue='relation', style='exp_type', size=None, colorbar=False):
+    break_pts = []
+    hs, ls = [], []
+    for ip, _ax in enumerate(ax):
+        try:
+            legend = ax[ip].get_legend()
+            l2 = [_l._text for _l in legend.get_texts()]
+            h2 = legend.legendHandles
+        except:
+            ax[ip].legend()
+            h2, l2 = ax[ip].get_legend_handles_labels()
+        hs.append(h2)
+        ls.append(l2)
+
+        break_pts2 = []
+        for ib, _l in enumerate(l2):
+            if _l in [hue, style, size]:
+                break_pt2 = ib
+                break_pts2.append(ib)
+        break_pts2.append(len(l2))
+        break_pts.append(break_pts2)
+
+    labels = []
+    handles = []
+
+    print(break_pts, ls)
+    for iq, bp_lst in enumerate(break_pts):  # [1:]):
+        for ik, bp in enumerate(bp_lst):
+            if ik > 0:
+                if split_btwn is True:
+                    labels.append('')
+                    handles.append(copy.copy(hs[0][-1]))
+                    handles[-1].set_alpha(0)
+                for im, _l in enumerate(ls[iq][:bp]):
+                    if _l not in labels:
+                        labels.append(_l)
+                        handles.append(hs[iq][im])
+
+    if colorbar is True:
+        start = 0
+        end = 0
+        looking = True
+        for ib, _l in enumerate(labels):
+            if looking is True:
+                if _l == hue:
+                    start = ib
+                elif _l in [size, style]:
+                    end = ib
+                    looking = False
+
+        labels = labels[0:start] + labels[end:]  # [start:]
+        handles = handles[0:start] + handles[end:]
+
+    start = 0
+    looking = True
+    for ib, _l in enumerate(labels):
+        if looking is True:
+            if _l == '':
+                start = ib + 1
+            else:
+                looking = False
+
+    labels = labels[start:]
+    handles = handles[start:]
+
+    return handles, labels
+
+
+# def consolidate_legends(ax, split_btwn=True, hue='relation', style='exp_type', size=None):
+#     break_pts = []
+#     hs, ls = [], []
+#     for ip, _ax in enumerate(ax):
+#         try:
+#             legend = ax[ip].get_legend()
+#             l2 = [_l._text for _l in legend.get_texts()]
+#             h2 = legend.legendHandles
+#         except:
+#             ax[ip].legend()
+#             h2, l2 = ax[ip].get_legend_handles_labels()
+#         hs.append(h2)
+#         ls.append(l2)
+#
+#         break_pt2 = len(l2)
+#         for ib, _l in enumerate(l2):
+#             if _l in [hue, style, size]:
+#                 break_pts.append(ib)
+#
+#     labels = []
+#     handles = []
+#
+#     if break_pts[0] ==0:
+#         break_pt_start = 1
+#     else:
+#         break_pt_start = 0
+#
+#     handles += hs[0][:break_pts[break_pt_start]]
+#     labels += ls[0][:break_pts[break_pt_start]]
+#
+#     print(ls)
+#     if len(break_pts)>1:
+#         for ik, bp in enumerate(break_pts[break_pt_start:]):
+#             if split_btwn is True:
+#                 labels.append('')
+#                 handles.append(copy.copy(handles[-1]))
+#                 handles[-1].set_alpha(0)
+#             for im, _l in enumerate(ls[0][:bp]):
+#                 if _l not in labels:
+#                     labels.append(_l)
+#                     handles.append(hs[0][im])
+#     print(labels)
+
+#     labels.append('')
+#     handles.append(copy.copy(handles[-1]))
+#     handles[-1].set_alpha(0)
+#
+#     handles += hs[0][break_pts[break_pt_start]:]
+#     labels += ls[0][break_pts[break_pt_start]:]
+#
+# for ik, bp in enumerate(break_pts[1:]):
+#     ik += 1
+#     if split_btwn is True:
+#         labels.append('')
+#         handles.append(copy.copy(handles[-1]))
+#         handles[-1].set_alpha(0)
+#     for im, _l in enumerate(ls[ik][bp:]):
+#         if _l not in labels:
+#             labels.append(_l)
+#             handles.append(hs[ik][im])
+#
+# return handles, labels
 
 
 def keep_center_colormap(cmap, vmin, vmax, center=0):
@@ -1259,7 +1409,6 @@ def keep_center_colormap(cmap, vmin, vmax, center=0):
 
 
     """
-
 
     vmin = vmin - center
     vmax = vmax - center
