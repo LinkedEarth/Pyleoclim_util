@@ -1735,7 +1735,7 @@ def wwz_coherence(y1, t1, y2, t2, smooth_factor=0.25,
 
     return res
 
-def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
+def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=0.95):
     ''' Return the frequency vector based on the REDFIT recommendation.
 
     Parameters
@@ -1774,8 +1774,9 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
     References
     ----------
 
-    Trauth, M. H. MATLAB® Recipes for Earth Sciences. (Springer, 2015). pp 181.
-
+    - Trauth, M. H. MATLAB® Recipes for Earth Sciences. (Springer, 2015). pp 181.
+    
+    - https://www.mathworks.com/matlabcentral/fileexchange/22215-lomb-normalized-periodogram?focused=5108122&tab=function
 
     See also
     --------
@@ -1800,6 +1801,7 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
     if nf is None:
         df = flo
         nf = int((fhi - flo) / df + 1)
+        
 
     freq = np.linspace(flo, fhi, nf)
 
@@ -2032,17 +2034,15 @@ def freq_vector_log(ts, fmin=None, fmax= None, nf=None):
     if nf is None:
         nf = nt//10 + 1
     if fmin is None:    
-        fmin = 2/(np.max(ts)-np.min(ts))
+        fmin = 1/np.ptp(ts)  # used to be 2/np.ptp(ts)
     if fmax is None:
         fmax = fs/2
         
-    start = np.log2(fmin)
-    stop = np.log2(fmax)
-    freq = np.logspace(start, stop, nf, base=2)
+    freq = np.logspace(np.log2(fmin), np.log2(fmax), nf, base=2)
 
     return freq
 
-def make_freq_vector(ts, method='log', **kwargs):
+def make_freq_vector(ts, method='log', rayleigh_bound=True, **kwargs):
     ''' Make frequency vector
 
     This function selects among five methods to obtain the frequency
@@ -2059,23 +2059,13 @@ def make_freq_vector(ts, method='log', **kwargs):
 
         The method to use. Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
         
-    kwargs : dict, optional
-            -fmin : float
-                minimum frequency. If None is provided (default), inferred by the method.
-                
-            - fmax : float
-                maximum frequency. If None is provided (default), inferred by the method. 
-                
-            - nf (int): number of frequency points
+    rayleigh_bound : boolean
     
-            For Lomb_Scargle, additional parameters may be passed:
-
-            - ofac (float): Oversampling rate that influences the resolution of the frequency axis,
-                 when equals to 1, it means no oversamling (should be >= 1).
-                 The default value 4 is usaually a good value.
-            - hifac (float): fhi/fnyq (should be >= 1), where fhi is the highest frequency that
-                  can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
-
+        If True (default), sets the minimum frequency to the Rayleigh frequency 1/L, where L is the length of the series
+        
+    kwargs : dict, optional
+    
+            See underlying methods for optional parameters
     Returns
     -------
 
@@ -2099,19 +2089,24 @@ def make_freq_vector(ts, method='log', **kwargs):
     '''
 
     if method == 'lomb_scargle':
-        freq = freq_vector_lomb_scargle(ts,**kwargs)
+        fr = freq_vector_lomb_scargle(ts,**kwargs)
     elif method == 'welch':
-        freq = freq_vector_welch(ts)
+        fr = freq_vector_welch(ts)
     elif method == 'nfft':
-        freq = freq_vector_nfft(ts)
+        fr = freq_vector_nfft(ts)
     elif method == 'scale':
-        freq = freq_vector_scale(ts, **kwargs)
+        fr = freq_vector_scale(ts, **kwargs)
     elif method == 'log':
-        freq = freq_vector_log(ts, **kwargs)
+        fr = freq_vector_log(ts, **kwargs)
     else:
         raise ValueError('This method is not supported')
-    #  freq = freq[1:]  # discard the first element 0
-
+        
+    if rayleigh_bound:
+        fR = 1/np.ptp(ts) # Rayleigh frequency
+        freq = fr[fr>=fR]
+    else:
+        freq = fr
+        
     return freq
 
 

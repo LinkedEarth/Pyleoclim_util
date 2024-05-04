@@ -346,10 +346,10 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
                  gaussianize=False,
                  standardize=True,
                  average='mean'):
-    """ Lomb-scargle priodogram
+    """ Lomb-scargle periodogram
 
     Appropriate for unevenly-spaced arrays.
-    Uses the lomb-scargle implementation from scipy.signal: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lombscargle.html
+    Uses the lomb-scargle implementation: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lombscargle.html
 
     Parameters
     ----------
@@ -469,8 +469,6 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     References
     ----------
     Lomb, N. R. (1976). Least-squares frequency analysis of unequally spaced data. Astrophysics and Space Science 39, 447-462.
-
-    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
 
     Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
 
@@ -1281,6 +1279,6 @@ def psd_fBM(freq, ts, H):
 
     for k in range(nf):
         tmp = 2 * omega[k] * T
-        psd[k] = (1 - 2**(1 - 2*H)*np.sin(tmp)/tmp) / np.abs(omega[k])**(1 + 2*H)
+        psd[k] = (1 - 2**(1 - 2*H)*np.sin(tmp)/tmp) / np.abs(omega[k])**(1 + 2*H) # Eq 6 from Flandrin, 1989
 
     return psd

@@ -249,14 +249,11 @@ class PSD:
         '''
         from ..core.surrogateseries import SurrogateSeries
 
-        if self.spec_method == 'wwz' and method == 'ar1asym':
+        if self.spec_method in ['wwz','lomb_scargle'] and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the wwz method')
 
-        if self.spec_method == 'lomb_scargle' and method == 'ar1asym':
-            raise ValueError('Asymptotic solution is not supported for the Lomb-Scargle method')
-
         if method not in ['ar1sim', 'uar1','ar1asym']:
-                raise ValueError("The available methods are 'ar1sim' and 'ar1asym'")
+                raise ValueError("The available methods are 'ar1sim', 'uar1' and 'ar1asym'")
 
         if method in ['ar1sim', 'uar1']:
             signif_scals = None
@@ -310,7 +307,7 @@ class PSD:
                                                        self.spec_args['param'],
                                                        qs=qs, **settings)
             else:
-                # hard code Mortlet values to obtain the spectrum
+                # hard code Morlet values to obtain the spectrum
                 param = 6
                 fourier_factor = 4 * np.pi / (param + np.sqrt(2 + param**2))
                 scale = 1/(fourier_factor*self.frequency)
