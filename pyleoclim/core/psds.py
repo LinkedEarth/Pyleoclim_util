@@ -1245,7 +1245,7 @@ class MultiplePSD:
             
         plot_legend : bool, optional
         
-            Wether to plot the legend. The default is True.
+            Whether to plot the legend. The default is True.
             
         curve_clr : str, optional
         
