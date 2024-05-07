@@ -8,7 +8,9 @@ from tqdm import tqdm
 import scipy as sp
 import numpy as np
 
-from ..core import Series, MultipleGeoSeries, MulMultivarDecomp
+from ..core.series import Series
+from ..core.multiplegeoseries import MultipleGeoSeries
+from ..core.mulmultivardecomp import MulMultivarDecomp
 
 class MulEnsGeoSeries():
     def __init__(self, ensemble_series_list,label=None):
