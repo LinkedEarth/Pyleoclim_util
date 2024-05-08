@@ -31,7 +31,7 @@ class TestUiPsdPlot:
 class TestUiPsdSignifTest:
     ''' Tests for PSD.signif_test()
     '''
-    @pytest.mark.parametrize('method',['ar1sim','uar1','ar1asym'])
+    @pytest.mark.parametrize('method',['ar1sim','uar1','ar1asym','CN'])
     def test_signif_test_t0(self,method,gen_ts):
         ''' Test PSD.signif_test() with default parameters
         '''

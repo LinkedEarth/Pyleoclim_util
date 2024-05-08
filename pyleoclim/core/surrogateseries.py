@@ -149,7 +149,8 @@ class SurrogateSeries(EnsembleSeries):
             y_surr = tsmodel.uar1_sim(t = times, tau=tau, sigma_2=sigma_2)
             
         elif self.method == 'CN':
-            alpha = target_series.interp().spectral(method='cwt').beta_est().beta_est_res['beta'] # fit the parameter
+            tsi = target_series if target_series.is_evenly_spaced() else target_series.interp()
+            alpha = tsi.spectral(method='cwt').beta_est().beta_est_res['beta'] # fit the parameter using the smoothest spectral method
             self.param = alpha
             y_surr = np.empty((len(target_series.time),self.number))
             for i in range(self.number):

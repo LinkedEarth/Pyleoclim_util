@@ -252,7 +252,7 @@ class PSD:
         if self.spec_method in ['wwz','lomb_scargle'] and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the wwz method')
         
-        supported_methods = ['CN', 'ar1sim', 'phaseran','ar1asym']
+        supported_methods = ['CN', 'ar1sim', 'phaseran', 'ar1asym', 'uar1']
         if method not in supported_methods:
                 raise ValueError(f"The available methods are {supported_methods}")
 
