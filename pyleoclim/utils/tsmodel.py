@@ -5,10 +5,10 @@ import numpy as np
 # new for statsmodels v0.12
 from statsmodels.tsa.arima_process import arma_generate_sample
 from statsmodels.tsa.arima.model import ARIMA
-from tqdm import tqdm
-from .tsutils import standardize
-from stochastic.processes.noise import ColoredNoise
-from stochastic.processes.noise import FractionalGaussianNoise
+# from tqdm import tqdm
+# from .tsutils import standardize
+# from stochastic.processes.noise import ColoredNoise
+# from stochastic.processes.noise import FractionalGaussianNoise
 
 from .tsbase import (
     is_evenly_spaced
@@ -103,7 +103,6 @@ def ar1_fit(y, t=None):   ## is this still used anywhere? Looks redundant
     if is_evenly_spaced(t):
         g = ar1_fit_evenly(y)
     else:
-        #  g = tau_estimation(y, t, detrend=detrend, params=params)
         g = tau_estimation(y, t)
 
     return g
@@ -116,7 +115,7 @@ def ar1_sim(y, p, t=None):
     
     Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
 
-    Will be replaced by ar1_sim_geneva in a future release
+    Will be replaced by uar1_sim in a future release
 
 
     Parameters
@@ -221,6 +220,8 @@ def ar1_fit_evenly(y):
     Uses `statsmodels.tsa.arima.model.ARIMA <https://www.statsmodels.org/devel/generated/statsmodels.tsa.arima.model.ARIMA.html>`_. to
     calculate lag-1 autocorrelation
 
+    MARK FOR DEPRECATION once uar1_fit is adopted
+    
     Parameters
     ----------
     y : array

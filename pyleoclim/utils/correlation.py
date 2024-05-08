@@ -12,10 +12,6 @@ __all__ = [
 
 import numpy as np
 import scipy.stats as stats
-#from scipy.stats import pearsonr
-#from scipy.stats.mstats import gmean
-#from scipy.stats import t as stu
-#from scipy.stats import gaussian_kde
 from sklearn import preprocessing
 from .tsmodel import ar1_fit_evenly, isopersistent_rn
 from .tsutils import phaseran
