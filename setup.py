@@ -45,7 +45,6 @@ setup(
         "pyyaml",
         "beautifulsoup4", 
         "scipy", 
-        "stochastic"
     ],
     python_requires=">=3.9.0"
 )

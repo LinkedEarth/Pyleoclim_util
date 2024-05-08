@@ -19,5 +19,4 @@ dependencies:
   - pytest
   - pip:
     - pyhht
-    - stochastic
     - '-e .'
