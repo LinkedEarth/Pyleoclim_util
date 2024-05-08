@@ -37,8 +37,27 @@ class TestUISurrogatesSeries:
             tau[i], sigma_2[i] = tsmodel.uar1_fit(ts.value, ts.time)
         assert np.abs(tau.mean()-param[0]) < eps
         assert np.abs(sigma_2.mean()-param[1]) < eps
-    
-    @pytest.mark.parametrize('method',['ar1sim','uar1','phaseran'])          
+        
+    @pytest.mark.parametrize('param',[1.0,[1.0]])    
+    def test_surrogates_CN(self, param, nsim=10, eps=.1, seed = 108):
+        ''' Generate colored noise surrogates based known parameters,
+        estimate the parameters from the surrogates series and verify accuracy
+        '''
+        CN = pyleo.SurrogateSeries(method='CN', number=nsim, seed=seed) 
+        CN.from_param(param = param, length=200)
+        beta = np.empty((nsim))
+        for i, ts in enumerate(CN.series_list):
+            beta[i] = ts.interp().spectral(method='cwt').beta_est().beta_est_res['beta']
+        assert np.abs(beta.mean()-1.0) < eps
+        
+    def test_surrogates_CN2(self, nsim=10):
+        ''' Generate colored noise surrogates with too many params; check error msg
+        '''
+        CN = pyleo.SurrogateSeries(method='CN', number=nsim) 
+        with pytest.raises(ValueError):  
+            CN.from_param(param = [2.0, 3.0], length=200) # check that this returns an error 
+           
+    @pytest.mark.parametrize('method',['ar1sim','uar1','phaseran','CN'])          
     @pytest.mark.parametrize('number',[1,5])     
     def test_surrogates_match(self, method, number):
         ''' Test that from_series() work with all methods, matches the original
@@ -46,10 +65,10 @@ class TestUISurrogatesSeries:
         '''
         t, v = pyleo.utils.gen_ts(model='colored_noise', nt=100)
         ts = pyleo.Series(time = t, value = v, verbose=False, auto_time_params=True)
-        ar1 = pyleo.SurrogateSeries(method=method, number=number) 
-        ar1.from_series(ts)
-        assert len(ar1.series_list) == number # test right number 
-        for s in ar1.series_list:
+        surr = pyleo.SurrogateSeries(method=method, number=number) 
+        surr.from_series(ts)
+        assert len(surr.series_list) == number # test right number 
+        for s in surr.series_list:
             assert_array_equal(s.time, ts.time) # test time axis match
     
     @pytest.mark.parametrize('delta_t',[1,3]) 

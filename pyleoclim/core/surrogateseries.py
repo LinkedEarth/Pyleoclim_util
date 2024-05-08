@@ -11,7 +11,7 @@ from ..utils import tsutils, tsmodel
 import numpy as np
 import warnings
 
-supported_surrogates = frozenset(['ar1sim','phaseran', 'uar1','CN']) # broadcast all supported surrogates as global variable, for exception handling
+supported_surrogates = frozenset(['ar1sim','phaseran','uar1','CN']) # broadcast all supported surrogates as global variable, for exception handling
 
 class SurrogateSeries(EnsembleSeries):
     ''' Object containing surrogate timeseries, obtained either by emulating an 
@@ -50,7 +50,7 @@ class SurrogateSeries(EnsembleSeries):
         _ [1] Mudelsee, M. (2002), TAUEST: a computer program for estimating persistence in unevenly spaced weather/climate time series, Computers and Geosciences, 28, 69–72, doi:10.1016/S0098- 3004(01)00041-3.
         _ [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correlation when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
         _ [3] Prichard, D., and J. Theiler (1994), Generating surrogate data for time series with several simultaneously measured variables, Phys. Rev. Lett., 73, 951–954, doi: 10.1103/PhysRevLett.73.951.
-        _ [4] Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+        _ [4] Kirchner, J. W., Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
         
         Raises
         ------
@@ -76,13 +76,13 @@ class SurrogateSeries(EnsembleSeries):
         # refine the display name
         if label is None:
             if method == 'ar1sim':
-                self.label =  "AR(1) surrogates (MoM)"
+                self.label =  "AR(1) (MoM)"
             elif method == 'phaseran':
-                self.label = "phase-randomized surrogates"
+                self.label = "phase-randomized"
             elif method == 'uar1':
-                self.label = "AR(1) surrogates (MLE)"
+                self.label = "AR(1) (MLE)"
             elif method == 'CN':
-                self.label = r'$f^{-\beta}$ surrogates'
+                self.label = r'$f^{-\beta}$'
             else:
                 raise ValueError(f"Unknown method: {self.method}. Please use one of {supported_surrogates}")
                 
@@ -176,7 +176,7 @@ class SurrogateSeries(EnsembleSeries):
         Parameters
         ----------
         param : list
-            model parameters (e.g. [tau, sigma0] for an AR(1) model)
+            model parameters (e.g. [tau, sigma0] for an AR(1) model, [beta] for colored noise)
         
         length : int
             Length of the series. Default: 50
@@ -202,7 +202,7 @@ class SurrogateSeries(EnsembleSeries):
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
-        pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
+        pyleoclim.utils.tsmodel.colored_noise: simulating from a power law spectrum, $S(f) \propto f^{-\beta}$
         pyleoclim.utils.tsmodel.random_time_axis : Generate time increment vector according to a specific probability model
         
         Examples
@@ -212,7 +212,7 @@ class SurrogateSeries(EnsembleSeries):
         ar1.plot_envelope(title=rf'AR(1) synthetic series ($\tau={2},\sigma^2={2}$)')
 
         '''    
-        param = list(param) if param is not None else [] # coerce param into a list, no matter the original format
+        param = param if isinstance(param, list) else [param] # coerce param into a list, no matter the original format
         nparam = len(param)
         
         settings = {} if settings is None else settings.copy()
@@ -242,12 +242,19 @@ class SurrogateSeries(EnsembleSeries):
         # apply surrogate method
         y_surr = np.empty_like(times)                 
         
-        if self.method in ['uar1','ar1sim']: #
-            if nparam<2:
+        if self.method in ['uar1','ar1sim']: # AR(1) models
+            if nparam != 2:
                 warnings.warn(f'The AR(1) model needs 2 parameters, tau and sigma2 (in that order); {nparam} provided. default values used, tau=5, sigma=0.5',UserWarning, stacklevel=2)
                 param = [5,0.5]
             y_surr = tsmodel.uar1_sim(t = times, tau=param[0], sigma_2=param[1])
-                
+            
+        elif self.method == 'CN': # colored noise
+            if nparam >1:
+                raise ValueError(f"1 parameter is needed for this model; only the first of the provided {nparam} will be used")
+            y_surr = np.empty((length,self.number))
+            for i in range(self.number):
+                y_surr[:,i] = tsmodel.colored_noise(alpha=param[0],t=times[:,i])
+                 
         elif self.method == 'phaseran':  
             raise ValueError("Phase-randomization is only available in from_series().")
         
