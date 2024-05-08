@@ -27,7 +27,6 @@ __all__ = [
     'gen_ar1_evenly',
     'gen_ts',
     'tau_estimation',
-    'parametric_surrogates',
     'random_time_axis',
     'inverse_cumsum'
 ]

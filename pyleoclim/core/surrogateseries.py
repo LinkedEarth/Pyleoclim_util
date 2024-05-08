@@ -11,7 +11,7 @@ from ..utils import tsutils, tsmodel
 import numpy as np
 import warnings
 
-supported_surrogates = frozenset(['ar1sim','phaseran', 'uar1']) # broadcast all supported surrogates as global variable, for exception handling
+supported_surrogates = frozenset(['ar1sim','phaseran', 'uar1','CN']) # broadcast all supported surrogates as global variable, for exception handling
 
 class SurrogateSeries(EnsembleSeries):
     ''' Object containing surrogate timeseries, obtained either by emulating an 
@@ -22,7 +22,7 @@ class SurrogateSeries(EnsembleSeries):
     '''
     def __init__(self, series_list=[], number=1, method=None, label=None, param=None, seed=None): 
         '''
-        Initiatlize a SurrogateSeries object. The parameters below are then used for series generation and labeling. 
+        Initialize a SurrogateSeries object. The parameters below are then used for series generation and labeling. 
 
         Parameters
         ----------
@@ -32,16 +32,26 @@ class SurrogateSeries(EnsembleSeries):
         number : int
             The number of surrogates to generate. The default is 1. 
             
-        method : str {ar1sim, phaseran, uar1}
+        method : str {ar1sim, phaseran, uar1, CN}
             The name of the method used to generate surrogates of the timeseries (no default)
+            - 'ar1sim' fits an AR(1) model using the method of moments (MoM) as per [1]
+            - 'phaseran' applies phase randomization as per [2, 3]
+            - 'CN' fits a "colored noise" model (power-law spectrum) as per [4] (Eq 15)
             
         param : list 
             a list of parameters for the method in question. Ignored if the method does not require parameters. 
             
         label : str
-            label of the collection of timeseries (e.g. 'SOI surrogates [AR(1) MLE]')
+            label of the collection of timeseries (e.g. 'SOI surrogates [AR(1) MoM]')
             If not provided, defaults to "series surrogates [{method}]"
-
+            
+        References
+        ----------
+        _ [1] Mudelsee, M. (2002), TAUEST: a computer program for estimating persistence in unevenly spaced weather/climate time series, Computers and Geosciences, 28, 69–72, doi:10.1016/S0098- 3004(01)00041-3.
+        _ [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correlation when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
+        _ [3] Prichard, D., and J. Theiler (1994), Generating surrogate data for time series with several simultaneously measured variables, Phys. Rev. Lett., 73, 951–954, doi: 10.1103/PhysRevLett.73.951.
+        _ [4] Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+        
         Raises
         ------
         ValueError
@@ -60,7 +70,7 @@ class SurrogateSeries(EnsembleSeries):
                 raise ValueError("2 parameters are needed for this model")
             elif method == 'phaseran':
                 warnings.warn("Phase-randomization is a non parametric method; the provided parameters will be ignored")
-            elif method in ['fBm','CN'] and nparam >1:
+            elif method == 'CN' and nparam >1:
                 raise ValueError(f"1 parameter is needed for this model; only the first of the provided {nparam} will be used")
        
         # refine the display name
@@ -71,6 +81,8 @@ class SurrogateSeries(EnsembleSeries):
                 self.label = "phase-randomized surrogates"
             elif method == 'uar1':
                 self.label = "AR(1) surrogates (MLE)"
+            elif method == 'CN':
+                self.label = r'$f^{-\beta}$ surrogates'
             else:
                 raise ValueError(f"Unknown method: {self.method}. Please use one of {supported_surrogates}")
                 
@@ -135,6 +147,12 @@ class SurrogateSeries(EnsembleSeries):
             times = np.squeeze(np.tile(target_series.time, (self.number, 1)).T)  
             # generate matrix
             y_surr = tsmodel.uar1_sim(t = times, tau=tau, sigma_2=sigma_2)
+            
+        elif self.method == 'CN':
+            alpha = target_series.interp().spectral(method='cwt').beta_est().beta_est_res['beta'] # fit the parameter
+            y_surr = np.empty((len(target_series.time),self.number))
+            for i in range(self.number):
+                y_surr[:,i] = tsmodel.colored_noise(alpha=alpha, t=target_series.time)
         
         if self.number > 1:
             s_list = []
