@@ -1,4 +1,4 @@
-''' Tests for pyleoclim.core.ui.EnsembleSeries
+''' Tests for pyleoclim.core.ui.EnsembleGeoSeries
 
 Naming rules:
 1. class: Test{filename}{Class}{method} with appropriate camel case
