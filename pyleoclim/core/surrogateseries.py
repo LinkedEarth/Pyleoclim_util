@@ -150,6 +150,7 @@ class SurrogateSeries(EnsembleSeries):
             
         elif self.method == 'CN':
             alpha = target_series.interp().spectral(method='cwt').beta_est().beta_est_res['beta'] # fit the parameter
+            self.param = alpha
             y_surr = np.empty((len(target_series.time),self.number))
             for i in range(self.number):
                 y_surr[:,i] = tsmodel.colored_noise(alpha=alpha, t=target_series.time)

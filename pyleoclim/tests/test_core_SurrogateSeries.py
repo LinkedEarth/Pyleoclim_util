@@ -60,7 +60,7 @@ class TestUISurrogatesSeries:
     @pytest.mark.parametrize('method',['ar1sim','uar1','phaseran','CN'])          
     @pytest.mark.parametrize('number',[1,5])     
     def test_surrogates_match(self, method, number):
-        ''' Test that from_series() work with all methods, matches the original
+        ''' Test that from_series() works with all methods, matches the original
             time axis AND that number can be varied
         '''
         t, v = pyleo.utils.gen_ts(model='colored_noise', nt=100)
