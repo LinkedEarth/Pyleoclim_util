@@ -32,7 +32,7 @@ class TestUiCoherencePlot:
         fig,ax = coh.plot()
         pyleo.closefig(fig)
         
-    @pytest.mark.parametrize('method', ['ar1sim','phaseran'])
+    @pytest.mark.parametrize('method', ['ar1sim','phaseran','uar1','CN'])
     def test_plot_t1(self, gen_ts, method):
         ''' Test Coherence.plot WTC with significance
         '''

@@ -413,7 +413,7 @@ class Scalogram:
         Parameters
         ----------
 
-        method : {'ar1asym', 'ar1sim','uar1'}
+        method : {'ar1asym', 'ar1sim','uar1', 'CN'}
 
             Method to use to generate the surrogates.  ar1sim uses simulated timeseries with similar persistence. 
             ar1asym represents the theoretical, closed-form solution. The default is ar1sim
@@ -463,6 +463,8 @@ class Scalogram:
         pyleoclim.core.scalograms.MultipleScalogram : MultipleScalogram object
 
         pyleoclim.utils.wavelet.tc_wave_signif : Asymptotic significance calculation
+        
+        pyleoclim.core.surrogateseries.SurrogateSeries : surrogate series objects
 
         Examples
         --------
@@ -486,11 +488,11 @@ class Scalogram:
         if self.wave_method == 'wwz' and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the wwz method')
 
-        acceptable_methods = ['ar1sim', 'ar1asym', 'uar1']
+        acceptable_methods = ['ar1sim', 'ar1asym', 'uar1','CN']
         if method not in acceptable_methods:
                 raise ValueError(f"The available methods are: {acceptable_methods}")
 
-        if method in ['ar1sim','uar1'] :
+        if method in ['ar1sim','uar1','CN']:
             from ..core.surrogateseries import SurrogateSeries
 
             if hasattr(self,'signif_scals'):

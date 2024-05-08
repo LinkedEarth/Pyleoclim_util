@@ -38,7 +38,7 @@ class TestUiScalogramSignifTest:
         fig,ax = scal_signif.plot(signif_thresh=0.99)
         pyleo.closefig(fig)
         
-    @pytest.mark.parametrize('method',['ar1sim','uar1','ar1asym'])
+    @pytest.mark.parametrize('method',['ar1sim','uar1','ar1asym','CN'])
     def test_signif_test_t1(self,method):
         ''' Test scalogram.signif_test() with various surrogates
         '''
