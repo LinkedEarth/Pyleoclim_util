@@ -247,15 +247,16 @@ class PSD:
         pyleoclim.core.series.Series.wavelet : Performs wavelet analysis on Pyleoclim Series
 
         '''
-        from ..core.surrogateseries import SurrogateSeries
+        from ..core.surrogateseries import SurrogateSeries, supported_surrogates
 
         if self.spec_method in ['wwz','lomb_scargle'] and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the wwz method')
+        
+        supported_methods = ['CN', 'ar1sim', 'phaseran', 'ar1asym', 'uar1']
+        if method not in supported_methods:
+                raise ValueError(f"The available methods are {supported_methods}")
 
-        if method not in ['ar1sim', 'uar1','ar1asym']:
-                raise ValueError("The available methods are 'ar1sim', 'uar1' and 'ar1asym'")
-
-        if method in ['ar1sim', 'uar1']:
+        if method in supported_surrogates:
             signif_scals = None
             if scalogram:
                 try:
@@ -733,7 +734,8 @@ class PSD:
             signif_method_label = {
                 'ar1sim': 'AR(1) simulations (MoM)',
                 'uar1': 'AR(1) simulations (MLE)',
-                'ar1asym': 'AR(1) asymptotic solution'
+                'ar1asym': 'AR(1) asymptotic solution',
+                'CN': 'Colored Noise'
             }
             nqs = np.size(self.signif_qs.psd_list)
 

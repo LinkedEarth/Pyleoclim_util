@@ -5,10 +5,10 @@ import numpy as np
 # new for statsmodels v0.12
 from statsmodels.tsa.arima_process import arma_generate_sample
 from statsmodels.tsa.arima.model import ARIMA
-from tqdm import tqdm
-from .tsutils import standardize
-from stochastic.processes.noise import ColoredNoise
-from stochastic.processes.noise import FractionalGaussianNoise
+# from tqdm import tqdm
+# from .tsutils import standardize
+# from stochastic.processes.noise import ColoredNoise
+# from stochastic.processes.noise import FractionalGaussianNoise
 
 from .tsbase import (
     is_evenly_spaced
@@ -27,7 +27,6 @@ __all__ = [
     'gen_ar1_evenly',
     'gen_ts',
     'tau_estimation',
-    'parametric_surrogates',
     'random_time_axis',
     'inverse_cumsum'
 ]
@@ -104,7 +103,6 @@ def ar1_fit(y, t=None):   ## is this still used anywhere? Looks redundant
     if is_evenly_spaced(t):
         g = ar1_fit_evenly(y)
     else:
-        #  g = tau_estimation(y, t, detrend=detrend, params=params)
         g = tau_estimation(y, t)
 
     return g
@@ -117,7 +115,7 @@ def ar1_sim(y, p, t=None):
     
     Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
 
-    Will be replaced by ar1_sim_geneva in a future release
+    Will be replaced by uar1_sim in a future release
 
 
     Parameters
@@ -222,6 +220,8 @@ def ar1_fit_evenly(y):
     Uses `statsmodels.tsa.arima.model.ARIMA <https://www.statsmodels.org/devel/generated/statsmodels.tsa.arima.model.ARIMA.html>`_. to
     calculate lag-1 autocorrelation
 
+    MARK FOR DEPRECATION once uar1_fit is adopted
+    
     Parameters
     ----------
     y : array
@@ -550,73 +550,73 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     return t, v
 
-def parametric_surrogates(y, p, model, param, seed):
-    ''' 
-    Generate `p` surrogates of array X according to a given
-    parametric model 
+# def parametric_surrogates(y, p, model, param, seed):
+#     ''' 
+#     Generate `p` surrogates of array X according to a given
+#     parametric model 
         
-    Parameters
-    ----------
+#     Parameters
+#     ----------
     
-    model : str
-        Stochastic model for the temporal behavior. Accepted choices are:
-        - 'unif': resample uniformly from the posterior distribution
-        - 'ar': autoregressive model, see  https://www.statsmodels.org/dev/tsa.html#univariate-autoregressive-processes-ar
-        - 'fGn': fractional Gaussian noise, see https://stochastic.readthedocs.io/en/stable/noise.html#stochastic.processes.noise.FractionalGaussianNoise 
-        - 'power-law': aka Colored Noise, see https://stochastic.readthedocs.io/en/stable/noise.html#stochastic.processes.noise.ColoredNoise
+#     model : str
+#         Stochastic model for the temporal behavior. Accepted choices are:
+#         - 'unif': resample uniformly from the posterior distribution
+#         - 'ar': autoregressive model, see  https://www.statsmodels.org/dev/tsa.html#univariate-autoregressive-processes-ar
+#         - 'fGn': fractional Gaussian noise, see https://stochastic.readthedocs.io/en/stable/noise.html#stochastic.processes.noise.FractionalGaussianNoise 
+#         - 'power-law': aka Colored Noise, see https://stochastic.readthedocs.io/en/stable/noise.html#stochastic.processes.noise.ColoredNoise
         
-    param : variable type [default is None]
-        parameter of the model. 
-        - 'unif': no parameter 
-        - 'ar': param is the result from fitting Statsmodels Autoreg.fit() (with zero-lag term)
-        - 'fGn': param is the Hurst exponent, H (float)
-        - 'power-law': param is the spectral exponent beta (float)
+#     param : variable type [default is None]
+#         parameter of the model. 
+#         - 'unif': no parameter 
+#         - 'ar': param is the result from fitting Statsmodels Autoreg.fit() (with zero-lag term)
+#         - 'fGn': param is the Hurst exponent, H (float)
+#         - 'power-law': param is the spectral exponent beta (float)
         
-    Under allowable values, 'fGn' and 'power-law' should return equivalent results as long as H = (beta+1)/2 is in [0, 1)
+#     Under allowable values, 'fGn' and 'power-law' should return equivalent results as long as H = (beta+1)/2 is in [0, 1)
         
-    p : int
-        number of series to export
+#     p : int
+#         number of series to export
         
-    trend : array, length self.nt
-        general trend of the ensemble. 
-        If None, it is calculated as the ensemble mean.
-        If provided, it will be added to the ensemble. 
+#     trend : array, length self.nt
+#         general trend of the ensemble. 
+#         If None, it is calculated as the ensemble mean.
+#         If provided, it will be added to the ensemble. 
           
-    seed : int
-        seed for the random generator (provided for reproducibility)
+#     seed : int
+#         seed for the random generator (provided for reproducibility)
 
-    Returns
-    -------
-    surr :  N x p array containing surrogates
-    '''
+#     Returns
+#     -------
+#     surr :  N x p array containing surrogates
+#     '''
     
-    if seed is not None:
-        np.random.seed(seed)
-    N = len(y)      
+#     if seed is not None:
+#         np.random.seed(seed)
+#     N = len(y)      
         
-    paths = np.ndarray((N, p))
+#     paths = np.ndarray((N, p))
     
-    if model == 'ar':
-        coeffs = param[1:] # ignore the zero-lag term
-        arparams = np.r_[1, -coeffs]
-        maparams = np.r_[1, np.zeros_like(coeffs)]
+#     if model == 'ar':
+#         coeffs = param[1:] # ignore the zero-lag term
+#         arparams = np.r_[1, -coeffs]
+#         maparams = np.r_[1, np.zeros_like(coeffs)]
        
-        for j in tqdm(range(p)):
-            y = arma_generate_sample(arparams, maparams, N)
-            z, _, _ = standardize(y)
-            paths[:,j] = z
+#         for j in tqdm(range(p)):
+#             y = arma_generate_sample(arparams, maparams, N)
+#             z, _, _ = standardize(y)
+#             paths[:,j] = z
 
-    elif model == 'power-law':
-        for j in tqdm(range(p)):
-            CN = ColoredNoise(beta=param,t=N)
-            z, _, _ = standardize(CN.sample(N-1))
-            paths[:,j] = z
+#     elif model == 'power-law':
+#         for j in tqdm(range(p)):
+#             CN = ColoredNoise(beta=param,t=N)
+#             z, _, _ = standardize(CN.sample(N-1))
+#             paths[:,j] = z
              
-    elif model == 'fGn':
-        for j in tqdm(range(p)):
-            fgn = FractionalGaussianNoise(hurst=param, t=N)
-            z, _, _ = standardize(fgn.sample(N, algorithm='daviesharte')) 
-            paths[:,j] = z
+#     elif model == 'fGn':
+#         for j in tqdm(range(p)):
+#             fgn = FractionalGaussianNoise(hurst=param, t=N)
+#             z, _, _ = standardize(fgn.sample(N, algorithm='daviesharte')) 
+#             paths[:,j] = z
         
 def n_ll_unevenly_spaced_ar1(theta, y, t):
   """

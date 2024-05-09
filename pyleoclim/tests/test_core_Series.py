@@ -582,7 +582,7 @@ class TestUISeriesSummaryPlot:
 class TestUISeriesCorrelation:
     ''' Test Series.correlation()
     '''
-    @pytest.mark.parametrize('sig_method', ['ttest','built-in','ar1sim','phaseran'])
+    @pytest.mark.parametrize('sig_method', ['ttest','built-in','ar1sim','phaseran','CN'])
     @pytest.mark.parametrize('number', [2,5])
     def test_correlation_t0a(self, sig_method, number, eps=0.1):
         ''' Test the various significance methods

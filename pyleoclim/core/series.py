@@ -3387,9 +3387,10 @@ class Series:
 
         The significance of the correlation is assessed using one of the following methods:
 
-        1) 'ttest': T-test adjusted for effective sample size.
-        2) 'ar1sim': AR(1) modeling of x and y.
-        3) 'phaseran': phase randomization of original inputs. (default)
+        1) 'ttest': T-test adjusted for effective sample size, see [1]
+        2) 'ar1sim': AR(1) modeling of x and y (Monte Carlo method)
+        3) 'CN': colored noise (power-law spectrum) modeling of x and y (Monte Carlo method)
+        3) 'phaseran': phase randomization of original inputs. (Monte Carlo method, default), see [2]
         4) 'built-in': uses built-in method
 
         Note: Up to version v0.14.0. ar1sim was called "isopersistent",  phaseran was called "isospectral"
@@ -3467,9 +3468,9 @@ class Series:
 
         References
         ----------
-        [1] Hu, J., J. Emile-Geay, and J. Partin (2017), Correlation-based interpretations of paleoclimate data – where statistics meet past climates, Earth and Planetary Science Letters, 459, 362–371, doi:10.1016/j.epsl.2016.11.048.
+        _ [1] Hu, J., J. Emile-Geay, and J. Partin (2017), Correlation-based interpretations of paleoclimate data – where statistics meet past climates, Earth and Planetary Science Letters, 459, 362–371, doi:10.1016/j.epsl.2016.11.048.
         
-        [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correla- tion when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
+        _ [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correla- tion when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
         
         Examples
         --------

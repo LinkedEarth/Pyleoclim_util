@@ -595,9 +595,9 @@ class Coherence:
         
             Number of surrogate series to create for significance testing. The default is 200.
         
-        method : {'ar1sim','phaseran'}, optional
+        method : {'ar1sim','phaseran','CN'}, optional
         
-            Method through which to generate the surrogate series. The default is 'ar1sim'.
+            Method through which to generate the surrogate series. The default is 'phaseran'.
        
         seed : int, optional
         
