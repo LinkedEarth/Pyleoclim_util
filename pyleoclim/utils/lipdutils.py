@@ -1622,21 +1622,23 @@ def getEnsemble(csv_dict, csvName):
 
     return depth, ensembleValues
 
-def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo):
+def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo,extrapolate=True):
     """ Map the depth for the ensemble age values to the paleo depth
 
     Parameters
     ----------
 
     ensembleValues : array
-        A matrix of possible age models. Realizations
-        should be stored in columns
+        A matrix of possible age models. Realizations should be stored in columns
+
     depthEnsemble : array
-        A vector of depth. The vector should have the same
-        length as the number of rows in the ensembleValues
+        A vector of depth. The vector should have the same length as the number of rows in the ensembleValues
+
     depthPaleo : array
-        A vector corresponding to the depth at which there
-        are paleodata information
+        A vector corresponding to the depth at which there are paleodata information
+
+    extrapolate : bool
+        Whether to extrapolate the ensemble values to the paleo depth. Default is True
 
     Returns
     -------
@@ -1655,8 +1657,13 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo):
 
     #Interpolate
     ensembleValuesToPaleo = np.zeros((len(depthPaleo),np.shape(ensembleValues)[1])) #placeholder
-    for i in np.arange(0,np.shape(ensembleValues)[1]):
-        ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i])
+
+    if extrapolate:
+        for i in np.arange(0,np.shape(ensembleValues)[1]):
+            ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i])
+    else:
+        for i in np.arange(0,np.shape(ensembleValues)[1]):
+            ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i],left=np.nan,right=np.nan)
 
     return ensembleValuesToPaleo
 
