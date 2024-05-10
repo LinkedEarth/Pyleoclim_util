@@ -5,8 +5,16 @@ list) of MultivariateDecomp objects. This class currently exists primarily for t
 
 import numpy as np
 import seaborn as sns
+import pandas as pd
 
-from ..utils import plotting
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.gridspec import GridSpec
+from matplotlib import cm
+
+from ..core.series import Series
+from ..core.ensembleseries import EnsembleSeries
+from ..utils import mapping, plotting
 
 class MulMultivarDecomp():
     def __init__(self, pca_list,label=None):
@@ -161,7 +169,7 @@ class MulMultivarDecomp():
         eof_quantiles = np.quantile(a=eof_array,q=quantiles,axis=1)
 
         time_unit = self.pca_list[0].orig.series_list[0].time_unit
-        pca_ens = pyleo.EnsembleSeries([pyleo.Series(time=t_list[idx],value=pc_list[idx],time_unit=time_unit,verbose=False) for idx in range(len(self.pca_list))])
+        pca_ens = EnsembleSeries([Series(time=t_list[idx],value=pc_list[idx],time_unit=time_unit,verbose=False) for idx in range(len(self.pca_list))])
 
         if 'plot_legend' not in plot_envelope_kwargs.keys():
             plot_envelope_kwargs['plot_legend'] = False
@@ -207,7 +215,7 @@ class MulMultivarDecomp():
         df_list = []
         for idx,q in enumerate(quantiles):
             eof_q = eof_quantiles[idx]
-            df_tmp = pyleo.utils.mapping.make_df(self.pca_list[0].orig, hue='quantile', marker=marker, size='EOF')
+            df_tmp = mapping.make_df(self.pca_list[0].orig, hue='quantile', marker=marker, size='EOF')
             # additional columns are added manually
             df_tmp['EOF'] = np.abs(eof_q)
             df_tmp['quantile'] = q*100
@@ -223,16 +231,15 @@ class MulMultivarDecomp():
         ax_cmap = plt.get_cmap(name=cmap)
         ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
 
-        _, ax['map'] = pyleo.utils.mapping.scatter_map(df, hue='quantile', size='EOF', marker=marker, projection=projection,
+        _, ax['map'] = mapping.scatter_map(df, hue='quantile', size='EOF', marker=marker, projection=projection,
                                             proj_default=proj_default,
                                             background=background, borders=borders, coastline=coastline,
                                             rivers=rivers, lakes=lakes,
                                             ocean=ocean, land=land, extent=extent,
                                             figsize=None, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
-                                            gridspec_kwargs=map_gridspec_kwargs, colorbar=colorbar,
+                                            gridspec_kwargs=map_gridspec_kwargs, colorbar=False,
                                             legend=legend, cmap=ax_sm.cmap,
                                             fig=fig, gs_slot=gs[-1, :]) #label rf'$EOF_{index + 1}$'
-        ax['map']['cb'].remove()
 
         if title is None:
             title = self.label + ' mode ' + str(index + 1) + ', ' + '{:3.2f}'.format(pctvar_array.mean()) + u" \u00B1 " + '{:3.2f}'.format(pctvar_array.std()) + '% variance explained'
@@ -246,11 +253,11 @@ class MulMultivarDecomp():
         fig.tight_layout()
         
         if 'path' in savefig_settings:
-            pyleo.utils.plotting.savefig(fig, settings=savefig_settings)
+            plotting.savefig(fig, settings=savefig_settings)
 
         return fig, ax
     
-    def screeplot(self,quantiles=[.25,.5,.75],clr_eig='C0', linewidth=.3, title='Screeplot', violin_kwargs = None, figsize=[8, 8],savefig_settings=None,ax=None):
+    def screeplot(self,clr_eig='C0', linewidth=.3, title='Screeplot', violin_kwargs = None, figsize=[8, 8],savefig_settings=None,ax=None):
         '''Function to plot the scree plot of the PCA
         
         Parameters
