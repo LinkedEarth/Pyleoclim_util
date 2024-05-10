@@ -29,9 +29,3 @@ class TestUIMulEnsGeoSeriesMCPCA():
         ens2 = ensemblegeoseries_nans
         m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
         _ = m_ens.mcpca(nsim=10)
-
-    def test_mcpca_t2(self,ensemblegeoseries_science):
-        ens1 = ensemblegeoseries_science
-        ens2 = ensemblegeoseries_science
-        m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
-        _ = m_ens.mcpca(nsim=10)

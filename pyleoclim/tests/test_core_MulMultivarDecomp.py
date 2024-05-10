@@ -18,7 +18,7 @@ import pyleoclim as pyleo
 
 class TestUIMulMultivarDecompScreeplot():
     '''Tests for the MulMultivarDecomp.screeplot function'''
-    def test_mcpca_t0(self,ensemblegeoseries_basic):
+    def test_screeplot_t0(self,ensemblegeoseries_basic):
         ens1 = ensemblegeoseries_basic
         ens2 = ensemblegeoseries_basic
         m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
@@ -28,10 +28,10 @@ class TestUIMulMultivarDecompScreeplot():
 
 class TestUIMulMultivarDecompModeplot():
     '''Tests for the MulMultivarDecomp.modeplot function'''
-    def test_mcpca_t0(self,ensemblegeoseries_basic):
+    def test_modeplot_t0(self,ensemblegeoseries_basic):
         ens1 = ensemblegeoseries_basic
         ens2 = ensemblegeoseries_basic
         m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
         mcpca = m_ens.mcpca(nsim=10)
-        fig,_ = mcpca.modeplot ()
+        fig,_ = mcpca.modeplot()
         pyleo.closefig(fig)

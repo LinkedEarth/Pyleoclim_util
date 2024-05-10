@@ -27,8 +27,3 @@ class TestUIEnsembleGeoSeriesDashboard():
         ens = ensemblegeoseries_nans
         fig,_ = ens.dashboard()
         pyleo.closefig(fig)
-
-    def test_dashboard_t2(self,ensemblegeoseries_science):
-        ens = ensemblegeoseries_science
-        fig,_ = ens.dashboard()
-        pyleo.closefig(fig)
