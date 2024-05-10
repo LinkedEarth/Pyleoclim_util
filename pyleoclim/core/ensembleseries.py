@@ -6,7 +6,7 @@ In addition to a MultipleSeries object, an EnsembleSeries object has the followi
 
 """
 
-from ..utils import plotting
+from ..utils import plotting, lipdutils
 from ..utils import correlation as corrutils
 from ..core.series import Series
 from ..core.correns import CorrEns
@@ -36,6 +36,83 @@ class EnsembleSeries(MultipleSeries):
     '''
     def __init__(self, series_list):
         self.series_list = series_list
+
+    @classmethod
+    def from_AgeEnsembleArray(self, series, age_array, value_depth = None, age_depth = None, extrapolate=True):
+        '''Function to create an EnsembleGeoSeries object
+
+        Function assumes that the input series and the age array share the same units.
+        If depth vectors are passed, these are also assumed to share the same units
+
+        Parameters
+        ----------
+
+        series : Series
+            A Series object with the values to be mapped
+
+        age_array : np.array
+            An array of ages to map the values to
+
+        value_depth : vector
+            An array of depths corresponding to the series values
+
+        age_depth : vector
+            An array of depths corresponding to the age array
+
+        extrapolate : bool
+            Whether to extrapolate the age array to the value depth. Default is True
+        '''
+
+        #squeeze paleoValues into a vector
+        values = np.squeeze(np.array(series.value))
+        
+        if value_depth is None and age_depth is None:
+            if len(values) != age_array.shape[0]:
+                raise ValueError("Age array and series need to have the same length when depth is not passed.")
+            else:
+                mapped_age = age_array
+                pass
+        else:
+            #Check that both arrays were passed
+            if value_depth is None or age_depth is None:
+                raise ValueError('Please pass both a value depth array and age depth array if value and age are not already aligned.')
+            
+            #Make sure that numpy arrays were given and try to coerce them into vectors if possible
+            age_depth=np.squeeze(np.array(age_depth))
+            value_depth = np.squeeze(np.array(value_depth))
+
+            #Check that arrays are vectors for np.interp
+            if age_depth.ndim > 1:
+                raise ValueError('chronDepth has more than one dimension, please pass it as a vector')
+            if value_depth.ndim > 1:
+                raise ValueError('paleoDepth has more than one dimension, please pass it as a vector')
+            #Check that the shape of the depth arrays matches up with the age array and value vector (separately)
+            if len(age_depth)!=age_array.shape[0]:
+                raise ValueError("Age depth and age array need to have the same length")
+            if len(value_depth)!=len(values):
+                raise ValueError("Paleo depth and series time need to have the same length")
+            
+            #Interpolate the age array to the value depth
+            mapped_age = lipdutils.mapAgeEnsembleToPaleoData(
+                ensembleValues=age_array, 
+                depthEnsemble=age_depth, 
+                depthPaleo=value_depth,
+                extrapolate=extrapolate
+            )
+        
+        series_list = []
+        
+        for s in mapped_age.T:
+            series_tmp = Series(time=s, value=values,
+                        verbose=False,
+                        clean_ts=False,
+                        value_name=series.value_name,
+                        value_unit=series.value_unit,
+                        time_name=series.time_name,
+                        time_unit=series.time_unit)
+            series_list.append(series_tmp)
+
+        return EnsembleSeries(series_list)
 
     def make_labels(self):
         '''Initialization of labels
