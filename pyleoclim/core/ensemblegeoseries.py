@@ -12,7 +12,6 @@ from ..core.geoseries import GeoSeries
 from ..utils import mapping, lipdutils, plotting
 
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
@@ -119,6 +118,12 @@ class EnsembleGeoSeries(EnsembleSeries):
         self.depth_name = depth_name
         self.depth_unit = depth_unit
 
+    @classmethod
+    def from_AgeEnsembleArray():
+        '''Function to create an EnsembleGeoSeries object
+        '''
+        pass
+    
     def make_labels(self):
         '''Initialization of labels
 
