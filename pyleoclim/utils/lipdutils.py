@@ -1658,10 +1658,10 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo,extrapol
     #Interpolate
     ensembleValuesToPaleo = np.zeros((len(depthPaleo),np.shape(ensembleValues)[1])) #placeholder
 
-    if extrapolate:
+    if extrapolate is True:
         for i in np.arange(0,np.shape(ensembleValues)[1]):
             ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i])
-    else:
+    elif extrapolate is False:
         for i in np.arange(0,np.shape(ensembleValues)[1]):
             ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i],left=np.nan,right=np.nan)
 
