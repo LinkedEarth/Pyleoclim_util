@@ -12,6 +12,8 @@ from ..core.series import Series
 from ..core.correns import CorrEns
 from ..core.multipleseries import MultipleSeries
 
+import warnings
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,8 +40,8 @@ class EnsembleSeries(MultipleSeries):
         self.series_list = series_list
 
     @classmethod
-    def from_AgeEnsembleArray(self, series, age_array, value_depth = None, age_depth = None, extrapolate=True):
-        '''Function to create an EnsembleGeoSeries object
+    def from_AgeEnsembleArray(self, series, age_array, value_depth = None, age_depth = None, extrapolate=True,verbose=True):
+        '''Function to create an EnsembleSeries object
 
         Function assumes that the input series and the age array share the same units.
         If depth vectors are passed, these are also assumed to share the same units
@@ -47,7 +49,7 @@ class EnsembleSeries(MultipleSeries):
         Parameters
         ----------
 
-        series : Series
+        series : pyleoclim.core.series.Series
             A Series object with the values to be mapped
 
         age_array : np.array
@@ -61,21 +63,36 @@ class EnsembleSeries(MultipleSeries):
 
         extrapolate : bool
             Whether to extrapolate the age array to the value depth. Default is True
+
+        verbose : bool
+            Whether to print warnings. Default is True
+
+        Returns
+        -------
+        
+        EnsembleSeries : pyleoclim.core.ensembleseries.EnsembleSeries
+            The ensemble created using the time axes from age_array and the values from series.
         '''
+
+        if not isinstance(series, Series):
+            raise ValueError('series must be a GeoSeries object')
 
         #squeeze paleoValues into a vector
         values = np.squeeze(np.array(series.value))
         
-        if value_depth is None and age_depth is None:
-            if len(values) != age_array.shape[0]:
-                raise ValueError("Age array and series need to have the same length when depth is not passed.")
-            else:
-                mapped_age = age_array
+        if age_depth is None:
+            if value_depth is None:
+                if len(values) != age_array.shape[0]:
+                    raise ValueError("Age array and series need to have the same length when age_depth is not passed.")
+                else:
+                    mapped_age = age_array
                 pass
+            else:
+                raise ValueError('Age_depth not found. Please pass both a value depth array and age depth array if value and age are not already aligned. Otherwise, pass neither.')
         else:
             #Check that both arrays were passed
-            if value_depth is None or age_depth is None:
-                raise ValueError('Please pass both a value depth array and age depth array if value and age are not already aligned.')
+            if value_depth is None:
+                raise ValueError('Value_depth not found. Please pass both a value depth array and age depth array if value and age are not already aligned. Otherwise, pass neither.')
             
             #Make sure that numpy arrays were given and try to coerce them into vectors if possible
             age_depth=np.squeeze(np.array(age_depth))
@@ -101,15 +118,17 @@ class EnsembleSeries(MultipleSeries):
             )
         
         series_list = []
+
+        #check that mapped_age and the original time vector are similar
+        if verbose:
+            if (np.mean(mapped_age[-1,:]) > 10*series.time[-1]) or (np.mean(mapped_age[-1,:]) < 0.1*series.time[-1]):
+                warnings.warn('The mapped age array is significantly different from the original time vector. You may want to check that the units are appropriate.')
+            elif (np.mean(mapped_age[0,:]) > 10*series.time[0]) or (np.mean(mapped_age[0,:]) < 0.1*series.time[0]):
+                warnings.warn('The mapped age array is significantly different from the original time vector. You may want to check that the units are appropriate.')
         
         for s in mapped_age.T:
-            series_tmp = Series(time=s, value=values,
-                        verbose=False,
-                        clean_ts=False,
-                        value_name=series.value_name,
-                        value_unit=series.value_unit,
-                        time_name=series.time_name,
-                        time_unit=series.time_unit)
+            series_tmp = series.copy()
+            series_tmp.time = s
             series_list.append(series_tmp)
 
         return EnsembleSeries(series_list)
