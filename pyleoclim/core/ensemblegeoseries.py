@@ -21,7 +21,7 @@ class EnsembleGeoSeries(EnsembleSeries):
     ''' EnsembleSeries object
 
     The EnsembleSeries object is a child of the MultipleSeries object, that is, a special case of MultipleSeries, aiming for ensembles of similar series.
-    Ensembles usually arise from age modeling or Bayesian calibrations. All members of an EnsembleSeries object are assumed to share identical labels and units.
+    Ensembles usually arise from age modeling and/or Bayesian calibrations. All members of an EnsembleSeries object are assumed to share identical labels and units.
 
     All methods available for MultipleSeries are available for EnsembleSeries. Some functions were modified for the special case of ensembles.
     The class enables ensemble-oriented methods for computation (e.g., quantiles) 
