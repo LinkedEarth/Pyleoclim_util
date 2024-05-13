@@ -154,6 +154,60 @@ class EnsembleGeoSeries(EnsembleSeries):
         
         EnsembleSeries : pyleoclim.core.ensembleseries.EnsembleSeries
             The ensemble created using the time axes from age_array and the values from series.
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            #Create an ensemble of 100 series with random time axes of length 1000
+            length = 1000
+            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(length) for i in range(100)]).T
+
+            #Create a random geoseries
+            value = np.random.randn(length)
+            time = pyleo.utils.tsmodel.random_time_axis(length)
+            lat = np.random.randint(-90,90)
+            lon = np.random.randint(-180,180)
+            geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon)
+
+            #Create an ensemble using these objects
+            #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
+            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array)
+
+        .. jupyter-execute::
+
+            #If we have depth vectors for our series and age array, we can pass them to the function
+            age_length = 1000
+            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(age_length) for i in range(100)]).T
+            age_depth = np.arange(age_length)
+
+            value_length = 800
+            value = np.random.randn(value_length)
+            time = pyleo.utils.tsmodel.random_time_axis(value_length)
+            lat = np.random.randint(-90,90)
+            lon = np.random.randint(-180,180)
+            geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon)
+            value_depth = np.arange(value_length)
+
+            #Note that the length of the depth vectors must match the length of the corresponding object (number of values or number of rows in age array)
+            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array, value_depth=value_depth, age_depth=age_depth)
+
+        .. jupyter-execute::
+
+            #We can also pass the depth vector through the GeoSeries object itself
+            age_length = 1000
+            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(age_length) for i in range(100)]).T
+            age_depth = np.arange(age_length)
+
+            value_length = 800
+            value = np.random.randn(value_length)
+            time = pyleo.utils.tsmodel.random_time_axis(value_length)
+            lat = np.random.randint(-90,90)
+            lon = np.random.randint(-180,180)
+            geo_series = pyleo.GeoSeries(time=time, value=value,depth=np.arange(value_length), lat=lat, lon=lon)
+
+            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array, age_depth=age_depth)
         '''
 
         if not isinstance(geo_series, GeoSeries):

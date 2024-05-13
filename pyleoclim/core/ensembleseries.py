@@ -72,6 +72,40 @@ class EnsembleSeries(MultipleSeries):
         
         EnsembleSeries : pyleoclim.core.ensembleseries.EnsembleSeries
             The ensemble created using the time axes from age_array and the values from series.
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            #Create an ensemble of 100 series with random time axes of length 1000
+            length = 1000
+            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(length) for i in range(100)]).T
+
+            #Create a random series
+            value = np.random.randn(length)
+            time = pyleo.utils.tsmodel.random_time_axis(length)
+            series = pyleo.Series(time=time,value=value)
+
+            #Create an ensemble using these objects
+            #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
+            ens = pyleo.EnsembleSeries.from_AgeEnsembleArray(series = series,age_array=age_array)
+
+        .. jupyter-execute::
+
+            #If we have depth vectors for our series and age array, we can pass them to the function
+            age_length = 1000
+            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(age_length) for i in range(100)]).T
+            age_depth = np.arange(age_length)
+
+            value_length = 800
+            value = np.random.randn(value_length)
+            time = pyleo.utils.tsmodel.random_time_axis(value_length)
+            series = pyleo.Series(time=time, value=value)
+            value_depth = np.arange(value_length)
+
+            #Note that the length of the depth vectors must match the length of the corresponding object (number of values or number of rows in age array)
+            ens = pyleo.EnsembleSeries.from_AgeEnsembleArray(series = series,age_array=age_array, value_depth=value_depth, age_depth=age_depth)
         '''
 
         if not isinstance(series, Series):
