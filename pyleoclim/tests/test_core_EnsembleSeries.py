@@ -351,7 +351,24 @@ class TestUIEnsembleSeriesArray():
         if labels == True:
             vals,headers=ens_qs.to_array(axis=mode) 
         else:
-            vals = ens_qs.to_array(axis=mode) 
+            vals = ens_qs.to_array(axis=mode)
+
+class TestUIEnsembleSeriesfromAgeEnsembleArray():
+    def test_fromAgeEnsembleArray_t0(self,pinkseries):
+        series = pinkseries
+        length = len(series.time)
+        num = 3
+        age_array = np.array([np.arange(length) for _ in range(num)]).T
+        _ = pyleo.EnsembleSeries.from_AgeEnsembleArray(series=series, age_array=age_array)
+
+    def test_fromAgeEnsembleArray_t1(self,pinkseries):
+        series = pinkseries
+        length = len(series.time)
+        value_depth = np.arange(length)
+        age_depth = np.arange(length)
+        num = 3
+        age_array = np.array([np.arange(length) for _ in range(num)]).T
+        _ = pyleo.EnsembleSeries.from_AgeEnsembleArray(series=series, age_array=age_array,value_depth=value_depth,age_depth=age_depth)
 
 # class TestUIEnsembleSeriesDistplot():
 #     def test_histplot_t0(self):

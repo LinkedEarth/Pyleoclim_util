@@ -14,6 +14,7 @@ Notes on how to test locally:
 '''
 
 import pytest
+import numpy as np
 import pyleoclim as pyleo
 
 class TestUIEnsembleGeoSeriesDashboard():
@@ -27,3 +28,29 @@ class TestUIEnsembleGeoSeriesDashboard():
         ens = ensemblegeoseries_nans
         fig,_ = ens.dashboard()
         pyleo.closefig(fig)
+
+class TestUIEnsembleGeoSeriesfromAgeEnsembleArray():
+    def test_fromAgeEnsembleArray_t0(self,pinkgeoseries):
+        series = pinkgeoseries
+        length = len(series.time)
+        num = 3
+        age_array = np.array([np.arange(length) for _ in range(num)]).T
+        _ = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series=series, age_array=age_array)
+
+    def test_fromAgeEnsembleArray_t1(self,pinkgeoseries):
+        series = pinkgeoseries
+        length = len(series.time)
+        value_depth = np.arange(length)
+        age_depth = np.arange(length)
+        num = 3
+        age_array = np.array([np.arange(length) for _ in range(num)]).T
+        _ = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series=series, age_array=age_array,value_depth=value_depth,age_depth=age_depth)
+
+    def test_fromAgeEnsembleArray_t1(self,pinkgeoseries):
+        series = pinkgeoseries
+        length = len(series.time)
+        series.depth = np.arange(length)
+        age_depth = np.arange(length)
+        num = 3
+        age_array = np.array([np.arange(length) for _ in range(num)]).T
+        _ = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series=series, age_array=age_array,age_depth=age_depth)

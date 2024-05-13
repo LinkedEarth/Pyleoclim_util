@@ -121,7 +121,7 @@ class EnsembleGeoSeries(EnsembleSeries):
         self.depth_unit = depth_unit
 
     @classmethod
-    def from_AgeEnsembleArray(self, series, age_array, value_depth = None, age_depth = None, extrapolate=True,verbose=True):
+    def from_AgeEnsembleArray(self, geo_series, age_array, value_depth = None, age_depth = None, extrapolate=True,verbose=True):
         '''Function to create an EnsembleGeoSeries object
 
         Function assumes that the input series and the age array share the same units.
@@ -131,7 +131,7 @@ class EnsembleGeoSeries(EnsembleSeries):
         Parameters
         ----------
 
-        series : pyleoclim.core.geoseries.GeoSeries
+        geo_series : pyleoclim.core.geoseries.GeoSeries
             A Series object with the values to be mapped
 
         age_array : np.array
@@ -156,11 +156,11 @@ class EnsembleGeoSeries(EnsembleSeries):
             The ensemble created using the time axes from age_array and the values from series.
         '''
 
-        if not isinstance(series, GeoSeries):
+        if not isinstance(geo_series, GeoSeries):
             raise ValueError('series must be a GeoSeries object')
 
         #squeeze paleoValues into a vector
-        values = np.squeeze(np.array(series.value))
+        values = np.squeeze(np.array(geo_series.value))
         
         if age_depth is None:
             if value_depth is None:
@@ -174,11 +174,11 @@ class EnsembleGeoSeries(EnsembleSeries):
         else:
             #Check that both arrays were passed
             if value_depth is None:
-                if series.depth is None:
+                if geo_series.depth is None:
                     raise ValueError('Value_depth not found. Please pass both a value depth array and age depth array if value and age are not already aligned. Otherwise, pass neither.')
                 else:
-                    value_depth = series.depth
-            elif value_depth is not None and series.depth is not None:
+                    value_depth = geo_series.depth
+            elif value_depth is not None and geo_series.depth is not None:
                 if verbose:
                     warnings.warn('Both a value depth array and a series depth array were passed. The value depth array will be used')
                 else:
@@ -211,13 +211,13 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         #check that mapped_age and the original time vector are similar
         if verbose:
-            if (np.mean(mapped_age[-1,:]) > 10*series.time[-1]) or (np.mean(mapped_age[-1,:]) < 0.1*series.time[-1]):
+            if (np.mean(mapped_age[-1,:]) > 10*geo_series.time[-1]) or (np.mean(mapped_age[-1,:]) < 0.1*geo_series.time[-1]):
                 warnings.warn('The mapped age array is significantly different from the original time vector. You may want to check that the units are appropriate.')
-            elif (np.mean(mapped_age[0,:]) > 10*series.time[0]) or (np.mean(mapped_age[0,:]) < 0.1*series.time[0]):
+            elif (np.mean(mapped_age[0,:]) > 10*geo_series.time[0]) or (np.mean(mapped_age[0,:]) < 0.1*geo_series.time[0]):
                 warnings.warn('The mapped age array is significantly different from the original time vector. You may want to check that the units are appropriate.')
         
         for s in mapped_age.T:
-            series_tmp = series.copy()
+            series_tmp = geo_series.copy()
             series_tmp.time = s
             series_list.append(series_tmp)
 
