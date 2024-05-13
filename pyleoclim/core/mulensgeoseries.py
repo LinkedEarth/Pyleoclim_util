@@ -52,7 +52,34 @@ class MulEnsGeoSeries():
         -------
         
         MultipleMvD : pyleo.MultipleMultivarDecomp
-            Multiple Multivariate Decomposition object'''
+            Multiple Multivariate Decomposition object
+            
+        Examples
+        --------
+        
+        .. jupyter-execute::
+            n = 3 # number of ensembles
+            nn = 30 # number of noise realizations
+            nt = 500
+            ens_list = []
+
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal = pyleo.Series(t,v)
+
+            for _ in range(n): 
+                series_list = []
+                lat = np.random.randint(-90,90)
+                lon = np.random.randint(-180,180)
+                for idx in range(nn):  # noise
+                    noise = np.random.randn(nt,nn)*100
+                    ts = pyleo.GeoSeries(time=signal.time, value=signal.value+noise[:,idx], lat=lat, lon=lon, verbose=False)
+                    series_list.append(ts)
+
+                ts_ens = pyleo.EnsembleSeries(series_list)
+                ens_list.append(ts_ens)
+
+            mul_ens = pyleo.MulEnsGeoSeries([ts_ens])
+            mul_ens.mcpca(nsim=10,seed=42)'''
         
         common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
         pca_kwargs = {} if pca_kwargs is None else pca_kwargs.copy()

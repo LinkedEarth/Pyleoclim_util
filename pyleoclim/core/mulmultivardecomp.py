@@ -126,7 +126,35 @@ class MulMultivarDecomp():
         
         pyleoclim.utils.tsutils.eff_sample_size : Effective sample size
 
-        pyleoclim.utils.mapping.scatter_map : mapping'''
+        pyleoclim.utils.mapping.scatter_map : mapping
+        
+        Examples
+        --------
+        
+        .. jupyter-execute::
+            n = 3 # number of ensembles
+            nn = 30 # number of noise realizations
+            nt = 500
+            ens_list = []
+
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal = pyleo.Series(t,v)
+
+            for _ in range(n): 
+                series_list = []
+                lat = np.random.randint(-90,90)
+                lon = np.random.randint(-180,180)
+                for idx in range(nn):  # noise
+                    noise = np.random.randn(nt,nn)*100
+                    ts = pyleo.GeoSeries(time=signal.time, value=signal.value+noise[:,idx], lat=lat, lon=lon, verbose=False)
+                    series_list.append(ts)
+
+                ts_ens = pyleo.EnsembleSeries(series_list)
+                ens_list.append(ts_ens)
+
+            mul_ens = pyleo.MulEnsGeoSeries([ts_ens])
+            mcpca = mul_ens.mcpca(nsim=10,seed=42)
+            mcpca.modeplot()'''
 
         plot_envelope_kwargs = {} if plot_envelope_kwargs is None else plot_envelope_kwargs.copy()
         psd_envelope_kwargs = {} if psd_envelope_kwargs is None else psd_envelope_kwargs.copy()
@@ -296,7 +324,35 @@ class MulMultivarDecomp():
             The figure
         
         ax : dict
-            dictionary of matplotlib ax'''
+            dictionary of matplotlib ax
+            
+        Examples
+        --------
+        
+        .. jupyter-execute::
+            n = 3 # number of ensembles
+            nn = 30 # number of noise realizations
+            nt = 500
+            ens_list = []
+
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal = pyleo.Series(t,v)
+
+            for _ in range(n): 
+                series_list = []
+                lat = np.random.randint(-90,90)
+                lon = np.random.randint(-180,180)
+                for idx in range(nn):  # noise
+                    noise = np.random.randn(nt,nn)*100
+                    ts = pyleo.GeoSeries(time=signal.time, value=signal.value+noise[:,idx], lat=lat, lon=lon, verbose=False)
+                    series_list.append(ts)
+
+                ts_ens = pyleo.EnsembleSeries(series_list)
+                ens_list.append(ts_ens)
+
+            mul_ens = pyleo.MulEnsGeoSeries([ts_ens])
+            mcpca = mul_ens.mcpca(nsim=10,seed=42)
+            mcpca.screeplot()'''
         
         violin_kwargs = {} if violin_kwargs is None else violin_kwargs.copy()
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
