@@ -275,7 +275,7 @@ class EnsembleGeoSeries(EnsembleSeries):
             series_tmp.time = s
             series_list.append(series_tmp)
 
-        return EnsembleSeries(series_list)
+        return EnsembleGeoSeries(series_list)
     
     def make_labels(self):
         '''Initialization of labels
