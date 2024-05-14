@@ -89,7 +89,7 @@ class EnsembleSeries(MultipleSeries):
 
             #Create an ensemble using these objects
             #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
-            ens = pyleo.EnsembleSeries.from_AgeEnsembleArray(series = series,age_array=age_array)
+            ens = pyleo.EnsembleSeries.from_AgeEnsembleArray(series = series,age_array=age_array,verbose=False)
 
         .. jupyter-execute::
 
@@ -105,7 +105,7 @@ class EnsembleSeries(MultipleSeries):
             value_depth = np.arange(value_length)
 
             #Note that the length of the depth vectors must match the length of the corresponding object (number of values or number of rows in age array)
-            ens = pyleo.EnsembleSeries.from_AgeEnsembleArray(series = series,age_array=age_array, value_depth=value_depth, age_depth=age_depth)
+            ens = pyleo.EnsembleSeries.from_AgeEnsembleArray(series = series,age_array=age_array, value_depth=value_depth, age_depth=age_depth,verbose=False)
         '''
 
         if not isinstance(series, Series):

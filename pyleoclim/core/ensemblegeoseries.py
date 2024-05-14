@@ -173,7 +173,7 @@ class EnsembleGeoSeries(EnsembleSeries):
 
             #Create an ensemble using these objects
             #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
-            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array)
+            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array,verbose=False)
 
         .. jupyter-execute::
 
@@ -191,7 +191,7 @@ class EnsembleGeoSeries(EnsembleSeries):
             value_depth = np.arange(value_length)
 
             #Note that the length of the depth vectors must match the length of the corresponding object (number of values or number of rows in age array)
-            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array, value_depth=value_depth, age_depth=age_depth)
+            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array, value_depth=value_depth, age_depth=age_depth,verbose=False)
 
         .. jupyter-execute::
 
@@ -207,7 +207,7 @@ class EnsembleGeoSeries(EnsembleSeries):
             lon = np.random.randint(-180,180)
             geo_series = pyleo.GeoSeries(time=time, value=value,depth=np.arange(value_length), lat=lat, lon=lon)
 
-            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array, age_depth=age_depth)
+            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array, age_depth=age_depth,verbose=False)
         '''
 
         if not isinstance(geo_series, GeoSeries):
