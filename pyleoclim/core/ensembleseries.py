@@ -6,11 +6,13 @@ In addition to a MultipleSeries object, an EnsembleSeries object has the followi
 
 """
 
-from ..utils import plotting
+from ..utils import plotting, lipdutils
 from ..utils import correlation as corrutils
 from ..core.series import Series
 from ..core.correns import CorrEns
 from ..core.multipleseries import MultipleSeries
+
+import warnings
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -36,6 +38,134 @@ class EnsembleSeries(MultipleSeries):
     '''
     def __init__(self, series_list):
         self.series_list = series_list
+
+    @classmethod
+    def from_AgeEnsembleArray(self, series, age_array, value_depth = None, age_depth = None, extrapolate=True,verbose=True):
+        '''Function to create an EnsembleSeries object
+
+        Function assumes that the input series and the age array share the same units.
+        If depth vectors are passed, these are also assumed to share the same units
+
+        Parameters
+        ----------
+
+        series : pyleoclim.core.series.Series
+            A Series object with the values to be mapped
+
+        age_array : np.array
+            An array of ages to map the values to
+
+        value_depth : vector
+            An array of depths corresponding to the series values
+
+        age_depth : vector
+            An array of depths corresponding to the age array
+
+        extrapolate : bool
+            Whether to extrapolate the age array to the value depth. Default is True
+
+        verbose : bool
+            Whether to print warnings. Default is True
+
+        Returns
+        -------
+        
+        EnsembleSeries : pyleoclim.core.ensembleseries.EnsembleSeries
+            The ensemble created using the time axes from age_array and the values from series.
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            #Create an ensemble of 100 series with random time axes of length 1000
+            length = 1000
+            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(length) for i in range(100)]).T
+
+            #Create a random series
+            value = np.random.randn(length)
+            time = pyleo.utils.tsmodel.random_time_axis(length)
+            series = pyleo.Series(time=time,value=value, verbose=False)
+
+            #Create an ensemble using these objects
+            #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
+            ens = pyleo.EnsembleSeries.from_AgeEnsembleArray(series = series,age_array=age_array,verbose=False)
+
+        .. jupyter-execute::
+
+            #If we have depth vectors for our series and age array, we can pass them to the function
+            age_length = 1000
+            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(age_length) for i in range(100)]).T
+            age_depth = np.arange(age_length)
+
+            value_length = 800
+            value = np.random.randn(value_length)
+            time = pyleo.utils.tsmodel.random_time_axis(value_length)
+            series = pyleo.Series(time=time, value=value, verbose=False)
+            value_depth = np.arange(value_length)
+
+            #Note that the length of the depth vectors must match the length of the corresponding object (number of values or number of rows in age array)
+            ens = pyleo.EnsembleSeries.from_AgeEnsembleArray(series = series,age_array=age_array, value_depth=value_depth, age_depth=age_depth,verbose=False)
+        '''
+
+        if not isinstance(series, Series):
+            raise ValueError('series must be a GeoSeries object')
+
+        #squeeze paleoValues into a vector
+        values = np.squeeze(np.array(series.value))
+        
+        if age_depth is None:
+            if value_depth is None:
+                if len(values) != age_array.shape[0]:
+                    raise ValueError("Age array and series need to have the same length when age_depth is not passed.")
+                else:
+                    mapped_age = age_array
+                pass
+            else:
+                raise ValueError('Age_depth not found. Please pass both a value depth array and age depth array if value and age are not already aligned. Otherwise, pass neither.')
+        else:
+            #Check that both arrays were passed
+            if value_depth is None:
+                raise ValueError('Value_depth not found. Please pass both a value depth array and age depth array if value and age are not already aligned. Otherwise, pass neither.')
+            
+            #Make sure that numpy arrays were given and try to coerce them into vectors if possible
+            age_depth=np.squeeze(np.array(age_depth))
+            value_depth = np.squeeze(np.array(value_depth))
+
+            #Check that arrays are vectors for np.interp
+            if age_depth.ndim > 1:
+                raise ValueError('chronDepth has more than one dimension, please pass it as a vector')
+            if value_depth.ndim > 1:
+                raise ValueError('paleoDepth has more than one dimension, please pass it as a vector')
+            #Check that the shape of the depth arrays matches up with the age array and value vector (separately)
+            if len(age_depth)!=age_array.shape[0]:
+                raise ValueError("Age depth and age array need to have the same length")
+            if len(value_depth)!=len(values):
+                raise ValueError("Paleo depth and series time need to have the same length")
+            
+            #Interpolate the age array to the value depth
+            mapped_age = lipdutils.mapAgeEnsembleToPaleoData(
+                ensembleValues=age_array, 
+                depthEnsemble=age_depth, 
+                depthPaleo=value_depth,
+                extrapolate=extrapolate
+            )
+        
+        series_list = []
+
+        #check that mapped_age and the original time vector are similar
+        if verbose:
+            if (np.mean(mapped_age[-1,:]) > 10*series.time[-1]) or (np.mean(mapped_age[-1,:]) < 0.1*series.time[-1]):
+                warnings.warn('The mapped age array is significantly different from the original time vector. You may want to check that the units are appropriate.')
+            elif (np.mean(mapped_age[0,:]) > 10*series.time[0]) or (np.mean(mapped_age[0,:]) < 0.1*series.time[0]):
+                warnings.warn('The mapped age array is significantly different from the original time vector. You may want to check that the units are appropriate.')
+        
+        for s in mapped_age.T:
+            series_tmp = series.copy()
+            series_tmp.time = s
+            series_list.append(series_tmp)
+
+        return EnsembleSeries(series_list)
 
     def make_labels(self):
         '''Initialization of labels

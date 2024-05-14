@@ -118,7 +118,7 @@ def multipleseries_nans():
     v2 = np.ones(len(t1))
     v2[2:4] = np.nan
     ts2 = pyleo.Series(time=t2, value =v2, dropna=False, verbose=False)
-    ms = ts1 & ts2
+    ms = pyleo.MultipleSeries([ts1, ts2])
     return ms
 
 @pytest.fixture
@@ -129,3 +129,51 @@ def multipleseries_science():
     ms.name = 'ENSO'
     return ms
 
+@pytest.fixture
+def ensembleseries_basic():
+    ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]))
+    ts2 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 8, 1]))
+    ens = pyleo.EnsembleSeries([ts1, ts2])
+    return ens
+
+@pytest.fixture
+def ensembleseries_nans():
+    t1 = np.arange(1,10)
+    v1 = np.ones(len(t1))
+    ts1 = pyleo.Series(time=t1, value=v1)
+    
+    t2 = np.arange(1,10)
+    v2 = np.ones(len(t1))
+    v2[2:4] = np.nan
+    ts2 = pyleo.Series(time=t2, value =v2, dropna=False, verbose=False)
+    ens = pyleo.EnsembleSeries([ts1, ts2])
+    return ens
+
+@pytest.fixture
+def ensembleseries_science():
+    soi = pyleo.utils.load_dataset('SOI')
+    ens = pyleo.EnsembleSeries([soi for _ in range(5)])
+    for series in ens.series_list:
+        series.value += np.random.randn(len(series))
+    return ens
+
+@pytest.fixture
+def ensemblegeoseries_basic():
+    time = np.arange(50)
+    ts1 = pyleo.GeoSeries(time=time, value=np.random.randn(len(time)),lat=0,lon=0)
+    ts2 = pyleo.GeoSeries(time=time, value=np.random.randn(len(time)),lat=0,lon=0)
+    ens = pyleo.EnsembleGeoSeries([ts1, ts2])
+    return ens
+
+@pytest.fixture
+def ensemblegeoseries_nans():
+    t1 = np.arange(50)
+    v1 = np.random.randn(len(t1))
+    ts1 = pyleo.GeoSeries(time=t1, value=v1,lat=0,lon=0)
+    
+    t2 = np.arange(50)
+    v2 = np.random.randn(len(t2))
+    v2[2:4] = np.nan
+    ts2 = pyleo.GeoSeries(time=t2, value =v2, dropna=False, verbose=False,lat=0,lon=0)
+    ens = pyleo.EnsembleGeoSeries([ts1, ts2])
+    return ens
