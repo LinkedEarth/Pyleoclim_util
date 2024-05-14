@@ -169,7 +169,7 @@ class EnsembleGeoSeries(EnsembleSeries):
             time = pyleo.utils.tsmodel.random_time_axis(length)
             lat = np.random.randint(-90,90)
             lon = np.random.randint(-180,180)
-            geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon)
+            geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon, verbose=False)
 
             #Create an ensemble using these objects
             #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
@@ -187,7 +187,7 @@ class EnsembleGeoSeries(EnsembleSeries):
             time = pyleo.utils.tsmodel.random_time_axis(value_length)
             lat = np.random.randint(-90,90)
             lon = np.random.randint(-180,180)
-            geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon)
+            geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon, verbose=False)
             value_depth = np.arange(value_length)
 
             #Note that the length of the depth vectors must match the length of the corresponding object (number of values or number of rows in age array)
@@ -205,7 +205,7 @@ class EnsembleGeoSeries(EnsembleSeries):
             time = pyleo.utils.tsmodel.random_time_axis(value_length)
             lat = np.random.randint(-90,90)
             lon = np.random.randint(-180,180)
-            geo_series = pyleo.GeoSeries(time=time, value=value,depth=np.arange(value_length), lat=lat, lon=lon)
+            geo_series = pyleo.GeoSeries(time=time, value=value,depth=np.arange(value_length), lat=lat, lon=lon, verbose=False)
 
             ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array, age_depth=age_depth,verbose=False)
         '''

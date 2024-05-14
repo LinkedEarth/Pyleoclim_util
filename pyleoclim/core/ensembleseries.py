@@ -85,7 +85,7 @@ class EnsembleSeries(MultipleSeries):
             #Create a random series
             value = np.random.randn(length)
             time = pyleo.utils.tsmodel.random_time_axis(length)
-            series = pyleo.Series(time=time,value=value)
+            series = pyleo.Series(time=time,value=value, verbose=False)
 
             #Create an ensemble using these objects
             #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
@@ -101,7 +101,7 @@ class EnsembleSeries(MultipleSeries):
             value_length = 800
             value = np.random.randn(value_length)
             time = pyleo.utils.tsmodel.random_time_axis(value_length)
-            series = pyleo.Series(time=time, value=value)
+            series = pyleo.Series(time=time, value=value, verbose=False)
             value_depth = np.arange(value_length)
 
             #Note that the length of the depth vectors must match the length of the corresponding object (number of values or number of rows in age array)
