@@ -1,4 +1,4 @@
-''' Tests for pyleoclim.core.ui.MulEnsGeoSeries
+''' Tests for pyleoclim.core.ui.EnsMultivarDecomp
 
 Naming rules:
 1. class: Test{filename}{Class}{method} with appropriate camel case
@@ -16,8 +16,8 @@ Notes on how to test locally:
 import pytest
 import pyleoclim as pyleo
 
-class TestUIMulMultivarDecompScreeplot():
-    '''Tests for the MulMultivarDecomp.screeplot function'''
+class TestUIEnsMultivarDecompScreeplot():
+    '''Tests for the EnsMultivarDecomp.screeplot function'''
     def test_screeplot_t0(self,ensemblegeoseries_basic):
         ens1 = ensemblegeoseries_basic
         ens2 = ensemblegeoseries_basic
@@ -26,8 +26,8 @@ class TestUIMulMultivarDecompScreeplot():
         fig,_ = mcpca.screeplot()
         pyleo.closefig(fig)
 
-class TestUIMulMultivarDecompModeplot():
-    '''Tests for the MulMultivarDecomp.modeplot function'''
+class TestUIEnsMultivarDecompModeplot():
+    '''Tests for the EnsMultivarDecomp.modeplot function'''
     def test_modeplot_t0(self,ensemblegeoseries_basic):
         ens1 = ensemblegeoseries_basic
         ens2 = ensemblegeoseries_basic

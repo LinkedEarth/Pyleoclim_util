@@ -22,4 +22,4 @@ from .lipdseries import LipdSeries
 from .resolutions import Resolution, MultipleResolution
 from .ensemblegeoseries import EnsembleGeoSeries
 from .mulensgeoseries import MulEnsGeoSeries
-from .mulmultivardecomp import MulMultivarDecomp
+from .ensmultivardecomp import EnsMultivarDecomp

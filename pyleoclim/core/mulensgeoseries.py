@@ -10,7 +10,7 @@ import numpy as np
 
 from ..core.series import Series
 from ..core.multiplegeoseries import MultipleGeoSeries
-from ..core.mulmultivardecomp import MulMultivarDecomp
+from ..core.ensmultivardecomp import EnsMultivarDecomp
 
 class MulEnsGeoSeries():
     def __init__(self, ensemble_series_list,label=None):
@@ -51,8 +51,8 @@ class MulEnsGeoSeries():
         Returns
         -------
         
-        MultipleMvD : pyleo.MultipleMultivarDecomp
-            Multiple Multivariate Decomposition object
+        EnsembleMvD : pyleo.EnsMultivarDecomp
+            Ensemble Multivariate Decomposition object
             
         Examples
         --------
@@ -162,5 +162,5 @@ class MulEnsGeoSeries():
         else:
             label = 'PCA of unlabelled object'
 
-        MultipleMvD = MulMultivarDecomp(pca_list=pca_list,label=label)
-        return MultipleMvD
+        EnsembleMvD = EnsMultivarDecomp(pca_list=pca_list,label=label)
+        return EnsembleMvD

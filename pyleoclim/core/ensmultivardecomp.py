@@ -12,11 +12,11 @@ import matplotlib as mpl
 from matplotlib.gridspec import GridSpec
 from matplotlib import cm
 
-from ..core.series import Series
-from ..core.ensembleseries import EnsembleSeries
+from .series import Series
+from .ensembleseries import EnsembleSeries
 from ..utils import mapping, plotting
 
-class MulMultivarDecomp():
+class EnsMultivarDecomp():
     def __init__(self, pca_list,label=None):
         self.pca_list = pca_list
         self.label = label
