@@ -67,5 +67,11 @@ def test_uar1_fit(p, evenly_spaced, tol = 0.45):
     # test that 
     assert np.abs(theta_hat_bar[0]-tau) < tol
     assert np.abs(theta_hat_bar[1]-sigma_2) < tol
-
+    
+@pytest.mark.parametrize('std',[None,2])
+def test_colored_noise(std, nt=100, eps = 0.1):
+    t = np.arange(nt)
+    v = tsmodel.colored_noise(alpha=1.0, t=t, std = std)
+    if std is not None:
+        assert np.abs(v.std() - std) < eps
 

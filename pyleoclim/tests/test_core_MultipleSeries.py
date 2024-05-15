@@ -21,10 +21,7 @@ from numpy.testing import assert_array_equal, assert_allclose
 import pytest
 
 import pyleoclim as pyleo
-from pyleoclim.utils.tsmodel import (
-    ar1_sim,
-    colored_noise,
-)
+from pyleoclim.utils.tsmodel import colored_noise
 
 # a collection of useful functions
 
@@ -41,11 +38,11 @@ def gen_normal(loc=0, scale=1, nt=100):
     v = np.random.normal(loc=loc, scale=scale, size=nt)
     return t, v
 
-def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
+def gen_colored_noise(alpha=1, nt=100, std=1.0, f0=None, m=None, seed=None):
     ''' Generate colored noise
     '''
     t = np.arange(nt)
-    v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
+    v = colored_noise(alpha=alpha, t=t, std=std, f0=f0, m=m, seed=seed)
     return t, v
     
 def load_data():
@@ -98,8 +95,8 @@ class TestMultipleSeriesPlot:
         t_1, v_1 = gen_normal()
 
         #Create series objects
-        ts_0 = pyleo.Series(time = t_0, value = v_0)
-        ts_1 = pyleo.Series(time = t_1, value = v_1)
+        ts_0 = pyleo.Series(time = t_0, value = v_0, auto_time_params=True, verbose=False)
+        ts_1 = pyleo.Series(time = t_1, value = v_1, auto_time_params=True, verbose=False)
 
         #Create a list of series objects
         serieslist = [ts_0, ts_1]
@@ -136,8 +133,8 @@ class TestMultipleSeriesStripes:
         t_1, v_1 = gen_normal()
 
         #Create series objects
-        ts_0 = pyleo.Series(time = t_0, value = v_0, label='series 1')
-        ts_1 = pyleo.Series(time = t_1, value = v_1, label='series 2')
+        ts_0 = pyleo.Series(time = t_0, value = v_0, label='series 1', auto_time_params=True, verbose=False)
+        ts_1 = pyleo.Series(time = t_1, value = v_1, label='series 2', auto_time_params=True, verbose=False)
 
         #Turn this list into a multiple series object
         ts_M = ts_0 &  ts_1
@@ -152,11 +149,11 @@ class TestMultipleSeriesStandardize:
     only now we are running the test on series in a MultipleSeries object'''
 
     def test_standardize(self):
-        t_0, v_0 = gen_colored_noise()
-        t_1, v_1 = gen_colored_noise()
+        t_0, v_0 = gen_colored_noise(std = 10)
+        t_1, v_1 = gen_colored_noise(std= 20)
 
-        ts_0 = pyleo.Series(time = t_0, value = v_0)
-        ts_1 = pyleo.Series(time = t_1, value = v_1)
+        ts_0 = pyleo.Series(time = t_0, value = v_0, auto_time_params=True, verbose=False)
+        ts_1 = pyleo.Series(time = t_1, value = v_1, auto_time_params=True, verbose=False)
 
         serieslist = [ts_0, ts_1]
 
@@ -164,11 +161,11 @@ class TestMultipleSeriesStandardize:
 
         ts_M_std = ts_M.standardize()
 
-        x_axis_0 = ts_M_std.series_list[0].__dict__['time']
-        x_axis_1 = ts_M_std.series_list[1].__dict__['time']
+        x_axis_0 = ts_M_std.series_list[0].time
+        x_axis_1 = ts_M_std.series_list[1].time
 
-        y_axis_0 = ts_M_std.series_list[0].__dict__['value']
-        y_axis_1 = ts_M_std.series_list[1].__dict__['value']
+        y_axis_0 = ts_M_std.series_list[0].value
+        y_axis_1 = ts_M_std.series_list[1].value
 
         assert_array_equal(x_axis_0, t_0)
         assert_array_equal(x_axis_1, t_1)

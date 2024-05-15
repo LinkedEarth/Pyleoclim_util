@@ -378,18 +378,10 @@ class TestUISeriesStandardize:
 
     Standardize normalizes the series object, so we'll simply test maximum and minimum values'''
 
-    def test_standardize(self, pinkseries):     
+    def test_standardize(self, pinkseries, eps=0.1):     
         ts = pinkseries
-
-        #Call function to be tested
-        ts_std = ts.standardize(keep_log=True)
-
-        #Compare maximum and minimum values
-        value = ts.__dict__['value']
-        value_std = ts_std.__dict__['value']
-
-        assert max(value) > max(value_std)
-        assert min(value) < min(value_std)
+        ts_std = ts.standardize(keep_log=False)
+        assert np.abs(ts_std.value.std()-1) < eps # current
 
 class TestUISeriesClean:
     '''Test for Series.clean()

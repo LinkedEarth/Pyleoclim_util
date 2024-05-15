@@ -57,7 +57,7 @@ def unevenly_spaced_series_nans():
     t = np.linspace(1,length,length) ** 2
     v = np.ones(length)
     v[2:4] = np.nan
-    series = pyleo.Series(time=t, value =v, dropna=False, verbose=False)
+    series = pyleo.Series(time=t, value =v, dropna=False, verbose=False, auto_time_params=True)
     return series
 
 @pytest.fixture
@@ -66,15 +66,16 @@ def evenly_spaced_series():
     length = 10
     t = np.linspace(1,length,length)
     v = np.cos(2*np.pi*t/10)
-    series = pyleo.Series(time=t, value=v, verbose=False)
+    series = pyleo.Series(time=t, value=v, verbose=False, auto_time_params=True)
     series.label = 'cosine'
     return series
 
 @pytest.fixture
 def pinkseries():
     """Pyleoclim geoseries with 1/f spectrum """
-    t,v = pyleo.utils.gen_ts(model='colored_noise',alpha=1.0, nt=100, seed=251)
-    ts = pyleo.Series(t,v, sort_ts='none', verbose=False)
+    t = np.arange(100)
+    v = pyleo.utils.colored_noise(alpha=1.0, t=t, seed=251, std=2.5)
+    ts = pyleo.Series(t,v, verbose=False, auto_time_params=True)
     ts.label = 'pink noise'
     return ts
 
