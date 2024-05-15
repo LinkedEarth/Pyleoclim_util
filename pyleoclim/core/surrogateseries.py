@@ -150,11 +150,12 @@ class SurrogateSeries(EnsembleSeries):
             
         elif self.method == 'CN':
             tsi = target_series if target_series.is_evenly_spaced() else target_series.interp()
+            sigma = tsi.value.std()
             alpha = tsi.spectral(method='cwt').beta_est().beta_est_res['beta'] # fit the parameter using the smoothest spectral method
-            self.param = alpha
+            self.param = [alpha]
             y_surr = np.empty((len(target_series.time),self.number))
             for i in range(self.number):
-                y_surr[:,i] = tsmodel.colored_noise(alpha=alpha, t=target_series.time)
+                y_surr[:,i] = tsmodel.colored_noise(alpha=alpha,t=target_series.time, std = sigma)
         
         if self.number > 1:
             s_list = []

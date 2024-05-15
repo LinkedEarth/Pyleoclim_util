@@ -6,7 +6,7 @@ import numpy as np
 from statsmodels.tsa.arima_process import arma_generate_sample
 from statsmodels.tsa.arima.model import ARIMA
 # from tqdm import tqdm
-# from .tsutils import standardize
+from .tsutils import standardize
 # from stochastic.processes.noise import ColoredNoise
 # from stochastic.processes.noise import FractionalGaussianNoise
 
@@ -370,7 +370,7 @@ def sm_ar1_sim(n, p, g, sig):
     return red
 
 
-def colored_noise(alpha, t, f0=None, m=None, seed=None):
+def colored_noise(alpha, t, std = 1.0, f0=None, m=None, seed=None):
     ''' Generate a colored noise timeseries
 
     Parameters
@@ -380,6 +380,9 @@ def colored_noise(alpha, t, f0=None, m=None, seed=None):
 
     t : float
         time vector of the generated noise
+        
+    std : float
+        standard deviation of the series. defaults to 1.0
 
     f0 : float
         fundamental frequency
@@ -387,6 +390,10 @@ def colored_noise(alpha, t, f0=None, m=None, seed=None):
     m : int
         maximum number of the waves, which determines the highest frequency of the components in the synthetic noise
 
+    seed : int
+        seed for the random number generator
+        
+        
     Returns
     -------
 
@@ -422,8 +429,13 @@ def colored_noise(alpha, t, f0=None, m=None, seed=None):
         coeff = (k*f0)**(-alpha/2)
         sin_func = np.sin(2*np.pi*k*f0*t[j] + theta)
         y[j] = np.sum(coeff*sin_func)
-
-    return y
+    
+    if std is not None:
+        ys, _, _ = standardize(y,scale=std) # rescale 
+    else:
+        ys = y
+        
+    return ys
 
 def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=None):
     ''' Generate a colored noise timeseries with two regimes
