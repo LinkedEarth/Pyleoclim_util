@@ -36,8 +36,9 @@ class EnsembleSeries(MultipleSeries):
     and visualization (e.g., envelope plot) that are unavailable to other classes.
 
     '''
-    def __init__(self, series_list):
+    def __init__(self, series_list, label=None):
         self.series_list = series_list
+        self.label = label
 
     @classmethod
     def from_AgeEnsembleArray(self, series, age_array, value_depth = None, age_depth = None, extrapolate=True,verbose=True):
@@ -681,7 +682,10 @@ class EnsembleSeries(MultipleSeries):
 
         if title is not None:
             ax.set_title(title)
-
+        else:
+            if self.label is not None:
+                ax.set_title(self.label)
+            
         if plot_legend:
             lgd_args = {'frameon': False}
             lgd_args.update(lgd_kwargs)

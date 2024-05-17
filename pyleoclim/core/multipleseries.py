@@ -1651,7 +1651,7 @@ class MultipleSeries:
             fig, ax = plt.subplots(figsize=figsize)
             
         if title is None and self.label is not None:
-            ax.set_title(self.label, fontweight='bold')
+            ax.set_title(self.label)
 
         if ylabel is None:
             consistent_ylabels = True

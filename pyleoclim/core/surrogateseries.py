@@ -76,13 +76,13 @@ class SurrogateSeries(EnsembleSeries):
         # refine the display name
         if label is None:
             if method == 'ar1sim':
-                self.label =  "AR(1) (MoM)"
+                self.label =  "AR(1) surrogates (MoM)"
             elif method == 'phaseran':
-                self.label = "phase-randomized"
+                self.label = "Phase-randomized surrogates"
             elif method == 'uar1':
-                self.label = "AR(1) (MLE)"
+                self.label = "AR(1) surrogates (MLE)"
             elif method == 'CN':
-                self.label = r'$f^{-\beta}$'
+                self.label = r'Power-law surrogates ($S(f) \propto f^{-\beta}$)'
             else:
                 raise ValueError(f"Unknown method: {self.method}. Please use one of {supported_surrogates}")
                 
@@ -131,7 +131,9 @@ class SurrogateSeries(EnsembleSeries):
         
         # apply surrogate method
         if self.method == 'ar1sim':
-                y_surr = tsmodel.ar1_sim(target_series.value, self.number, target_series.time)  
+            tsi = target_series if target_series.is_evenly_spaced() else target_series.interp()
+            mu = tsi.value.mean()
+            y_surr = tsmodel.ar1_sim(target_series.value, self.number, target_series.time) + mu  
 
         elif self.method == 'phaseran':
             if target_series.is_evenly_spaced():
@@ -142,32 +144,35 @@ class SurrogateSeries(EnsembleSeries):
         elif self.method == 'uar1':
             # estimate theta with MLE
             tau, sigma_2 = tsmodel.uar1_fit(target_series.value, target_series.time)
+            tsi = target_series if target_series.is_evenly_spaced() else target_series.interp()
+            mu = tsi.value.mean()
             self.param = [tau, sigma_2] # assign parameters for future use
             # generate time axes according to provided pattern
             times = np.squeeze(np.tile(target_series.time, (self.number, 1)).T)  
-            # generate matrix
-            y_surr = tsmodel.uar1_sim(t = times, tau=tau, sigma_2=sigma_2)
+            # generate matrix and add  the mean
+            y_surr = tsmodel.uar1_sim(t = times, tau=tau, sigma_2=sigma_2) + mu
             
         elif self.method == 'CN':
             tsi = target_series if target_series.is_evenly_spaced() else target_series.interp()
+            mu = tsi.value.mean()
             sigma = tsi.value.std()
             alpha = tsi.spectral(method='cwt').beta_est().beta_est_res['beta'] # fit the parameter using the smoothest spectral method
             self.param = [alpha]
             y_surr = np.empty((len(target_series.time),self.number))
             for i in range(self.number):
-                y_surr[:,i] = tsmodel.colored_noise(alpha=alpha,t=target_series.time, std = sigma)
+                y_surr[:,i] = tsmodel.colored_noise(alpha=alpha,t=target_series.time, std = sigma) + mu
         
         if self.number > 1:
             s_list = []
             for i, y in enumerate(y_surr.T):
                 ts = target_series.copy() # copy Series
-                ts.value = y # replace value with y_surr column
-                ts.label = str(target_series.label or '') + " surr #" + str(i+1)
+                ts.value = y 
+                ts.label = str(target_series.label or '') + " #" + str(i+1)
                 s_list.append(ts)
         else:
             ts = target_series.copy() # copy Series
-            ts.value = y_surr # replace value with y_surr column
-            ts.label = str(target_series.label or '') + " surr" 
+            ts.value = y_surr
+            ts.label = str(target_series.label or '') 
             s_list = [ts]
 
         self.series_list = s_list
@@ -238,7 +243,10 @@ class SurrogateSeries(EnsembleSeries):
             if "time" not in settings:
                 raise ValueError("'time' not found in settings")
             else:
-                times =  np.tile(settings["time"], (self.number, 1)).T  
+                if self.number > 1:
+                    times =  np.tile(settings["time"], (self.number, 1)).T 
+                else:
+                    times = settings["time"]
         else:
             raise ValueError(f"Unknown time pattern: {time_pattern}")
          
@@ -263,9 +271,15 @@ class SurrogateSeries(EnsembleSeries):
         
         # create the series_list    
         s_list = []
-        for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
-            ts = Series(time=t, value=y,  
-                           label = str(self.label or '') + " surr #" + str(i+1),
+        if self.number > 1:
+            for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
+                ts = Series(time=t, value=y,  
+                               label = str(self.label or '') + " #" + str(i+1),
+                               verbose=False, auto_time_params=True)
+                s_list.append(ts)
+        else:
+            ts = Series(time=times, value=y_surr,  
+                           label = str(self.label or '') + " #`",
                            verbose=False, auto_time_params=True)
             s_list.append(ts)
 
