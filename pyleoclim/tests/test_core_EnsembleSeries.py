@@ -239,8 +239,9 @@ class TestUIEnsembleSeriesPlots():
 
         fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
         pyleo.closefig(fig)
-
-    def test_plot_traces_t0(self):
+        
+    @pytest.mark.parametrize('label', ['ensemble', None])
+    def test_plot_traces_t0(self,label):
         ''' Test EnsembleSeries.plot_traces() on a list of colored noise
         '''
         nn = 30 # number of noise realizations
@@ -254,9 +255,9 @@ class TestUIEnsembleSeriesPlots():
             ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
             series_list.append(ts)
 
-        ts_ens = pyleo.EnsembleSeries(series_list)
+        ts_ens = pyleo.EnsembleSeries(series_list, label=label)
 
-        fig, ax = ts_ens.plot_traces(alpha=0.2, num_traces=8)
+        fig, ax = ts_ens.plot_traces(alpha=0.2, num_traces=8) # test transparency and num_traces at the same time
         pyleo.closefig(fig)
 
 class TestUIEnsembleSeriesQuantiles():

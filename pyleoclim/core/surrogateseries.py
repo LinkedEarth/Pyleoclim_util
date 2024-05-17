@@ -80,7 +80,7 @@ class SurrogateSeries(EnsembleSeries):
             elif method == 'phaseran':
                 self.label = "Phase-randomized surrogates"
             elif method == 'uar1':
-                self.label = "AR(1) surrogates(MLE)"
+                self.label = "AR(1) surrogates (MLE)"
             elif method == 'CN':
                 self.label = r'Power-law surrogates ($S(f) \propto f^{-\beta}$)'
             else:
@@ -271,9 +271,15 @@ class SurrogateSeries(EnsembleSeries):
         
         # create the series_list    
         s_list = []
-        for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
-            ts = Series(time=t, value=y,  
-                           label = str(self.label or '') + " #" + str(i+1),
+        if self.number > 1:
+            for i, (t, y) in enumerate(zip(times.T,y_surr.T)):
+                ts = Series(time=t, value=y,  
+                               label = str(self.label or '') + " #" + str(i+1),
+                               verbose=False, auto_time_params=True)
+                s_list.append(ts)
+        else:
+            ts = Series(time=times, value=y_surr,  
+                           label = str(self.label or '') + " #`",
                            verbose=False, auto_time_params=True)
             s_list.append(ts)
 
