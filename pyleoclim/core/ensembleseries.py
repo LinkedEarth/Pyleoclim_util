@@ -681,7 +681,9 @@ class EnsembleSeries(MultipleSeries):
 
         if title is not None:
             ax.set_title(title)
-
+        else:
+            ax.set_title(self.label)
+            
         if plot_legend:
             lgd_args = {'frameon': False}
             lgd_args.update(lgd_kwargs)

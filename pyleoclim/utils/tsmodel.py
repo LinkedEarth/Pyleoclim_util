@@ -415,7 +415,7 @@ def colored_noise(alpha, t, std = 1.0, f0=None, m=None, seed=None):
     y = np.zeros(n)
 
     if f0 is None:
-        f0 = 1/n  # fundamental frequency
+        f0 = 1/np.ptp(t)  # fundamental frequency
     if m is None:
         m = n//2
 
