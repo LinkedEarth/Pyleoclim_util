@@ -263,8 +263,11 @@ class SurrogateSeries(EnsembleSeries):
             if nparam >1:
                 raise ValueError(f"1 parameter is needed for this model; only the first of the provided {nparam} will be used")
             y_surr = np.empty((length,self.number))
-            for i in range(self.number):
-                y_surr[:,i] = tsmodel.colored_noise(alpha=param[0],t=times[:,i])
+            if self.number > 1:
+                for i in range(self.number):
+                    y_surr[:,i] = tsmodel.colored_noise(alpha=param[0],t=times[:,i])
+            else:
+                y_surr = tsmodel.colored_noise(alpha=param[0],t=times)
                  
         elif self.method == 'phaseran':  
             raise ValueError("Phase-randomization is only available in from_series().")
@@ -278,7 +281,7 @@ class SurrogateSeries(EnsembleSeries):
                                verbose=False, auto_time_params=True)
                 s_list.append(ts)
         else:
-            ts = Series(time=times, value=y_surr,  
+            ts = Series(time=np.squeeze(times), value=np.squeeze(y_surr),  
                            label = str(self.label or '') + " #`",
                            verbose=False, auto_time_params=True)
             s_list.append(ts)
