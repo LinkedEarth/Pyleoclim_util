@@ -282,8 +282,8 @@ class SurrogateSeries(EnsembleSeries):
                 s_list.append(ts)
         else:
             ts = Series(time=np.squeeze(times), value=np.squeeze(y_surr),  
-                           label = str(self.label or '') + " #`",
-                           verbose=False, auto_time_params=True)
+                        label = str(self.label or '') + " #`",
+                        verbose=False, auto_time_params=True)
             s_list.append(ts)
 
         self.series_list = s_list
