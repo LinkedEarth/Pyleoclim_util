@@ -28,7 +28,7 @@ class TestSurrogateSeriesFromSeries:
         '''Test from_series method'''
         series = gen_ts
         surr = pyleo.SurrogateSeries(method=method,number=number,seed=seed)
-        surr.from_series(target_series=series,method=method,number=number,seed=seed)
+        surr.from_series(target_series=series)
 
     @pytest.mark.parametrize('method',['ar1sim','uar1','phaseran','CN'])          
     @pytest.mark.parametrize('number',[1,5])     
@@ -57,7 +57,7 @@ class TestSurrogateSeriesFromParam:
     def test_from_param_t0(self,method,noise_param,number,seed,time_pattern,settings):
         '''Test from_series method'''
         surr = pyleo.SurrogateSeries(method=method,number=number,seed=seed)
-        surr.from_param(noise_param=noise_param,time_pattern=time_pattern,settings=settings)
+        surr.from_param(param=noise_param,time_pattern=time_pattern,settings=settings)
 
     @pytest.mark.parametrize('delta_t',[1,3]) 
     @pytest.mark.parametrize('length',[10,20]) 
