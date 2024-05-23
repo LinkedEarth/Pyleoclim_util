@@ -153,6 +153,12 @@ class Series:
         time = np.array(time)
         value = np.array(value)
 
+        # ensure 1D arrays
+        if len(time) > 1:
+            time = np.squeeze(time)
+        if len(value) > 1:
+            value = np.squeeze(value)
+
         if auto_time_params is None:
             auto_time_params = True
             if verbose:
