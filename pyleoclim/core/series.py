@@ -1807,7 +1807,7 @@ class Series:
 
             import pyleoclim as pyleo
             series = pyleo.utils.load_dataset('SOI')
-            psd = series.spectral(freq_method = 'welch')
+            psd = series.spectral(freq = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
 
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
@@ -1819,10 +1819,10 @@ class Series:
 
             import pyleoclim as pyleo
             series = pyleo.utils.load_dataset('SOI')
-            psd = series.spectral(freq_method = 'welch')
+            psd = series.spectral(freq = 'welch').signif_test(number=20)
             scalogram = series.wavelet(freq_method = 'welch')
 
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'Purple','linewidth':.5}, psd_plot_kwargs = {'color':'Purple','linewidth':1.5})
 
         '''
 
@@ -3142,7 +3142,10 @@ class Series:
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        
         freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
+        
+        
         args = {}
         args['wwz'] = {'freq': freq}
         args['cwt'] = {'freq': freq}

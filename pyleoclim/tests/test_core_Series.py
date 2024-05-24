@@ -1039,6 +1039,13 @@ class TestUISeriesWavelet():
        '''
        ts = gen_ts(model='colored_noise',nt=200)
        _ = ts.wavelet(method='cwt',settings={'mother':mother})
+       
+    @pytest.mark.parametrize('freq_meth', ['log', 'scale', 'nfft', 'welch'])
+    def test_wave_t4(self,freq_meth):
+       ''' Test Series.wavelet() with different mother wavelets
+       '''
+       ts = gen_ts(model='colored_noise',nt=200)
+       _ = ts.wavelet(method='cwt',freq_method=freq_meth)
 
 class TestUISeriesSsa():
     ''' Test the SSA functionalities
