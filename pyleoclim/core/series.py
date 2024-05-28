@@ -1822,7 +1822,7 @@ class Series:
             psd = series.spectral(freq = 'welch').signif_test(number=20)
             scalogram = series.wavelet(freq_method = 'welch')
 
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'Purple','linewidth':.5}, psd_plot_kwargs = {'color':'Purple','linewidth':1.5})
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [0,5], ts_plot_kwargs = {'color':'Purple','linewidth':.5}, psd_plot_kwargs = {'color':'Purple','linewidth':1.5})
 
         '''
 

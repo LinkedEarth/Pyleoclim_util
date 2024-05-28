@@ -1,0 +1,30 @@
+name: GEOL425_v2023
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # jupyterhub-singleuser version 3 or greater is a requirement for working well
+  # with a JupyterHub such as at https://linkedearth.2i2c.cloud. After
+  # https://github.com/jupyterhub/repo2docker/pull/1239 is merged, this doesn't
+  # need to be specified.
+  #
+  - python=3.12
+  - seaborn
+  - scikit-learn
+  - statsmodels
+  - fsspec
+  - requests
+  - xarray
+  # - intake
+#  - esgf-pyclient
+  - jupyter=1.0.0
+  - jupyterlab
+#  - jupyter_server<2
+  - pip
+  - pip:
+    - setuptools
+    - nitime
+    - cartopy>=0.21.1
+    - fitter
+    - '-e .'
+    - pandas>=2.0.0
