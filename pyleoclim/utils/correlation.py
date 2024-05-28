@@ -705,7 +705,6 @@ def association(y1, y2, statistic='pearsonr',settings=None):
     acceptable_methods = ['linregress','pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
     if statistic in acceptable_methods:
         func = getattr(stats, statistic) 
-        print(args)
         res = func(y1,y2,**args)
     else:
         raise ValueError(f'Wrong statistic: {statistic}; acceptable choices are {acceptable_methods}')

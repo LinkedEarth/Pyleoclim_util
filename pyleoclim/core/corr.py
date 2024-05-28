@@ -70,7 +70,7 @@ class Corr:
         self.p = p
         self.p_fmt_td = p_fmt_td
         self.p_fmt_style = p_fmt_style
-        self.signif = signif
+        self.signif = bool(signif) # coerce as Boolean
         self.alpha = alpha
         
     def copy(self):
