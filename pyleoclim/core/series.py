@@ -2710,7 +2710,7 @@ class Series:
 
 
     def detrend(self, method='emd', keep_log=False, preserve_mean = False, **kwargs):
-        '''Detrend Series object
+        ''' Detrend Series object
 
         Parameters
         ----------

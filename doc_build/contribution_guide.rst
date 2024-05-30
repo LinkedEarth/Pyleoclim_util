@@ -12,15 +12,15 @@ and ideas are welcome, and take place through `GitHub <https://github.com/Linked
 
 There are several levels of contributions to an open development software package like Pyleoclim, including:
 
-#. Reporting Bugs
-#. Updating the documentation
-#. Updating existing functionalities
-#. Contributing new functionalities
+#.  Reporting Bugs
+#.  Updating the documentation
+#.  Updating existing functionalities
+#.  Contributing new functionalities
 
 All of that takes place through GitHub `issues <https://docs.github.com/en/issues/tracking-your-work-with-issues/quickstart>`_, but we recommend first reaching out to our community Slack to avoid effort duplication (to get added to our Slack workspace, please email `LinkedEarth <mailto:linkedearth@gmail.com>`_.
 
 When you start working on an issue, it’s a good idea to assign the issue to yourself, again to limit duplication. If you can’t think of an issue of your own, we have you covered:  check the list of unassigned issues and assign yourself one you like.
-If for whatever reason you are not able to continue working with the issue, please try to unassign it, so other people know it’s available again. You can check the list of assigned issues, since people may not be working in them anymore. If you want to work on one that is assigned, feel free to kindly ask the current assignee (on GitHub and/or Slack) if you can take it (please allow at least a week of inactivity before considering work in the issue discontinued).
+If, for whatever reason, you are not able to continue working with the issue, please try to unassign it, so other people know it’s available again. You can check the list of assigned issues, since people may not be working in them anymore. If you want to work on one that is assigned, feel free to kindly ask the current assignee (on GitHub and/or Slack) if you can take it (please allow at least a week of inactivity before considering work in the issue discontinued).
 
 Bug reports and enhancement requests
 ====================================
@@ -33,11 +33,9 @@ Bug reports must:
 
     gmst = pyleo.utils.load_dataset('HadCRUT5')
     fig, ax = gmst.stripes(ref_period=(1971,2000))
-
 2. Include the full version string of pyleoclim, which you can obtain through::
 
     pyleo.__version__
-
 3. Explain why the current behavior is wrong/not desired and what you expect or would like to see instead.
 
 
@@ -61,6 +59,7 @@ Forking
 """""""
 You will need your own fork to work on the code. Go to the Pyleoclim repository and hit the Fork button. You will then want to clone your fork (i.e. download all the code to your local machine so you can edit it locally).
 At the command line, this would like something like::
+
     git clone https://github.com/your-user-name/Pyleoclim_util.git pyleoclim-yourname
     cd pyleoclim-yourname
     git remote add upstream https://github.com/LinkedEarth/Pyleoclim_util.git
@@ -96,18 +95,23 @@ Pyleoclim Protocol
 Contributing new functionalities
 ********************************
 
-  1. Open an issue on GitHub (See above)
-  2. Implement outside of Pyleoclim
-  Before incorporating any code into Pyleoclim, make sure you have a solution that works outside Pyleoclim. Demonstrate this in a notebook, which can be hosted on GitHub as well so it is easy for the maintainers to check out. The notebook should be organized as follows:
-    * dependencies (package names and versions),
-    * body of the function
-    * example usage
-  3. Integrate the new functionality
-  Now you may implement the new functionality inside Pyleoclim. In so doing, make sure you:
+1.  Open an issue on GitHub (See above)
+2.  Implement outside of Pyleoclim
+
+    Before incorporating any code into Pyleoclim, make sure you have a solution that works outside Pyleoclim. Demonstrate this in a notebook, which can be hosted on GitHub as well so it is easy for the maintainers to check out. The notebook should be organized as follows:
+
+    - dependencies (package names and versions),
+    - body of the function
+    - example usage
+3.  Integrate the new functionality
+
+    Now you may implement the new functionality inside Pyleoclim. In so doing, make sure you:
+
     * Re-use as many of Pyleoclim’s existing utilities as you can, introducing new package  dependencies only as necessary.
     * Create a docstring for your new function, describing arguments and returned variables, and showing an example of use. (Use an existing docstring for inspiration).
     * If possible, also include a unit test for `continuous integration <https://youtu.be/_WvjhrZR01U>`_ (Pyleoclim uses `pytest`). Feel free to ask for help from the package developers.
-  4. Expose the new functionality in the Pyleoclim user API (files located in the `core` folder)
+
+4.  Expose the new functionality in the Pyleoclim user API (files located in the `core` folder)
 
 
 Updating existing functionalities
@@ -132,12 +136,9 @@ Your test should be as minimal as possible; it is aimed to see if the function y
 
 To run the test(s):
 
-0. Make sure the `pytest package <https://docs.pytest.org>`_ is installed on your system; run `pip install pytest` if not.
-1. In your terminal, switch to the “tests” subdirectory of your Pyleoclim forked repository. If you wish to  test a specific class/method inside a specified file, run
-`pytest {file_path}::{TestClass}::{test_method}`
-
+0.  Make sure the `pytest package <https://docs.pytest.org>`_ is installed on your system; run `pip install pytest` if not.
+1.  In your terminal, switch to the “tests” subdirectory of your Pyleoclim forked repository. If you wish to  test a specific class/method inside a specified file, run `pytest {file_path}\::{TestClass}\::{test_method}`
 2.  To run *all* tests in the specified file, run `pytest {file_path}`
-
 3.  To perform all tests in all testing files inside the specified directory, execute `pytest {directory_path}`
 
 The order above is somewhat loose, but goes from least complex (time-consuming) to more complex.

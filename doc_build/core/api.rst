@@ -110,7 +110,7 @@ CorrEns (pyleoclim.CorrEns)
    :members:
 
 MultivarDecomp (pyleoclim.MultivariateDecomp)
-"""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.multivardecomp.MultivariateDecomp
   :members:
@@ -124,5 +124,5 @@ SsaRes (pyleoclim.SsaRes)
 Resolution (pyleoclim.Resolution)
 """""""""""""""""""""""""""""""""""""""""
 
-.. autoclass:: pyleoclim.core.resolution.Resolution
+.. autoclass:: pyleoclim.core.resolutions.Resolution
    :members:

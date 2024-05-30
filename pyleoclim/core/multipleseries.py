@@ -765,7 +765,7 @@ class MultipleSeries:
         
             Parameters for the correlation function, including:
 
-            nsim : int
+            number : int
                 the number of simulations (default: 1000)
             method : str, {'ttest','isopersistent','isospectral' (default)}
                 method for significance testing
@@ -828,17 +828,17 @@ class MultipleSeries:
 
         Correlation between the MultipleSeries object and a target Series. We also set an arbitrary random seed to ensure reproducibility:
        
-        .. jupyter-execute::
-           
-            corr_res = ms.correlation(ts_target, settings={'nsim': 20}, seed=2333)
-            print(corr_res)
+        # .. jupyter-execute::
+        #
+        #     corr_res = ms.correlation(ts_target, settings={'number': 20}, seed=2333)
+        #     print(corr_res)
         
         Correlation among the series of the MultipleSeries object
         
-        .. jupyter-execute::
-
-            corr_res = ms.correlation(settings={'nsim': 20}, seed=2333)
-            print(corr_res)
+        # .. jupyter-execute::
+        #
+        #     corr_res = ms.correlation(settings={'number': 20}, seed=2333)
+        #     print(corr_res)
 
         '''
         r_list = []
@@ -850,7 +850,8 @@ class MultipleSeries:
 
         print("Looping over "+ str(len(self.series_list)) +" Series in collection")
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
-            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
+            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings,
+                                      common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res.r)
             signif_list.append(corr_res.signif)
             p_list.append(corr_res.p)
@@ -974,11 +975,14 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist).common_time()
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = (soi & nino).common_time()
+            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            # data = pyleo.Lipd(usr_path = url)
+            # tslist = data.to_LipdSeriesList()
+            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            # ms = pyleo.MultipleSeries(tslist).common_time()
             ms.label = ms.series_list[0].label
             res = ms.pca() # carry out PCA
 
@@ -1132,11 +1136,15 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            # data = pyleo.Lipd(usr_path = url)
+            # tslist = data.to_LipdSeriesList()
+            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            # ms = pyleo.MultipleSeries(tslist)
+            #
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             msbin = ms.bin()
 
         '''
@@ -1189,11 +1197,15 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            # data = pyleo.Lipd(usr_path = url)
+            # tslist = data.to_LipdSeriesList()
+            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            # ms = pyleo.MultipleSeries(tslist)
+            #
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             msk = ms.gkernel()
 
         '''
@@ -1248,11 +1260,14 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            # data = pyleo.Lipd(usr_path = url)
+            # tslist = data.to_LipdSeriesList()
+            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            # ms = pyleo.MultipleSeries(tslist)
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             msinterp = ms.interp()
 
         '''
@@ -1491,11 +1506,15 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only contain age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            # data = pyleo.Lipd(usr_path = url)
+            # tslist = data.to_LipdSeriesList()
+            # tslist = tslist[2:] # drop the first two series which only contain age and depth
+            # ms = pyleo.MultipleSeries(tslist)
+            #
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = (soi & nino)
             wav = ms.wavelet(method='wwz')
 
         '''
@@ -1821,22 +1840,26 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            d = pyleo.Lipd(usr_path = url)
-            tslist = d.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            # d = pyleo.Lipd(usr_path = url)
+            # tslist = d.to_LipdSeriesList()
+            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            # ms = pyleo.MultipleSeries(tslist)
+            #
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             fig, ax = ms.stackplot()
 
         Let's change the labels on the left
 
         .. jupyter-execute::
 
-            sst = d.to_LipdSeries(number=5)
-            d18Osw = d.to_LipdSeries(number=3)
-            ms = pyleo.MultipleSeries([sst,d18Osw])
+            # sst = d.to_LipdSeries(number=5)
+            # d18Osw = d.to_LipdSeries(number=3)
+            # ms = pyleo.MultipleSeries([sst,d18Osw])
 
-            fig, ax = ms.stackplot(labels=['sst','d18Osw'])
+            fig, ax = ms.stackplot(labels=['SOI','NINO3'])
 
         And let's remove them completely
 
