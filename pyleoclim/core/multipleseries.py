@@ -982,11 +982,6 @@ class MultipleSeries:
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = (soi & nino).common_time()
-            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            # data = pyleo.Lipd(usr_path = url)
-            # tslist = data.to_LipdSeriesList()
-            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            # ms = pyleo.MultipleSeries(tslist).common_time()
             ms.label = ms.series_list[0].label
             res = ms.pca() # carry out PCA
 
@@ -1028,72 +1023,6 @@ class MultipleSeries:
                                 pcs = out.scores, pctvar = pctvar, eigvals = out.eigenvals,
                                 eigvecs = out.eigenvecs, orig=self)
             return res
-
-    # def mcpca(self,nMC=200,**pca_kwargs):
-    #     ''' Monte Carlo Principal Component Analysis
-
-    #     (UNDER REPAIR)
-
-    #     Parameters
-    #     ----------
-
-    #     nMC : int
-    #         number of Monte Carlo simulations
-
-    #     pca_kwargs : tuple
-
-
-    #     Returns
-    #     -------
-    #     res : dictionary containing:
-
-    #         - eigval : eigenvalues (nrec,)
-    #         - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
-    #         - pcs  : PC series of all components (nrec, nt)
-    #         - eofs : EOFs of all components (nrec, nrec)
-
-    #     References:
-    #     ----------
-    #     Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
-    #     European speleothem δ18O records linked to North Atlantic Ocean circulation.
-    #     Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
-
-    #     See also
-    #     --------
-
-    #     pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA
-
-    #     Examples
-    #     --------
-
-    #     .. ipython:: python
-    #         :okwarning:
-
-    #         import pyleoclim as pyleo
-    #         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-    #         data = pyleo.Lipd(usr_path = url)
-    #         tslist = data.to_LipdSeriesList()
-    #         tslist = tslist[2:] # drop the first two series which only concerns age and depth
-    #         ms = pyleo.MultipleSeries(tslist)
-
-    #         # msc = ms.common_time()
-
-    #         # res = msc.pca(nMC=20)
-
-    #     '''
-    #     flag, lengths = self.equal_lengths()
-
-    #     if flag==False:
-    #         print('All Time Series should be of same length. Apply common_time() first')
-    #     else: # if all series have equal length
-    #         p = len(lengths)
-    #         n = lengths[0]
-    #         ys = np.empty((n,p))
-    #         for j in range(p):
-    #             ys[:,j] = self.series_list[j].value
-
-    #     res = decomposition.mcpca(ys, nMC, **pca_kwargs)
-    #     return res
 
     def bin(self, **kwargs):
         '''Aligns the time axes of a MultipleSeries object, via binning.
@@ -1140,12 +1069,6 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            # data = pyleo.Lipd(usr_path = url)
-            # tslist = data.to_LipdSeriesList()
-            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            # ms = pyleo.MultipleSeries(tslist)
-            #
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1201,12 +1124,6 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            # data = pyleo.Lipd(usr_path = url)
-            # tslist = data.to_LipdSeriesList()
-            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            # ms = pyleo.MultipleSeries(tslist)
-            #
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1264,11 +1181,6 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            # data = pyleo.Lipd(usr_path = url)
-            # tslist = data.to_LipdSeriesList()
-            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            # ms = pyleo.MultipleSeries(tslist)
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1510,12 +1422,6 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            # data = pyleo.Lipd(usr_path = url)
-            # tslist = data.to_LipdSeriesList()
-            # tslist = tslist[2:] # drop the first two series which only contain age and depth
-            # ms = pyleo.MultipleSeries(tslist)
-            #
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = (soi & nino)
@@ -1844,12 +1750,6 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            # url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            # d = pyleo.Lipd(usr_path = url)
-            # tslist = d.to_LipdSeriesList()
-            # tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            # ms = pyleo.MultipleSeries(tslist)
-            #
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1858,10 +1758,6 @@ class MultipleSeries:
         Let's change the labels on the left
 
         .. jupyter-execute::
-
-            # sst = d.to_LipdSeries(number=5)
-            # d18Osw = d.to_LipdSeries(number=3)
-            # ms = pyleo.MultipleSeries([sst,d18Osw])
 
             fig, ax = ms.stackplot(labels=['SOI','NINO3'])
 
