@@ -126,3 +126,9 @@ Resolution (pyleoclim.Resolution)
 
 .. autoclass:: pyleoclim.core.resolutions.Resolution
    :members:
+
+MultipleResolution (pyleoclim.MultipleResolution)
+"""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.resolutions.MultipleResolution
+   :members:
