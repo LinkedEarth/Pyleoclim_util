@@ -3433,6 +3433,9 @@ class Series:
             The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning.
             Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.
 
+        number : int
+            the number of surrogates series used for simulation, as appropriate for the method. Ignored if the method is 'ttest' or 'built-in'
+
         timespan : tuple
             The time interval over which to perform the calculation
 
@@ -3490,7 +3493,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
@@ -3513,6 +3515,8 @@ class Series:
             
             # To use the built-in signficance test:
             corr_res2s = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'built-in')
+            print(corr_res2s)
+            
             # To modify the method, use `settings`. For instance, to specify a 1-sided test instead of a 2-sided one for Spearman's R:
             corr_res1s = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'built-in', settings={'alternative':'less'})
             print(corr_res1s.p-corr_res2s.p) # shows the difference in p-values

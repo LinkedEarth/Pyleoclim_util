@@ -437,7 +437,7 @@ def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_
     See also
     --------
     
-    scipy.signal.firwin : FIR filter design using the window method
+    scipy.signal.firwin : FIR filter design using the window method. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.get_window.html#scipy.signal.get_window
     pyleoclim.utils.filter.ts_pad : Pad a timeseries based on timeseries model predictions
     pyleoclim.utils.filter.butterworth : Applies a Butterworth filter with frequency fc, with padding
     pyleoclim.utils.filter.lanczos : Applies a Lanczos filter with frequency fc, with padding
@@ -457,6 +457,7 @@ def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_
         # use the largest number of taps that the default padding method in scipy.signal.filtfilt allows
         numtaps = int(np.size(ys)//3)
 
+    print(f'filtering with windown {window}')
     taps = signal.firwin(numtaps, fc/nyq, window=window, pass_zero=pass_zero, **kwargs)
 
     ts = np.arange(len(ys)) # define time axis
