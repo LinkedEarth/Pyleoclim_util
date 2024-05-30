@@ -742,7 +742,7 @@ class MultipleSeries:
 
         return ms
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, 
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, method='phaseran', number=1000,
                     fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
@@ -763,11 +763,14 @@ class MultipleSeries:
 
         settings : dict
         
-            Parameters for the correlation function, including:
+            Parameters for the correlation function (per scipy)
 
-            number : int
+        number : int
+
                 the number of simulations (default: 1000)
-            method : str, {'ttest','isopersistent','isospectral' (default)}
+
+        method : str, {'ttest', 'ar1sim', 'phaseran' (default)}
+
                 method for significance testing
 
         fdr_kwargs : dict
@@ -828,17 +831,17 @@ class MultipleSeries:
 
         Correlation between the MultipleSeries object and a target Series. We also set an arbitrary random seed to ensure reproducibility:
        
-        # .. jupyter-execute::
-        #
-        #     corr_res = ms.correlation(ts_target, settings={'number': 20}, seed=2333)
-        #     print(corr_res)
+        .. jupyter-execute::
+
+            corr_res = ms.correlation(ts_target, number=20, seed=2333)
+            print(corr_res)
         
         Correlation among the series of the MultipleSeries object
         
-        # .. jupyter-execute::
-        #
-        #     corr_res = ms.correlation(settings={'number': 20}, seed=2333)
-        #     print(corr_res)
+        .. jupyter-execute::
+
+            corr_res = ms.correlation(number=20, seed=2333)
+            print(corr_res)
 
         '''
         r_list = []
@@ -851,6 +854,7 @@ class MultipleSeries:
         print("Looping over "+ str(len(self.series_list)) +" Series in collection")
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
             corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings,
+                                      method=method, number=number,
                                       common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res.r)
             signif_list.append(corr_res.signif)
