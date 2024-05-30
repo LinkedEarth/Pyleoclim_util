@@ -46,12 +46,10 @@ def gen_colored_noise(alpha=1, nt=100, std=1.0, f0=None, m=None, seed=None):
     return t, v
     
 def load_data():
-    #Loads stott MD982176 record
-    try:
-        d = pyleo.Lipd(usr_path='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
-    except:
-        d = pyleo.Lipd('./example_data/MD982176.Stott.2004.lpd')
-    return d
+    soi = pyleo.utils.load_dataset('SOI')
+    nino = pyleo.utils.load_dataset('NINO3')
+    ms = soi & nino
+    return ms
 
 # Tests below
 class TestUIMultipleSeriesDetrend():
@@ -449,24 +447,17 @@ class TestMultipleSeriesStackPlot():
     ''' Test for MultipleSeries.Stackplot
     '''
     
-    @pytest.mark.parametrize('labels', [None, 'auto', ['sst','d18Osw']])
+    @pytest.mark.parametrize('labels', [None, 'auto', ['soi','nino']])
     def test_StackPlot_t0(self, labels):
     
-        d=load_data()
-        sst = d.to_LipdSeries(number=5)
-        d18Osw = d.to_LipdSeries(number=3)
-        ms = pyleo.MultipleSeries([sst,d18Osw])
+        ms = load_data()
         fig, ax = ms.stackplot(labels=labels)
         pyleo.closefig(fig)
     
     @pytest.mark.parametrize('plot_kwargs', [{'marker':'o'},[{'marker':'o'},{'marker':'^'}]])
     def test_StackPlot_t1(self, plot_kwargs):
     
-        d=load_data()
-        sst = d.to_LipdSeries(number=5)
-        d18Osw = d.to_LipdSeries(number=3)
-        ms = pyleo.MultipleSeries([sst,d18Osw])
-
+        ms = load_data()
         fig, ax = ms.stackplot(plot_kwargs=plot_kwargs)
         pyleo.closefig(fig)
         
@@ -478,13 +469,9 @@ class TestMultipleSeriesSpectral():
         '''Test the spectral function with pre-generated scalogram objects
         '''
         
-        d = load_data()
-        sst = d.to_LipdSeries(number=5)
-        d18Osw = d.to_LipdSeries(number=3)
+        ms = load_data()
         if spec_method == 'cwt':
-            sst = sst.interp()
-            d18Osw = d18Osw.interp()
-        ms = pyleo.MultipleSeries([sst,d18Osw])
+            ms = ms.interp()
         scals = ms.wavelet(method=spec_method)
         ms.spectral(method=spec_method,scalogram_list=scals)
  
