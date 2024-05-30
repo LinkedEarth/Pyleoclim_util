@@ -468,8 +468,18 @@ class MultipleResolution:
     MultipleResolution objects store time axis resolution information derived from MultipleSeries objects.
     They are generated via the resolution method applied to a MultipleSeries object and contain methods relevant to the analysis of resolution information.
 
+    Parameters
+    ----------
+
+    resolution_list : list
+        List of resolution objects.
+    time_unit : str
+        The unit of time for the resolution.
+
     See Also
     --------
+    
+    Resolution : The base class from which MultipleResolution is derived.
 
     '''
 
