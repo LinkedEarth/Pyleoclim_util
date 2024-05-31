@@ -75,9 +75,8 @@ class MultipleSeries:
         # check that all components are Series
         from ..core.series import Series
         from ..core.geoseries import GeoSeries
-        from ..core.lipdseries import LipdSeries
         
-        if not all([isinstance(ts, (Series, GeoSeries, LipdSeries)) for ts in self.series_list]):
+        if not all([isinstance(ts, (Series, GeoSeries)) for ts in self.series_list]):
             raise ValueError('All components must be of the same type')
 
         if self.time_unit is not None:
@@ -743,7 +742,7 @@ class MultipleSeries:
 
         return ms
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, 
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, method='phaseran', number=1000,
                     fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
@@ -764,11 +763,14 @@ class MultipleSeries:
 
         settings : dict
         
-            Parameters for the correlation function, including:
+            Parameters for the correlation function (per scipy)
 
-            nsim : int
+        number : int
+
                 the number of simulations (default: 1000)
-            method : str, {'ttest','isopersistent','isospectral' (default)}
+
+        method : str, {'ttest', 'ar1sim', 'phaseran' (default)}
+
                 method for significance testing
 
         fdr_kwargs : dict
@@ -830,15 +832,15 @@ class MultipleSeries:
         Correlation between the MultipleSeries object and a target Series. We also set an arbitrary random seed to ensure reproducibility:
        
         .. jupyter-execute::
-           
-            corr_res = ms.correlation(ts_target, settings={'nsim': 20}, seed=2333)
+
+            corr_res = ms.correlation(ts_target, number=20, seed=2333)
             print(corr_res)
         
         Correlation among the series of the MultipleSeries object
         
         .. jupyter-execute::
 
-            corr_res = ms.correlation(settings={'nsim': 20}, seed=2333)
+            corr_res = ms.correlation(number=20, seed=2333)
             print(corr_res)
 
         '''
@@ -851,7 +853,9 @@ class MultipleSeries:
 
         print("Looping over "+ str(len(self.series_list)) +" Series in collection")
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
-            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
+            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings,
+                                      method=method, number=number,
+                                      common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res.r)
             signif_list.append(corr_res.signif)
             p_list.append(corr_res.p)
@@ -975,11 +979,9 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist).common_time()
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = (soi & nino).common_time()
             ms.label = ms.series_list[0].label
             res = ms.pca() # carry out PCA
 
@@ -1021,72 +1023,6 @@ class MultipleSeries:
                                 pcs = out.scores, pctvar = pctvar, eigvals = out.eigenvals,
                                 eigvecs = out.eigenvecs, orig=self)
             return res
-
-    # def mcpca(self,nMC=200,**pca_kwargs):
-    #     ''' Monte Carlo Principal Component Analysis
-
-    #     (UNDER REPAIR)
-
-    #     Parameters
-    #     ----------
-
-    #     nMC : int
-    #         number of Monte Carlo simulations
-
-    #     pca_kwargs : tuple
-
-
-    #     Returns
-    #     -------
-    #     res : dictionary containing:
-
-    #         - eigval : eigenvalues (nrec,)
-    #         - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
-    #         - pcs  : PC series of all components (nrec, nt)
-    #         - eofs : EOFs of all components (nrec, nrec)
-
-    #     References:
-    #     ----------
-    #     Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
-    #     European speleothem δ18O records linked to North Atlantic Ocean circulation.
-    #     Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
-
-    #     See also
-    #     --------
-
-    #     pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA
-
-    #     Examples
-    #     --------
-
-    #     .. ipython:: python
-    #         :okwarning:
-
-    #         import pyleoclim as pyleo
-    #         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-    #         data = pyleo.Lipd(usr_path = url)
-    #         tslist = data.to_LipdSeriesList()
-    #         tslist = tslist[2:] # drop the first two series which only concerns age and depth
-    #         ms = pyleo.MultipleSeries(tslist)
-
-    #         # msc = ms.common_time()
-
-    #         # res = msc.pca(nMC=20)
-
-    #     '''
-    #     flag, lengths = self.equal_lengths()
-
-    #     if flag==False:
-    #         print('All Time Series should be of same length. Apply common_time() first')
-    #     else: # if all series have equal length
-    #         p = len(lengths)
-    #         n = lengths[0]
-    #         ys = np.empty((n,p))
-    #         for j in range(p):
-    #             ys[:,j] = self.series_list[j].value
-
-    #     res = decomposition.mcpca(ys, nMC, **pca_kwargs)
-    #     return res
 
     def bin(self, **kwargs):
         '''Aligns the time axes of a MultipleSeries object, via binning.
@@ -1133,11 +1069,9 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             msbin = ms.bin()
 
         '''
@@ -1190,11 +1124,9 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             msk = ms.gkernel()
 
         '''
@@ -1249,11 +1181,9 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             msinterp = ms.interp()
 
         '''
@@ -1492,11 +1422,9 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only contain age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = (soi & nino)
             wav = ms.wavelet(method='wwz')
 
         '''
@@ -1822,22 +1750,16 @@ class MultipleSeries:
         .. jupyter-execute::
 
             import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            d = pyleo.Lipd(usr_path = url)
-            tslist = d.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             fig, ax = ms.stackplot()
 
         Let's change the labels on the left
 
         .. jupyter-execute::
 
-            sst = d.to_LipdSeries(number=5)
-            d18Osw = d.to_LipdSeries(number=3)
-            ms = pyleo.MultipleSeries([sst,d18Osw])
-
-            fig, ax = ms.stackplot(labels=['sst','d18Osw'])
+            fig, ax = ms.stackplot(labels=['SOI','NINO3'])
 
         And let's remove them completely
 

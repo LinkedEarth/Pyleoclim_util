@@ -376,7 +376,7 @@ class EnsembleSeries(MultipleSeries):
 
         return ens_qs
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, method = 'ttest', statistic = 'pearsonr',
+    def correlation(self, target=None, timespan=None, alpha=0.05, method = 'ttest', statistic = 'pearsonr',number=1000,
                     settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between an EnsembleSeries object to a target.
 
@@ -414,12 +414,10 @@ class EnsembleSeries(MultipleSeries):
 
         settings : dict
 
-            Parameters for the correlation function, including:
+            Parameters for the correlation function (per scipy)
 
-            nsim : int
+        number : int
                 the number of simulations (default: 1000)
-            method : str, {'ttest','isopersistent','isospectral' (default)}
-                method for significance testing
 
         fdr_kwargs : dict
 
@@ -478,7 +476,7 @@ class EnsembleSeries(MultipleSeries):
             print(corr_res)
             
             # to change the statistic: 
-            corr_res = ts_ens.correlation(ts, statistic='kendalltau', method='phaseran', settings = {'nsim':20})
+            corr_res = ts_ens.correlation(ts, statistic='kendalltau', method='phaseran', number=20)
             print(corr_res)
             
         The `print` function tabulates the output, and conveys the p-value according
@@ -510,7 +508,7 @@ class EnsembleSeries(MultipleSeries):
                 time2 = target.time
 
             ts2 = Series(time=time2, value=value2, verbose=idx==0, auto_time_params=False)
-            corr_res = ts1.correlation(ts2, timespan=timespan, method=method,
+            corr_res = ts1.correlation(ts2, timespan=timespan, method=method,number=number,
                                        statistic=statistic,
                                        settings=settings, mute_pbar=True,
                                        common_time_kwargs=common_time_kwargs, seed=seed)
@@ -1299,8 +1297,8 @@ class EnsembleSeries(MultipleSeries):
         headers: list
             A list of corresponding labels for each columm
             
-        Example
-        -------
+        Examples
+        --------
             
         .. jupyter-execute::
             

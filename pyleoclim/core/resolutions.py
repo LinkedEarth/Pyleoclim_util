@@ -468,8 +468,19 @@ class MultipleResolution:
     MultipleResolution objects store time axis resolution information derived from MultipleSeries objects.
     They are generated via the resolution method applied to a MultipleSeries object and contain methods relevant to the analysis of resolution information.
 
+    Parameters
+    ----------
+
+    resolution_list : list
+        List of resolution objects.
+
+    time_unit : str
+        The unit of time for the resolution.
+
     See Also
     --------
+
+    Resolution : The base class from which MultipleResolution is derived.
 
     '''
 
@@ -544,13 +555,14 @@ class MultipleResolution:
         Examples
         --------
         .. jupyter-execute::
+
             import pyleoclim as pyleo
 
             co2ts = pyleo.utils.load_dataset('AACO2')
             edc = pyleo.utils.load_dataset('EDC-dD')
             ms = edc & co2ts # create MS object
-            ms_resolution = ms.resolution()
-            ms_resolution.plot()
+            ms_resolution = ms.resolution(statistic=None)
+            ms_resolution.summary_plot()
             """
         
         boxplot_kwargs = {} if boxplot_kwargs is None else boxplot_kwargs.copy()
@@ -628,13 +640,14 @@ class MultipleResolution:
         --------
 
         ..jupyter-execute::
+
             import pyleoclim as pyleo
 
             co2ts = pyleo.utils.load_dataset('AACO2')
             edc = pyleo.utils.load_dataset('EDC-dD')
             ms = edc & co2ts # create MS object
-            ms_resolution = ms.resolution()
-            ms_resolution.plot()
+            ms_resolution = ms.resolution(statistic=None)
+            ms_resolution.describe()
         
         '''
         

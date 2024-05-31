@@ -21,14 +21,14 @@ For example (please check for version updates on Zenodo)
 
 
 @article{Pyleoclim:PP2022,
-	author = {Khider, Deborah and Emile-Geay, Julien and Zhu, Feng and James, Alexander and Landers, Jordan and Ratnakar, Varun and Gil, Yolanda},
-	journal = {Paleoceanography and Paleoclimatology},
-	number = {10},
-	pages = {e2022PA004509},
-	title = {Pyleoclim: Paleoclimate Timeseries Analysis and Visualization With Python},
-	volume = {37},
-	year = {2022},
-  doi = {10.1029/2022PA004509},
+    author = {Khider, Deborah and Emile-Geay, Julien and Zhu, Feng and James, Alexander and Landers, Jordan and Ratnakar, Varun and Gil, Yolanda},
+    journal = {Paleoceanography and Paleoclimatology},
+    number = {10},
+    pages = {e2022PA004509},
+    title = {Pyleoclim: Paleoclimate Timeseries Analysis and Visualization With Python},
+    volume = {37},
+    year = {2022},
+    doi = {10.1029/2022PA004509},
 }
 
 

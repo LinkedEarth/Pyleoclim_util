@@ -54,20 +54,6 @@ SurrogateSeries (pyleoclim.SurrogateSeries)
 .. autoclass:: pyleoclim.core.surrogateseries.SurrogateSeries
   :members:
 
-Lipd (pyleoclim.Lipd)
-"""""""""""""""""""""
-
-This class allows to manipulate LiPD objects.
-
-.. autoclass:: pyleoclim.core.lipd.Lipd
-   :members:
-
-LipdSeries (pyleoclim.LipdSeries)
-"""""""""""""""""""""""""""""""""
-
-.. autoclass:: pyleoclim.core.lipdseries.LipdSeries
-   :members:
-
 PSD (pyleoclim.PSD)
 """""""""""""""""""
 
@@ -110,7 +96,7 @@ CorrEns (pyleoclim.CorrEns)
    :members:
 
 MultivarDecomp (pyleoclim.MultivariateDecomp)
-"""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.multivardecomp.MultivariateDecomp
   :members:
@@ -122,7 +108,13 @@ SsaRes (pyleoclim.SsaRes)
    :members:
 
 Resolution (pyleoclim.Resolution)
-"""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""
 
-.. autoclass:: pyleoclim.core.resolution.Resolution
+.. autoclass:: pyleoclim.core.resolutions.Resolution
+   :members:
+
+MultipleResolution (pyleoclim.MultipleResolution)
+"""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.resolutions.MultipleResolution
    :members:

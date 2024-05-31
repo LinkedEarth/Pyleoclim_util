@@ -36,6 +36,7 @@ autodoc_mock_imports = ["_tkinter"]
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.viewcode',
@@ -43,7 +44,6 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.napoleon',
     'matplotlib.sphinxext.plot_directive',
     'numpydoc',
     'nbsphinx',
