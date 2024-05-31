@@ -132,6 +132,7 @@ class EnsMultivarDecomp():
         --------
         
         .. jupyter-execute::
+
             n = 3 # number of ensembles
             nn = 30 # number of noise realizations
             nt = 500
@@ -330,6 +331,7 @@ class EnsMultivarDecomp():
         --------
         
         .. jupyter-execute::
+        
             n = 3 # number of ensembles
             nn = 30 # number of noise realizations
             nt = 500
