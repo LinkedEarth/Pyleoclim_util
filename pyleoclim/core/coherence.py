@@ -283,7 +283,7 @@ class Coherence:
         }
         contourf_args.update(contourf_style)
 
-        cmap = cm.get_cmap(contourf_args['cmap'])
+        cmap = plt.get_cmap(contourf_args['cmap'])
         cmap.set_under(under_clr)
         cmap.set_over(over_clr)
         cmap.set_bad(bad_clr)

@@ -1206,9 +1206,9 @@ def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
                 ax_cmap = mpl.colors.LinearSegmentedColormap.from_list("MyCmapName", cmap, N=n)
         elif type(cmap) == str:
             if n is None:
-                ax_cmap = plt.get_cmap(cmap)
+                ax_cmap = plt.get_cmap(name=cmap)
             else:
-                ax_cmap = plt.get_cmap(cmap, n)
+                ax_cmap = plt.get_cmap(name=cmap, lut=n)
         else:
             print('what madness is this?')
     ax_sm = cm.ScalarMappable(norm=ax_norm, cmap=ax_cmap)
