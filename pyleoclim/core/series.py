@@ -66,7 +66,6 @@ class Series:
 
     Parameters
     ----------
-
     time : list or numpy.array
         time axis (prograde or retrograde)
 
@@ -377,6 +376,36 @@ class Series:
 
     @classmethod
     def from_pandas(cls, ser, metadata):
+        """
+        Class method to create a Series object from a pandas Series.
+
+        Parameters
+        ----------
+        ser : pandas.Series
+            The pandas Series object to convert. The index must be a DatetimeIndex.
+        metadata : dict
+            A dictionary containing metadata for the Series. If 'time_name' or 'value_name' are not provided, defaults to the name of the index and the name of the pandas Series, respectively.
+
+        Returns
+        -------
+        Series
+            The created Series object.
+
+        Raises
+        ------
+        ValueError
+            If the index of the pandas Series is not a DatetimeIndex.
+
+        Notes
+        -----
+
+        This method first checks if the index of the pandas Series is a DatetimeIndex. If it is, it converts the index to seconds if it's not already in that unit. Then it converts the datetime index to a time array using the 'time_unit' and 'time_name' from the metadata.
+
+
+
+        The method then returns a new Series object with the converted time and values, and the provided metadata.
+        """
+
         if isinstance(ser.index, pd.DatetimeIndex):
             index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index
             time = tsbase.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
@@ -430,6 +459,7 @@ class Series:
 
         See Also
         --------
+
         pyleoclim.Series.from_csv
 
         Examples
@@ -485,6 +515,7 @@ class Series:
 
         See Also
         --------
+
         pyleoclim.Series.to_csv
 
         '''
@@ -567,6 +598,20 @@ class Series:
         return cls(**b)
 
     def pandas_method(self, method):
+        '''
+        Apply a pandas method to the Series object
+
+        Parameters
+        ----------
+        method : str
+            The name of the pandas method to apply to the Series object
+
+        Returns
+        -------
+        Series
+            A new Series object with the result of the method applied to the original Series object
+
+        '''
         ser = self.to_pandas()
         result = method(ser)
         if not isinstance(result, pd.Series):
@@ -673,7 +718,6 @@ class Series:
 
         Parameters
         ----------
-
         time_unit : str
             the target time unit, possible input:
             {
@@ -771,7 +815,6 @@ class Series:
 
         Returns
         -------
-
         res : dictionary
             Contains the mean, median, minimum value, maximum value, standard
             deviation, and interquartile range for the Series.
@@ -862,7 +905,6 @@ class Series:
 
         Parameters
         ----------
-
         figsize : list
             a list of two integers indicating the figure size
 
@@ -933,7 +975,6 @@ class Series:
 
         Returns
         -------
-
         fig : matplotlib.figure
             the figure object from matplotlib
             See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
@@ -1083,7 +1124,6 @@ class Series:
 
         Returns
         -------
-
         fig : matplotlib.figure
             the figure object from matplotlib
             See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
@@ -1099,6 +1139,7 @@ class Series:
 
         See also
         --------
+
         pyleoclim.utils.plotting.stripes : stripes representation of a timeseries
         pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
 
@@ -1178,10 +1219,13 @@ class Series:
         ----------
         M : int, optional
             window size. The default is None (10% of the length of the series).
+
         MC : int, optional
             Number of iteration in the Monte-Carlo process. The default is 0.
+
         f : float, optional
             maximum allowable fraction of missing values. The default is 0.3.
+
         trunc : str
             if present, truncates the expansion to a level K < M owing to one of 4 criteria:
                 (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
@@ -1193,8 +1237,10 @@ class Series:
             While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton,
             then the knee-finding method is a good compromise between objectivity and efficiency.
             See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
+
         var_thresh : float
             variance threshold for reconstruction (only impactful if trunc is set to 'var')
+
         online : bool; {True,False}
             Whether or not to conduct knee finding analysis online or offline.
             Only called when trunc = 'knee'. Default is True
@@ -1220,6 +1266,7 @@ class Series:
 
         References
         ----------
+
         [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
         dynamics, with applications to paleoclimatic time series, Physica D, 35,
         395–424.
@@ -1350,7 +1397,6 @@ class Series:
 
         Returns
         -------
-
         res : bool
 
         '''
@@ -1370,9 +1416,7 @@ class Series:
 
         Parameters
         ----------
-
         method : str, {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
-
             the filtering method
             - 'butterworth': a Butterworth filter (default = 3rd order)
             - 'savitzky-golay': Savitzky-Golay filter
@@ -1400,7 +1444,6 @@ class Series:
 
         Returns
         -------
-
         new : Series
 
         See also
@@ -1550,7 +1593,6 @@ class Series:
 
         Parameters
         ----------
-
         figsize : list
             a list of two integers indicating the figure size
 
@@ -1704,7 +1746,6 @@ class Series:
 
         Parameters
         ----------
-
         psd : PSD
             the PSD object of a Series.
 
@@ -2216,7 +2257,6 @@ class Series:
 
         Parameters
         ----------
-
         verbose : bool
             If True, will print warning messages if there is any
 
@@ -2225,7 +2265,6 @@ class Series:
 
         Returns
         -------
-
         new : Series
             Series object with removed NaNs and sorting
 
@@ -2282,6 +2321,7 @@ class Series:
 
         References
         ----------
+
         Emile-Geay, J., and M. Tingley (2016), Inferring climate variability from nonlinear proxies: application to palaeo-enso studies, Climate of the Past, 12 (1), 31–50, doi:10.5194/cp- 12-31-2016.
         '''
         new = self.copy()
@@ -2362,7 +2402,6 @@ class Series:
 
         Parameters
         ----------
-
         factor : float
             The factor that adjusts the threshold for gap detection
 
@@ -2371,7 +2410,6 @@ class Series:
 
         Returns
         -------
-
         res : MultipleSeries or Series
             If gaps were detected, returns the segments in a MultipleSeries object,
             else, returns the original timeseries.
@@ -2427,6 +2465,7 @@ class Series:
 
         Examples
         --------
+
         >>> ts = pyleo.Series(
         ...     time=np.array([1, 1.1, 2, 3]), value=np.array([4, .9, 6, 1]), time_unit='years BP'
         ... )
@@ -2616,7 +2655,6 @@ class Series:
 
         Parameters
         ----------
-
         timespan : tuple or list
             The list of time points for slicing, whose length must be even.
             When there are n time points, the output Series includes n/2 segments.
@@ -2625,7 +2663,6 @@ class Series:
 
         Returns
         -------
-
         new : Series
             The sliced Series object.
 
@@ -2661,7 +2698,6 @@ class Series:
 
         Parameters
         ----------
-
         timespan : tuple or list
             The list of time points for slicing, whose length must be 2.
             For example, if timespan = [a, b], then the sliced output includes one segment [a, b].
@@ -2675,7 +2711,6 @@ class Series:
 
         Returns
         -------
-
         new : Series
             The sliced Series object.
 
@@ -2738,6 +2773,7 @@ class Series:
 
         See also
         --------
+
         pyleoclim.utils.tsutils.detrend : detrending wrapper functions
 
         Examples
@@ -2768,7 +2804,6 @@ class Series:
 
         Parameters
         ----------
-
         method : str;
             {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
             Default is Lomb-Scargle, because it can handle unevenly spaced series, and is fast. 
@@ -2800,12 +2835,12 @@ class Series:
 
         Returns
         -------
-
         psd : PSD
             A PSD object
 
         See also
         --------
+
         pyleoclim.utils.spectral.mtm : Spectral analysis using the Multitaper approach
 
         pyleoclim.utils.spectral.lomb_scargle : Spectral analysis using the Lomb-Scargle method
@@ -3035,7 +3070,6 @@ class Series:
 
         Parameters
         ----------
-
         method : str {wwz, cwt}
             cwt - the continuous wavelet transform [1]
                 is appropriate for evenly-spaced series.
@@ -3057,7 +3091,6 @@ class Series:
 
         Returns
         -------
-
         scal : Scalogram object
 
         See also
@@ -3193,10 +3226,8 @@ class Series:
                           common_time_kwargs=None):
         ''' Performs wavelet coherence analysis with the target timeseries
 
-
         Parameters
         ----------
-
         target_series : Series
             A pyleoclim Series object on which to perform the coherence analysis
 
@@ -3223,7 +3254,6 @@ class Series:
 
         Returns
         -------
-
         coh : pyleoclim.core.coherence.Coherence
 
         References
@@ -3411,7 +3441,6 @@ class Series:
 
         Parameters
         ----------
-
         target_series : Series
             A pyleoclim Series object
 
@@ -3453,7 +3482,6 @@ class Series:
 
         Returns
         -------
-
         corr : pyleoclim.Corr
             the result object, containing
 
@@ -3488,7 +3516,7 @@ class Series:
         --------
 
         Let us compute the correlation between the Nino3.4 index and the Deasonalized All Indian Rainfall Index.
-        For expendiency, we limit the Monte Carlo tests to 20 surrogates, which is not sufficient to obtain accurate p-values. 
+        For expediency, we limit the Monte Carlo tests to 20 surrogates, which is not sufficient to obtain accurate p-values.
         The default number, 1000, is more respectable, though to avoid p-hacking, we recommend bumping it even higher if at all possible. 
 
         .. jupyter-execute::
@@ -3602,7 +3630,6 @@ class Series:
 
         Parameters
         ----------
-
         target_series : Series
             A pyleoclim Series object on which to compute causality
 
@@ -3620,7 +3647,6 @@ class Series:
 
         Returns
         -------
-
         res : dict
             Dictionary containing the results of the the causality analysis. See indivudal methods for details
 
@@ -4056,7 +4082,6 @@ class Series:
 
         Parameters
         ----------
-
         method : {‘linear’, ‘nearest’, ‘zero’, ‘slinear’, ‘quadratic’, ‘cubic’, ‘previous’, ‘next’}
             where ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and ‘next’ simply return the previous or next value of the point) or as an integer specifying the order of the spline interpolator to use. Default is ‘linear’.
 
@@ -4068,7 +4093,6 @@ class Series:
 
         Returns
         -------
-
         new : Series
             An interpolated Series object
 
@@ -4101,7 +4125,6 @@ class Series:
 
         Parameters
         ----------
-
         step_style : str
 
             type of timestep: 'mean', 'median', or 'max' of the time increments
@@ -4115,7 +4138,6 @@ class Series:
 
         Returns
         -------
-
         new : Series
 
             The coarse-grained Series object
@@ -4153,7 +4175,6 @@ class Series:
 
         Returns
         -------
-
         new : Series
             An binned Series object
 
@@ -4252,7 +4273,6 @@ class Series:
 
         Returns
         -------
-
         resolution : Resolution
             Resolution object
 
