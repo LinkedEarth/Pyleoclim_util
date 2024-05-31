@@ -48,6 +48,18 @@ EnsembleSeries (pyleoclim.EnsembleSeries)
 .. autoclass:: pyleoclim.core.ensembleseries.EnsembleSeries
    :members:
 
+EnsembleGeoSeries (pyleoclim.EnsembleGeoSeries)
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.ensemblegeoseries.EnsembleGeoSeries
+   :members:
+
+MulEnsGeoSeries (pyleoclim.MulEnsGeoSeries)
+"""""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.mulensgeoseries.MulEnsGeoSeries
+   :members:
+
 SurrogateSeries (pyleoclim.SurrogateSeries)
 """""""""""""""""""""""""""""""""""""""""""
 
@@ -99,6 +111,12 @@ MultivarDecomp (pyleoclim.MultivariateDecomp)
 """""""""""""""""""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.multivardecomp.MultivariateDecomp
+  :members:
+
+EnsMultivarDecomp (pyleoclim.EnsMultivarDecomp)
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.ensmultivardecomp.EnsMultivarDecomp
   :members:
 
 SsaRes (pyleoclim.SsaRes)
