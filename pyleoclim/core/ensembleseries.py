@@ -1297,8 +1297,8 @@ class EnsembleSeries(MultipleSeries):
         headers: list
             A list of corresponding labels for each columm
             
-        Example
-        -------
+        Examples
+        --------
             
         .. jupyter-execute::
             
