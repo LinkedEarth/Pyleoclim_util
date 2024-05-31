@@ -461,21 +461,19 @@ class GeoSeries(Series):
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment') and paleoData_variableName not in ('year')") 
+            dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment') and paleoData_variableName not in ('year')") 
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
                 ts_list.append(pyleo.GeoSeries(time=row['time_values'],value=row['paleoData_values'],
-                                               time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
-                                               time_unit=row['time_units'], value_unit=row['paleoData_units'],
-                                               lat = row['geo_meanLat'], lon = row['geo_meanLon'],
-                                               archiveType = row['archiveType'], verbose = False, 
-                                               label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+                                                time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
+                                                time_unit=row['time_units'], value_unit=row['paleoData_units'],
+                                                lat = row['geo_meanLat'], lon = row['geo_meanLon'],
+                                                archiveType = row['archiveType'], verbose = False, 
+                                                label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
 
-            print(ts_list)
-            print(len(ts_list))
             mgs = pyleo.MultipleGeoSeries(series_list=ts_list,time_unit='years AD') 
-            gs = ts_list[0] # extract one record as the target one
+            gs = ts_list[6] # extract one record as the target one
             gs.map_neighbors(mgs, radius=4000)
             
         '''
