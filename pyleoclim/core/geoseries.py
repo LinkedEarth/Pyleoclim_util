@@ -471,9 +471,11 @@ class GeoSeries(Series):
                                                lat = row['geo_meanLat'], lon = row['geo_meanLon'],
                                                archiveType = row['archiveType'], verbose = False, 
                                                label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
-        
-            mgs = pyleo.MultipleGeoSeries(ts_list,time_unit='years AD') 
-            gs = mgs.series_list[6] # extract one record as the target one
+
+            print(ts_list)
+            print(len(ts_list))
+            mgs = pyleo.MultipleGeoSeries(series_list=ts_list,time_unit='years AD') 
+            gs = ts_list[0] # extract one record as the target one
             gs.map_neighbors(mgs, radius=4000)
             
         '''
