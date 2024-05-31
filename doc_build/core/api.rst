@@ -54,20 +54,6 @@ SurrogateSeries (pyleoclim.SurrogateSeries)
 .. autoclass:: pyleoclim.core.surrogateseries.SurrogateSeries
   :members:
 
-Lipd (pyleoclim.Lipd)
-"""""""""""""""""""""
-
-This class allows to manipulate LiPD objects.
-
-.. autoclass:: pyleoclim.core.lipd.Lipd
-   :members:
-
-LipdSeries (pyleoclim.LipdSeries)
-"""""""""""""""""""""""""""""""""
-
-.. autoclass:: pyleoclim.core.lipdseries.LipdSeries
-   :members:
-
 PSD (pyleoclim.PSD)
 """""""""""""""""""
 
