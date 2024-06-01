@@ -775,8 +775,17 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                      }
         missing_val = missing_d['label']
 
-        if 'edgecolor' not in scatter_kwargs:
-            scatter_kwargs['edgecolor'] = edgecolor
+        # if 'edgecolor' in scatter_kwargs:
+        #     edgecolor = scatter_kwargs['edgecolor']
+        #     scatter_kwargs['edgecolors'] = edgecolor
+        # if 'edgecolors' not in scatter_kwargs:
+        #     scatter_kwargs['edgecolors'] = edgecolor
+        #
+        if 'edgecolor' in scatter_kwargs:
+            edgecolor = scatter_kwargs['edgecolor']# = edgecolor
+        if isinstance(edgecolor, (list, np.ndarray)):
+            _df['edgecolor'] = edgecolor
+        print(edgecolor, len(_df), len(edgecolor))
 
         hue_var = hue_var if hue_var in _df.columns else None
         hue_var_type_numeric = False
@@ -874,6 +883,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         elif hue_var == 'archiveType':
             palette = {key: value[0] for key, value in plot_defaults.items()}
         elif isinstance(hue_var,str): #hue_var) == str:
+            print(_df.columns)
             hue_data = _df[_df[hue_var] != missing_val]
             # If scalar mappable was passed, try to extract components.
             if ax_sm is not None:
@@ -924,15 +934,31 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         # we plot all data with missing color, collect legend information,
         # then plot data with available hue over it, collect the legend information again and recompose the legend
         if type(hue_var) == str:
+            print('alomst to missing', _df.columns, edgecolor)
             scatter_kwargs['zorder'] = 13
+            if isinstance(edgecolor, np.ndarray):
+                _df['edgecolor'] = edgecolor
+                _df['neighbor'] = _df['edgecolor'].map({'k': 'target', 'w': 'neighbor'})
+
             hue_data = _df[_df[hue_var] == missing_val]
+
             if len(hue_data) > 0:
+                print('missing')
                 sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var,
-                                style=marker_var, transform=transform,
+                                style=marker_var, transform=transform,edgecolor='w',
                                 # change to transform=scatter_kwargs['transform']
                                 palette=[missing_d['hue'] for ik in range(len(hue_data))],
                                 ax=ax, **scatter_kwargs)
                 missing_handles, missing_labels = ax.get_legend_handles_labels()
+                if 'neighbor' in hue_data.columns:
+                    if len(hue_data[hue_data['neighbor'] != 'neighbor']) > 1:
+                        _edgecolor = hue_data[hue_data['neighbor'] != 'neighbor']['edgecolor'].values[0]
+                    else:
+                        _edgecolor = hue_data[hue_data['neighbor'] != 'neighbor']['edgecolor']
+                    sns.scatterplot(data=hue_data[hue_data['neighbor'] != 'neighbor'], x=x, y=y, size=size_var,
+                                    transform=transform, edgecolor=_edgecolor,
+                                    style=marker_var, hue=hue_var, palette=palette, ax=ax, **scatter_kwargs)
+                    print('made it?')
             else:
                 missing_handles, missing_labels = [], []
 
@@ -941,9 +967,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             if hue_norm is not None:
                 scatter_kwargs['hue_norm'] = hue_norm
 
-            sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var, transform=transform,
-                            # change to transform=scatter_kwargs['transform']
+            sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var, transform=transform,edgecolor='w',
                             style=marker_var, palette=palette, ax=ax, **scatter_kwargs)
+            if 'neighbor' in hue_data.columns:
+                sns.scatterplot(data=hue_data[hue_data['neighbor'] != 'neighbor'], x=x, y=y, size=size_var,
+                            transform=transform, edgecolor=hue_data[hue_data['neighbor'] != 'neighbor']['edgecolor'].values[0],
+                            style=marker_var, hue=hue_var, palette=palette, ax=ax, **scatter_kwargs)
 
         else:
             scatter_kwargs['zorder'] = 13
