@@ -35,7 +35,6 @@ class MultipleGeoSeries(MultipleSeries):
 
     Parameters
     ----------
-
     series_list : list
     
         a list of pyleoclim.Series objects
@@ -52,12 +51,13 @@ class MultipleGeoSeries(MultipleSeries):
 
     Examples
     --------
+
     .. jupyter-execute::
         
         from pylipd.utils.dataset import load_dir
         lipd = load_dir(name='Pages2k')
         df = lipd.get_timeseries_essentials()
-        dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment')") 
+        dfs = df.query("archiveType in ('tree','documents','coral','lake sediment')")
         # place in a MultipleGeoSeries object
         ts_list = []
         for _, row in dfs.iterrows():
@@ -69,7 +69,8 @@ class MultipleGeoSeries(MultipleSeries):
                                            label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
     
         Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
-        Euro2k.map() 
+        Euro2k.map()
+
     '''
 
     def __init__(self, series_list, time_unit=None, label=None):
@@ -226,16 +227,18 @@ class MultipleGeoSeries(MultipleSeries):
             
         See also
         --------
+
         pyleoclim.utils.mapping.scatter_map: information-rich scatterplot on Cartopy map
             
         Examples
         --------
+
         .. jupyter-execute::
             
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment','Borehole')") 
+            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment','borehole')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -330,7 +333,6 @@ class MultipleGeoSeries(MultipleSeries):
 
         Returns
         -------
-
         res: MultivariateDecomp
 
             Resulting pyleoclim.MultivariateDecomp object
@@ -353,7 +355,7 @@ class MultipleGeoSeries(MultipleSeries):
             lipd = load_dir(name='Pages2k') # this loads a small subset of the PAGES 2k database
             lipd_euro = lipd.filter_by_geo_bbox(-20,20,40,80)
             df = lipd_euro.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('Wood') & paleoData_variableName not in ('year')") 
+            dfs = df.query("archiveType in ('tree') & paleoData_variableName not in ('year')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -579,7 +581,6 @@ class MultipleGeoSeries(MultipleSeries):
 
         Returns
         -------
-
         fig : matplotlib.figure
         
             the figure object from matplotlib
@@ -604,7 +605,7 @@ class MultipleGeoSeries(MultipleSeries):
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment')") 
+            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iloc[:5].iterrows():
