@@ -124,7 +124,8 @@ class GeoSeries(Series):
          ts = pyleo.utils.datasets.load_dataset('EDC-dD')
          ts_interp = ts.convert_time_unit('kyr BP').interp(step=.5) # interpolate for a faster result
          fig, ax = ts_interp.dashboard()
-          
+
+
     '''
 
     def __init__(self, time, value, lat, lon, elevation = None, time_unit=None, time_name=None, 
@@ -271,7 +272,7 @@ class GeoSeries(Series):
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
         
-        '''Map the location of the record
+        ''' Map the location of the record
 
         Parameters
         ----------
@@ -361,6 +362,7 @@ class GeoSeries(Series):
             import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
             fig, ax = ts.map()
+
 
         '''
         if markersize != None:
@@ -510,7 +512,7 @@ class GeoSeries(Series):
                   hue='archiveType', marker='archiveType', size=None, scatter_kwargs=None,
                   gridspec_kwargs=None,
                   savefig_settings=None):
-        '''
+        ''' Create a dashboard of plots for the GeoSeries object
 
         Parameters
         ----------
@@ -524,7 +526,6 @@ class GeoSeries(Series):
             - bottom left: map
             - bottom right: PSD
             See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
-
 
         plt_kwargs : dict, optional
             Optional arguments for the timeseries plot. See Series.plot() or EnsembleSeries.plot_envelope(). The default is None.
@@ -620,6 +621,7 @@ class GeoSeries(Series):
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
             ts_interp = ts.convert_time_unit('kyr BP').interp(step=.5) # interpolate for a faster result
             fig, ax = ts_interp.dashboard()
+
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

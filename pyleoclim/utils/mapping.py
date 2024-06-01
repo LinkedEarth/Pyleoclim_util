@@ -69,7 +69,6 @@ def set_proj(projection='Robinson', proj_default=True):
     Parameters
     ----------
     projection : string
-
         the map projection. Available projections:
         'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
         'AzimuthalEquidistant','EquidistantConic','LambertConformal',
@@ -81,7 +80,6 @@ def set_proj(projection='Robinson', proj_default=True):
         'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
 
     proj_default : bool; {True,False}
-
         If True, uses the standard projection attributes from Cartopy.
         Enter new attributes in a dictionary to change them. Lists of attributes
         can be found in the `Cartopy documentation <https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv>`_.
@@ -90,8 +88,9 @@ def set_proj(projection='Robinson', proj_default=True):
     -------
     proj : the Cartopy projection object
 
-    See Also
+    See also
     --------
+
     pyleoclim.utils.mapping.map : mapping function making use of the projection
 
     """

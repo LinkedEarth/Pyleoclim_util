@@ -73,6 +73,7 @@ plot_formats = [("png", 90)]
 plot_html_show_formats = True
 plot_html_show_source_link = True
 autosummary_generate = True
+numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

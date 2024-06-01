@@ -48,11 +48,12 @@ warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 #----------------
 
 class AliasFilter(object):
-    '''Performing anti-alias filter on a psd
+    ''' Performing anti-alias filter on a psd
 
     experimental: Use at your own risk
 
     @author: fzhu
+
     '''
 
     def alias_filter(self, freq, pwr, fs, fc, f_limit, avgs):
@@ -242,54 +243,42 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     Parameters
     ----------
     ys : array
-
         a time series
 
     ts : array
-
         time axis of the time series
 
     freq : array
-
         vector of frequency
 
     tau : array
-
         the evenly-spaced time points, namely the time shift for wavelet analysis
 
     c : float
-
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
 
     Neff_threshold : int
-
         the threshold of the number of effective degrees of freedom
 
     nproc :int
-
         fake argument, just for convenience
 
     detrend : string
-
         None - the original time series is assumed to have no trend (default);
         Types of detrending:
-
         - "linear" : the result of a linear least-squares fit to y is subtracted from y.
         - "constant" : only the mean of data is subtracted.
         - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
 
     sg_kwargs : dict
-
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
 
     gaussianize : bool
-
         If True, gaussianizes the timeseries
 
     standardize : bool
-
         If True, standardizes the timeseries
 
     Returns
@@ -400,54 +389,42 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
     Parameters
     ----------
     ys : array
-
         a time series
 
     ts : array
-
         time axis of the time series
         
     freq : array
-
         vector of frequency
 
     tau : array
-
         the evenly-spaced time points, namely the time shift for wavelet analysis
 
     c : float
-
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
 
     Neff_threshold : int
-
         the threshold of the number of effective degrees of freedom [default = 3]
 
     nproc : int
-
         the number of processes for multiprocessing [default = 8]
 
     detrend : string
-
        False - the original time series is assumed to have no trend; 
        Types of detrending:
-
        - "linear" : the result of a linear least-squares fit to y is subtracted from y.
        - "constant" : only the mean of data is subtracted.
        - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
        - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
 
     sg_kwargs : dict
-
         The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
 
     gaussianize : bool
-
         If True, gaussianizes the timeseries
 
     standardize : bool
-
         If True, standardizes the timeseries
 
     Returns
@@ -2078,11 +2055,9 @@ def get_wwz_func(nproc, method):
     Parameters
     ----------
     nproc : int
-
         the number of processes for multiprocessing
 
     method : string
-
         'Foster' - the original WWZ method;
         'Kirchner' - the method Kirchner adapted from Foster;
         'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -2122,43 +2097,34 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
     Parameters
     ----------
     ys : array
-
         a time series, NaNs will be deleted automatically
 
     ts : array
-
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
 
     freq : array
-
         vector of frequency. If None, will be generated according to freq_method.
         may be set.
 
     freq_method : str
-
         when freq=None, freq will be ganerated according to freq_method
 
     freq_kwargs : str
-
         used when freq=None for certain methods
 
     tau : array
-
         The evenly-spaced time points, namely the time shift for wavelet analysis.
         If the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so.
         If None, at most 50 tau points will be generated from the input time span.
 
     len_bd : int
-
         the number of the ghost grid points desired on each boundary
 
     bc_mode : string
-
         {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
         For more details, see np.lib.pad()
 
     reflect_type : string
-
          {‘even’, ‘odd’}, optional
          Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
          For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
@@ -2302,12 +2268,18 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
     def rect(length, normalize=False):
         """ Rectangular function adapted from https://github.com/regeirk/pycwt/blob/master/pycwt/helpers.py
 
-        Args:
-            length (int): length of the rectangular function
-            normalize (bool): normalize or not
+        Parameters
+        ----------
+        length : int
+            length of the rectangular function
 
-        Returns:
-            rect (array): the (normalized) rectangular function
+        normalize : bool
+            normalize or not
+
+        Returns
+        -------
+        rect : np.ndarray
+            the (normalized) rectangular function
 
         """
         rect = np.zeros(length)

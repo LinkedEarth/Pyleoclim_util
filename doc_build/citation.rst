@@ -17,7 +17,7 @@ For example (please check for version updates on Zenodo)
    type = {Computer Program},
    title = {Pyleoclim: A Python package for the analysis of paleoclimate data},
    authors = {Deborah Khider and Feng Zhu and Julien Emile-Geay and Jun Hu and Alexander James and Pratheek Athreya and Myron Kwan and Daniel Garijo}
-}
+    }
 
 
 @article{Pyleoclim:PP2022,
@@ -28,8 +28,8 @@ For example (please check for version updates on Zenodo)
     title = {Pyleoclim: Paleoclimate Timeseries Analysis and Visualization With Python},
     volume = {37},
     year = {2022},
-    doi = {10.1029/2022PA004509},
-}
+    doi = {10.1029/2022PA004509}
+    }
 
 
 AGU style entry
