@@ -57,7 +57,7 @@ class MultipleGeoSeries(MultipleSeries):
         from pylipd.utils.dataset import load_dir
         lipd = load_dir(name='Pages2k')
         df = lipd.get_timeseries_essentials()
-        dfs = df.query("archiveType in ('tree','documents','coral','lake sediment')")
+        dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment')")
         # place in a MultipleGeoSeries object
         ts_list = []
         for _, row in dfs.iterrows():
@@ -238,7 +238,7 @@ class MultipleGeoSeries(MultipleSeries):
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment','borehole')")
+            dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment','Borehole')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -355,7 +355,7 @@ class MultipleGeoSeries(MultipleSeries):
             lipd = load_dir(name='Pages2k') # this loads a small subset of the PAGES 2k database
             lipd_euro = lipd.filter_by_geo_bbox(-20,20,40,80)
             df = lipd_euro.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree') & paleoData_variableName not in ('year')")
+            dfs = df.query("archiveType in ('Wood') & paleoData_variableName not in ('year')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -605,7 +605,7 @@ class MultipleGeoSeries(MultipleSeries):
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment')")
+            dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iloc[:5].iterrows():
