@@ -30,7 +30,6 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
 
     Parameters
     ----------
-
     y1, y2: array
         vectors of (real) numbers with identical length, no NaNs allowed
     maxlag : int or int iterable, optional
@@ -42,7 +41,6 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
 
     Returns
     -------
-
     dict
         All test results, dictionary keys are the number of lags. For each lag the values are a tuple, with the first element a dictionary with test statistic,
         pvalues, degrees of freedom, the second element are the OLS estimation results for the restricted model, the unrestricted model and the restriction (contrast)
@@ -96,7 +94,6 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
 
     Parameters
     ----------
-
     y1, y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
 
@@ -117,7 +114,6 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
 
     Returns
     -------
-
     res : dict
 
         A dictionary of results including:
@@ -255,7 +251,6 @@ def liang(y1, y2, npt=1):
 
     Parameters
     ----------
-
     y1, y2 : array
         Vectors of (real) numbers with identical length, no NaNs allowed
 
@@ -266,7 +261,6 @@ def liang(y1, y2, npt=1):
 
     Returns
     -------
-
     res : dict
 
         A dictionary of results including:
@@ -387,7 +381,6 @@ def signif_isopersist(y1, y2, method,
 
     Parameters
     ----------
-
     y1, y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
 
@@ -402,7 +395,6 @@ def signif_isopersist(y1, y2, method,
 
     Returns
     -------
-
     res_dict : dict
 
         A dictionary with the following information:
@@ -458,7 +450,6 @@ def signif_isospec(y1, y2, method,
 
     Parameters
     ----------
-
     y1, y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
     method : str; {'liang'}
@@ -472,7 +463,6 @@ def signif_isospec(y1, y2, method,
 
     Returns
     -------
-
     res_dict : dict
 
         A dictionary with the following information:

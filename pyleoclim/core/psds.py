@@ -32,7 +32,6 @@ class PSD:
 
     Parameters
     ----------
-
     frequency : numpy.array, list, or float
 
         One or more frequencies in power spectrum
@@ -148,7 +147,6 @@ class PSD:
 
         Parameters
         ----------
-
         number : int, optional
 
             Number of surrogate series to generate for significance testing. The default is None.
@@ -176,7 +174,6 @@ class PSD:
 
         Returns
         -------
-
         new : pyleoclim.core.psds.PSD
 
             New PSD object with appropriate significance test
@@ -341,7 +338,6 @@ class PSD:
         
         Parameters
         ----------
-
         fmin : float, optional
             the minimum frequency edge for beta estimation; the default is the minimum of the frequency vector of the PSD obj
 
@@ -357,7 +353,6 @@ class PSD:
 
         Returns
         -------
-
         new : pyleoclim.core.psds.PSD
             New PSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
@@ -415,14 +410,12 @@ class PSD:
 
         Parameters
         ----------
-
         avgs : int
             flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
             OR from measurements averaged over each sampling interval (avgs==1)
 
         Returns
         -------
-
         new : pyleoclim.core.psds.PSD
             New PSD object with the spectral aliasing effect alleviated.
 
@@ -479,7 +472,6 @@ class PSD:
 
         Parameters
         ----------
-        
         in_loglog : bool; {True, False}, optional
 
             Plot on loglog axis. The default is True.
@@ -603,7 +595,6 @@ class PSD:
 
         Returns
         -------
-        
         fig, ax
 
         Examples
@@ -825,7 +816,6 @@ class MultiplePSD:
        
         Parameters
         ----------
-        
         beta_est_res : numpy.array
         
             Results of the beta estimation calculation
@@ -853,7 +843,6 @@ class MultiplePSD:
 
         Parameters
         ----------
-        
         qs : list, optional
         
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
@@ -864,14 +853,12 @@ class MultiplePSD:
 
         Raises
         ------
-        
         ValueError
         
             Frequency axis not consistent across the PSD list!
 
         Returns
         -------
-        
         psds : pyleoclim.core.psds.MultiplePSD
 
         '''
@@ -906,7 +893,6 @@ class MultiplePSD:
 
         Parameters
         ----------
-
         fmin : float
         
             the minimum frequency edge for beta estimation; the default is the minimum of the frequency vector of the PSD object
@@ -926,7 +912,6 @@ class MultiplePSD:
 
         Returns
         -------
-
         new : pyleoclim.core.psds.MultiplePSD
         
             New MultiplePSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
@@ -970,7 +955,6 @@ class MultiplePSD:
 
         Parameters
         ----------
-        
         figsize : list, optional
         
             Figure size. The default is [10, 4].
@@ -1052,7 +1036,6 @@ class MultiplePSD:
 
         Returns
         -------
-        
         fig : matplotlib.pyplot.figure
         
         ax : matplotlib.pyplot.axis
@@ -1138,7 +1121,6 @@ class MultiplePSD:
 
         Parameters
         ----------
-
         avgs : int
         
             flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
@@ -1150,7 +1132,6 @@ class MultiplePSD:
 
         Returns
         -------
-
         new : pyleoclim.core.psds.MultiplePSD
             New MultiplePSD object with the spectral aliasing effect alleviated.
 
@@ -1189,7 +1170,6 @@ class MultiplePSD:
 
         Parameters
         ----------
-        
         figsize : list, optional
         
             The figure size. The default is [10, 4].

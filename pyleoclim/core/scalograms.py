@@ -26,7 +26,6 @@ class Scalogram:
         '''
         Parameters
         ----------
-
             frequency : array
 
                 The frequency axis
@@ -158,7 +157,6 @@ class Scalogram:
 
         Returns
         -------
-
         scal : pyleoclim.core.scalograms.Scalogram
 
             The copied version of the pyleoclim.Scalogram object
@@ -195,7 +193,6 @@ class Scalogram:
 
         Parameters
         ----------
-
         in_scale : bool, optional
 
             Plot the in scale instead of frequency space. The default is True.
@@ -268,7 +265,6 @@ class Scalogram:
 
         Returns
         -------
-
         fig : matplotlib.figure
 
             the figure object from matplotlib
@@ -296,6 +292,7 @@ class Scalogram:
             scalogram = ts.wavelet()
 
             fig,ax = scalogram.plot()
+
         '''
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
@@ -412,7 +409,6 @@ class Scalogram:
 
         Parameters
         ----------
-
         method : {'ar1asym', 'ar1sim','uar1', 'CN'}
 
             Method to use to generate the surrogates.  ar1sim uses simulated timeseries with similar persistence. 
@@ -442,14 +438,12 @@ class Scalogram:
 
         Raises
         ------
-
         ValueError
 
             qs should be a list with at least one value.
 
         Returns
         -------
-
         new : pyleoclim.core.scalograms.Scalogram
 
             A new Scalogram object with the significance level
@@ -614,14 +608,12 @@ class MultipleScalogram:
 
         Parameters
         ----------
-        
         qs : list, optional
         
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
 
         Raises
         ------
-        
         ValueError
         
             Frequency axis not consistent across the PSD list!
@@ -632,7 +624,6 @@ class MultipleScalogram:
 
         Returns
         -------
-        
         scals : pyleoclim.core.scalograms.MultipleScalogram
         
         '''

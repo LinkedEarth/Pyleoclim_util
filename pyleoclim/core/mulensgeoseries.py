@@ -22,7 +22,6 @@ class MulEnsGeoSeries():
         
         Parameters
         ----------
-        
         nsim : int
             Number of simulations to carry out. Default is 1000
             
@@ -50,7 +49,6 @@ class MulEnsGeoSeries():
             
         Returns
         -------
-        
         EnsembleMvD : pyleo.EnsMultivarDecomp
             Ensemble Multivariate Decomposition object
             

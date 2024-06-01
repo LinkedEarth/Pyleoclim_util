@@ -197,7 +197,6 @@ class Coherence:
 
         Returns
         -------
-        
         fig, ax
 
         See also
@@ -428,7 +427,6 @@ class Coherence:
 
          Parameters
          ----------
-
          title : str, optional
          
              Title of the plot. The default is None.
@@ -473,11 +471,11 @@ class Coherence:
 
          Returns
          -------
-         
          fig, ax
 
          See also
          --------
+
          pyleoclim.core.coherence.Coherence.plot : creates a coherence plot
 
          pyleoclim.core.series.Series.wavelet_coherence : computes the coherence between two timeseries.
@@ -590,7 +588,6 @@ class Coherence:
 
         Parameters
         ----------
-        
         number : int, optional
         
             Number of surrogate series to create for significance testing. The default is 200.
@@ -619,7 +616,6 @@ class Coherence:
 
         Returns
         -------
-        
         new : pyleoclim.core.coherence.Coherence
 
             original Coherence object augmented with significance levels signif_qs,
@@ -784,7 +780,6 @@ class Coherence:
 
         Parameters
         ----------
-        
         scales : float
         
             scale at which to evaluate the phase angle
@@ -800,7 +795,6 @@ class Coherence:
 
         Returns
         -------
-        
         result : dict
         
             contains angle_mean (the mean angle for those scales), sigma (the 

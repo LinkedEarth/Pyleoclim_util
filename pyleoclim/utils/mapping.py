@@ -68,7 +68,6 @@ def set_proj(projection='Robinson', proj_default=True):
 
     Parameters
     ----------
-
     projection : string
 
         the map projection. Available projections:
@@ -89,7 +88,7 @@ def set_proj(projection='Robinson', proj_default=True):
 
     Returns
     -------
-        proj : the Cartopy projection object
+    proj : the Cartopy projection object
 
     See Also
     --------
@@ -295,7 +294,6 @@ def map(lat, lon, criteria, marker=None, color=None,
 
     Parameters
     ----------
-
     lat : list
         a list of latitudes.
 
@@ -376,11 +374,11 @@ def map(lat, lon, criteria, marker=None, color=None,
 
     Returns
     -------
-
     ax: The figure, or axis if ax specified
 
-    See Also
+    See also
     --------
+
     pyleoclim.utils.mapping.set_proj : Set the projection for Cartopy-based maps
     pyleoclim.utils.mapping.pick_proj : pick the projection type based on the degree of clustering of coordinates
     """
@@ -691,8 +689,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     TYPE
         fig, dictionary of ax objects which includes the as many as three items: 'cb' (colorbar ax), 'map' (scatter map), and 'leg' (legend ax)
 
-    See Also
+    See also
     --------
+
     pyleoclim.utils.mapping.set_proj : Set the projection for Cartopy-based maps
     pyleoclim.utils.mapping.pick_proj : pick the projection type based on the degree of clustering of coordinates
 
@@ -1297,16 +1296,17 @@ def compute_dist(lat_r, lon_r, lat_c, lon_c):
     lon_c: list
         A list of longitudes for the comparison points, in deg
 
+    Returns
+    -------
+    dist: list
+        A list of distances in km.
+
     See also
     --------
 
     pyleoclim.utils.mapping.dist_sphere: calculate distance on a sphere
 
-    Returns
-    -------
 
-    dist: list
-        A list of distances in km.
     """
     dist = []
     lon_c = lon_360_to_180(np.array(lon_c))
@@ -1326,7 +1326,6 @@ def within_distance(distance, radius):
 
     Parameters
     ----------
-
     distance: list
         A list containing the distance
 
@@ -1335,7 +1334,6 @@ def within_distance(distance, radius):
 
     Returns
     -------
-
     idx: list
         a list of index
     """
@@ -1371,13 +1369,15 @@ def centroid_coords(lat, lon, true_centroid=False):
         if True, computes a true centroid, otherwise a representative point,
         which is guaranteed to lie within the polygon.
 
-    See Also
-    --------
-    https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon
-
     Returns
     -------
     clat, clon : coordinates of the centroid
+
+    See also
+    --------
+
+    https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon
+
 
     '''
     lon = lon_360_to_180(np.array(lon))

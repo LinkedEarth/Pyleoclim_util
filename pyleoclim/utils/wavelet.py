@@ -60,7 +60,6 @@ class AliasFilter(object):
 
         Parameters
         ----------
-
         freq : array
             vector of frequencies in power spectrum
         pwr : array
@@ -77,7 +76,6 @@ class AliasFilter(object):
 
         Returns
         -------
-
         alpha : float
             best-fit exponent of power-law model
         filtered_pwr : array
@@ -220,7 +218,6 @@ def assertPositiveInt(*args):
 
     Parameters
     ----------
-
     args
 
     '''
@@ -244,7 +241,6 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -298,7 +294,6 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
 
     Returns
     -------
-
     wwa : array
         the weighted wavelet amplitude
     phase : array
@@ -404,7 +399,6 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -458,7 +452,6 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
 
     Returns
     -------
-
     wwa : array
         the weighted wavelet amplitude
     phase : array
@@ -567,7 +560,6 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -621,7 +613,6 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     Returns
     -------
-
     wwa : array
         the weighted wavelet amplitude
     phase : array
@@ -738,7 +729,6 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -791,7 +781,6 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     Returns
     -------
-
     wwa (array): the weighted wavelet amplitude
     phase (array): the weighted wavelet phase
     Neffs (array): the matrix of effective number of points in the time-scale coordinates
@@ -911,7 +900,6 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -965,7 +953,6 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
 
     Returns
     -------
-
     wwa : array
         the weighted wavelet amplitude
     phase : array
@@ -1092,7 +1079,6 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -1146,7 +1132,6 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
 
     Returns
     -------
-
     wwa : array
         the weighted wavelet amplitude
     phase : array
@@ -1208,7 +1193,6 @@ def make_coi(tau, Neff_threshold=3):
 
     Parameters
     ----------
-
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     Neff_threshold : int
@@ -1216,7 +1200,6 @@ def make_coi(tau, Neff_threshold=3):
 
     Returns
     -------
-
         coi : array
             cone of influence
 
@@ -1252,7 +1235,6 @@ def make_omega(ts, freq):
 
     Parameters
     ----------
-
     ys : array
         a time series
     ts : array
@@ -1262,8 +1244,6 @@ def make_omega(ts, freq):
 
     Returns
     -------
-
-
     omega : array
         the angular frequency vector
 
@@ -1281,7 +1261,6 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff_threshold=3, anti_alias=False, avgs=
 
     Parameters
     ----------
-
     wwa : array
         the weighted wavelet amplitude.
     ts : array
@@ -1299,7 +1278,6 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff_threshold=3, anti_alias=False, avgs=
 
     Returns
     -------
-
     psd : array
         power spectral density
 
@@ -1345,7 +1323,6 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
 
     Parameters
     ----------
-
     ys : array
 
         a time series, NaNs will be deleted automatically
@@ -1428,7 +1405,6 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
 
     Returns
     -------
-
     res : namedtuple
         a namedtuple that includes below items
 
@@ -1550,7 +1526,6 @@ def wwz_coherence(y1, t1, y2, t2, smooth_factor=0.25,
 
     Parameters
     ----------
-
     y1 : array
 
         first of two time series
@@ -1625,7 +1600,6 @@ def wwz_coherence(y1, t1, y2, t2, smooth_factor=0.25,
 
     Returns
     -------
-
     res : dict
         contains the cross wavelet coherence, cross-wavelet phase,
         vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
@@ -1740,7 +1714,6 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=0.95):
 
     Parameters
     ----------
-
     ts : array
 
         time axis of the time series
@@ -1767,7 +1740,6 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=0.95):
 
     Returns
     -------
-
     freq : array
         the frequency vector
 
@@ -1812,13 +1784,11 @@ def freq_vector_welch(ts):
 
     Parameters
     ----------
-
     ts : array
         time axis of the time series
 
     Returns
     -------
-
     freq : array
         the frequency vector
 
@@ -1859,13 +1829,11 @@ def freq_vector_nfft(ts):
 
     Parameters
     ----------
-
     ts : array
         time axis of the time series
 
     Returns
     -------
-
     freq : array
         the frequency vector
 
@@ -1899,7 +1867,6 @@ def freq_vector_scale(ts, dj=0.25, s0=None,j1=None, mother='MORLET',param=None):
 
     Parameters
     ----------
-
     ts: numpy.array
 
         The time axis for the timeseries    
@@ -1931,7 +1898,6 @@ def freq_vector_scale(ts, dj=0.25, s0=None,j1=None, mother='MORLET',param=None):
 
     Returns
     -------
-
     freq : array
         the frequency vector
 
@@ -1994,7 +1960,6 @@ def freq_vector_log(ts, fmin=None, fmax= None, nf=None):
 
     Parameters
     ----------
-
     ts : array
         time axis of the time series
         
@@ -2009,7 +1974,6 @@ def freq_vector_log(ts, fmin=None, fmax= None, nf=None):
         
     Returns
     -------
-
     freq : array
         the frequency vector
 
@@ -2050,7 +2014,6 @@ def make_freq_vector(ts, method='log', rayleigh_bound=True, **kwargs):
 
     Parameters
     ----------
-
     ts : array
 
         Time axis of the time series
@@ -2068,7 +2031,6 @@ def make_freq_vector(ts, method='log', rayleigh_bound=True, **kwargs):
             See underlying methods for optional parameters
     Returns
     -------
-
     freq : array
         the frequency vector
 
@@ -2115,7 +2077,6 @@ def get_wwz_func(nproc, method):
 
     Parameters
     ----------
-
     nproc : int
 
         the number of processes for multiprocessing
@@ -2129,7 +2090,6 @@ def get_wwz_func(nproc, method):
 
     Returns
     -------
-
     wwz_func : function
         the wwz function to use
 
@@ -2161,7 +2121,6 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
 
     Parameters
     ----------
-
     ys : array
 
         a time series, NaNs will be deleted automatically
@@ -2207,7 +2166,6 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
 
     Returns
     -------
-
     ys_cut : array
         the truncated time series with NaNs deleted
     ts_cut : array
@@ -2282,7 +2240,6 @@ def xwt(coeff1, coeff2):
 
     Parameters
     ----------
-
     coeff1 : array
         the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
     coeff2 : array
@@ -2294,7 +2251,6 @@ def xwt(coeff1, coeff2):
 
     Returns
     -------
-
     xw_t : array (complex)
         the cross wavelet transform 
     xw_amplitude : array
@@ -2320,7 +2276,6 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
 
     Parameters
     ----------
-
     coeff1 : array
         the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
     coeff2 : array
@@ -2332,7 +2287,6 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
 
     Returns
     -------
-
     xw_coherence : array
         the cross wavelet coherence
 
@@ -2499,7 +2453,6 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
 
     Parameters
     ----------
-
     ys : numpy.array
 
         the time series.
@@ -2659,7 +2612,6 @@ def cwt_coherence(y1, t1, y2, t2, freq=None, freq_method='log',freq_kwargs={},
 
     Parameters
     ----------
-
     y1 : array
 
         first of two time series
@@ -2741,7 +2693,6 @@ def cwt_coherence(y1, t1, y2, t2, freq=None, freq_method='log',freq_kwargs={},
 
     Returns
     -------
-
     res : dict
         contains the cross wavelet coherence (WTC), cross-wavelet transform (XWT),
         cross-wavelet phase, vector of frequency, evenly-spaced time points, 
@@ -3006,7 +2957,6 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
 
     Parameters
     ----------
-
     ys : numpy.array
 
         Values for the timeseries
@@ -3344,7 +3294,6 @@ def angle_sig(theta, nMC=1000, level = 0.05):
 
     Returns
     -------
-    
     angle_mean : float
         mean angle
     

@@ -66,7 +66,6 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -236,7 +235,6 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
 
     Parameters
     ----------
-
     ys : array
         a time series
     ts : array
@@ -277,7 +275,6 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
 
     Returns
     -------
-
     res_dict : dict
         the result dictionary, including
         - freq (array): the frequency vector
@@ -353,7 +350,6 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -445,7 +441,6 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     Returns
     -------
-
     res_dict : dict
 
         the result dictionary, including
@@ -468,6 +463,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     References
     ----------
+
     Lomb, N. R. (1976). Least-squares frequency analysis of unequally spaced data. Astrophysics and Space Science 39, 447-462.
 
     Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
@@ -594,7 +590,6 @@ def periodogram(ys, ts, window='hann', nfft=None,
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -668,7 +663,6 @@ def periodogram(ys, ts, window='hann', nfft=None,
 
     Returns
     -------
-
     res_dict : dict
 
         the result dictionary, including
@@ -752,7 +746,6 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
 
     Parameters
     ----------
-
     ys : array
 
         a time series, NaNs will be deleted automatically
@@ -852,7 +845,6 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
 
     Returns
     -------
-
     res : namedtuple
 
         a namedtuple that includes below items
@@ -915,7 +907,6 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
 
     Parameters
     ----------
-
     ys : numpy.array
 
         the time series.
@@ -1042,7 +1033,6 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', ve
     
     Parameters
     ----------
-
     psd : array
 
         the power spectral density
@@ -1065,7 +1055,6 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', ve
 
     Returns
     -------
-
     beta : float
 
         the estimated slope
@@ -1180,13 +1169,11 @@ def beta2Hurst(beta):
 
     Parameters
     ----------
-
     beta : float
         the estimated slope of a power spectral density :math: `S(f) \propto 1/f^{\beta}`
         
     Returns
     -------
-
     H : float
         Hurst index, should be in (0, 1)
     
@@ -1204,7 +1191,6 @@ def psd_ar(var_noise, freq, ar_params, f_sampling):
 
     Parameters
     ----------
-
     var_noise : float
 
         the variance of the noise of the AR process
@@ -1223,7 +1209,6 @@ def psd_ar(var_noise, freq, ar_params, f_sampling):
 
     Returns
     -------
-
     psd : array
         power spectral density
 
@@ -1245,7 +1230,6 @@ def psd_fBM(freq, ts, H):
 
     Parameters
     ----------
-
     freq : array
 
         vector of frequency
@@ -1260,7 +1244,6 @@ def psd_fBM(freq, ts, H):
 
     Returns
     -------
-
     psd : array
         power spectral density
 

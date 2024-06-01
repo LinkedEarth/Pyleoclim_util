@@ -408,6 +408,7 @@ class EmpiricalModeDecomposition(object):
 
         Examples
         --------
+
         >>> from pyhht.visualization import plot_imfs
         >>> import numpy as np
         >>> t = np.linspace(0, 1, 1000)
@@ -484,7 +485,6 @@ def simple_stats(y, axis=None):
 
     Parameters
     ----------
-
     y: array
         A Numpy array
     axis : int, tuple of ints
@@ -494,7 +494,6 @@ def simple_stats(y, axis=None):
 
     Returns
     -------
-
     mean :  float
         mean of y, ignoring NaNs
     median : float
@@ -532,7 +531,6 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     Parameters
     ----------
-
     x : array
         The x-axis series.
 
@@ -576,7 +574,6 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     Returns
     -------
-
     binned_values : array
         The binned values
     bins : array
@@ -912,7 +909,6 @@ def increments(x,step_style='median'):
 
     Parameters
     ----------
-
     x : array
 
     step_style : str
@@ -925,7 +921,6 @@ def increments(x,step_style='median'):
 
     Returns
     -------
-
     start : float
         min(x)
     stop : float
@@ -965,7 +960,6 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
     Parameters
     ----------
-
     x : array
        The x-axis
 
@@ -1001,7 +995,6 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
     Returns
     -------
-
     xi : array
         The interpolated x-axis
     yi : array
@@ -1102,7 +1095,6 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
 
     Parameters
     ----------
-
     x : array
         vector of (real) numbers as a time series, NaNs allowed
     scale : real
@@ -1116,7 +1108,6 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
 
     Returns
     -------
-
     z : array
        The standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
     mu : real
@@ -1166,7 +1157,6 @@ def center(y, axis=0):
 
     Parameters
     ----------
-
     y : array
         Vector of (real) numbers as a time series, NaNs allowed
     axis : int or None
@@ -1174,7 +1164,6 @@ def center(y, axis=0):
         
     Returns
     -------
-
     yc : array
        The centered time series, yc = (y - ybar), NaNs allowed
     ybar : real
@@ -1209,7 +1198,6 @@ def ts2segments(ys, ts, factor=10):
 
     Parameters
     ----------
-
     ys : array
         A time series, NaNs allowed
     ts : array
@@ -1219,7 +1207,6 @@ def ts2segments(ys, ts, factor=10):
 
     Returns
     -------
-
     seg_ys : list
         A list of several segments with potentially different lengths
     seg_ts : list
@@ -1298,13 +1285,11 @@ def gaussianize(ys):
     
     Parameters
     ----------
-
     ys : 1D Array
         e.g. a timeseries
 
     Returns
     -------
-
     yg : 1D Array
         Gaussianized values of ys.
 
@@ -1348,7 +1333,6 @@ def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None)
 
     Parameters
     ----------
-
     y : array
 
        The series to be detrended.
@@ -1381,7 +1365,6 @@ def detrend(y, x=None, method="emd", n=1, preserve_mean = False, sg_kwargs=None)
 
     Returns
     -------
-
     ys : array
         The detrended version of y.
         
@@ -1449,7 +1432,7 @@ def calculate_distances(ys, n_neighbors=None, NN_kwargs=None):
 
     Parameters
     ----------
-    ys : tnumpy.array
+    ys : numpy.array
         the y-values for the timeseries
     n_neighbors : int, optional
         Number of neighbors to use by default for kneighbors queries. The default is None.
@@ -1774,7 +1757,6 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
 
     Parameters
     ----------
-
     ys : array
 
         a time series
@@ -1806,7 +1788,6 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
 
     Returns
     -------
-
     res : array
         the processed time series
 
@@ -1843,7 +1824,6 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
     
     Parameters
     ----------
-
     x : np.ndarray
         Uneven time axis upon which to base the uniform time axis.
     
@@ -1932,7 +1912,6 @@ def phaseran(recblk, nsurr):
 
     Parameters
     ----------
-
     recblk : numpy array
         2D array , Row: time sample. Column: recording.
         An odd number of time samples (height) is expected.
@@ -1944,7 +1923,6 @@ def phaseran(recblk, nsurr):
 
     Returns
     -------
-
     surrblk : numpy array
         3D multidimensional array image block with the surrogate datasey along the third dimension
 

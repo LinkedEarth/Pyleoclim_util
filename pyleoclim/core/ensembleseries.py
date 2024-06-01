@@ -49,7 +49,6 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
-
         series : pyleoclim.core.series.Series
             A Series object with the values to be mapped
 
@@ -70,7 +69,6 @@ class EnsembleSeries(MultipleSeries):
 
         Returns
         -------
-        
         EnsembleSeries : pyleoclim.core.ensembleseries.EnsembleSeries
             The ensemble created using the time axes from age_array and the values from series.
 
@@ -173,7 +171,6 @@ class EnsembleSeries(MultipleSeries):
 
         Returns
         -------
-
         time_header : str
 
             Label for the time axis
@@ -212,7 +209,6 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
-
         timespan : tuple or list
             The list of time points for slicing, whose length must be even.
             When there are n time points, the output Series includes n/2 segments.
@@ -221,7 +217,6 @@ class EnsembleSeries(MultipleSeries):
 
         Returns
         -------
-
         new : EnsembleSeries
             The sliced EnsembleSeries object.
 
@@ -268,7 +263,6 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
-
         qs : list, optional
 
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
@@ -279,7 +273,6 @@ class EnsembleSeries(MultipleSeries):
 
         Returns
         -------
-
         ens_qs : EnsembleSeries
 
             EnsembleSeries object containing empirical quantiles of original 
@@ -385,7 +378,6 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
-
         target : Series or EnsembleSeries
 
             A pyleoclim Series object or EnsembleSeries object.
@@ -437,7 +429,6 @@ class EnsembleSeries(MultipleSeries):
 
         Returns
         -------
-
         corr_ens : CorrEns
 
             The resulting object, see pyleoclim.CorrEns
@@ -541,7 +532,6 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
-
         figsize : list, optional
 
             The figure size. The default is [10, 4].
@@ -611,7 +601,6 @@ class EnsembleSeries(MultipleSeries):
 
         Returns
         -------
-
         fig : matplotlib.figure
         
             the figure object from matplotlib
@@ -705,7 +694,6 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
-
         figsize : list, optional
 
             The figure size. The default is [10, 4].
@@ -779,7 +767,6 @@ class EnsembleSeries(MultipleSeries):
 
         Returns
         -------
-
         fig : matplotlib.figure
         
             the figure object from matplotlib
@@ -883,7 +870,6 @@ class EnsembleSeries(MultipleSeries):
         
         Parameters
         ----------
-
         figsize : list
 
             Size of the figure.
@@ -946,7 +932,6 @@ class EnsembleSeries(MultipleSeries):
 
         Returns
         -------
-        
         fig : matplotlib.figure
         
             the figure object from matplotlib
@@ -1108,7 +1093,6 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
-
         figsize : list, optional
 
             The size of the figure. The default is [10, 4].
