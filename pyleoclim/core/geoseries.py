@@ -457,7 +457,7 @@ class GeoSeries(Series):
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment') and paleoData_variableName not in ('year')")
+            dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment') and paleoData_variableName not in ('year')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
