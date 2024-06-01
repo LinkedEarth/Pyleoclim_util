@@ -124,8 +124,10 @@ def scatter_xy(x, y, c=None, figsize=None, xlabel=None, ylabel=None, title=None,
     if ylim is not None:
         ax.set_ylim(ylim)
 
-    if legend:
+    if len(lgd_kwargs)>0:
         ax.legend(**lgd_kwargs)
+    # if legend:
+    #     ax.legend(**lgd_kwargs)
     else:
         ax.legend().remove()
 
@@ -216,8 +218,10 @@ def plot_scatter_xy(x1, y1, x2, y2, figsize=None, xlabel=None,
     if ylim is not None:
         ax.set_ylim(ylim)
 
-    if legend:
+    if (legend is True) & (len(lgd_kwargs)>0):
         ax.legend(**lgd_kwargs)
+    # if legend:
+    #     ax.legend(**lgd_kwargs)
     else:
         ax.legend().remove()
 
@@ -283,7 +287,10 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     --------
     
     pyleoclim.utils.plotting.set_style : set different styles for the figures. Should be set before invoking the plotting functions
-    pyleoclim.utils.plotting.savefig : save figures        
+
+    pyleoclim.utils.plotting.savefig : save figures
+
+
     '''
     # handle dict defaults
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -310,7 +317,8 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     if ylim is not None:
         ax.set_ylim(ylim)
 
-    if legend:
+    if (legend is True) & (len(lgd_kwargs)>0):
+    # if legend:
         ax.legend(**lgd_kwargs)
     else:
         ax.legend().remove()
@@ -384,6 +392,7 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     --------
 
     https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.pcolormesh.html
+
     https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
 
 
@@ -898,7 +907,7 @@ def calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=.1):
     This function identifies sets of labels that would overlap if rendered at the same height on a plot.
     It is used to determine how to place labels to avoid overlap in visualizations.
 
-    Parameters:
+    Parameters
     ----------
     ax : matplotlib.axes.Axes
         The Axes object on which the labels will be plotted.
@@ -916,9 +925,10 @@ def calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=.1):
         Additional space to consider around each label to prevent overlap.
         Defaults to 0.1.
 
-    Returns:
-    --------
-    list of list of int: A list where each sublist contains the indices of overlapping labels.
+    Returns
+    -------
+    list of list of int : A list where each sublist contains the indices of overlapping labels.
+
 
     """
 
@@ -960,7 +970,7 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
     This function positions labels at specified x-locations with adjustments to avoid overlaps.
     Labels can be oriented either above (north) or below (south) a baseline.
 
-    Parameters:
+    Parameters
     ----------
     ax : matplotlib.axes.Axes
         The Axes object where the labels are to be placed.
@@ -998,8 +1008,8 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
     text_kwargs : dict, optional
         Additional keyword arguments for styling the text labels (per Matplotlib).
 
-    Returns:
-    --------
+    Returns
+    -------
     matplotlib.axes.Axes: The modified Axes object with labels placed.
 
     Examples
@@ -1134,7 +1144,7 @@ def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
         A dictionary containing keyword arguments for the normalization process, specifically supporting 'vcenter' and 'clip'. Defaults to {'vcenter': 0, 'clip': False} if not provided or if provided keys are missing.
 
 
-    Returns:
+    Returns
     -------
     ax_sm : matplotlib.cm.ScalarMappable
         The configured ScalarMappable object, which can be used to map scalar data to colors based on the specified colormap and normalization settings.
@@ -1143,21 +1153,20 @@ def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
     Examples
     --------
 
-        .. jupyter-execute::
+    .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            import numpy as np
+        import pyleoclim as pyleo
+        import numpy as np
 
-            scalar_values = np.random.randn(100)
-            sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values)
-            # Now `sm` can be used with matplotlib plotting functions to map scalar values to colors.
+        scalar_values = np.random.randn(100)
+        sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values)
+        # Now `sm` can be used with matplotlib plotting functions to map scalar values to colors.
 
-            sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values, n=10)
-            # This creates a ScalarMappable a discrete color scale.
+        sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values, n=10)
+        # This creates a ScalarMappable a discrete color scale.
 
-            sm = pyleo.utils.plotting.make_scalar_mappable(cmap=['blue', 'white', 'red'], hue_vect=scalar_values, norm_kwargs={'vcenter': 0})
-            # This creates a ScalarMappable with a custom linear segmented colormap and centered normalization.
-
+        sm = pyleo.utils.plotting.make_scalar_mappable(cmap=['blue', 'white', 'red'], hue_vect=scalar_values, norm_kwargs={'vcenter': 0})
+        # This creates a ScalarMappable with a custom linear segmented colormap and centered normalization.
 
     """
 
@@ -1351,8 +1360,6 @@ def consolidate_legends(ax, split_btwn=True, hue='relation', style='exp_type', s
 
 def keep_center_colormap(cmap, vmin, vmax, center=0):
     """
-
-
     Adjust a colormap so that a specific value remains centered, and extend its limits symmetrically.
 
     This function modifies a given colormap such that the color representing the 'center' value
@@ -1361,7 +1368,6 @@ def keep_center_colormap(cmap, vmin, vmax, center=0):
     20% larger than the absolute range from the center to either the original minimum or maximum value.
     This is particularly useful for visualizing data with a significant central value (e.g., zero in
     anomaly maps) to ensure that the colormap visually represents deviations from this center in a balanced manner.
-
 
     Parameters
     ----------
@@ -1384,6 +1390,7 @@ def keep_center_colormap(cmap, vmin, vmax, center=0):
 
     Notes
     -----
+
     The adjustment involves shifting the original `vmin` and `vmax` values to be symmetric around the `center`,
     then expanding the range by at least 20% to ensure that the colormap's central part accurately represents
     the centered value across the data. This adjusted colormap can then be used for data visualization tasks
@@ -1393,7 +1400,7 @@ def keep_center_colormap(cmap, vmin, vmax, center=0):
     Examples
     --------
 
-        .. jupyter-execute::
+    .. jupyter-execute::
 
         import matplotlib.pyplot as plt
 
