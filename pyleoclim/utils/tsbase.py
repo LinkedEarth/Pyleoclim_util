@@ -476,7 +476,6 @@ def is_evenly_spaced(x, tol=1e-4):
 
     Parameters
     ----------
-
     x : array
 
     tol : float64
@@ -484,7 +483,6 @@ def is_evenly_spaced(x, tol=1e-4):
 
     Returns
     -------
-
     check : bool
         True - evenly spaced; False - unevenly spaced.
 

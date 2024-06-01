@@ -16,7 +16,6 @@ class MultivariateDecomp:
 
         Parameters
         ----------
-
         time: float
         
             the common time axis
@@ -66,7 +65,6 @@ class MultivariateDecomp:
 
         Parameters
         ----------
-        
         figsize : list, optional
         
             The figure size. The default is [6, 4].
@@ -106,8 +104,9 @@ class MultivariateDecomp:
         
             color to be used for plotting eigenvalues
             
-        See Also
+        See also
         --------
+
         pyleoclim.core.MultipleSeries.pca : Principal Component Analysis
 
         References
@@ -196,7 +195,6 @@ class MultivariateDecomp:
 
         Parameters
         ----------
-        
         index : int
             the (0-based) index of the mode to visualize.
             Default is 0, corresponding to the first mode.
@@ -270,7 +268,6 @@ class MultivariateDecomp:
             
         Returns
         -------
-
         fig : matplotlib.figure
             The figure
 

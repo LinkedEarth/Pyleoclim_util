@@ -44,18 +44,19 @@ class SurrogateSeries(EnsembleSeries):
         label : str
             label of the collection of timeseries (e.g. 'SOI surrogates [AR(1) MoM]')
             If not provided, defaults to "series surrogates [{method}]"
-            
-        References
-        ----------
-        _ [1] Mudelsee, M. (2002), TAUEST: a computer program for estimating persistence in unevenly spaced weather/climate time series, Computers and Geosciences, 28, 69–72, doi:10.1016/S0098- 3004(01)00041-3.
-        _ [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correlation when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
-        _ [3] Prichard, D., and J. Theiler (1994), Generating surrogate data for time series with several simultaneously measured variables, Phys. Rev. Lett., 73, 951–954, doi: 10.1103/PhysRevLett.73.951.
-        _ [4] Kirchner, J. W., Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
-        
+
         Raises
         ------
         ValueError
             errors out if an unknown method is specified
+
+        References
+        ----------
+
+        _ [1] Mudelsee, M. (2002), TAUEST: a computer program for estimating persistence in unevenly spaced weather/climate time series, Computers and Geosciences, 28, 69–72, doi:10.1016/S0098- 3004(01)00041-3.
+        _ [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correlation when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
+        _ [3] Prichard, D., and J. Theiler (1994), Generating surrogate data for time series with several simultaneously measured variables, Phys. Rev. Lett., 73, 951–954, doi: 10.1103/PhysRevLett.73.951.
+        _ [4] Kirchner, J. W., Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
 
         '''
         self.series_list = series_list

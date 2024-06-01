@@ -135,7 +135,6 @@ def enumerateLipds(lipds):
 
     Parameters
     ----------
-
     lipds : dict
         A dictionary of LiPD files.
 
@@ -153,14 +152,12 @@ def getLipd(lipds):
 
     Parameters
     ----------
-
     lipds : dict
         A dictionary of LiPD files. Can be obtained from
         pyleoclim.readLipd()
 
     Returns
     -------
-
     select_lipd : int
         The index of the LiPD file
 
@@ -186,7 +183,6 @@ def promptForVariable():
 
     Returns
     -------
-
     select_var : int
         The index of the variable
 
@@ -199,17 +195,16 @@ def xAxisTs(timeseries):
 
     Parameters
     ----------
-
     timeseries : dict
         a timeseries object
 
     Returns
     -------
-
     x_axis : array
         the values for the x-axis representation
     label : string
         returns either "age", "year", or "depth"
+
     """
 
     if "depth" in timeseries.keys() and "age" in timeseries.keys() or\
@@ -243,7 +238,6 @@ def checkXaxis(timeseries, x_axis= None):
 
     Parameters
     ----------
-
     timeseries : dict
         a timeseries
 
@@ -252,7 +246,6 @@ def checkXaxis(timeseries, x_axis= None):
 
     Returns
     -------
-
     x : array
         the values for the x-axis representation
 
@@ -291,18 +284,17 @@ def checkTimeAxis(timeseries, x_axis = None):
 
     Parameters
     ----------
-
     timeseries : dict
         A LiPD timeseries object
 
     Returns
     -------
-
     x : array
         the time values for the timeseries
 
     label : string
         the time representation for the timeseries
+
     """
     if x_axis is None:
         if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
@@ -336,7 +328,6 @@ def searchVar(timeseries_list, key, exact = True, override = True):
 
     Parameters
     ----------
-
     timeseries_list : list
         A list of available series
 
@@ -351,10 +342,10 @@ def searchVar(timeseries_list, key, exact = True, override = True):
 
     Returns
     -------
-
     match : list
         A list of keys for the timeseries that match the selection
         criteria.
+
     """
 
     # Make sure thaat the keys are contained in a list
@@ -527,10 +518,8 @@ def enumerateTs(timeseries_list):
 
     Parameters
     ----------
-
     timeseries_list : list
         a  list of available timeseries objects.
-
 
     """
     available_y = []
@@ -565,13 +554,11 @@ def LipdToOntology(archiveType):
 
     Parameters
     ----------
-
     archiveType : string
         name of the archiveType from the LiPD file
 
     Returns
     -------
-
     archiveType : string
         archiveType according to the ontology
 
@@ -596,13 +583,11 @@ def timeUnitsCheck(units):
 
     Parameters
     ----------
-
     units : string
         The units string for the timeseries
 
     Returns
     -------
-
     unit_group : string
         Whether the units belongs to age_units, kage_units, year_units, ma_units, or undefined
     """
@@ -641,13 +626,11 @@ def whatArchives(print_response=True):
 
     Parameters
     ----------
-
     print_response : bool
         Whether to print the results on the console. Default is True
 
     Returns
     -------
-
     res : JSON-object with the request from LinkedEarth wiki api
 
     """
@@ -685,13 +668,11 @@ def whatProxyObservations(print_response=True):
 
     Parameters
     ----------
-
     print_response : bool
         Whether to print the results on the console. Default is True
 
     Returns
     -------
-
     res : JSON-object with the request from LinkedEarth wiki api
     """
 
@@ -726,14 +707,13 @@ def whatProxySensors(print_response=True):
 
     Parameters
     ----------
-
     print_response : bool
         Whether to print the results on the console. Default is True
 
     Returns
     -------
-
     res : JSON-object with the request from LinkedEarth wiki api
+
     """
     url = "http://wiki.linked.earth/store/ds/query"
 
@@ -767,14 +747,13 @@ def whatInferredVariables(print_response=True):
 
     Parameters
     ----------
-
     print_response : bool
         Whether to print the results on the console. Default is True
 
     Returns
     -------
-
     res : JSON-object with the request from LinkedEarth wiki api
+
     """
     url = "http://wiki.linked.earth/store/ds/query"
 
@@ -805,14 +784,13 @@ def whatInterpretations(print_response=True):
 
     Parameters
     ----------
-
     print_response : bool
         Whether to print the results on the console. Default is True
 
     Returns
     -------
-
     res : JSON-object with the request from LinkedEarth wiki api
+
     """
 
     url = "http://wiki.linked.earth/store/ds/query"
@@ -845,15 +823,14 @@ def pre_process_list(list_str):
 
     Parameters
     ----------
-
     list_str : list
         A list of strings from which to strip capitals, spaces, and other characters
 
     Returns
     -------
-
     res : list
         A list of strings with capitalization, spaces, and punctuation removed
+
     """
     res=[]
     for item in list_str:
@@ -865,7 +842,6 @@ def similar_string(list_str, search):
 
     Parameters
     ----------
-
     list_str : list
         A list of strings
 
@@ -874,9 +850,9 @@ def similar_string(list_str, search):
 
     Returns
     -------
-
     indices: list
         A list of indices with similar value as the keyword
+
     """
     #exact matches
     indices = [i for i, x in enumerate(list_str) if x == search]
@@ -888,7 +864,6 @@ def pre_process_str(word):
 
     Parameters
     ----------
-
     string : str
         A string from which to strip capitals, spaces, and other characters
 
@@ -910,7 +885,6 @@ def isModel(csvName, lipd):
 
     Parameters
     ----------
-
     csvName : string
         The name of the csv file corresponding to the measurement table
 
@@ -919,7 +893,6 @@ def isModel(csvName, lipd):
 
     Returns
     -------
-
     model : list
         List of models already available
 
@@ -955,13 +928,11 @@ def modelNumber(model):
 
     Parameters
     ----------
-
     model : list
         List of possible model number. Obtained from isModel
 
     Returns
     -------
-
     modelNum : int
         The number of the model
     """
@@ -986,13 +957,11 @@ def isMeasurement(csv_dict):
 
     Parameters
     ----------
-
     csv_dict : dict
         Dictionary of available csv
 
     Returns
     -------
-
     paleoMeasurementTables : list
         List of available paleoMeasurementTables
     chronMeasurementTables : list
@@ -1016,13 +985,11 @@ def whichMeasurement(measurementTableList):
 
     Parameters
     ----------
-
     measurementTableList : list
         List of measurement tables contained in the LiPD file. Output from the isMeasurement function
 
     Returns
     -------
-
     csvName : string
         the name of the csv file
 
@@ -1042,7 +1009,6 @@ def getMeasurement(csvName, lipd):
 
     Parameters
     ----------
-
     csvName : string
         The name of the csv file
     lipd : dict
@@ -1050,7 +1016,6 @@ def getMeasurement(csvName, lipd):
 
     Returns
     -------
-
     ts_list : dict
         A dictionary containing data and metadata for each column in the
         csv file.
@@ -1081,13 +1046,11 @@ def isEnsemble(csv_dict):
 
     Parameters
     ----------
-
     csv_dict : dict
         Dictionary of available csv
 
     Returns
     -------
-
     paleoEnsembleTables : list
         List of available paleoEnsembleTables
     chronEnsembleTables : list
@@ -1111,7 +1074,6 @@ def whichEnsemble(ensembleTableList):
 
     Parameters
     ----------
-
     measurementTableList : list
         List of measurement tables contained in the LiPD file. Output from the isMeasurement function
     csv_list : list
@@ -1119,7 +1081,6 @@ def whichEnsemble(ensembleTableList):
 
     Returns
     -------
-
     csvName : string
         the name of the csv file
 
@@ -1140,7 +1101,6 @@ def getEnsemble(csv_dict, csvName):
 
     Parameters
     ----------
-
     csv_dict : dict
         dictionary containing the availableTables
 
@@ -1149,7 +1109,6 @@ def getEnsemble(csv_dict, csvName):
 
     Returns
     -------
-
     depth : array
         Vector of depth
 
@@ -1172,7 +1131,6 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo,extrapol
 
     Parameters
     ----------
-
     ensembleValues : array
         A matrix of possible age models. Realizations should be stored in columns
 
@@ -1187,7 +1145,6 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo,extrapol
 
     Returns
     -------
-
     ensembleValuesToPaleo : array
         A matrix of age ensemble on the PaleoData scale
 

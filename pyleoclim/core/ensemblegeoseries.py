@@ -130,7 +130,6 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         Parameters
         ----------
-
         geo_series : pyleoclim.core.geoseries.GeoSeries
             A Series object with the values to be mapped
 
@@ -151,7 +150,6 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         Returns
         -------
-        
         EnsembleSeries : pyleoclim.core.ensembleseries.EnsembleSeries
             The ensemble created using the time axes from age_array and the values from series.
 
@@ -282,7 +280,6 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         Returns
         -------
-
         time_header : str
 
             Label for the time axis
@@ -325,7 +322,6 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         Parameters
         ----------
-        
         figsize : list or tuple, optional
             Figure size. The default is [11,8].
 
@@ -389,7 +385,6 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         Returns
         -------
-        
         fig : matplotlib.figure
             The figure
 

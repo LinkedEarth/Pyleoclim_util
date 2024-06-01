@@ -38,7 +38,6 @@ def savitzky_golay(ys, window_length=None, polyorder=2, deriv=0, delta=1,
 
     Parameters
     ----------
-
     ys : array
         the values of the signal to be filtered
         
@@ -72,7 +71,6 @@ def savitzky_golay(ys, window_length=None, polyorder=2, deriv=0, delta=1,
     
     Returns
     -------
-
     yf : array
         ndarray of shape (N), the smoothed signal (or its n-th derivative).
 
@@ -131,7 +129,6 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
 
     Parameters
     ----------
-
     ys : numpy array
 
         Evenly-spaced timeseries
@@ -163,7 +160,6 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
 
     Returns
     -------
-
     yp : array
         padded timeseries
     tp : array
@@ -218,7 +214,6 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
 
     Parameters
     ----------
-
     ys : numpy array
 
         Timeseries
@@ -254,7 +249,6 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
 
     Returns
     -------
-
     yf : array
         filtered array
     
@@ -300,7 +294,6 @@ def lanczos(ys,fc,fs=1,pad='reflect',
 
     Parameters
     ----------
-
     ys : numpy array
 
         Timeseries
@@ -331,7 +324,6 @@ def lanczos(ys,fc,fs=1,pad='reflect',
 
     Returns
     -------
-
     yf : array
         filtered array
     
@@ -345,6 +337,7 @@ def lanczos(ys,fc,fs=1,pad='reflect',
         
     References
     ----------
+
     Filter design from http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html
 
     '''
@@ -385,7 +378,6 @@ def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_
 
     Parameters
     ----------
-
     ys : numpy array
 
         Timeseries
@@ -430,7 +422,6 @@ def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_
 
     Returns
     -------
-
     yf : array
         filtered array
     

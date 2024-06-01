@@ -24,7 +24,6 @@ class GeoSeries(Series):
     
     Parameters
     ----------
-
     time : list or numpy.array
         independent variable (t)
 
@@ -276,7 +275,6 @@ class GeoSeries(Series):
 
         Parameters
         ----------
-        
         projection : str, optional
             The projection to use. The default is 'Orthographic'.
 
@@ -348,7 +346,6 @@ class GeoSeries(Series):
 
         Returns
         -------
-
         res : fig,ax_d
 
         See also
@@ -445,7 +442,6 @@ class GeoSeries(Series):
 
         Returns
         -------
-
         res : fig,ax_d
 
         See also
@@ -461,7 +457,7 @@ class GeoSeries(Series):
             from pylipd.utils.dataset import load_dir
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
-            dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment') and paleoData_variableName not in ('year')") 
+            dfs = df.query("archiveType in ('tree','documents','coral','lake sediment') and paleoData_variableName not in ('year')")
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -518,7 +514,6 @@ class GeoSeries(Series):
 
         Parameters
         ----------
-        
         figsize : list or tuple, optional
             Figure size. The default is [11,8].
 
@@ -585,7 +580,6 @@ class GeoSeries(Series):
 
         Returns
         -------
-        
         fig : matplotlib.figure
             The figure
 
@@ -752,7 +746,6 @@ class GeoSeries(Series):
 
         Parameters
         ----------
-
         factor : float
             The factor that adjusts the threshold for gap detection
         
@@ -761,13 +754,13 @@ class GeoSeries(Series):
 
         Returns
         -------
-
         res : MultiplegGeoSeries or GeoSeries
             If gaps were detected, returns the segments in a MultipleGeoSeries object,
             else, returns the original timeseries.
             
         Examples
         --------
+
         .. jupyter-execute::
             
             import numpy as np
@@ -775,6 +768,7 @@ class GeoSeries(Series):
             gs.value[4000:5000] = np.nan # cut a large gap in the middle
             mgs = gs.segment()
             mgs.plot()
+
         """
         from ..core.multiplegeoseries import MultipleGeoSeries
         seg_y, seg_t, n_segs = tsutils.ts2segments(self.value,self.time,factor=factor)

@@ -38,7 +38,6 @@ class Corr:
 
     Parameters
     ----------
-
     r: float
         the correlation coefficient
 

@@ -36,7 +36,6 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
 
     Parameters
     ----------
-
     y1 : array
         vector of (real) numbers of same length as y2, no NaNs allowed
         
@@ -103,7 +102,6 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
     
     Parameters
     ----------
-
     pvals : list or array
         A vector of p-values on which to conduct the multiple testing.
 
@@ -189,7 +187,6 @@ def corr_ttest(y1, y2, alpha=0.05):
     
     Parameters
     ----------
-
     y1 : array
         vectors of (real) numbers with identical length, no NaNs allowed
         
@@ -201,7 +198,6 @@ def corr_ttest(y1, y2, alpha=0.05):
 
     Returns
     -------
-
     r : float
          correlation between x and y
          
@@ -251,7 +247,6 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     Parameters
     ----------
-
     y1 : array
         vectors of (real) numbers with identical length, no NaNs allowed
         
@@ -266,7 +261,6 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     Returns
     -------
-
     r : float
         correlation between x and y
         
@@ -334,7 +328,6 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
 
     Parameters
     ----------
-
     y1 : array
         vectors of (real) numbers with identical length, no NaNs allowed
         
@@ -349,7 +342,6 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
 
     Returns
     -------
-
     r : float
         correlation between y1 and y2
         
@@ -404,7 +396,6 @@ def fdr_basic(pvals,qlevel=0.05):
 
     Parameters
     ----------
-
     pvals : list or array
         A vector of p-values on which to conduct the multiple testing.
 
@@ -413,7 +404,6 @@ def fdr_basic(pvals,qlevel=0.05):
 
     Returns
     -------
-
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
 
@@ -450,7 +440,6 @@ def fdr_master(pvals, qlevel=0.05, method='original'):
 
     Parameters
     ----------
-
     pvals : list or array
         A vector of p-values on which to conduct the multiple testing.
 
@@ -465,7 +454,6 @@ def fdr_master(pvals, qlevel=0.05, method='original'):
 
     Returns
     -------
-
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
 
@@ -495,7 +483,6 @@ def storey(edf_quantile, pvals):
 
     Parameters
     ----------
-
     edf_quantile : float
         The quantile of the empirical distribution function at which to estimate a.
 
@@ -504,7 +491,6 @@ def storey(edf_quantile, pvals):
 
     Returns
     -------
-
     a : int
         estimate of a, the number of alternative hypotheses
 
@@ -533,7 +519,6 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
 
     Parameters
     ----------
-
     pvals : list or array
         A vector of p-values on which to estimate a
 
@@ -555,7 +540,6 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
 
     Returns
     -------
-
     a : int
         estimate of a, the number of alternative hypotheses
 
@@ -619,7 +603,6 @@ def cov_shrink_rblw(S, n):
 
     Returns
     -------
-
     sigma : array, shape=(p, p)
         Estimated shrunk covariance matrix
 

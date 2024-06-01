@@ -145,7 +145,6 @@ def plot_scatter_xy(x1, y1, x2, y2, figsize=None, xlabel=None,
     
     Parameters
     ----------
-    
     x1 : array
       x axis of timeseries1 - plotted as a line
     y1 : array
@@ -182,7 +181,6 @@ def plot_scatter_xy(x1, y1, x2, y2, figsize=None, xlabel=None,
 
     Returns
     -------
-    
     ax : the pyplot.axis object
     
     See also
@@ -279,7 +277,6 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         
     Returns
     -------
-
     ax : the pyplot.axis object
 
     See Also
@@ -378,15 +375,17 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     invert_xaxis : bool, optional
         if True, the x-axis of the plot will be inverted
-        
-    See Also
-    --------
-    https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.pcolormesh.html
-    https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
-   
+
     Returns
     -------
     ax, or (fig, ax) if no axes were provided.
+
+    See Also
+    --------
+
+    https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.pcolormesh.html
+    https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
+
 
     '''
     # handle dict defaults
@@ -511,7 +510,6 @@ def set_style(style='journal', font_scale=1.0, dpi=300):
     
     Parameters
     ----------
-    
     style : {journal,web,matplotlib,_spines, _nospines,_grid,_nogrid}
 
         set the styles for the figure:
@@ -901,7 +899,7 @@ def calculate_overlapping_sets(fig, ax, labels, x_locs, fontsize, buffer=.1):
     It is used to determine how to place labels to avoid overlap in visualizations.
 
     Parameters:
-    -----------
+    ----------
     ax : matplotlib.axes.Axes
         The Axes object on which the labels will be plotted.
 
@@ -963,7 +961,7 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
     Labels can be oriented either above (north) or below (south) a baseline.
 
     Parameters:
-    --------
+    ----------
     ax : matplotlib.axes.Axes
         The Axes object where the labels are to be placed.
 
@@ -1120,45 +1118,45 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
 
 def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
     """
-        Create a ScalarMappable object for mapping scalar data to colors.
+    Create a ScalarMappable object for mapping scalar data to colors.
 
-        This function configures and returns a ScalarMappable object based on the provided colormap (`cmap`), the scalar values (`hue_vect`), the number of discrete colors (`n`), and normalization parameters (`norm_kwargs`). It supports dynamic selection of normalization and colormap based on the input parameters and the range of scalar values.
+    This function configures and returns a ScalarMappable object based on the provided colormap (`cmap`), the scalar values (`hue_vect`), the number of discrete colors (`n`), and normalization parameters (`norm_kwargs`). It supports dynamic selection of normalization and colormap based on the input parameters and the range of scalar values.
 
-        Parameters
-        ----------
-        cmap : str, list, or None, optional
-            The colormap to use for mapping scalar data to colors. Can be a name of a matplotlib colormap (str), a list of color names, or None. If None, defaults to 'vlag' if conditions for centered normalization are met, otherwise 'viridis'.
-        hue_vect : np.ndarray, pd.Series, list, or None, optional
-            An array-like object containing the scalar values to be mapped to colors. These values are used to determine the range and center for normalization.
-        n : int or None, optional
-            Specifies the number of discrete colors in the colormap if `cmap` is provided as a list. If None, the number of colors is not explicitly set.
-        norm_kwargs : dict or None, optional
-            A dictionary containing keyword arguments for the normalization process, specifically supporting 'vcenter' and 'clip'. Defaults to {'vcenter': 0, 'clip': False} if not provided or if provided keys are missing.
-
-
-        Returns:
-        -------
-        ax_sm : matplotlib.cm.ScalarMappable
-            The configured ScalarMappable object, which can be used to map scalar data to colors based on the specified colormap and normalization settings.
+    Parameters
+    ----------
+    cmap : str, list, or None, optional
+        The colormap to use for mapping scalar data to colors. Can be a name of a matplotlib colormap (str), a list of color names, or None. If None, defaults to 'vlag' if conditions for centered normalization are met, otherwise 'viridis'.
+    hue_vect : np.ndarray, pd.Series, list, or None, optional
+        An array-like object containing the scalar values to be mapped to colors. These values are used to determine the range and center for normalization.
+    n : int or None, optional
+        Specifies the number of discrete colors in the colormap if `cmap` is provided as a list. If None, the number of colors is not explicitly set.
+    norm_kwargs : dict or None, optional
+        A dictionary containing keyword arguments for the normalization process, specifically supporting 'vcenter' and 'clip'. Defaults to {'vcenter': 0, 'clip': False} if not provided or if provided keys are missing.
 
 
-        Examples
-        --------
+    Returns:
+    -------
+    ax_sm : matplotlib.cm.ScalarMappable
+        The configured ScalarMappable object, which can be used to map scalar data to colors based on the specified colormap and normalization settings.
 
-            .. jupyter-execute::
 
-                import pyleoclim as pyleo
-                import numpy as np
+    Examples
+    --------
 
-                scalar_values = np.random.randn(100)
-                sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values)
-                # Now `sm` can be used with matplotlib plotting functions to map scalar values to colors.
+        .. jupyter-execute::
 
-                sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values, n=10)
-                # This creates a ScalarMappable a discrete color scale.
+            import pyleoclim as pyleo
+            import numpy as np
 
-                sm = pyleo.utils.plotting.make_scalar_mappable(cmap=['blue', 'white', 'red'], hue_vect=scalar_values, norm_kwargs={'vcenter': 0})
-                # This creates a ScalarMappable with a custom linear segmented colormap and centered normalization.
+            scalar_values = np.random.randn(100)
+            sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values)
+            # Now `sm` can be used with matplotlib plotting functions to map scalar values to colors.
+
+            sm = pyleo.utils.plotting.make_scalar_mappable(cmap='viridis', hue_vect=scalar_values, n=10)
+            # This creates a ScalarMappable a discrete color scale.
+
+            sm = pyleo.utils.plotting.make_scalar_mappable(cmap=['blue', 'white', 'red'], hue_vect=scalar_values, norm_kwargs={'vcenter': 0})
+            # This creates a ScalarMappable with a custom linear segmented colormap and centered normalization.
 
 
     """

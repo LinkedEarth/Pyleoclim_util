@@ -30,7 +30,6 @@ class EnsMultivarDecomp():
         
         Parameters
         ----------
-        
         index : int
             The 1-based index of the mode to visualize.
             Default is 1, corresponding to the first mode.
@@ -110,7 +109,6 @@ class EnsMultivarDecomp():
             
         Returns
         -------
-
         fig : matplotlib.figure
             The figure
 
@@ -291,7 +289,6 @@ class EnsMultivarDecomp():
         
         Parameters
         ----------
-
         quantiles : list,array
             Quantiles to use for plotting range of pctvar for each mode.
 
@@ -320,7 +317,6 @@ class EnsMultivarDecomp():
             
         Returns
         -------
-        
         fig : matplotlib.figure
             The figure
         
@@ -382,7 +378,7 @@ class EnsMultivarDecomp():
         if 'linewidth' in violin_kwargs.keys():
             linewidth = violin_kwargs.pop('linewidth')
         
-        sns.violinplot(data=df,x='Mode',y='Pctvar',linewidth=linewidth,color=clr_eig,figsize=(8,8),ax=ax,**violin_kwargs)
+        sns.violinplot(data=df,x='Mode',y='Pctvar',linewidth=linewidth,color=clr_eig,ax=ax,**violin_kwargs)
         ax.set_xlabel(r'Mode index $i$')
         ax.set_ylabel(r'$\lambda_i$')
 

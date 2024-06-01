@@ -36,7 +36,6 @@ class MultipleSeries:
 
     Parameters
     ----------
-
     series_list : list
     
         a list of pyleoclim.Series objects
@@ -231,7 +230,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         time_unit : str
         
             the target time unit, possible input:
@@ -283,7 +281,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         method : str; {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
         
             The filtering method  
@@ -312,7 +309,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         ms : MultipleSeries
 
         See also
@@ -357,14 +353,12 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         ts : pyleoclim.Series
         
             The pyleoclim Series object to be appended to the MultipleSeries object
 
         Returns
         -------
-
         ms : MultipleSeries
         
             The augmented object, comprising the old one plus `ts`
@@ -403,7 +397,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         ms : MultipleSeries
         
             The copied version of the pyleoclim.MultipleSeries object
@@ -465,7 +458,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         ms : MultipleSeries
         
             The standardized pyleoclim.MultipleSeries object
@@ -496,7 +488,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-        
         step_style : str; {'median','mean','mode','max'}
         
             Method to obtain a representative step if x is not evenly spaced.
@@ -511,7 +502,6 @@ class MultipleSeries:
             
         Returns
         -------
-
         increments : numpy.array
         
             n x 3 array, where n is the number of series,
@@ -566,7 +556,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-        
         method :  string; {'bin','interp','gkernel'}
         
             either 'bin', 'interp' [default] or 'gkernel'
@@ -597,7 +586,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         ms : MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
@@ -748,7 +736,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         target : pyleoclim.Series, optional
         
             The Series against which to take the correlation. If the target Series is not specified, then the 1st member of MultipleSeries will be used as the target
@@ -791,7 +778,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         corr : CorrEns
         
             the result object
@@ -882,7 +868,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         flag : bool
         
             Whether or not the Series in the pyleo.MultipleSeries object are of equal length
@@ -932,7 +917,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         weights : ndarray, optional
         
             Series weights to use after transforming data according to standardize
@@ -959,7 +943,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         res: MultivariateDecomp
 
             Resulting pyleoclim.MultivariateDecomp object
@@ -1042,14 +1025,12 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         kwargs : dict
         
             Arguments for the binning function. See pyleoclim.utils.tsutils.bin
 
         Returns
         -------
-
         ms : MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
@@ -1100,14 +1081,12 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         kwargs : dict
         
             Arguments for gkernel. See pyleoclim.utils.tsutils.gkernel for details.
 
         Returns
         -------
-
         ms : MultipleSeries
             The MultipleSeries objects with all series aligned to the same time axis.
 
@@ -1156,12 +1135,10 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         kwargs: keyword arguments (dictionary) for the interpolation method
 
         Returns
         -------
-
         ms : MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
@@ -1198,7 +1175,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-        
         method : str, optional
         
             The method for detrending. The default is 'emd'.
@@ -1213,7 +1189,6 @@ class MultipleSeries:
 
         Returns
         -------
-        
         ms : MultipleSeries
         
             The detrended timeseries
@@ -1239,7 +1214,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         method : str; {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
 
         freq : str or array, optional
@@ -1277,7 +1251,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         psd : MultiplePSD
         
             A Multiple PSD object
@@ -1355,7 +1328,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-        
         method : str {wwz, cwt}
         
             - cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
@@ -1389,7 +1361,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         scals : MultipleScalograms
         
             A Multiple Scalogram object
@@ -1450,7 +1421,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-        
         figsize : list, optional
         
             Size of the figure. The default is [10, 4].
@@ -1540,7 +1510,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         fig : matplotlib.figure
         
             the figure object from matplotlib
@@ -1641,7 +1610,6 @@ class MultipleSeries:
 
         Parameters
         ----------
-
         figsize : list
         
             Size of the figure.
@@ -1730,7 +1698,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         fig : matplotlib.figure
             the figure object from matplotlib
             See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
@@ -2016,7 +1983,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         fig : matplotlib.figure
             the figure object from matplotlib
             See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
@@ -2147,6 +2113,7 @@ class MultipleSeries:
         Returns
         -------
         pandas.DataFrame
+
         """
         if use_common_time:
             ms = self.common_time(*args, **kwargs)
@@ -2179,6 +2146,7 @@ class MultipleSeries:
     
         Examples
         --------
+
         This will place the NINO3 and SOI datasets into a MultipleSeries object and export it to enso.csv.
 
         .. jupyter-execute::
@@ -2304,7 +2272,6 @@ class MultipleSeries:
         
         Parameters
         ----------
-        
         figsize : list, optional
         
             Size of the figure. The default is [10, 4].
@@ -2419,7 +2386,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         fig : matplotlib.figure
         
             the figure object from matplotlib
@@ -2553,7 +2519,6 @@ class MultipleSeries:
 
         Returns
         -------
-
         multipleresolution : pyleoclim.MultipleResolution
             MultipleResolution object
 

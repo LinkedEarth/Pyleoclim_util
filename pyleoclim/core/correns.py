@@ -46,7 +46,6 @@ class CorrEns:
 
     Parameters
     ----------
-
     r: list
     
         the list of correlation coefficients
@@ -134,7 +133,6 @@ class CorrEns:
 
         Parameters
         ----------
-        
         figsize : list, optional
         
             The figure size. The default is [4, 4].

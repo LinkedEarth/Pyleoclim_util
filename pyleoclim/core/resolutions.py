@@ -80,7 +80,6 @@ class Resolution:
         
         Returns
         -------
-        
         stats : dict
             Dictionary of relevant stats produced by `scipy.stats.describe <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html>`_
 
@@ -183,7 +182,6 @@ class Resolution:
 
         Returns
         -------
-
         fig : matplotlib.figure
             the figure object from matplotlib
             See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
@@ -379,7 +377,6 @@ class Resolution:
 
         Returns
         -------
-        
         fig : matplotlib.figure
 
             The figure
@@ -554,6 +551,7 @@ class MultipleResolution:
         
         Examples
         --------
+
         .. jupyter-execute::
 
             import pyleoclim as pyleo
@@ -563,7 +561,8 @@ class MultipleResolution:
             ms = edc & co2ts # create MS object
             ms_resolution = ms.resolution(statistic=None)
             ms_resolution.summary_plot()
-            """
+
+        """
         
         boxplot_kwargs = {} if boxplot_kwargs is None else boxplot_kwargs.copy()
         stripplot_kwargs = {} if stripplot_kwargs is None else stripplot_kwargs.copy()
@@ -632,7 +631,6 @@ class MultipleResolution:
         
         Returns
         -------
-        
         resolution_dict : dict
             Dictionary of relevant stats produced by `scipy.stats.describe <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html>`_
 

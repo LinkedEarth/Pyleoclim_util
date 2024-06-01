@@ -99,6 +99,7 @@ def PyleoObj_to_json(obj, filename):
     
     See also
     --------
+
     pyleoclim.utils.jsonutils.PyleoObj_to_dict : Encodes a Pyleoclim UI object into a dictionary that is JSON serializable
     
     '''
@@ -202,6 +203,7 @@ def json_to_PyleoObj(filename,objname):
         
     See also
     --------
+
     pyleoclim.utils.jsonutils.open_json : open a json file from a local source or URL
     
     pyleoclim.utils.jsonutils.objname_to_obj : create a valid Pyleoclim object from a string   

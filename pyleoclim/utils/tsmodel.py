@@ -39,7 +39,6 @@ def ar1_model(t, tau, output_sigma=1):
 
     Parameters
     ----------
-
     t :  array
         Time axis of the time series
     tau : float
@@ -47,7 +46,6 @@ def ar1_model(t, tau, output_sigma=1):
 
     Returns
     -------
-
     y : array
         The AR(1) time series
 
@@ -78,7 +76,6 @@ def ar1_fit(y, t=None):   ## is this still used anywhere? Looks redundant
 
     Parameters
     ----------
-
     y : array
         The time series
     t : array
@@ -86,7 +83,6 @@ def ar1_fit(y, t=None):   ## is this still used anywhere? Looks redundant
 
     Returns
     -------
-
     g : float
         Lag-1 autocorrelation coefficient (for evenly-spaced time series)
         OR estimated persistence (for unevenly-spaced time series)
@@ -120,7 +116,6 @@ def ar1_sim(y, p, t=None):
 
     Parameters
     ----------
-
     y : array
         a time series; NaNs not allowed
     p : int
@@ -130,7 +125,6 @@ def ar1_sim(y, p, t=None):
 
     Returns
     -------
-
     ysim : array
         n by p matrix of simulated AR(1) vector
 
@@ -184,7 +178,6 @@ def gen_ar1_evenly(t, g, scale=1, burnin=50):
 
     Parameters
     ----------
-
     t : array
         the time axis
     
@@ -254,7 +247,6 @@ def tau_estimation(y, t):
 
     Parameters
     ----------
-
     y : array
         A time series
     t : array
@@ -262,7 +254,6 @@ def tau_estimation(y, t):
 
     Returns
     -------
-
     tau_est : float
         The estimated persistence
 
@@ -291,7 +282,6 @@ def isopersistent_rn(y, p):
 
     Parameters
     ----------
-
     X : array
         vector of (real) numbers as a time series, no NaNs allowed
     p : int
@@ -299,7 +289,6 @@ def isopersistent_rn(y, p):
 
     Returns
     -------
-
     red : numpy array
         n rows by p columns matrix of an AR1 process, where n is the size of X
     g :float
@@ -331,7 +320,6 @@ def sm_ar1_sim(n, p, g, sig):
 
     Parameters
     ----------
-
     n : int
         row dimensions
     p : int
@@ -345,7 +333,6 @@ def sm_ar1_sim(n, p, g, sig):
 
     Returns
     -------
-
     red : numpy matrix
         n rows by p columns matrix of an AR1 process
 
@@ -396,7 +383,6 @@ def colored_noise(alpha, t, std = 1.0, f0=None, m=None, seed=None):
         
     Returns
     -------
-
     y : array
         the generated 1/f^alpha noise
 
@@ -442,7 +428,6 @@ def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=Non
 
     Parameters
     ----------
-
     alpha1, alpha2 : float
         the exponent of the 1/f^alpha noise
 
@@ -458,7 +443,6 @@ def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=Non
 
     Returns
     -------
-
     y : array
         the generated 1/f^alpha noise
 
@@ -508,7 +492,6 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     Parameters
     ----------
-
     model : str, {'colored_noise', 'colored_noise_2regimes', 'ar1'}
 
         the timeseries model to use
@@ -528,7 +511,6 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     Returns
     -------
-
     t, v : NumPy arrays
         time axis and values
 
@@ -676,9 +658,8 @@ def uar1_fit(y, t):
         Time index values of the time series
 
     Returns:
-        An array containing the estimated parameters tau_hat and sigma_2_hat, first entry is tau_hat, second entry is sigma_2_hat
-    -------
-    None.
+    --------
+    theta_hat : An array containing the estimated parameters tau_hat and sigma_2_hat, first entry is tau_hat, second entry is sigma_2_hat
 
     '''
     
@@ -769,8 +750,7 @@ def random_time_axis(n, delta_t_dist = "exponential", param = [1.0]):
    
         
     Returns:
-    -------
-    
+    --------
     t : 1D array of random time axis obtained by taking the cumulative sum of the sampled random time increments, length n
 
     '''
