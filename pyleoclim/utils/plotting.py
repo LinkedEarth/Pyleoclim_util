@@ -1143,7 +1143,6 @@ def make_scalar_mappable(cmap=None, hue_vect=None, n=None, norm_kwargs=None):
     norm_kwargs : dict or None, optional
         A dictionary containing keyword arguments for the normalization process, specifically supporting 'vcenter' and 'clip'. Defaults to {'vcenter': 0, 'clip': False} if not provided or if provided keys are missing.
 
-
     Returns
     -------
     ax_sm : matplotlib.cm.ScalarMappable

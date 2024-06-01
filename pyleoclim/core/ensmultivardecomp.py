@@ -378,7 +378,7 @@ class EnsMultivarDecomp():
         if 'linewidth' in violin_kwargs.keys():
             linewidth = violin_kwargs.pop('linewidth')
         
-        sns.violinplot(data=df,x='Mode',y='Pctvar',linewidth=linewidth,color=clr_eig,figsize=(8,8),ax=ax,**violin_kwargs)
+        sns.violinplot(data=df,x='Mode',y='Pctvar',linewidth=linewidth,color=clr_eig,ax=ax,**violin_kwargs)
         ax.set_xlabel(r'Mode index $i$')
         ax.set_ylabel(r'$\lambda_i$')
 

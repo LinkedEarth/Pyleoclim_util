@@ -649,8 +649,7 @@ def n_ll_unevenly_spaced_ar1(theta, y, t):
   return(nll)
 
 def uar1_fit(y, t):
-    '''
-    Maximum Likelihood Estimation of parameters tau and sigma_2
+    ''' Maximum Likelihood Estimation of parameters tau and sigma_2
 
     Parameters
     ----------
