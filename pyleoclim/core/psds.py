@@ -380,6 +380,7 @@ class PSD:
 
         See also
         --------
+
         pyleoclim.core.series.Series.spectral : spectral analysis
 
         pyleoclim.utils.spectral.beta_estimation : Estimate the scaling exponent of a power spectral density
