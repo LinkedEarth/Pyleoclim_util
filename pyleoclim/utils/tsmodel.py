@@ -94,6 +94,7 @@ def ar1_fit(y, t=None):   ## is this still used anywhere? Looks redundant
 
     pyleoclim.utils.tsmodel.tau_estimation : Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
+
     '''
 
     if is_evenly_spaced(t):
@@ -627,7 +628,8 @@ def n_ll_unevenly_spaced_ar1(theta, y, t):
     t: array,length n,
         the vector of time values.
   
-    Returns:
+    Returns
+    -------
       float. The value of the negative log likelihood evalued with the arguments provided (theta, y, t).
   """
   # define n
@@ -647,8 +649,7 @@ def n_ll_unevenly_spaced_ar1(theta, y, t):
   return(nll)
 
 def uar1_fit(y, t):
-    '''
-    Maximum Likelihood Estimation of parameters tau and sigma_2
+    ''' Maximum Likelihood Estimation of parameters tau and sigma_2
 
     Parameters
     ----------
@@ -657,8 +658,8 @@ def uar1_fit(y, t):
     t : An array of the time index values of the time series
         Time index values of the time series
 
-    Returns:
-    --------
+    Returns
+    -------
     theta_hat : An array containing the estimated parameters tau_hat and sigma_2_hat, first entry is tau_hat, second entry is sigma_2_hat
 
     '''
@@ -749,9 +750,10 @@ def random_time_axis(n, delta_t_dist = "exponential", param = [1.0]):
             (These two arrays must be of the same size)
    
         
-    Returns:
-    --------
+    Returns
+    -------
     t : 1D array of random time axis obtained by taking the cumulative sum of the sampled random time increments, length n
+
 
     '''
     # check for a valid distribution 

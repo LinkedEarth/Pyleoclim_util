@@ -239,6 +239,7 @@ class MultipleGeoSeries(MultipleSeries):
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
             dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment','Borehole')")
+
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -306,7 +307,6 @@ class MultipleGeoSeries(MultipleSeries):
 
         Parameters
         ----------
-
         weights : ndarray, optional
 
             Series weights to use after transforming data according to standardize
@@ -356,6 +356,7 @@ class MultipleGeoSeries(MultipleSeries):
             lipd_euro = lipd.filter_by_geo_bbox(-20,20,40,80)
             df = lipd_euro.get_timeseries_essentials()
             dfs = df.query("archiveType in ('Wood') & paleoData_variableName not in ('year')")
+
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -462,7 +463,6 @@ class MultipleGeoSeries(MultipleSeries):
         
         Parameters
         ----------
-        
         figsize : list, optional
         
             Size of the figure. The default is [10, 4].
@@ -606,6 +606,7 @@ class MultipleGeoSeries(MultipleSeries):
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
             dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment')")
+            
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iloc[:5].iterrows():
