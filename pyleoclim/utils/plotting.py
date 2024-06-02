@@ -1395,24 +1395,6 @@ def keep_center_colormap(cmap, vmin, vmax, center=0):
     the centered value across the data. This adjusted colormap can then be used for data visualization tasks
     where maintaining a perceptual 'zero' or central reference point is important.
 
-
-    Examples
-    --------
-
-    .. jupyter-execute::
-
-        import matplotlib.pyplot as plt
-        import pyleoclim as pyleo
-
-        new_colormap = pyleo.utils.plotting.keep_center_colormap('RdBu', vmin=-300, vmax=300, center=0)
-        plt.imshow(data, cmap=new_colormap)
-        plt.colorbar()
-
-    This will create and use a colormap where the value 0 is centered, and the colormap is adjusted
-    to symmetrically represent deviations from this center, making it suitable for displaying anomalies
-    or differences from a baseline in a visually balanced manner.
-
-
     """
 
     vmin = vmin - center
