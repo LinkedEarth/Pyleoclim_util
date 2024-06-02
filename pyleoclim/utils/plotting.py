@@ -1424,7 +1424,7 @@ def keep_center_colormap(cmap, vmin, vmax, center=0):
 
     dv = max(-vmin, vmax) * 2
     N = int(256 * dv / (vmax - vmin))
-    cont_map = cm.get_cmap(cmap, N)
+    cont_map = plt.get_cmap(cmap, N)
     newcolors = cont_map(np.linspace(0, 1, N))
     beg = int((dv / 2 + vmin) * N / dv)
     end = N - int((dv / 2 - vmax) * N / dv)
