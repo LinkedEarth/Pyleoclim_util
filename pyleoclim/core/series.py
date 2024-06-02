@@ -4276,7 +4276,7 @@ class Series:
         resolution : Resolution
             Resolution object
 
-        See Also
+        See also
         --------
 
         pyleoclim.core.resolutions.Resolution

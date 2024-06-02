@@ -41,8 +41,6 @@ class Resolution:
     timeseries : pyleoclim.Series
         Original pyleoclim timeseries object.
 
-    See Also
-    --------
 
     '''
 
@@ -385,9 +383,6 @@ class Resolution:
 
             The axis
 
-        See also
-        --------
-
 
         Examples
         --------
@@ -474,7 +469,7 @@ class MultipleResolution:
     time_unit : str
         The unit of time for the resolution.
 
-    See Also
+    See also
     --------
 
     Resolution : The base class from which MultipleResolution is derived.

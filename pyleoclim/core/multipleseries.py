@@ -2532,7 +2532,7 @@ class MultipleSeries:
             If a recognized statistic is passed, this function will simply output that statistic applied to the resolution of each series in the MulitipleSeries object. Options are 'mean' or 'median'.
             If statistic is None, then the function will return a new MultipleResolution class with plotting capabilities.
 
-        See Also
+        See also
         --------
         
         pyleoclim.core.resolutions.MultipleResolution

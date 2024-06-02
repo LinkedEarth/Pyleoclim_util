@@ -107,7 +107,9 @@ class SurrogateSeries(EnsembleSeries):
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
+
         pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
+
         pyleoclim.utils.tsutils.phaseran2 : phase randomization
         
         Examples
@@ -211,14 +213,21 @@ class SurrogateSeries(EnsembleSeries):
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
+
         pyleoclim.utils.tsmodel.colored_noise: simulating from a power law spectrum, $S(f) \propto f^{-\beta}$
+
         pyleoclim.utils.tsmodel.random_time_axis : Generate time increment vector according to a specific probability model
         
         Examples
         --------
-        ar1 = pyleo.SurrogateSeries(method='ar1sim', number=10) 
-        ar1.from_param(length=100, param = [2,2])
-        ar1.plot_envelope(title=rf'AR(1) synthetic series ($\tau={2},\sigma^2={2}$)')
+
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+
+            ar1 = pyleo.SurrogateSeries(method='ar1sim', number=10)
+            ar1.from_param(length=100, param = [2,2])
+            ar1.plot_envelope(title=rf'AR(1) synthetic series ($\tau={2},\sigma^2={2}$)')
 
         '''    
         param = param if isinstance(param, list) else [param] # coerce param into a list, no matter the original format
