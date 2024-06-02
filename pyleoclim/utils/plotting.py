@@ -1402,8 +1402,9 @@ def keep_center_colormap(cmap, vmin, vmax, center=0):
     .. jupyter-execute::
 
         import matplotlib.pyplot as plt
+        import pyleoclim as pyleo
 
-        new_colormap = keep_center_colormap('RdBu', vmin=-300, vmax=300, center=0)
+        new_colormap = pyleo.utils.plotting.keep_center_colormap('RdBu', vmin=-300, vmax=300, center=0)
         plt.imshow(data, cmap=new_colormap)
         plt.colorbar()
 
