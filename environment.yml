@@ -3,6 +3,7 @@
 name: pyleo
 channels:
   - default
+  - conda-forge
 dependencies:
   - python=3.11.0
   - cartopy
