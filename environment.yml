@@ -4,7 +4,7 @@ name: pyleo
 channels:
   - default
 dependencies:
-  - python>=3.10
+  - python=3.11.0
   - cartopy
   - numba
   - pyyaml

@@ -115,24 +115,22 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
     Returns
     -------
     res : dict
-
         A dictionary of results including:
-
-            - T21 : float
-                information flow from y2 to y1 (Note: not y1 -> y2!)
-            - tau21 : float
-                the standardized information flow from y2 to y1
-            - Z : float
-                the total information flow from y2 to y1
-            - dH1_star : float
-                dH*/dt (Liang, 2016)
-            - dH1_noise : float
-            - signif_qs : 
-                the quantiles for significance test
-            - T21_noise : list
-                the quantiles of the information flow from noise2 to noise1 for significance testing
-            - tau21_noise : list
-                the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+        - T21 : float
+            information flow from y2 to y1 (Note: not y1 -> y2!)
+        - tau21 : float
+            the standardized information flow from y2 to y1
+        - Z : float
+            the total information flow from y2 to y1
+        - dH1_star : float
+            dH*/dt (Liang, 2016)
+        - dH1_noise : float
+        - signif_qs :
+            the quantiles for significance test
+        - T21_noise : list
+            the quantiles of the information flow from noise2 to noise1 for significance testing
+        - tau21_noise : list
+            the quantiles of the standardized information flow from noise2 to noise1 for significance testing
     
     See also
     --------
@@ -262,18 +260,13 @@ def liang(y1, y2, npt=1):
     Returns
     -------
     res : dict
-
         A dictionary of results including:
 
-            - T21 : float
-                information flow from y2 to y1 (Note: not y1 -> y2!)
-            - tau21 : float
-                the standardized information flow from y2 to y1
-            - Z : float
-                the total information flow from y2 to y1
-            - dH1_star : float
-                dH*/dt (Liang, 2016)
-            - dH1_noise : float
+            - T21 (float): information flow from y2 to y1 (Note: not y1 -> y2!)
+            - tau21 (float): the standardized information flow from y2 to y1
+            - Z (float): the total information flow from y2 to y1
+            - dH1_star (float): dH*/dt (Liang, 2016)
+            - dH1_noise (float)
             
     See also
     --------
@@ -464,9 +457,7 @@ def signif_isospec(y1, y2, method,
     Returns
     -------
     res_dict : dict
-
         A dictionary with the following information:
-
           - T21_noise_qs : list
                         the quantiles of the information flow from noise2 to noise1 for significance testing
           - tau21_noise_qs : list

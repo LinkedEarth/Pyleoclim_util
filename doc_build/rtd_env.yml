@@ -3,14 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.11
+  - python=3.11.0
   - ipykernel
   - pip:
+    - pip
     - cartopy
-    - seaborn
-    - matplotlib
-    - numpy
-    - pandas
     - Sphinx<6.0
     - pylint
     - chardet
@@ -22,5 +19,5 @@ dependencies:
     - sphinx-rtd-theme>=1.0.0
     - jupyter-sphinx
     - sphinx-copybutton
-    - git+https://github.com/LinkedEarth/Pyleoclim_util.git@master
+#    - git+https://github.com/LinkedEarth/Pyleoclim_util.git@master
     - git+https://github.com/LinkedEarth/pylipd@main

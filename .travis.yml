@@ -15,7 +15,7 @@ before_install:
   - conda info -a
 
 install:
-  - conda create -n pyleoenv python=3.9
+  - conda create -n pyleoenv python=3.11
   - source activate pyleoenv
   - conda install numpy
   - conda install -c conda-forge cartopy
