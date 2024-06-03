@@ -24,7 +24,7 @@ jobs:
       with:
         activate-environment: pyleo
         environment-file: environment.yml
-        python-version: "3.10"
+        python-version: "3.11.0"
         auto-activate-base: false
 
     - name: Conda list
