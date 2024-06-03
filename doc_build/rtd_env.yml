@@ -8,7 +8,9 @@ dependencies:
   - pip:
     - cartopy
     - seaborn
-    - pyhht
+    - matplotlib
+    - numpy
+    - pandas
     - Sphinx<6.0
     - pylint
     - chardet
