@@ -7,6 +7,10 @@ dependencies:
   - ipykernel
   - pip:
     - cartopy
+    - seaborn
+    - matplotlib
+    - numpy
+    - pandas
     - Sphinx<6.0
     - pylint
     - chardet
