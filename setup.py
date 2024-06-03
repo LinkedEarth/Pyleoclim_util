@@ -45,5 +45,5 @@ setup(
         "beautifulsoup4", 
         "scipy", 
     ],
-    python_requires="==3.11.0",
+    python_requires=">=3.9",
 )
