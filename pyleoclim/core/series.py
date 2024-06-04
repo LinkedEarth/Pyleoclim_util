@@ -3457,7 +3457,7 @@ class Series:
 
         coh = self.wavelet_coherence(target_series,**wavelet_kwargs)
         spectrum_coh = coh.wtc.mean(axis=0)
-        return SpectralCoherence(
+        return GlobalCoherence(
             coherence=spectrum_coh,
             scale=coh.scale,
             frequency=coh.frequency,
