@@ -186,12 +186,10 @@ class MultivariateDecomp:
                  hue='EOF', marker=None, size=None, scatter_kwargs=None,
                  flip = False, map_kwargs=None, gridspec_kwargs=None):
 
-        ''' Dashboard visualizing the properties of a given mode, including:
-            1. The temporal coefficient (PC or similar)
-            2. its spectrum
-            3. The loadings (EOF or similar), possibly geolocated. If the object
-                does not have geolocation information, a spaghetti plot of the standardized
-                series is displayed.
+        '''Dashboard visualizing the properties of a given mode.
+        
+        Includes: The temporal coefficient (PC or similar), its spectrum, and the loadings (EOF or similar), possibly geolocated. 
+        If the object does not have geolocation information, a spaghetti plot of the standardized series is displayed.
 
         Parameters
         ----------
