@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup, find_packages
 
-version = '0.14.1b0'
+version = '1.0.0'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -42,8 +42,8 @@ setup(
         "Unidecode>=1.1.1",
         "cartopy>=0.22.0",
         "pyyaml",
-        "beautifulsoup4", 
-        "scipy", 
+        "beautifulsoup4",
+        "scipy",
     ],
     python_requires=">=3.9",
 )
