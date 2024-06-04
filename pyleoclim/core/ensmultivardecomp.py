@@ -131,27 +131,17 @@ class EnsMultivarDecomp():
         
         .. jupyter-execute::
 
-            n = 3 # number of ensembles
-            nn = 30 # number of noise realizations
-            nt = 500
-            ens_list = []
+            n = 100 # number of series
 
-            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
-            signal = pyleo.Series(t,v)
+            soi = pyleo.utils.load_dataset('SOI')
+            soi_time_axes = [pyleo.utils.random_time_axis(n=len(soi.time)) for _ in range(n)]
+            soi_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=soi.value,lat=-5,lon=-85,auto_time_params=True,verbose=False) for time in soi_time_axes])
 
-            for _ in range(n): 
-                series_list = []
-                lat = np.random.randint(-90,90)
-                lon = np.random.randint(-180,180)
-                for idx in range(nn):  # noise
-                    noise = np.random.randn(nt,nn)*100
-                    ts = pyleo.GeoSeries(time=signal.time, value=signal.value+noise[:,idx], lat=lat, lon=lon, verbose=False)
-                    series_list.append(ts)
+            nino3 = pyleo.utils.load_dataset('NINO3')
+            nino3_time_axes = [pyleo.utils.random_time_axis(n=len(nino3.time)) for _ in range(n)]
+            nino3_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=nino3.value,lat=-5,lon=-85,auto_time_params=True,verbose=False) for time in nino3_time_axes])
 
-                ts_ens = pyleo.EnsembleSeries(series_list)
-                ens_list.append(ts_ens)
-
-            mul_ens = pyleo.MulEnsGeoSeries([ts_ens])
+            mul_ens = pyleo.MulEnsGeoSeries([nino3_ens,soi_ens])
             mcpca = mul_ens.mcpca(nsim=10,seed=42)
             mcpca.modeplot()'''
 
@@ -328,27 +318,17 @@ class EnsMultivarDecomp():
         
         .. jupyter-execute::
         
-            n = 3 # number of ensembles
-            nn = 30 # number of noise realizations
-            nt = 500
-            ens_list = []
+            n = 100 # number of series
 
-            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
-            signal = pyleo.Series(t,v)
+            soi = pyleo.utils.load_dataset('SOI')
+            soi_time_axes = [pyleo.utils.random_time_axis(n=len(soi.time)) for _ in range(n)]
+            soi_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=soi.value,lat=0,lon=0,auto_time_params=True,verbose=False) for time in soi_time_axes])
 
-            for _ in range(n): 
-                series_list = []
-                lat = np.random.randint(-90,90)
-                lon = np.random.randint(-180,180)
-                for idx in range(nn):  # noise
-                    noise = np.random.randn(nt,nn)*100
-                    ts = pyleo.GeoSeries(time=signal.time, value=signal.value+noise[:,idx], lat=lat, lon=lon, verbose=False)
-                    series_list.append(ts)
+            nino3 = pyleo.utils.load_dataset('NINO3')
+            nino3_time_axes = [pyleo.utils.random_time_axis(n=len(nino3.time)) for _ in range(n)]
+            nino3_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=nino3.value,lat=0,lon=0,auto_time_params=True,verbose=False) for time in nino3_time_axes])
 
-                ts_ens = pyleo.EnsembleSeries(series_list)
-                ens_list.append(ts_ens)
-
-            mul_ens = pyleo.MulEnsGeoSeries([ts_ens])
+            mul_ens = pyleo.MulEnsGeoSeries([nino3_ens,soi_ens])
             mcpca = mul_ens.mcpca(nsim=10,seed=42)
             mcpca.screeplot()'''
         

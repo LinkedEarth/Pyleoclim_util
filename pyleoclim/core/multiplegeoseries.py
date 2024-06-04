@@ -82,7 +82,6 @@ class MultipleGeoSeries(MultipleSeries):
         
         super().__init__(series_list, time_unit, label)
 
-    # ============ MAP goes here ================
 
     def map(self, marker='archiveType', hue='archiveType', size=None, cmap=None,
             edgecolor='k', projection='auto',
@@ -90,7 +89,7 @@ class MultipleGeoSeries(MultipleSeries):
             background=True, borders=False, coastline=True,rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, scatter_kwargs=None, gridspec_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
-        '''
+        '''Mapping of the collection of GeoSeries objects.
         
 
         Parameters

@@ -3,14 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.11
+  - python=3.11.0
   - ipykernel
   - pip:
+    - pip
     - cartopy
-    - seaborn
-    - matplotlib
-    - numpy
-    - pandas
     - Sphinx<6.0
     - pylint
     - chardet

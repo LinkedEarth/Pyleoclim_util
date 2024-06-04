@@ -457,7 +457,7 @@ class Series:
         -------
         None
 
-        See Also
+        See also
         --------
 
         pyleoclim.Series.from_csv
@@ -513,7 +513,7 @@ class Series:
         Series
             pyleoclim Series object containing data and metadata.
 
-        See Also
+        See also
         --------
 
         pyleoclim.Series.to_csv

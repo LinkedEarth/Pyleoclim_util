@@ -281,11 +281,9 @@ class EnsembleGeoSeries(EnsembleSeries):
         Returns
         -------
         time_header : str
-
             Label for the time axis
 
         value_header : str
-
             Label for the value axis
 
         '''
@@ -318,7 +316,7 @@ class EnsembleGeoSeries(EnsembleSeries):
                   hue='archiveType', marker='archiveType', size=None, scatter_kwargs=None,
                   gridspec_kwargs=None,
                   savefig_settings=None):
-        '''
+        '''Dashboard that plots the trace, histogram, map, and power spectrum of the ensemble.
 
         Parameters
         ----------
@@ -393,7 +391,7 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         See also
         --------
-
+        
         pyleoclim.core.series.Series.plot : plot a timeseries
 
         pyleoclim.core.ensembleseries.EnsembleSeries.plot_envelope: Envelope plots for an ensemble
