@@ -25,6 +25,7 @@ from ..core.scalograms import Scalogram
 from ..core.coherence import Coherence
 from ..core.corr import Corr
 from ..core.resolutions import Resolution
+from ..core.spectralcoherence import SpectralCoherence
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -3418,6 +3419,53 @@ class Series:
         )
 
         return coh
+
+    def spectral_coherence(self,target_series,method='cwt',wavelet_kwargs=None):
+        '''Compute the cross-spectral coherence between two Series objects using wavelet analysis
+
+        Built on top of `pyleoclim.core.series.wavelet_coherence`.
+        
+        Parameters
+        ----------
+        
+        target_series : pyleo.Series
+            The target series to compare with
+
+        method : str; {'ww','cwt'}
+            The method to use for the wavelet analysis. 
+            Default is 'cwt', which only works if the series share an evenly spaced time axis.
+
+        common_time_kwargs : dict
+            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+            This is necessary to ensure that the two series are on the same time axis.
+            
+        wavelet_kwargs : dict
+            Keyword arguments to pass to the `pyleoclim.core.series.wavelet_coherence`
+            
+        Returns
+        -------
+        
+        coh : pyleo.core.spectralcoherence.SpectralCoherence
+        
+        See Also
+        --------
+        
+        pyleoclim.core.spectralcoherence.SpectralCoherence : SpectralCoherence object
+        
+        pyleoclim.core.series.wavelet_coherence : Wavelet coherence analysis'''
+        wavelet_kwargs = {} if wavelet_kwargs is None else wavelet_kwargs.copy()
+
+        coh = self.wavelet_coherence(target_series,**wavelet_kwargs)
+        spectrum_coh = coh.wtc.mean(axis=0)
+        return SpectralCoherence(
+            coherence=spectrum_coh,
+            scale=coh.scale,
+            frequency=coh.frequency,
+            coi=coh.coi,
+            method=method,
+            timeseries1=self,
+            timeseries2=target_series
+        )
 
     def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran',
                     number=1000, timespan=None,  settings=None, seed=None, 
