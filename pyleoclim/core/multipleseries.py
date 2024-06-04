@@ -1932,7 +1932,6 @@ class MultipleSeries:
         figsize : list
             a list of two integers indicating the figure size (in inches)
         
-        
         sat : float > 0
             Controls the saturation of the colormap normalization by scaling the vmin, vmax in https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
             default = 1.0
@@ -1941,7 +1940,6 @@ class MultipleSeries:
             flag indicating whether or not the x-axis should be shown (default = False) 
             
         savefig_settings : dictionary
-        
             the dictionary of arguments for plt.savefig(); some notes below:
 
             - 'path' must be specified; it can be any existing or non-existing path,
@@ -1949,7 +1947,6 @@ class MultipleSeries:
             - 'format' can be one of {"pdf", 'eps', 'png', ps'} The default is None.
             
         time_unit : str
-        
             the target time unit, possible inputs:
             {
                 'year', 'years', 'yr', 'yrs',
