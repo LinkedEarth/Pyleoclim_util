@@ -1004,7 +1004,17 @@ class TestUISeriesWaveletCoherence():
        ts1 = gen_ts(model='colored_noise')
        ts2 = gen_ts(model='colored_noise')
        tau = ts1.time[::10]
-       _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})    
+       _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})
+
+class TestUISeriesSpectralCoherence():
+    '''Test spectral coherence
+    '''
+    def test_spectralcoherence_t0(self):
+        ''' Test Series.spectral_coherence() with default arguments
+        '''
+        ts1 = gen_ts(model='colored_noise')
+        ts2 = gen_ts(model='colored_noise')
+        _ = ts1.spectral_coherence(ts2)
 
 
 class TestUISeriesWavelet():
