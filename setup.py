@@ -44,6 +44,7 @@ setup(
         "pyyaml",
         "beautifulsoup4",
         "scipy",
+        "requests",
     ],
     python_requires=">=3.9",
 )
