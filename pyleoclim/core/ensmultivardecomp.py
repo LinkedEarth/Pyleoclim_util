@@ -135,11 +135,11 @@ class EnsMultivarDecomp():
 
             soi = pyleo.utils.load_dataset('SOI')
             soi_time_axes = [pyleo.utils.random_time_axis(n=len(soi.time)) for _ in range(n)]
-            soi_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=soi.value,lat=-5,lon=-85,auto_time_params=True) for time in soi_time_axes])
+            soi_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=soi.value,lat=-5,lon=-85,auto_time_params=True,verbose=False) for time in soi_time_axes])
 
             nino3 = pyleo.utils.load_dataset('NINO3')
             nino3_time_axes = [pyleo.utils.random_time_axis(n=len(nino3.time)) for _ in range(n)]
-            nino3_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=nino3.value,lat=-5,lon=-85,auto_time_params=True) for time in nino3_time_axes])
+            nino3_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=nino3.value,lat=-5,lon=-85,auto_time_params=True,verbose=False) for time in nino3_time_axes])
 
             mul_ens = pyleo.MulEnsGeoSeries([nino3_ens,soi_ens])
             mcpca = mul_ens.mcpca(nsim=10,seed=42)
@@ -322,11 +322,11 @@ class EnsMultivarDecomp():
 
             soi = pyleo.utils.load_dataset('SOI')
             soi_time_axes = [pyleo.utils.random_time_axis(n=len(soi.time)) for _ in range(n)]
-            soi_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=soi.value,lat=0,lon=0,auto_time_params=True) for time in soi_time_axes])
+            soi_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=soi.value,lat=0,lon=0,auto_time_params=True,verbose=False) for time in soi_time_axes])
 
             nino3 = pyleo.utils.load_dataset('NINO3')
             nino3_time_axes = [pyleo.utils.random_time_axis(n=len(nino3.time)) for _ in range(n)]
-            nino3_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=nino3.value,lat=0,lon=0,auto_time_params=True) for time in nino3_time_axes])
+            nino3_ens = pyleo.EnsembleGeoSeries([pyleo.GeoSeries(time=time, value=nino3.value,lat=0,lon=0,auto_time_params=True,verbose=False) for time in nino3_time_axes])
 
             mul_ens = pyleo.MulEnsGeoSeries([nino3_ens,soi_ens])
             mcpca = mul_ens.mcpca(nsim=10,seed=42)
