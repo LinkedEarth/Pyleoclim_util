@@ -391,6 +391,7 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         See also
         --------
+        
         pyleoclim.core.series.Series.plot : plot a timeseries
 
         pyleoclim.core.ensembleseries.EnsembleSeries.plot_envelope: Envelope plots for an ensemble
