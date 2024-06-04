@@ -1010,11 +1010,11 @@ class TestUISeriesSpectralCoherence():
     '''Test spectral coherence
     '''
     def test_spectralcoherence_t0(self):
-        ''' Test Series.spectral_coherence() with default arguments
+        ''' Test Series.global_coherence() with default arguments
         '''
         ts1 = gen_ts(model='colored_noise')
         ts2 = gen_ts(model='colored_noise')
-        _ = ts1.spectral_coherence(ts2)
+        _ = ts1.global_coherence(ts2)
 
 
 class TestUISeriesWavelet():

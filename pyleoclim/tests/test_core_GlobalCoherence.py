@@ -1,4 +1,4 @@
-''' Tests for pyleoclim.core.ui.SpectralCoherence
+''' Tests for pyleoclim.core.globalcoherence.GlobalCoherence
 
 Naming rules:
 1. class: Test{filename}{Class}{method} with appropriate camel case
@@ -16,15 +16,15 @@ Notes on how to test:
 import pytest
 import pyleoclim as pyleo
 
-class TestUiSpectralCoherencePlot:
+class TestUiGlobalCoherencePlot:
     ''' Tests for Coherence.plot()
     '''
 
     def test_plot_t0(self, gen_ts):
-        ''' Test Coherence.plot with default parameters
+        ''' Test GlobalCoherence.plot with default parameters
         '''
         ts1 = gen_ts
         ts2 = gen_ts
-        coh = ts1.spectral_coherence(ts2)
+        coh = ts1.global_coherence(ts2)
         fig,ax = coh.plot()
         pyleo.closefig(fig)

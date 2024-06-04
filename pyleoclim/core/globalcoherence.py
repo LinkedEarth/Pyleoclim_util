@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-The SpectralCoherence class stores the result of Series.spectral_coherence(), whether WWZ or CWT.
+The GlobalCoherence class stores the result of Series.global_coherence(), whether WWZ or CWT.
 """
 from ..utils import plotting
 import matplotlib.pyplot as plt
 
-class SpectralCoherence:
+class GlobalCoherence:
     '''Class to store the results of cross spectral analysis
     
     Attributes
@@ -27,7 +27,7 @@ class SpectralCoherence:
     See Also
     --------
     
-    pyleoclim.core.series.Series.spectral_coherence : method to compute the spectral coherence'''
+    pyleoclim.core.series.Series.global_coherence : method to compute the spectral coherence'''
 
     def __init__(self, coherence, scale, frequency,coi,method,timeseries1,timeseries2,label='Coherence'):
         self.coherence = coherence

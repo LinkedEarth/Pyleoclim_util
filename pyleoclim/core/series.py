@@ -25,7 +25,7 @@ from ..core.scalograms import Scalogram
 from ..core.coherence import Coherence
 from ..core.corr import Corr
 from ..core.resolutions import Resolution
-from ..core.spectralcoherence import SpectralCoherence
+from .globalcoherence import GlobalCoherence
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -3420,8 +3420,8 @@ class Series:
 
         return coh
 
-    def spectral_coherence(self,target_series,method='cwt',wavelet_kwargs=None):
-        '''Compute the cross-spectral coherence between two Series objects using wavelet analysis
+    def global_coherence(self,target_series,method='cwt',wavelet_kwargs=None):
+        '''Compute the global coherence between two Series objects using wavelet analysis
 
         Built on top of `pyleoclim.core.series.wavelet_coherence`.
         
