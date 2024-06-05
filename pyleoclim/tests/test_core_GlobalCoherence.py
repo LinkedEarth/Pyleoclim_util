@@ -34,7 +34,7 @@ class TestUiGlobalCoherencePlot:
         '''
         ts1 = gen_ts
         ts2 = gen_ts
-        coh = ts1.global_coherence(ts2).signif_test(number=2)
+        coh = ts1.global_coherence(ts2).signif_test(number=1)
         fig,ax = coh.plot()
         pyleo.closefig(fig)
 
@@ -43,7 +43,7 @@ class TestUiGlobalCoherenceSignifTest:
     '''
 
     @pytest.mark.parametrize('method',['ar1sim','phaseran','CN'])
-    @pytest.mark.parametrize('number',[2,10])
+    @pytest.mark.parametrize('number',[1,10])
     @pytest.mark.parametrize('qs',[[.95],[.05,.95]])
     def test_signiftest_t0(self,method,number, qs,gen_ts):
         ''' Test GlobalCoherence.signif_test
