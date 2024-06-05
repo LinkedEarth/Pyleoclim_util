@@ -162,6 +162,9 @@ class GlobalCoherence:
         legend: bool
             whether to include a legend or not
 
+        legend_kwargs: dict
+            additional arguments to pass to ax.legend
+            
         ax: matplotlib axis
             axis to plot on
             
