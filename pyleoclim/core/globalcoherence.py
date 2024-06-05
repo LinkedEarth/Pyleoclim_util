@@ -56,7 +56,6 @@ class GlobalCoherence:
 
         Parameters
         ----------
-
         method: str; {'ar1sim','CN','phaseran'}
             method to use for the surrogate test. Default is 'ar1sim'.
 
@@ -68,9 +67,20 @@ class GlobalCoherence:
         
         Returns
         -------
-        
         global_coh: pyleoclim.core.globalcoherence.GlobalCoherence
-            Global coherence with significance field filled in'''
+            Global coherence with significance field filled in
+            
+        Examples
+        --------
+        
+        .. jupyter-execute::
+        
+            soi = pyleo.utils.load_dataset('SOI')
+            nino3 = pyleo.utils.load_dataset('NINO3')
+
+            gcoh = soi.global_coherence(nino3)
+            gcoh_sig = gcoh.signif_test(number=10)
+            gcoh_sig.plot()'''
         
         from ..core.surrogateseries import SurrogateSeries
 
@@ -107,13 +117,12 @@ class GlobalCoherence:
 
         return new
 
-    def plot(self,figsize=(8,8),xlim=None,label=None,coh_y_label=None,coh_line_color=None,ax=None,coh_ylim=(.4,1),fill_alpha=.3,fill_color=None,coh_plot_kwargs=None,
+    def plot(self,figsize=(8,8),xlim=None,label=None,coh_y_label=None,coh_line_color='grey',ax=None,coh_ylim=(.4,1),fill_alpha=.3,fill_color='grey',coh_plot_kwargs=None,
              savefig_settings=None,spectral_kwargs=None,legend=True,legend_kwargs=None,spec1_plot_kwargs=None,spec2_plot_kwargs=None):
         '''Plot the coherence as a function of scale or frequency, alongside the spectrum of the two timeseries (using the same method used for the coherence).
         
         Parameters
         ----------
-
         figsize: tuple
             size of the figure. Default is (8,8). Only used if ax is None
 
@@ -158,9 +167,19 @@ class GlobalCoherence:
             
         Returns
         -------
-        
         ax: matplotlib axis
-            axis with the plot'''
+            axis with the plot
+            
+        Examples
+        --------
+        
+        .. jupyter-execute::
+        
+            soi = pyleo.utils.load_dataset('SOI')
+            nino3 = pyleo.utils.load_dataset('NINO3')
+
+            gcoh = soi.global_coherence(nino3)
+            gcoh.plot()'''
 
         coh_plot_kwargs = {} if coh_plot_kwargs is None else coh_plot_kwargs.copy()
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

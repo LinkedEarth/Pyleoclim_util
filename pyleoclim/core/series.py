@@ -3427,7 +3427,6 @@ class Series:
         
         Parameters
         ----------
-        
         target_series : pyleo.Series
             The target series to compare with
 
@@ -3444,7 +3443,6 @@ class Series:
             
         Returns
         -------
-        
         coh : pyleo.core.spectralcoherence.SpectralCoherence
         
         See Also
@@ -3452,7 +3450,18 @@ class Series:
         
         pyleoclim.core.spectralcoherence.SpectralCoherence : SpectralCoherence object
         
-        pyleoclim.core.series.wavelet_coherence : Wavelet coherence analysis'''
+        pyleoclim.core.series.wavelet_coherence : Wavelet coherence analysis
+        
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI')
+            nino3 = pyleo.utils.load_dataset('NINO3')
+
+            gcoh = soi.global_coherence(nino3)
+            '''
         wavelet_kwargs = {} if wavelet_kwargs is None else wavelet_kwargs.copy()
 
         coh = self.wavelet_coherence(target_series,**wavelet_kwargs)
