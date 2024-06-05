@@ -17,14 +17,37 @@ import pytest
 import pyleoclim as pyleo
 
 class TestUiGlobalCoherencePlot:
-    ''' Tests for Coherence.plot()
+    ''' Tests for GlobalCoherence.plot()
     '''
 
     def test_plot_t0(self, gen_ts):
-        ''' Test GlobalCoherence.plot with default parameters
+        ''' Test GlobalCoherence.plot with various parameters
         '''
         ts1 = gen_ts
         ts2 = gen_ts
         coh = ts1.global_coherence(ts2)
         fig,ax = coh.plot()
         pyleo.closefig(fig)
+
+    def test_plot_t1(self, gen_ts):
+        ''' Test GlobalCoherence.plot with signif tests
+        '''
+        ts1 = gen_ts
+        ts2 = gen_ts
+        coh = ts1.global_coherence(ts2).signif_test(number=2)
+        fig,ax = coh.plot()
+        pyleo.closefig(fig)
+
+class TestUiGlobalCoherenceSignifTest:
+    ''' Tests for GlobalCoherence.signif_test()
+    '''
+
+    @pytest.mark.parametrize('method',['ar1sim','phaseran','CN'])
+    @pytest.mark.parametrize('number',[2,10])
+    @pytest.mark.parametrize('qs',[[.95],[.05,.95]])
+    def test_signiftest_t0(self,method,number, qs,gen_ts):
+        ''' Test GlobalCoherence.signif_test
+        '''
+        ts1 = gen_ts
+        ts2 = gen_ts
+        _ = ts1.global_coherence(ts2).signif_test(method=method,number=number,qs=qs)

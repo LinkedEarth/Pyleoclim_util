@@ -221,8 +221,7 @@ class GlobalCoherence:
         if self.signif_qs is not None:
             signif_method_label = {
                 'ar1sim': 'AR(1) simulations (MoM)',
-                'uar1': 'AR(1) simulations (MLE)',
-                'ar1asym': 'AR(1) asymptotic solution',
+                'phaseran': 'Phase Randomization',
                 'CN': 'Colored Noise'
             }
 
@@ -258,6 +257,6 @@ class GlobalCoherence:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-                return fig, ax
+            return fig, ax
         else:
             return ax
