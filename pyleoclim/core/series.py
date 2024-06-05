@@ -3456,15 +3456,17 @@ class Series:
         wavelet_kwargs = {} if wavelet_kwargs is None else wavelet_kwargs.copy()
 
         coh = self.wavelet_coherence(target_series,**wavelet_kwargs)
-        spectrum_coh = coh.wtc.mean(axis=0)
+        scale_time_array = np.array([coh.scale for _ in range(len(coh.time))])
+        coi_scale_array = np.array([coh.coi for _ in range(len(coh.scale))]).T
+        mask = coi_scale_array < scale_time_array
+
+        #Account for cone of influence in the coherence
+        masked_wtc = np.ma.masked_array(coh.wtc, mask=mask)
+        global_coh = masked_wtc.mean(axis=0).data
+        #global_coh = coh.wtc.mean(axis=0)
         return GlobalCoherence(
-            coherence=spectrum_coh,
-            scale=coh.scale,
-            frequency=coh.frequency,
-            coi=coh.coi,
-            method=method,
-            timeseries1=self,
-            timeseries2=target_series
+            global_coh=global_coh,
+            coh = coh
         )
 
     def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran',
