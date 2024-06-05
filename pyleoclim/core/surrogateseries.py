@@ -174,7 +174,7 @@ class SurrogateSeries(EnsembleSeries):
                 s_list.append(ts)
         else:
             ts = target_series.copy() # copy Series
-            ts.value = y_surr
+            ts.value = np.squeeze(y_surr)
             ts.label = str(target_series.label or '') 
             s_list = [ts]
 
