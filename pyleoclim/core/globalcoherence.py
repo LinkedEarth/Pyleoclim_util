@@ -117,7 +117,7 @@ class GlobalCoherence:
 
         return new
 
-    def plot(self,figsize=(8,8),xlim=None,label=None,coh_y_label=None,coh_line_color='grey',ax=None,coh_ylim=(.4,1),fill_alpha=.3,fill_color='grey',coh_plot_kwargs=None,
+    def plot(self,figsize=(8,8),xlim=None,label=None,coh_y_label='Coherence',coh_line_color='grey',ax=None,coh_ylim=(.4,1),fill_alpha=.3,fill_color='grey',coh_plot_kwargs=None,
              savefig_settings=None,spectral_kwargs=None,legend=True,legend_kwargs=None,spec1_plot_kwargs=None,spec2_plot_kwargs=None):
         '''Plot the coherence as a function of scale or frequency, alongside the spectrum of the two timeseries (using the same method used for the coherence).
         
@@ -164,7 +164,7 @@ class GlobalCoherence:
 
         legend_kwargs: dict
             additional arguments to pass to ax.legend
-            
+
         ax: matplotlib axis
             axis to plot on
             
