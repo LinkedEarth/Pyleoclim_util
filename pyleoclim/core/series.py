@@ -3444,12 +3444,12 @@ class Series:
             
         Returns
         -------
-        coh : pyleo.core.spectralcoherence.SpectralCoherence
+        coh : pyleo.core.globalcoherence.GlobalCoherence
         
         See Also
         --------
         
-        pyleoclim.core.spectralcoherence.SpectralCoherence : SpectralCoherence object
+        pyleoclim.core.globalcoherence.GlobalCoherence : global Coherence object
         
         pyleoclim.core.series.wavelet_coherence : Wavelet coherence analysis
         
