@@ -117,7 +117,7 @@ class GlobalCoherence:
 
         return new
 
-    def plot(self,figsize=(8,8),xlim=None,label=None,coh_y_label='Coherence',coh_line_color='grey',ax=None,coh_ylim=(.4,1),fill_alpha=.3,fill_color='grey',coh_plot_kwargs=None,
+    def plot(self,figsize=(8,8),xlim=None,xlabel=None,label=None,psd_y_label='PSD',coh_y_label='Coherence',coh_line_color='grey',ax=None,coh_ylim=(.4,1),fill_alpha=.3,fill_color='grey',coh_plot_kwargs=None,
              savefig_settings=None,spectral_kwargs=None,legend=True,legend_kwargs=None,spec1_plot_kwargs=None,spec2_plot_kwargs=None):
         '''Plot the coherence as a function of scale or frequency, alongside the spectrum of the two timeseries (using the same method used for the coherence).
         
@@ -131,6 +131,15 @@ class GlobalCoherence:
 
         label: str
             label of the plot
+
+        xlabel: str
+            x label of the plot
+
+        psd_y_label: str
+            y label of the power spectral density plot (left hand side)
+
+        coh_y_label: str
+            y label of the coherence plot (right hand side)
         
         coh_line_color: str
             color of the coherence line
@@ -220,6 +229,10 @@ class GlobalCoherence:
 
         if xlim is not None:
             ax.set_xlim(xlim)
+        if xlabel is not None:
+            ax.set_xlabel(xlabel)
+        if psd_y_label is not None:
+            ax.set_ylabel(psd_y_label)
 
         ax2 = ax.twinx()
 
