@@ -95,6 +95,12 @@ Coherence (pyleoclim.Coherence)
 .. autoclass:: pyleoclim.core.coherence.Coherence
    :members:
 
+SpectralCoherence (pyleoclim.GlobalCoherence)
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.globalcoherence.GlobalCoherence
+   :members:
+
 Corr (pyleoclim.Corr)
 """""""""""""""""""""
 

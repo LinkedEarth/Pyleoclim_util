@@ -25,6 +25,7 @@ from ..core.scalograms import Scalogram
 from ..core.coherence import Coherence
 from ..core.corr import Corr
 from ..core.resolutions import Resolution
+from .globalcoherence import GlobalCoherence
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -3418,6 +3419,76 @@ class Series:
         )
 
         return coh
+
+    def global_coherence(self,target_series=None,coh=None,method='cwt',wavelet_kwargs=None):
+        '''Compute the global coherence between two Series objects using wavelet analysis
+
+        Built on top of `pyleoclim.core.series.wavelet_coherence`.
+        
+        Parameters
+        ----------
+        target_series : pyleo.Series
+            The target series to compare with
+
+        coh : pyleo.core.coherence.Coherence
+            A coherence object. 
+            If None, will compute the coherence from scratch.
+            If passed, will take precedence over target_series.
+
+        method : str; {'ww','cwt'}
+            The method to use for the wavelet analysis. 
+            Default is 'cwt', which only works if the series share an evenly spaced time axis.
+            
+        wavelet_kwargs : dict
+            Keyword arguments to pass to the `pyleoclim.core.series.wavelet_coherence`
+            
+        Returns
+        -------
+        coh : pyleo.core.globalcoherence.GlobalCoherence
+        
+        See Also
+        --------
+        
+        pyleoclim.core.globalcoherence.GlobalCoherence : global Coherence object
+        
+        pyleoclim.core.series.wavelet_coherence : Wavelet coherence analysis
+        
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI')
+            nino3 = pyleo.utils.load_dataset('NINO3')
+
+            gcoh = soi.global_coherence(nino3)
+            gcoh.plot()
+            '''
+        
+        wavelet_kwargs = {} if wavelet_kwargs is None else wavelet_kwargs.copy()
+
+        if coh is None:
+            if target_series is None:
+                raise ValueError("If target_series is None, coh must be provided.")
+            else:
+                coh = self.wavelet_coherence(target_series,**wavelet_kwargs)
+        else:
+            if not isinstance(coh,Coherence):
+                raise ValueError("coh must be a Coherence object.")
+            pass
+
+        scale_time_array = np.array([coh.scale for _ in range(len(coh.time))])
+        coi_scale_array = np.array([coh.coi for _ in range(len(coh.scale))]).T
+        mask = coi_scale_array < scale_time_array
+
+        #Account for cone of influence in the coherence
+        masked_wtc = np.ma.masked_array(coh.wtc, mask=mask)
+        global_coh = masked_wtc.mean(axis=0).data
+        
+        return GlobalCoherence(
+            global_coh=global_coh,
+            coh = coh
+        )
 
     def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran',
                     number=1000, timespan=None,  settings=None, seed=None, 

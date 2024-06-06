@@ -13,6 +13,7 @@ from .surrogateseries import SurrogateSeries
 from .ensembleseries import EnsembleSeries
 from .scalograms import Scalogram, MultipleScalogram
 from .coherence import Coherence
+from .globalcoherence import GlobalCoherence
 from .corr import Corr
 from .correns import CorrEns
 from .multivardecomp import MultivariateDecomp
