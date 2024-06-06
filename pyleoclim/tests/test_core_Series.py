@@ -1006,16 +1006,23 @@ class TestUISeriesWaveletCoherence():
        tau = ts1.time[::10]
        _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})
 
-class TestUISeriesSpectralCoherence():
-    '''Test spectral coherence
+class TestUISeriesGlobalCoherence():
+    '''Test global coherence
     '''
-    def test_spectralcoherence_t0(self):
+    def test_globalcoherence_t0(self):
         ''' Test Series.global_coherence() with default arguments
         '''
         ts1 = gen_ts(model='colored_noise')
         ts2 = gen_ts(model='colored_noise')
         _ = ts1.global_coherence(ts2)
 
+    def test_globalcoherence_t0(self):
+        ''' Test Series.global_coherence() with passed coh
+        '''
+        ts1 = gen_ts(model='colored_noise')
+        ts2 = gen_ts(model='colored_noise')
+        coh = ts1.wavelet_coherence(ts2)
+        _ = ts1.global_coherence(coh=coh)
 
 class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
