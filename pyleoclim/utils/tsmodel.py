@@ -726,7 +726,7 @@ def uar1_sim(t, tau, sigma_2=1):
 def inverse_cumsum(arr):
     return np.diff(np.concatenate(([0], arr)))
 
-def random_time_axis(n, delta_t_dist = "exponential", param = [1.0]):
+def random_time_axis(n, delta_t_dist = "exponential", param = [1.0], seed = None):
     '''
     Generate a random time axis according to a specific probability model
 
@@ -756,12 +756,14 @@ def random_time_axis(n, delta_t_dist = "exponential", param = [1.0]):
 
 
     '''
+    if seed is not None:
+        np.random.seed(seed) 
+    
     # check for a valid distribution 
     valid_distributions = ["exponential", "poisson", "pareto", "random_choice"]
     if delta_t_dist not in valid_distributions:
         raise ValueError("delta_t_dist must be one of: 'exponential', 'poisson', 'pareto', 'random_choice'.")    
     
-
     param = np.array(param) # coerce array type
     
     if delta_t_dist == "exponential":
