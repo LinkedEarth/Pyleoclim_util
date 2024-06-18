@@ -1032,13 +1032,31 @@ class TestUISeriesGlobalCoherence():
         ts2 = gen_ts(model='colored_noise')
         _ = ts1.global_coherence(ts2)
 
-    def test_globalcoherence_t0(self):
+    def test_globalcoherence_t1(self):
         ''' Test Series.global_coherence() with passed coh
         '''
         ts1 = gen_ts(model='colored_noise')
         ts2 = gen_ts(model='colored_noise')
         coh = ts1.wavelet_coherence(ts2)
         _ = ts1.global_coherence(coh=coh)
+    
+    @pytest.mark.parametrize('freq', [None,np.linspace(1/100,1/2,num=20),'log', 'nfft', 'welch'])
+    def test_globalcoherence_t2(self,freq):
+        ''' Test Series.global_coherence() with wavelet kwargs
+        '''
+        ts1 = gen_ts(model='colored_noise')
+        ts2 = gen_ts(model='colored_noise')
+        
+        kwargs = {}
+        kwargs['freq'] = freq
+        gcoh = ts1.global_coherence(target_series=ts2,wavelet_kwargs=kwargs)
+        
+        if freq is None:
+            assert gcoh.coh.freq_method == 'log'
+        elif isinstance(freq,np.ndarray):
+            assert gcoh.coh.freq_method == 'user_specified'
+        elif isinstance(freq, str): 
+            assert gcoh.coh.freq_method == freq
 
 class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
