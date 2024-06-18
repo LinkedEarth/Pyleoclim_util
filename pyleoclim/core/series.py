@@ -3076,8 +3076,12 @@ class Series:
                 is appropriate for unevenly-spaced series.
             Default is cwt, returning an error if the Series is unevenly-spaced.
 
-        freq_method : str, optional
-            Can be one of 'log', 'scale', 'nfft', 'lomb_scargle', 'welch'. 
+        freq : str or array, optional
+           Information to produce the frequency vector (highly consequential for the WWZ method) 
+           This can be 'log','scale', 'nfft', 'lomb_scargle', 'welch' or a NumPy array.
+           If a string, will use `make_freq_vector()` with the specified frequency-generating method.
+           If an array, this will be passed directly to the spectral method.
+           If None (default), will use the 'log' method
             
         freq_kwargs : dict
             Arguments for the frequency vector
@@ -3234,7 +3238,7 @@ class Series:
         return scal
 
     def wavelet_coherence(self, target_series, method='cwt', settings=None,
-                          freq_method='log', freq_kwargs=None, verbose=False,
+                          freq=None, freq_kwargs=None, verbose=False,
                           common_time_kwargs=None):
         ''' Performs wavelet coherence analysis with the target timeseries
 
@@ -3248,8 +3252,12 @@ class Series:
             if the series share the same evenly-spaced time axis.
             'wwz' is designed for unevenly-spaced data, but is far slower.
 
-        freq_method : str
-            {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
+        freq : str or array, optional
+           Information to produce the frequency vector (highly consequential for the WWZ method) 
+           This can be 'log','scale', 'nfft', 'lomb_scargle', 'welch' or a NumPy array.
+           If a string, will use `make_freq_vector()` with the specified frequency-generating method.
+           If an array, this will be passed directly to the spectral method.
+           If None (default), will use the 'log' method
 
         freq_kwargs : dict
             Arguments for frequency vector
@@ -3340,7 +3348,7 @@ class Series:
             # by default, the plot function will look for the closest quantile to 0.95, but it is easy to adjust:
             cwt_sig.plot(signif_thresh = 0.9)
 
-        Another plotting option, `dashboard`, allows to visualize both
+        Another plotting option, `dashboard()`, allows to visualize both
         timeseries as well as the wavelet transform coherency (WTC), which quantifies where
         two timeseries exhibit similar behavior in time-frequency space, and the cross-wavelet
         transform (XWT), which indicates regions of high common power.
@@ -3366,11 +3374,26 @@ class Series:
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
+        
+        if 'freq' in settings.keys():
+            freq_vec = settings['freq']
+            freq_method = "user_specified"
+        else:
+            if freq is None: # assign the frequency method automatically based on context
+                freq_vec = specutils.make_freq_vector(self.time, method='log', **freq_kwargs)
+                freq_method = "log"
+            elif isinstance(freq, str):   # apply the specified method     
+                freq_vec = specutils.make_freq_vector(self.time, method=freq, **freq_kwargs) 
+                freq_method = freq
+            elif isinstance(freq,np.ndarray): # use the specified vector if dimensions check out
+                freq_vec = np.squeeze(freq)
+                freq_method = "user_specified"
+                if freq.ndim != 1:
+                    raise ValueError("freq should be a 1-dimensional array")
+        
         args = {}
-        args['wwz'] = {'freq': freq, 'verbose': verbose}
-        args['cwt'] = {'freq': freq}
-
+        args['wwz'] = {'freq': freq_vec, 'verbose': verbose}
+        args['cwt'] = {'freq': freq_vec}
 
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):

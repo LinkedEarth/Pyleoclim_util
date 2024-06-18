@@ -1341,7 +1341,12 @@ class MultipleSeries:
         
             Settings for the particular method. The default is {}.
 
-        freq_method : str; {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
+        freq : str or array, optional
+           Information to produce the frequency vector (highly consequential for the WWZ method) 
+           This can be 'log','scale', 'nfft', 'lomb_scargle', 'welch' or a NumPy array.
+           If a string, will use `make_freq_vector()` with the specified frequency-generating method.
+           If an array, this will be passed directly to the spectral method.
+           If None (default), will use the 'log' method
 
         freq_kwargs : dict
         
@@ -1392,7 +1397,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = (soi & nino)

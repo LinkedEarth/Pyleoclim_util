@@ -974,8 +974,8 @@ class TestUISeriesWaveletCoherence():
         v_unevenly =  np.delete(ts1.value, deleted_idx)
         t1_unevenly =  np.delete(ts2.time, deleted_idx1)
         v1_unevenly =  np.delete(ts2.value, deleted_idx1)
-        ts3 = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts4 = pyleo.Series(time=t1_unevenly, value=v1_unevenly)
+        ts3 = pyleo.Series(time=t_unevenly, value=v_unevenly,auto_time_params=True)
+        ts4 = pyleo.Series(time=t1_unevenly, value=v1_unevenly,auto_time_params=True)
         _ = ts3.wavelet_coherence(ts4,method='wwz')
   
     def test_xwave_t4(self):
@@ -1005,6 +1005,22 @@ class TestUISeriesWaveletCoherence():
        ts2 = gen_ts(model='colored_noise')
        tau = ts1.time[::10]
        _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})
+       
+    @pytest.mark.parametrize('freq', [None,np.linspace(1/100,1/2,num=20),'log', 'nfft', 'welch'])
+    def test_xwave_t7(self, freq):
+       ''' Test Series.wavelet_coherence() with freq method argument
+       '''
+       ts1 = gen_ts(model='colored_noise')
+       ts2 = gen_ts(model='colored_noise')
+       
+       coh = ts1.wavelet_coherence(ts2,freq=freq)
+       
+       if freq is None:
+           assert coh.freq_method == 'log'
+       elif isinstance(freq,np.ndarray):
+           assert coh.freq_method == 'user_specified'
+       elif isinstance(freq, str): 
+           assert coh.freq_method == freq
 
 class TestUISeriesGlobalCoherence():
     '''Test global coherence
