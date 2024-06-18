@@ -7,14 +7,13 @@ Compared to its parent class MultipleSeries, MultipleGeoSeries opens new possibi
 from ..core.multipleseries import MultipleSeries
 from ..utils import mapping as mp
 from ..utils import plotting
-import warnings
-import copy
+
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from matplotlib import cm
-from itertools import cycle
-import matplotlib.lines as mlines
+#from matplotlib import cm
+#from itertools import cycle
+#import matplotlib.lines as mlines
 import numpy as np
 #import warnings
 

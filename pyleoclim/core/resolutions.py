@@ -4,10 +4,8 @@
 Resolution objects are designed to contain, display, and analyze information on the resolution of the time axis of a Series object.
 """
 
-from ..utils import tsutils, plotting, tsmodel, tsbase
-
-import warnings
-
+from ..utils import plotting
+#import warnings
 import numpy as np
 import seaborn as sns
 import pandas as pd

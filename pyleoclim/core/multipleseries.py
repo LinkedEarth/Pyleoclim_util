@@ -1323,7 +1323,7 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='cwt', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
+    def wavelet(self, method='cwt', settings={}, freq=None, freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
@@ -1403,7 +1403,7 @@ class MultipleSeries:
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)

@@ -1042,28 +1042,41 @@ class TestUISeriesWavelet():
         n = 100
         ts = gen_ts(model='colored_noise',nt=n)
         freq = np.linspace(1/n, 1/2, 20)
-        _ = ts.wavelet(method=wave_method, settings={'freq': freq})
-
+        scal = ts.wavelet(method=wave_method, settings={'freq': freq})
+        assert scal.freq_method == "user_specified"
+        
     def test_wave_t2(self):
        ''' Test Series.wavelet() ntau option and plot functionality
        '''
-       ts = gen_ts(model='colored_noise',nt=200)
+       ts = gen_ts(model='colored_noise',nt=100)
        _ = ts.wavelet(method='wwz',settings={'ntau':10})
 
     @pytest.mark.parametrize('mother',['MORLET', 'PAUL', 'DOG'])
     def test_wave_t3(self,mother):
        ''' Test Series.wavelet() with different mother wavelets
        '''
-       ts = gen_ts(model='colored_noise',nt=200)
-       _ = ts.wavelet(method='cwt',settings={'mother':mother})
+       ts = gen_ts(model='colored_noise',nt=100)
+       _ = ts.wavelet(settings={'mother':mother})
        
     @pytest.mark.parametrize('freq_meth', ['log', 'scale', 'nfft', 'welch'])
     def test_wave_t4(self,freq_meth):
-       ''' Test Series.wavelet() with different mother wavelets
+       ''' Test Series.wavelet() with different frequency methods
        '''
-       ts = gen_ts(model='colored_noise',nt=200)
-       _ = ts.wavelet(method='cwt',freq_method=freq_meth)
-
+       ts = gen_ts(model='colored_noise',nt=100)
+       scal = ts.wavelet(freq=freq_meth)
+       assert scal.freq_method == freq_meth 
+       
+    @pytest.mark.parametrize('freq', [None,np.linspace(1/100,1/2,num=20)])
+    def test_wave_t5(self,freq):
+       ''' Test Series.wavelet() with different frequency vectors
+       '''
+       ts = gen_ts(model='colored_noise',nt=100)
+       scal = ts.wavelet(freq=freq)
+       if freq is None:
+           assert scal.freq_method == 'log'
+       else:
+           assert scal.freq_method == 'user_specified'
+           
 class TestUISeriesSsa():
     ''' Test the SSA functionalities
     '''

@@ -10,7 +10,7 @@ How to create and manipulate such objects is described in a short example below,
 import datetime as dt
 import re
 
-from ..utils import tsutils, plotting, tsmodel, tsbase, lipdutils, jsonutils
+from ..utils import tsutils, plotting, tsbase, jsonutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -1847,10 +1847,9 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             series = pyleo.utils.load_dataset('SOI')
             psd = series.spectral(freq = 'welch')
-            scalogram = series.wavelet(freq_method = 'welch')
+            scalogram = series.wavelet(freq = 'welch')
 
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
 
@@ -1859,7 +1858,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             series = pyleo.utils.load_dataset('SOI')
             psd = series.spectral(freq = 'welch').signif_test(number=20)
             scalogram = series.wavelet(freq_method = 'welch')
@@ -3066,7 +3064,7 @@ class Series:
 
         return psd
 
-    def wavelet(self, method='cwt', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
+    def wavelet(self, method='cwt', settings=None, freq=None, freq_kwargs=None, verbose=False):
         ''' Perform wavelet analysis on a timeseries
 
         Parameters
@@ -3177,12 +3175,25 @@ class Series:
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         
-        freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
-        
+        if 'freq' in settings.keys():
+            freq_vec = settings['freq']
+            freq_method = "user_specified"
+        else:
+            if freq is None: # assign the frequency method automatically based on context
+                freq_vec = specutils.make_freq_vector(self.time, method='log', **freq_kwargs)
+                freq_method = "log"
+            elif isinstance(freq, str):   # apply the specified method     
+                freq_vec = specutils.make_freq_vector(self.time, method=freq, **freq_kwargs) 
+                freq_method = freq
+            elif isinstance(freq,np.ndarray): # use the specified vector if dimensions check out
+                freq_vec = np.squeeze(freq)
+                freq_method = "user_specified"
+                if freq.ndim != 1:
+                    raise ValueError("freq should be a 1-dimensional array")
         
         args = {}
-        args['wwz'] = {'freq': freq}
-        args['cwt'] = {'freq': freq}
+        args['wwz'] = {'freq': freq_vec}
+        args['cwt'] = {'freq': freq_vec}
 
         if method == 'wwz':
             if 'ntau' in settings.keys():

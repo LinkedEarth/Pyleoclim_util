@@ -10,8 +10,6 @@ import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt, gridspec
 from matplotlib.ticker import MaxNLocator
-
-from ..core import series
 from ..utils import plotting
 
 
