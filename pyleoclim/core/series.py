@@ -17,15 +17,15 @@ from ..utils import correlation as corrutils
 from ..utils import causality as causalutils
 from ..utils import decomposition
 from ..utils import filter as filterutils
+from ..utils import lipdutils
 
 from ..core.psds import PSD
 from ..core.ssares import SsaRes
 from ..core.multipleseries import MultipleSeries
 from ..core.scalograms import Scalogram
-from ..core.coherence import Coherence
+from ..core.coherences import Coherence, GlobalCoherence
 from ..core.corr import Corr
 from ..core.resolutions import Resolution
-from .globalcoherence import GlobalCoherence
 
 import seaborn as sns
 import matplotlib.pyplot as plt
