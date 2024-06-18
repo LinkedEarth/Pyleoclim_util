@@ -8,6 +8,7 @@ from ..core.series import Series
 import matplotlib.pyplot as plt
 import re
 import pandas as pd
+import numpy as np
 
 #from copy import deepcopy
 from matplotlib import gridspec
@@ -497,9 +498,12 @@ class GeoSeries(Series):
         neighbor_coloring = ['w' for ik in range(len(neighborhood))]
         neighbor_coloring[-1] = 'k'
         neighborhood['original'] =neighbor_coloring
+        neighborhood['neighbors'] =neighbor_coloring
+
         # plot neighbors
 
-        fig, ax_d = mapping.scatter_map(neighborhood, fig=fig, gs_slot=gridspec_slot, hue=hue, size=size, marker=marker, projection=projection,
+        fig, ax_d = mapping.scatter_map(neighborhood, fig=fig, gs_slot=gridspec_slot, hue=hue, size=size,
+                                        marker=marker, projection=projection,
                                            proj_default=proj_default,
                                            background=background, borders=borders, rivers=rivers, lakes=lakes,
                                            ocean=ocean, land=land,
