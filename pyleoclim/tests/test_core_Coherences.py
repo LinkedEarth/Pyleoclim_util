@@ -86,3 +86,39 @@ class TestUiCoherencePhaseStats:
         ts2 = gen_ts
         coh = ts2.wavelet_coherence(ts1)
         _ = coh.phase_stats(scales=[2,8])
+        
+class TestUiGlobalCoherencePlot:
+    ''' Tests for GlobalCoherence.plot()
+    '''
+
+    def test_plot_t0(self, gen_ts):
+        ''' Test GlobalCoherence.plot with various parameters
+        '''
+        ts1 = gen_ts
+        ts2 = gen_ts
+        coh = ts1.global_coherence(ts2)
+        fig,ax = coh.plot()
+        pyleo.closefig(fig)
+
+    def test_plot_t1(self, gen_ts):
+        ''' Test GlobalCoherence.plot with signif tests
+        '''
+        ts1 = gen_ts
+        ts2 = gen_ts
+        coh = ts1.global_coherence(ts2).signif_test(number=1)
+        fig,ax = coh.plot()
+        pyleo.closefig(fig)
+
+class TestUiGlobalCoherenceSignifTest:
+    ''' Tests for GlobalCoherence.signif_test()
+    '''
+
+    @pytest.mark.parametrize('method',['ar1sim','phaseran','CN'])
+    @pytest.mark.parametrize('number',[1,10])
+    @pytest.mark.parametrize('qs',[[.95],[.05,.95]])
+    def test_signiftest_t0(self,method,number, qs,gen_ts):
+        ''' Test GlobalCoherence.signif_test
+        '''
+        ts1 = gen_ts
+        ts2 = gen_ts
+        _ = ts1.global_coherence(ts2).signif_test(method=method,number=number,qs=qs)

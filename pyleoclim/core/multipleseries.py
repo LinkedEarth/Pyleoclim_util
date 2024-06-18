@@ -1323,7 +1323,7 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='cwt', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
+    def wavelet(self, method='cwt', settings={}, freq=None, freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
@@ -1341,7 +1341,12 @@ class MultipleSeries:
         
             Settings for the particular method. The default is {}.
 
-        freq_method : str; {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
+        freq : str or array, optional
+           Information to produce the frequency vector (highly consequential for the WWZ method) 
+           This can be 'log','scale', 'nfft', 'lomb_scargle', 'welch' or a NumPy array.
+           If a string, will use `make_freq_vector()` with the specified frequency-generating method.
+           If an array, this will be passed directly to the spectral method.
+           If None (default), will use the 'log' method
 
         freq_kwargs : dict
         
@@ -1392,7 +1397,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = (soi & nino)
@@ -1403,7 +1407,7 @@ class MultipleSeries:
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
