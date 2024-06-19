@@ -384,6 +384,36 @@ def dropna(ys, ts, verbose=False):
 
     return ys, ts
 
+def dropna_matrix(matrix, verbose=False):
+    '''Drop NaN values from matrix
+
+    Remove columns from matrix that contain nans
+
+    Parameters
+    ----------
+    matrix : array
+        A matrix, NaNs allowed
+    verbose : bool
+        If True, will print a warning message
+
+    Returns
+    -------
+    matrix : array
+        The matrix without nans
+
+    See Also
+    --------
+
+    https://pandas.pydata.org/docs/reference/api/pandas.Series.dropna.html
+
+    '''
+    matrix = matrix[:, ~np.isnan(matrix).any(axis=0)]
+
+    if verbose and any(np.isnan(matrix)):
+        print('NaNs have been detected and dropped.')
+
+    return matrix
+
 def sort_ts(ys, ts, ascending = True, verbose=False):
     ''' Sort timeseries
 

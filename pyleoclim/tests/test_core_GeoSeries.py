@@ -45,6 +45,47 @@ def multiple_pinkgeoseries(nrecs = 20, seed = 108, geobox=[-85.0,85.0,-180,180])
         
     return pyleo.MultipleGeoSeries(ts_list, label='Multiple Pink GeoSeries')
 
+class TestUIGeoSeriesInit:
+    ''' Test for GeoSeries instantiation '''
+    
+    def test_init_no_dropna_depth(self, evenly_spaced_series):
+            ts = evenly_spaced_series
+            t = ts.time
+            v = ts.value
+            d = np.arange(len(t))
+            v[0] = np.nan
+            ts2 = pyleo.GeoSeries(time=t,value=v,depth=d,dropna=False, verbose=False,lat=0,lon=0)
+            assert np.isnan(ts2.value[0])
+            assert ts2.depth[0] == d[0]
+        
+    def test_init_dropna_depth(self, evenly_spaced_series):
+            ts = evenly_spaced_series
+            t = ts.time
+            v = ts.value
+            d = np.arange(len(t))
+            v[0] = np.nan
+            ts2 = pyleo.GeoSeries(time=t,value=v,depth=d,dropna=True, verbose=False,lat=0,lon=0)
+            print(ts2.value)
+            assert ~np.isnan(ts2.value[0])
+            assert ts2.depth[0] == d[1]
+
+    def test_init_no_dropna(self, evenly_spaced_series):
+            ts = evenly_spaced_series
+            t = ts.time
+            v = ts.value
+            v[0] = np.nan
+            ts2 = pyleo.GeoSeries(time=t,value=v,dropna=False, verbose=False,lat=0,lon=0)
+            assert np.isnan(ts2.value[0])
+        
+    def test_init_dropna(self, evenly_spaced_series):
+            ts = evenly_spaced_series
+            t = ts.time
+            v = ts.value
+            v[0] = np.nan
+            ts2 = pyleo.GeoSeries(time=t,value=v,dropna=True, verbose=False,lat=0,lon=0)
+            print(ts2.value)
+            assert ~np.isnan(ts2.value[0])
+
 @pytest.mark.xfail   # will fail until pandas is fixed
 class TestUIGeoSeriesResample():
     ''' test GeoSeries.Resample()

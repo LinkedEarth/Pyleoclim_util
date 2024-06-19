@@ -167,7 +167,17 @@ class GeoSeries(Series):
                 time_name='Time'
         else:
             pass
-       
+
+        if dropna:
+            if depth is not None:
+                matrix = np.array([time,value,depth])
+                matrix = tsbase.dropna_matrix(matrix)
+                time = matrix[0,:]
+                value = matrix[1,:]
+                depth = matrix[2,:]
+            else:
+                pass
+        
         # assign latitude
         if lat is not None:
             lat = float(lat) 
