@@ -90,15 +90,26 @@ class EnsembleGeoSeries(EnsembleSeries):
             # check that all components are GeoSeries
             if not all([isinstance(ts, GeoSeries) for ts in series_list]):
                 raise ValueError('If lat is not passed, all components must be GeoSeries objects')
-            else:
-                self.lat = series_list[0].lat
-        elif lon is None:
+            #Check that the latitudes are all the same
+            else: 
+                lat_array = np.array([float(ts.lat) for ts in series_list],dtype=float)
+                test_lat = lat_array[0]
+                if not np.allclose(lat_array,test_lat):
+                    raise ValueError('All components must have the same latitude')
+                else:
+                    self.lat = test_lat
+        if lon is None:
             if not all([isinstance(ts, GeoSeries) for ts in series_list]):
                 raise ValueError('If lon is not passed, all components must be GeoSeries objects')
+            #Check that the longitudes are all the same
             else:
-                self.lon = series_list[0].lon
-
-        else:
+                lon_array = np.array([ts.lon for ts in series_list],dtype=float)
+                test_lon = lon_array[0]
+                if not np.allclose(lon_array,test_lon):
+                    raise ValueError('All components must have the same longitude')
+                else:
+                    self.lon = test_lon
+        elif lat and lon:
             lat = float(lat) 
             if -90 <= lat <= 90: 
                 self.lat = lat
