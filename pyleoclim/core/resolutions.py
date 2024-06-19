@@ -478,7 +478,7 @@ class MultipleResolution:
         self.resolution_list = resolution_list
         self.time_unit = time_unit
 
-    def summary_plot(self,figsize=(10,8),xlabel=None,ylabel=None,legend=False,ax=None,
+    def summary_plot(self,figsize=(10,8),xlabel=None,ylabel=None,legend=False,ax=None,log_scale=None,
              boxplot_whis=[0,100], boxplot_width=.6, boxplot_dodge=False,boxplot_palette='viridis',
              stripplot_size=2,stripplot_color=".3",stripplot_alpha=.8,stripplot_dodge=False,
              boxplot_kwargs=None,stripplot_kwargs=None,savefig_settings=None):
@@ -486,7 +486,6 @@ class MultipleResolution:
 
         Parameters
         ----------
-
         figsize : tuple, list
             Size of the figure.
 
@@ -501,6 +500,9 @@ class MultipleResolution:
         
         ax : matplotlib.ax
             The matplotlib axis onto which to return the figure. The default is None.
+
+        log_scale : bool
+            Whether to plot the y-axis on a log scale. Default is None.
 
         boxplot_whis : float or pair of floats
             If scalar, whiskers are drawn to the farthest datapoint within whis * IQR from the nearest hinge. 
@@ -541,6 +543,16 @@ class MultipleResolution:
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+
+        Returns
+        -------
+        fig : matplotlib.figure
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
+
+        ax : matplotlib.axis
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
         
         Examples
         --------
@@ -578,8 +590,8 @@ class MultipleResolution:
             boxplot_dodge = boxplot_kwargs.pop('dodge')
         if 'palette' in boxplot_kwargs:
             boxplot_palette = boxplot_kwargs.pop('palette')
-        # if 'log_scale' in boxplot_kwargs:
-        #     log_scale = boxplot_kwargs.pop('log_scale')
+        if 'log_scale' in boxplot_kwargs:
+            log_scale = boxplot_kwargs.pop('log_scale')
 
         if 'size' in stripplot_kwargs:
             stripplot_size = stripplot_kwargs.pop('size')
@@ -589,11 +601,11 @@ class MultipleResolution:
             stripplot_alpha = stripplot_kwargs.pop('alpha')
         if 'dodge' in stripplot_kwargs:
             stripplot_dodge = stripplot_kwargs.pop('dodge')
-        # if 'log_scale' in stripplot_kwargs:
-        #     log_scale = stripplot_kwargs.pop('log_scale')
+        if 'log_scale' in stripplot_kwargs:
+            log_scale = stripplot_kwargs.pop('log_scale')
 
-        sns.boxplot(data,x='Resolution',y='Label',hue='Label',whis=boxplot_whis,width=boxplot_width,dodge=boxplot_dodge,palette=boxplot_palette,ax=ax,**boxplot_kwargs)
-        sns.stripplot(data, x="Resolution", y="Label",size=stripplot_size,color=stripplot_color,alpha=stripplot_alpha,dodge=stripplot_dodge,ax=ax,**stripplot_kwargs)
+        sns.boxplot(data,x='Resolution',y='Label',hue='Label',whis=boxplot_whis,width=boxplot_width,dodge=boxplot_dodge,palette=boxplot_palette,ax=ax,log_scale=log_scale,**boxplot_kwargs)
+        sns.stripplot(data, x="Resolution", y="Label",size=stripplot_size,color=stripplot_color,alpha=stripplot_alpha,dodge=stripplot_dodge,ax=ax,log_scale=log_scale,**stripplot_kwargs)
 
         if ylabel:
             ax.set(ylabel=ylabel)
