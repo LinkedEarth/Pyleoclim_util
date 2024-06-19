@@ -86,7 +86,7 @@ class TestUIGeoSeriesInit:
             print(ts2.value)
             assert ~np.isnan(ts2.value[0])
 
-
+@pytest.mark.xfail   # will fail until pandas is fixed
 class TestUIGeoSeriesResample():
     ''' test GeoSeries.Resample()
     '''

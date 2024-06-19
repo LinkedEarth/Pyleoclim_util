@@ -1,7 +1,7 @@
 
 # It is unclear why the documentation for these two modules does not build automatically using automodule. It therefore had to be built using autoclass
 
-from ..utils import plotting, lipdutils, tsutils
+from ..utils import plotting, tsutils
 from ..utils import wavelet as waveutils
 
 import matplotlib.pyplot as plt
@@ -9,12 +9,10 @@ import numpy as np
 from tabulate import tabulate
 from copy import deepcopy
 
-from matplotlib.ticker import ScalarFormatter, FormatStrFormatter #, MaxNLocator
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter 
 
 from scipy.stats.mstats import mquantiles
 
-#from ..core import MultipleScalogram
 
 class Scalogram:
     '''

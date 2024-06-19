@@ -1,10 +1,7 @@
 import numpy as np
 #import pandas as pd
 from matplotlib import pyplot as plt, gridspec
-#from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 from matplotlib.ticker import MaxNLocator
-#import cartopy.crs as ccrs
-#import cartopy.feature as cfeature
 
 from ..core import series
 from ..utils import plotting, mapping, tsbase

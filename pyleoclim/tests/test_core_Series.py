@@ -974,8 +974,8 @@ class TestUISeriesWaveletCoherence():
         v_unevenly =  np.delete(ts1.value, deleted_idx)
         t1_unevenly =  np.delete(ts2.time, deleted_idx1)
         v1_unevenly =  np.delete(ts2.value, deleted_idx1)
-        ts3 = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts4 = pyleo.Series(time=t1_unevenly, value=v1_unevenly)
+        ts3 = pyleo.Series(time=t_unevenly, value=v_unevenly,auto_time_params=True)
+        ts4 = pyleo.Series(time=t1_unevenly, value=v1_unevenly,auto_time_params=True)
         _ = ts3.wavelet_coherence(ts4,method='wwz')
   
     def test_xwave_t4(self):
@@ -1005,6 +1005,22 @@ class TestUISeriesWaveletCoherence():
        ts2 = gen_ts(model='colored_noise')
        tau = ts1.time[::10]
        _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})
+       
+    @pytest.mark.parametrize('freq', [None,np.linspace(1/100,1/2,num=20),'log', 'nfft', 'welch'])
+    def test_xwave_t7(self, freq):
+       ''' Test Series.wavelet_coherence() with freq method argument
+       '''
+       ts1 = gen_ts(model='colored_noise')
+       ts2 = gen_ts(model='colored_noise')
+       
+       coh = ts1.wavelet_coherence(ts2,freq=freq)
+       
+       if freq is None:
+           assert coh.freq_method == 'log'
+       elif isinstance(freq,np.ndarray):
+           assert coh.freq_method == 'user_specified'
+       elif isinstance(freq, str): 
+           assert coh.freq_method == freq
 
 class TestUISeriesGlobalCoherence():
     '''Test global coherence
@@ -1016,13 +1032,31 @@ class TestUISeriesGlobalCoherence():
         ts2 = gen_ts(model='colored_noise')
         _ = ts1.global_coherence(ts2)
 
-    def test_globalcoherence_t0(self):
+    def test_globalcoherence_t1(self):
         ''' Test Series.global_coherence() with passed coh
         '''
         ts1 = gen_ts(model='colored_noise')
         ts2 = gen_ts(model='colored_noise')
         coh = ts1.wavelet_coherence(ts2)
         _ = ts1.global_coherence(coh=coh)
+    
+    @pytest.mark.parametrize('freq', [None,np.linspace(1/100,1/2,num=20),'log', 'nfft', 'welch'])
+    def test_globalcoherence_t2(self,freq):
+        ''' Test Series.global_coherence() with wavelet kwargs
+        '''
+        ts1 = gen_ts(model='colored_noise')
+        ts2 = gen_ts(model='colored_noise')
+        
+        kwargs = {}
+        kwargs['freq'] = freq
+        gcoh = ts1.global_coherence(target_series=ts2,wavelet_kwargs=kwargs)
+        
+        if freq is None:
+            assert gcoh.coh.freq_method == 'log'
+        elif isinstance(freq,np.ndarray):
+            assert gcoh.coh.freq_method == 'user_specified'
+        elif isinstance(freq, str): 
+            assert gcoh.coh.freq_method == freq
 
 class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
@@ -1042,28 +1076,41 @@ class TestUISeriesWavelet():
         n = 100
         ts = gen_ts(model='colored_noise',nt=n)
         freq = np.linspace(1/n, 1/2, 20)
-        _ = ts.wavelet(method=wave_method, settings={'freq': freq})
-
+        scal = ts.wavelet(method=wave_method, settings={'freq': freq})
+        assert scal.freq_method == "user_specified"
+        
     def test_wave_t2(self):
        ''' Test Series.wavelet() ntau option and plot functionality
        '''
-       ts = gen_ts(model='colored_noise',nt=200)
+       ts = gen_ts(model='colored_noise',nt=100)
        _ = ts.wavelet(method='wwz',settings={'ntau':10})
 
     @pytest.mark.parametrize('mother',['MORLET', 'PAUL', 'DOG'])
     def test_wave_t3(self,mother):
        ''' Test Series.wavelet() with different mother wavelets
        '''
-       ts = gen_ts(model='colored_noise',nt=200)
-       _ = ts.wavelet(method='cwt',settings={'mother':mother})
+       ts = gen_ts(model='colored_noise',nt=100)
+       _ = ts.wavelet(settings={'mother':mother})
        
     @pytest.mark.parametrize('freq_meth', ['log', 'scale', 'nfft', 'welch'])
     def test_wave_t4(self,freq_meth):
-       ''' Test Series.wavelet() with different mother wavelets
+       ''' Test Series.wavelet() with different frequency methods
        '''
-       ts = gen_ts(model='colored_noise',nt=200)
-       _ = ts.wavelet(method='cwt',freq_method=freq_meth)
-
+       ts = gen_ts(model='colored_noise',nt=100)
+       scal = ts.wavelet(freq=freq_meth)
+       assert scal.freq_method == freq_meth 
+       
+    @pytest.mark.parametrize('freq', [None,np.linspace(1/100,1/2,num=20)])
+    def test_wave_t5(self,freq):
+       ''' Test Series.wavelet() with different frequency vectors
+       '''
+       ts = gen_ts(model='colored_noise',nt=100)
+       scal = ts.wavelet(freq=freq)
+       if freq is None:
+           assert scal.freq_method == 'log'
+       else:
+           assert scal.freq_method == 'user_specified'
+           
 class TestUISeriesSsa():
     ''' Test the SSA functionalities
     '''
