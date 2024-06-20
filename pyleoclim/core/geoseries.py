@@ -142,13 +142,16 @@ class GeoSeries(Series):
             time = np.squeeze(time)
         if len(value) > 1:
             value = np.squeeze(value)
-        if len(depth) >1:
-            depth = np.squeeze(depth)
+        if depth is not None:
+            if len(depth) >1:
+                depth = np.squeeze(depth)
         
-        if len(depth) != len(time):
-            raise ValueError('Depth and time arrays must be the same length')
-        if len(depth) != len(value):
-            raise ValueError('Depth and value arrays must be the same length')
+        #Check that array sizes are equal
+        if depth is not None:
+            if len(depth) != len(time):
+                raise ValueError('Depth and time arrays must be the same length')
+            if len(depth) != len(value):
+                raise ValueError('Depth and value arrays must be the same length')
         if len(time) != len(value):
             raise ValueError('Time and value arrays must be the same length')
         
