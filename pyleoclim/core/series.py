@@ -159,6 +159,9 @@ class Series:
         if len(value) > 1:
             value = np.squeeze(value)
 
+        if len(time) != len(value):
+            raise ValueError('Time and value arrays must have the same length')
+
         if auto_time_params is None:
             auto_time_params = True
             if verbose:

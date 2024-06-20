@@ -371,6 +371,23 @@ class TestUIEnsembleSeriesfromAgeEnsembleArray():
         age_array = np.array([np.arange(length) for _ in range(num)]).T
         _ = pyleo.EnsembleSeries.from_AgeEnsembleArray(series=series, age_array=age_array,value_depth=value_depth,age_depth=age_depth)
 
+class TestUIEnsembleSeriesfromPaleoEnsembleArray():
+    def test_fromPaleoEnsembleArray_t0(self,pinkseries):
+        series = pinkseries
+        length = len(series.time)
+        num = 3
+        paleo_array = np.array([np.random.normal(0,1,length) for _ in range(num)]).T
+        _ = pyleo.EnsembleSeries.from_PaleoEnsembleArray(series=series, paleo_array=paleo_array)
+
+    def test_fromPaleoEnsembleArray_t1(self,pinkseries):
+        series = pinkseries
+        length = len(series.time)
+        paleo_depth = np.arange(length)
+        age_depth = np.arange(length)
+        num = 3
+        paleo_array = np.array([np.random.normal(0,1,length) for _ in range(num)]).T
+        _ = pyleo.EnsembleSeries.from_PaleoEnsembleArray(series=series, paleo_array=paleo_array,paleo_depth=paleo_depth,age_depth=age_depth)
+
 # class TestUIEnsembleSeriesDistplot():
 #     def test_histplot_t0(self):
 #         '''Test for EnsembleSeries.distplot()

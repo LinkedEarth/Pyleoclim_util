@@ -1126,7 +1126,7 @@ def getEnsemble(csv_dict, csvName):
 
     return depth, ensembleValues
 
-def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo,extrapolate=True):
+def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthMapping,extrapolate=True):
     """ Map the depth for the ensemble age values to the paleo depth
 
     Parameters
@@ -1137,8 +1137,8 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo,extrapol
     depthEnsemble : array
         A vector of depth. The vector should have the same length as the number of rows in the ensembleValues
 
-    depthPaleo : array
-        A vector corresponding to the depth at which there are paleodata information
+    depthMapping : array
+        A vector corresponding to the depth that will be the ensemble should be mapped onto
 
     extrapolate : bool
         Whether to extrapolate the ensemble values to the paleo depth. Default is True
@@ -1150,24 +1150,25 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo,extrapol
 
     """
     if len(depthEnsemble)!=np.shape(ensembleValues)[0]:
-        raise ValueError("Depth and age need to have the same length")
+        raise ValueError("Depth and ensemble need to have the same length")
 
     #Make sure that numpy arrays were given
     ensembleValues=np.array(ensembleValues)
     depthEnsemble=np.array(depthEnsemble)
-    depthPaleo = np.array(depthPaleo)
+    depthMapping = np.array(depthMapping)
 
     #Interpolate
-    ensembleValuesToPaleo = np.zeros((len(depthPaleo),np.shape(ensembleValues)[1])) #placeholder
+    ensembleValuesMapped = np.zeros((len(depthMapping),np.shape(ensembleValues)[1])) #placeholder
 
     if extrapolate is True:
         for i in np.arange(0,np.shape(ensembleValues)[1]):
-            ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i])
+            ensembleValuesMapped[:,i]=np.interp(depthMapping,depthEnsemble,ensembleValues[:,i])
     elif extrapolate is False:
         for i in np.arange(0,np.shape(ensembleValues)[1]):
-            ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i],left=np.nan,right=np.nan)
+            ensembleValuesMapped[:,i]=np.interp(depthMapping,depthEnsemble,ensembleValues[:,i],left=np.nan,right=np.nan)
 
-    return ensembleValuesToPaleo
+    return ensembleValuesMapped
+
 
 def gen_dict_extract(key, var):
     '''Recursively searches for all the values in nested dictionaries corresponding

@@ -46,7 +46,7 @@ class TestUIEnsembleGeoSeriesfromAgeEnsembleArray():
         age_array = np.array([np.arange(length) for _ in range(num)]).T
         _ = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series=series, age_array=age_array,value_depth=value_depth,age_depth=age_depth)
 
-    def test_fromAgeEnsembleArray_t1(self,pinkgeoseries):
+    def test_fromAgeEnsembleArray_t2(self,pinkgeoseries):
         series = pinkgeoseries
         length = len(series.time)
         series.depth = np.arange(length)
@@ -54,3 +54,29 @@ class TestUIEnsembleGeoSeriesfromAgeEnsembleArray():
         num = 3
         age_array = np.array([np.arange(length) for _ in range(num)]).T
         _ = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series=series, age_array=age_array,age_depth=age_depth)
+
+class TestUIEnsembleGeoSeriesfromPaleoEnsembleArray():
+    def test_fromPaleoEnsembleArray_t0(self,pinkgeoseries):
+        series = pinkgeoseries
+        length = len(series.time)
+        num = 3
+        paleo_array = np.array([np.arange(length) for _ in range(num)]).T
+        _ = pyleo.EnsembleGeoSeries.from_PaleoEnsembleArray(geo_series=series, paleo_array=paleo_array)
+
+    def test_fromPaleoEnsembleArray_t1(self,pinkgeoseries):
+        series = pinkgeoseries
+        length = len(series.time)
+        paleo_depth = np.arange(length)
+        age_depth = np.arange(length)
+        num = 3
+        paleo_array = np.array([np.random.normal(0,1,length) for _ in range(num)]).T
+        _ = pyleo.EnsembleGeoSeries.from_PaleoEnsembleArray(geo_series=series, paleo_array=paleo_array,paleo_depth=paleo_depth,age_depth=age_depth)
+
+    def test_fromPaleoEnsembleArray_t2(self,pinkgeoseries):
+        series = pinkgeoseries
+        length = len(series.time)
+        series.depth = np.arange(length)
+        paleo_depth = np.arange(length)
+        num = 3
+        paleo_array = np.array([np.random.normal(0,1,length) for _ in range(num)]).T
+        _ = pyleo.EnsembleGeoSeries.from_PaleoEnsembleArray(geo_series=series, paleo_array=paleo_array,paleo_depth=paleo_depth)

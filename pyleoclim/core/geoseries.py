@@ -137,6 +137,24 @@ class GeoSeries(Series):
                  depth = None, depth_name = None, depth_unit= None,
                  sort_ts = 'ascending', dropna = True,  clean_ts=False, auto_time_params = None):
         
+        # ensure 1D arrays
+        if len(time) > 1:
+            time = np.squeeze(time)
+        if len(value) > 1:
+            value = np.squeeze(value)
+        if depth is not None:
+            if len(depth) >1:
+                depth = np.squeeze(depth)
+        
+        #Check that array sizes are equal
+        if depth is not None:
+            if len(depth) != len(time):
+                raise ValueError('Depth and time arrays must be the same length')
+            if len(depth) != len(value):
+                raise ValueError('Depth and value arrays must be the same length')
+        if len(time) != len(value):
+            raise ValueError('Time and value arrays must be the same length')
+        
         if auto_time_params is None:
             auto_time_params = True
             if verbose:
