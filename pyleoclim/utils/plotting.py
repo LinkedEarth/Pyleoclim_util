@@ -317,9 +317,14 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     if ylim is not None:
         ax.set_ylim(ylim)
 
-    if (legend is True) & (len(lgd_kwargs)>0):
+
+    if legend is True:
+        if len(lgd_kwargs)>0:
+            ax.legend(**lgd_kwargs)
+        else:
+            ax.legend()
     # if legend:
-        ax.legend(**lgd_kwargs)
+    #     ax.legend(**lgd_kwargs)
     else:
         ax.legend().remove()
 
