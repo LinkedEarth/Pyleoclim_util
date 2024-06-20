@@ -317,6 +317,8 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     if ylim is not None:
         ax.set_ylim(ylim)
 
+    # if 'label' not in plot_kwargs.keys():
+    #     legend = False
 
     if legend is True:
         if len(lgd_kwargs)>0:
@@ -326,7 +328,8 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     # if legend:
     #     ax.legend(**lgd_kwargs)
     else:
-        ax.legend().remove()
+        if 'label' in plot_kwargs.keys():
+            ax.legend().remove()
 
     if invert_xaxis:
         ax.invert_xaxis()
