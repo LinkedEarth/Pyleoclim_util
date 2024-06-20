@@ -170,6 +170,7 @@ class EnsembleGeoSeries(EnsembleSeries):
         .. jupyter-execute::
 
             #Create an ensemble of 100 series with random time axes of length 1000
+
             length = 1000
             age_array = np.array([pyleo.utils.tsmodel.random_time_axis(length) for i in range(100)]).T
 
@@ -186,25 +187,26 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         .. jupyter-execute::
 
-            #If we have depth vectors for our series and age array, we can pass them to the function
+            #In this example we'll explicitly pass the depth vectors
+
             age_length = 1000
-            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(age_length) for i in range(100)]).T
+            age_array = np.array([pyleo.utils.tsmodel.random_time_axis(length) for i in range(100)]).T
             age_depth = np.arange(age_length)
 
             value_length = 800
-            value = np.random.randn(value_length)
+            value = np.random.normal(0,1,value_length)
             time = pyleo.utils.tsmodel.random_time_axis(value_length)
             lat = np.random.randint(-90,90)
             lon = np.random.randint(-180,180)
             geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon, verbose=False)
             value_depth = np.arange(value_length)
 
-            #Note that the length of the depth vectors must match the length of the corresponding object (number of values or number of rows in age array)
-            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array, value_depth=value_depth, age_depth=age_depth,verbose=False)
+            ens = pyleo.EnsembleGeoSeries.from_AgeEnsembleArray(geo_series = geo_series,age_array=age_array,value_depth=value_depth,age_depth=age_depth,verbose=False)
 
         .. jupyter-execute::
 
             #We can also pass the depth vector through the GeoSeries object itself
+
             age_length = 1000
             age_array = np.array([pyleo.utils.tsmodel.random_time_axis(age_length) for i in range(100)]).T
             age_depth = np.arange(age_length)
@@ -266,7 +268,7 @@ class EnsembleGeoSeries(EnsembleSeries):
             mapped_age = lipdutils.mapAgeEnsembleToPaleoData(
                 ensembleValues=age_array, 
                 depthEnsemble=age_depth, 
-                depthPaleo=value_depth,
+                depthMapping=value_depth,
                 extrapolate=extrapolate
             )
         
@@ -282,6 +284,164 @@ class EnsembleGeoSeries(EnsembleSeries):
         for s in mapped_age.T:
             series_tmp = geo_series.copy()
             series_tmp.time = s
+            series_list.append(series_tmp)
+
+        return EnsembleGeoSeries(series_list)
+    
+    @classmethod
+    def from_PaleoEnsembleArray(self, geo_series, paleo_array, paleo_depth = None, age_depth = None, extrapolate=True,verbose=True):
+        '''Function to create an EnsembleGeoSeries object using a paleo ensemble
+
+        Function assumes that the input series and the age array share the same units.
+        If depth vectors are passed, these are also assumed to share the same units
+
+        Parameters
+        ----------
+        geo_series : pyleoclim.core.series.Series
+            A Series object with the values to be mapped
+
+        paleo_array : np.array
+            An array of paleo values to map the values to
+
+        paleo_depth : vector
+            An array of depths corresponding to the paleo values
+
+        age_depth : vector
+            An array of depths corresponding to the time axis of the series object
+
+        extrapolate : bool
+            Whether to extrapolate the age array to the value depth. Default is True
+
+        verbose : bool
+            Whether to print warnings. Default is True
+
+        Returns
+        -------
+        EnsembleSeries : pyleoclim.core.ensembleseries.EnsembleSeries
+            The ensemble created using the time axes from age_array and the values from series.
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+
+            #Create an ensemble of 100 series with random time axes of length 1000
+
+            length = 1000
+            paleo_array = np.array([np.random.normal(0, 1, 1000) for _ in range(100)]).T
+
+            #Create a random geoseries
+            value = np.random.normal(0,1,length)
+            time = pyleo.utils.tsmodel.random_time_axis(length)
+            lat = np.random.randint(-90,90)
+            lon = np.random.randint(-180,180)
+            geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon, verbose=False)
+
+            #Create an ensemble using these objects
+            #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
+            ens = pyleo.EnsembleGeoSeries.from_PaleoEnsembleArray(geo_series = geo_series,paleo_array=paleo_array,verbose=False)
+
+        .. jupyter-execute::
+
+            #In this example we'll explicitly pass the depth vectors
+
+            paleo_length = 1000
+            paleo_array = np.array([np.random.normal(0, 1, 1000) for _ in range(100)]).T
+            paleo_depth = np.arange(paleo_length)
+
+            age_length = 800
+            value = np.random.normal(0,1,age_length)
+            time = pyleo.utils.tsmodel.random_time_axis(age_length)
+            lat = np.random.randint(-90,90)
+            lon = np.random.randint(-180,180)
+            geo_series = pyleo.GeoSeries(time=time, value=value, lat=lat, lon=lon, verbose=False)
+            age_depth = np.arange(age_length)
+
+            ens = pyleo.EnsembleGeoSeries.from_PaleoEnsembleArray(geo_series = geo_series,paleo_array=paleo_array,paleo_depth=paleo_depth,age_depth=age_depth,verbose=False)
+
+        .. jupyter-execute::
+        
+            #Depth can also be passed via the GeoSeries object
+
+            paleo_length = 1000
+            paleo_array = np.array([np.random.normal(0, 1, 1000) for _ in range(100)]).T
+            paleo_depth = np.arange(paleo_length)
+
+            age_length = 800
+            value = np.random.normal(0,1,age_length)
+            time = pyleo.utils.tsmodel.random_time_axis(age_length)
+            lat = np.random.randint(-90,90)
+            lon = np.random.randint(-180,180)
+            depth = np.arange(age_length)
+            geo_series = pyleo.GeoSeries(time=time, value=value, depth=depth,lat=lat, lon=lon, verbose=False)
+
+            ens = pyleo.EnsembleGeoSeries.from_PaleoEnsembleArray(geo_series = geo_series,paleo_array=paleo_array,paleo_depth=paleo_depth,verbose=False)
+            
+        '''
+
+        if not isinstance(geo_series, GeoSeries):
+            raise ValueError('series must be a Series object')
+
+        #squeeze paleoValues into a vector
+        time = np.squeeze(np.array(geo_series.time))
+        
+        if paleo_depth is None:
+            if age_depth is None:
+                if len(time) != paleo_array.shape[0]:
+                    raise ValueError("Paleo array and series need to have the same length when paleo_depth is not passed.")
+                else:
+                    mapped_paleo = paleo_array
+                pass
+            else:
+                raise ValueError('Paleo_depth not found. Please pass both a paleo depth array and age depth array if the paleo ensemble and age are not already aligned. Otherwise, pass neither.')
+        else:
+            #Check that both arrays were passed
+            if age_depth is None:
+                if geo_series.depth is None:
+                    raise ValueError('Age_depth not found. Please pass both a value depth array and age depth array if value and age are not already aligned. Otherwise, pass neither.')
+                else:
+                    age_depth = geo_series.depth
+            elif age_depth is not None and geo_series.depth is not None:
+                if verbose:
+                    warnings.warn('Both an age depth array and a series depth array were passed. The age depth array will be used')
+                else:
+                    pass
+            
+            #Make sure that numpy arrays were given and try to coerce them into vectors if possible
+            age_depth=np.squeeze(np.array(age_depth))
+            paleo_depth = np.squeeze(np.array(paleo_depth))
+
+            #Check that arrays are vectors for np.interp
+            if age_depth.ndim > 1:
+                raise ValueError('age_depth has more than one dimension, please pass it as a vector')
+            if paleo_depth.ndim > 1:
+                raise ValueError('paleo_depth has more than one dimension, please pass it as a vector')
+            #Check that the shape of the depth arrays matches up with the age array and value vector (separately)
+            if len(paleo_depth)!=paleo_array.shape[0]:
+                raise ValueError("Paleo depth and paleo array need to have the same length")
+            if len(age_depth)!=len(time):
+                raise ValueError("Age depth and series time need to have the same length")
+            
+            #Interpolate the age array to the value depth
+            mapped_paleo = lipdutils.mapAgeEnsembleToPaleoData(
+                ensembleValues=paleo_array, 
+                depthEnsemble=paleo_depth, 
+                depthMapping=age_depth,
+                extrapolate=extrapolate
+            )
+        
+        series_list = []
+
+        #check that mapped_age and the original time vector are similar, and that the object is not a geoseries object
+        if verbose:
+            if (np.mean(mapped_paleo[-1,:]) > 10*geo_series.value[-1]) or (np.mean(mapped_paleo[-1,:]) < 0.1*geo_series.value[-1]):
+                warnings.warn('The mapped value array is significantly different from the original value vector. You may want to check that the units are appropriate.')
+            elif (np.mean(mapped_paleo[0,:]) > 10*geo_series.value[0]) or (np.mean(mapped_paleo[0,:]) < 0.1*geo_series.value[0]):
+                warnings.warn('The mapped value array is significantly different from the original value vector. You may want to check that the units are appropriate.')
+        
+        for s in mapped_paleo.T:
+            series_tmp = geo_series.copy()
+            series_tmp.value = s
             series_list.append(series_tmp)
 
         return EnsembleGeoSeries(series_list)
