@@ -108,7 +108,11 @@ class EnsembleSeries(MultipleSeries):
         '''
 
         if not isinstance(series, Series):
-            raise ValueError('series must be a GeoSeries object')
+            raise ValueError('series must be a Series object')
+        
+        if verbose:
+            if hasattr(series,'lat') or hasattr(series,'lon'):
+                warnings.warn('Passed series object looks like a geoseries object, did you mean to use EnsembleGeoSeries.from_AgeEnsembleArray?')
 
         #squeeze paleoValues into a vector
         values = np.squeeze(np.array(series.value))
@@ -152,7 +156,7 @@ class EnsembleSeries(MultipleSeries):
         
         series_list = []
 
-        #check that mapped_age and the original time vector are similar
+        #check that mapped_age and the original time vector are similar, and that the object is not a geoseries object
         if verbose:
             if (np.mean(mapped_age[-1,:]) > 10*series.time[-1]) or (np.mean(mapped_age[-1,:]) < 0.1*series.time[-1]):
                 warnings.warn('The mapped age array is significantly different from the original time vector. You may want to check that the units are appropriate.')
