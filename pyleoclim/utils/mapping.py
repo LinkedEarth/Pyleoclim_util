@@ -723,16 +723,17 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                      fig=None, color_scale_type=None,  # gs_slot=None,
                      cmap=None, **kwargs):
 
+        # ensure these are dictionaries if not specified in the function call
         scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
         lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
         kwargs = {} if type(kwargs) != dict else kwargs
+
+        # color mapping specs
         norm_kwargs = kwargs.pop('norm_kwargs', {})
         ax_sm = kwargs.pop('scalar_mappable', None)
 
         palette = None
         hue_norm = None
-        # if (color_scale_type is not None) and (colorbar is None):
-        #         colorbar = True
 
         # plot_defaults = copy.copy(PLOT_DEFAULT)
         f = copy.copy(PLOT_DEFAULT)
@@ -759,12 +760,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 ax = fig.add_subplot()
 
         transform = ccrs.PlateCarree()
-        # if type(ax) == cartopy.mpl.geoaxes.GeoAxes:
-        #     transform=ccrs.PlateCarree()
-        #     if proj is not None:
-        #         scatter_kwargs['transform'] = ccrs.PlateCarree()#proj
-        #     else:
-        #         scatter_kwargs['transform'] = ccrs.PlateCarree()
 
         missing_d = {'hue': kwargs['missing_val_hue'] if 'missing_val_hue' in kwargs else 'k',
                      'marker': kwargs['missing_val_marker'] if 'missing_val_marker' in kwargs else r'$?$',
@@ -776,13 +771,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if isinstance(scatter_kwargs, dict):
             edgecolor = scatter_kwargs.pop('edgecolor', edgecolor)
 
+        if isinstance(scatter_kwargs, dict):
+            linewidth = scatter_kwargs.pop('linewidth', 1)
+
         if 'neighbor' in df.columns:
             edgecolor_var = 'neighbor'
-        # if ~isinstance(edgecolor, np.ndarray):
-        #     if isinstance(edgecolor, str):
-        #         edgecolor = [edgecolor]
-        #     edgecolor = np.array(edgecolor)
-
 
         if isinstance(edgecolor, (list, np.ndarray)):
             if len(edgecolor) == len(_df):
@@ -801,6 +794,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if hue_var is not None:
             hue_var_type_numeric = all(isinstance(i, (int, float)) for i in _df[_df[hue_var] != missing_val][
                 hue_var])  # pd.to_numeric(_df[hue_var], errors='coerce').notnull().all()
+        if hue_var_type_numeric is False:
+            colorbar = False
 
         marker_var = marker_var if marker_var in _df.columns else None
         marker_var_type_numeric = False
@@ -812,6 +807,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if size_var is not None:
             size_var_type_numeric = all(isinstance(i, (int, float)) for i in _df[_df[size_var] != missing_val][
                 size_var])  # pd.to_numeric(_df[size_var], errors='coerce').notnull().all()
+
+        # if maker is None, and colorbar is True, legend should be False
+        if (marker_var is None):
+            if (colorbar is True):
+                legend = False
 
         trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if
                       ((trait_var != None) and (trait_var in _df.columns))]
@@ -887,12 +887,13 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
         # use hue mapping if supplied
         if 'hue_mapping' in kwargs:
-            palette = kwargs['hue_mapping']
+            palette = kwargs.pop('hue_mapping', None)
         # there should be different control for discrete and continuous hue
         elif hue_var == 'archiveType':
             palette = {key: value[0] for key, value in plot_defaults.items()}
         elif isinstance(hue_var,str): #hue_var) == str:
             hue_data = _df[_df[hue_var] != missing_val]
+
             # If scalar mappable was passed, try to extract components.
             if ax_sm is not None:
                 try:
@@ -904,13 +905,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 except:
                     hue_norm = None
 
+            # should not be changed to else, as the above block can set ax_sm to None
             if ax_sm is None:
-                if cmap != None:
+                if cmap is not None:
                     palette = cmap
                 if len(hue_data[hue_var]) > 0:
                     if hue_var_type_numeric is not True:
-                        # trait_val_types = [True if type(val) in (np.str_, str) else False for val in hue_data[hue_var]]
-                        # if True in trait_val_types:
                         colorbar = False
                         if len(hue_data[hue_var].unique()) < 20:
                             palette = 'tab20'
@@ -953,7 +953,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 if 'neighbor' in hue_data.columns:
                     sns.scatterplot(data=hue_data, x=x, y=y, size=size_var,
                                     transform=transform,
-                                    edgecolor=hue_data.edgecolor.values, linewidth=2,
+                                    edgecolor=hue_data.edgecolor.values, linewidth=linewidth,
                                     style=marker_var, hue=hue_var, palette=[missing_d['hue'] for ik in range(len(hue_data))],
                                      ax=ax, legend=False,
                                     **scatter_kwargs)
@@ -997,13 +997,13 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             if 'neighbor' in hue_data.columns:
                 sns.scatterplot(data=hue_data, x=x, y=y, size=size_var,
                                 transform=transform,
-                                edgecolor=hue_data.edgecolor.values,linewidth=2,
+                                edgecolor=hue_data.edgecolor.values,linewidth=linewidth,
                                 style=marker_var, hue=hue_var, palette=palette, ax=ax, legend=False, **scatter_kwargs)
             if not isinstance(edgecolor, str):
                 edgecolor = None
                 linewidth = 0
             else:
-                linewidth = 1
+                linewidth = linewidth
 
             sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var, transform=transform,
                             edgecolor=edgecolor,linewidth=linewidth,
