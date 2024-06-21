@@ -700,13 +700,22 @@ class PSD:
             ylim = [np.min(x_axis), np.max(x_axis)]
             xlim = [np.min(y_axis), np.max(y_axis)]
             x_axis, y_axis = y_axis, x_axis
-            ax.plot(x_axis,y_axis, **plot_kwargs)
+            # ax.plot(x_axis,y_axis, **plot_kwargs)
 
             xticks, yticks = yticks, xticks
             xlabel, ylabel = ylabel, xlabel
-        else:
-            ax.set_xlim(xlim)
-            ax.plot(x_axis, y_axis, **plot_kwargs)
+        # else:
+        #     ax.set_xlim(xlim)
+        #     ax.plot(x_axis, y_axis, **plot_kwargs)
+
+        ax = plotting.plot_xy(
+            x_axis, y_axis,
+            figsize=figsize, xlabel=xlabel, ylabel=ylabel,
+            title=title, savefig_settings=savefig_settings,
+            ax=ax, legend=legend, xlim=xlim, ylim=ylim,
+            plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
+            # invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis
+        )
 
         #
         # if transpose:
@@ -735,16 +744,33 @@ class PSD:
                 idx = np.argwhere(q.frequency==0)
                 signif_x_axis = 1/np.delete(q.frequency, idx) if in_period else np.delete(q.frequency, idx)
                 signif_y_axis = np.delete(q.amplitude, idx)
+                legend = True
                 if transpose:
                     signif_x_axis, signif_y_axis = signif_y_axis, signif_x_axis
 
-                ax.plot(
+                plot_kwargs = {'label': f'{signif_method_label[self.signif_method]}, {q.label} threshold',
+                               'color': signif_clr,
+                               'linestyle': signif_linestyles[i%3],
+                               'linewidth': signif_linewidth}
+
+                ax = plotting.plot_xy(
                     signif_x_axis, signif_y_axis,
-                    label=f'{signif_method_label[self.signif_method]}, {q.label} threshold',
-                    color=signif_clr,
-                    linestyle=signif_linestyles[i%3],
-                    linewidth=signif_linewidth,
+                    # figsize=figsize,
+                    # xlabel=xlabel, ylabel=ylabel,
+                    # title=title, savefig_settings=savefig_settings,
+                    ax=ax, legend=legend,
+                    # xlim=xlim, ylim=ylim,
+                    plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
+                    # invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis
                 )
+
+                # ax.plot(
+                #     signif_x_axis, signif_y_axis,
+                #     label=f'{signif_method_label[self.signif_method]}, {q.label} threshold',
+                #     color=signif_clr,
+                #     linestyle=signif_linestyles[i%3],
+                #     linewidth=signif_linewidth,
+                # )
 
         if in_loglog:
             ax.set_xscale('log')
@@ -760,8 +786,8 @@ class PSD:
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        # ax.set_xlabel(xlabel)
+        # ax.set_ylabel(ylabel)
 
         if plot_beta and self.beta_est_res is not None:
             plot_beta_kwargs = {
@@ -775,23 +801,36 @@ class PSD:
             beta_y_axis = self.beta_est_res['Y_reg']
             if transpose:
                 beta_x_axis, beta_y_axis = beta_y_axis, beta_x_axis
-            ax.plot(beta_x_axis, beta_y_axis , **plot_beta_kwargs)
+            # ax.plot(beta_x_axis, beta_y_axis , **plot_beta_kwargs)
+            legend = True
+            ax = plotting.plot_xy(
+                beta_x_axis, beta_y_axis,
+                # figsize=figsize,
+                # xlabel=xlabel, ylabel=ylabel,
+                title=title,
+                # savefig_settings=savefig_settings,
+                ax=ax, legend=legend,
+                # xlim=xlim, ylim=ylim,
+                plot_kwargs=plot_beta_kwargs, lgd_kwargs=lgd_kwargs,
+                # invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis
+            )
 
-        if legend:
-            lgd_args = {'frameon': False}
-            lgd_args.update(lgd_kwargs)
-            ax.legend(**lgd_args)
+        # print('psd leg', legend)
+        # if legend:
+        #     lgd_args = {'frameon': False}
+        #     lgd_args.update(lgd_kwargs)
+        #     ax.legend(**lgd_args)
 
-        if title is not None:
-            ax.set_title(title)
+        # if title is not None:
+        #     ax.set_title(title)
 
-        if xlim is not None:
-            if False not in np.isfinite(xlim):
-                ax.set_xlim(xlim)
-
-        if ylim is not None:
-            if False not in np.isfinite(ylim):
-                ax.set_ylim(ylim)
+        # if xlim is not None:
+        #     if False not in np.isfinite(xlim):
+        #         ax.set_xlim(xlim)
+        #
+        # if ylim is not None:
+        #     if False not in np.isfinite(ylim):
+        #         ax.set_ylim(ylim)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
