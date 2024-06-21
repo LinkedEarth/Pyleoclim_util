@@ -300,6 +300,13 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
 
+    if 'label' in plot_kwargs.keys():
+        if plot_kwargs['label'] is None:
+            plot_kwargs.pop('label')
+
+    if 'label' not in plot_kwargs.keys():
+        legend = False
+
     ax.plot(x, y, **plot_kwargs)
 
     if xlabel is not None:
@@ -311,14 +318,19 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     if title is not None:
         ax.set_title(title)
 
+    # if xlim is not None:
+    #     ax.set_xlim(xlim)
     if xlim is not None:
-        ax.set_xlim(xlim)
+        if False not in np.isfinite(xlim):
+            ax.set_xlim(xlim)
 
     if ylim is not None:
         ax.set_ylim(ylim)
 
-    # if 'label' not in plot_kwargs.keys():
-    #     legend = False
+    if ylim is not None:
+        if False not in np.isfinite(ylim):
+            ax.set_ylim(ylim)
+
 
     if legend is True:
         if len(lgd_kwargs)>0:
@@ -1421,3 +1433,7 @@ def keep_center_colormap(cmap, vmin, vmax, center=0):
     newmap = mpl.colors.ListedColormap(newcolors[beg:end])
 
     return newmap
+
+def tidy_labels(label):
+    ''' Tidy up the label string'''
+    return label.rstrip().lstrip().rstrip(',').lstrip(',')
