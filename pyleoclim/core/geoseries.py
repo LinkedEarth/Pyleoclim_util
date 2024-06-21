@@ -410,7 +410,7 @@ class GeoSeries(Series):
     def map_neighbors(self, mgs, radius=3000, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None,
-            figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
+            figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor=None,#'w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
         
@@ -522,11 +522,21 @@ class GeoSeries(Series):
         df_self = mapping.make_df(self, hue=hue, marker=marker, size=size)
 
         neighborhood = pd.concat([df, df_self], axis=0)
+
         # additional columns are added manually
         neighbor_coloring = ['w' for ik in range(len(neighborhood))]
-        neighbor_coloring[-1] = 'k'
+
+        neighbor_status = ['neighbor' for ik in range(len(neighborhood))]
+        neighbor_status[-1] = 'target'
+        neighborhood['neighbor_status'] = neighbor_status
+
+        if edgecolor is None:
+            edgecolor = 'k'
+            if isinstance(scatter_kwargs, dict):
+                edgecolor = scatter_kwargs.pop('edgecolor', 'k')
+
+        neighbor_coloring[-1] = edgecolor
         neighborhood['original'] =neighbor_coloring
-        neighborhood['neighbors'] =neighbor_coloring
 
         # plot neighbors
 
