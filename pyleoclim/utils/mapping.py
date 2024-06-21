@@ -23,7 +23,7 @@ from matplotlib.colors import TwoSlopeNorm
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
-from .plotting import savefig, make_scalar_mappable, keep_center_colormap, consolidate_legends
+from .plotting import savefig, make_scalar_mappable, keep_center_colormap, consolidate_legends, tidy_labels
 from .lipdutils import PLOT_DEFAULT, LipdToOntology, CaseInsensitiveDict
 
 
@@ -723,16 +723,17 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                      fig=None, color_scale_type=None,  # gs_slot=None,
                      cmap=None, **kwargs):
 
+        # ensure these are dictionaries if not specified in the function call
         scatter_kwargs = {} if type(scatter_kwargs) != dict else scatter_kwargs
         lgd_kwargs = {} if type(lgd_kwargs) != dict else lgd_kwargs
         kwargs = {} if type(kwargs) != dict else kwargs
+
+        # color mapping specs
         norm_kwargs = kwargs.pop('norm_kwargs', {})
         ax_sm = kwargs.pop('scalar_mappable', None)
 
         palette = None
         hue_norm = None
-        # if (color_scale_type is not None) and (colorbar is None):
-        #         colorbar = True
 
         # plot_defaults = copy.copy(PLOT_DEFAULT)
         f = copy.copy(PLOT_DEFAULT)
@@ -759,12 +760,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 ax = fig.add_subplot()
 
         transform = ccrs.PlateCarree()
-        # if type(ax) == cartopy.mpl.geoaxes.GeoAxes:
-        #     transform=ccrs.PlateCarree()
-        #     if proj is not None:
-        #         scatter_kwargs['transform'] = ccrs.PlateCarree()#proj
-        #     else:
-        #         scatter_kwargs['transform'] = ccrs.PlateCarree()
 
         missing_d = {'hue': kwargs['missing_val_hue'] if 'missing_val_hue' in kwargs else 'k',
                      'marker': kwargs['missing_val_marker'] if 'missing_val_marker' in kwargs else r'$?$',
@@ -776,13 +771,14 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if isinstance(scatter_kwargs, dict):
             edgecolor = scatter_kwargs.pop('edgecolor', edgecolor)
 
+        if isinstance(scatter_kwargs, dict):
+            linewidth = scatter_kwargs.pop('linewidth', 1)
+
+        if isinstance(lgd_kwargs, dict):
+            handle_size = lgd_kwargs.pop('handle_size', 11)
+
         if 'neighbor' in df.columns:
             edgecolor_var = 'neighbor'
-        # if ~isinstance(edgecolor, np.ndarray):
-        #     if isinstance(edgecolor, str):
-        #         edgecolor = [edgecolor]
-        #     edgecolor = np.array(edgecolor)
-
 
         if isinstance(edgecolor, (list, np.ndarray)):
             if len(edgecolor) == len(_df):
@@ -796,11 +792,14 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             if edgecolor_var in _df.columns:
                 _df['edgecolor'] = _df[edgecolor_var].map(edgecolor)
 
+        _df = _df.apply(lambda x: tidy_labels(x) if x.dtype == "str" else x)
         hue_var = hue_var if hue_var in _df.columns else None
         hue_var_type_numeric = False
         if hue_var is not None:
             hue_var_type_numeric = all(isinstance(i, (int, float)) for i in _df[_df[hue_var] != missing_val][
                 hue_var])  # pd.to_numeric(_df[hue_var], errors='coerce').notnull().all()
+        if hue_var_type_numeric is False:
+            colorbar = False
 
         marker_var = marker_var if marker_var in _df.columns else None
         marker_var_type_numeric = False
@@ -812,6 +811,11 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if size_var is not None:
             size_var_type_numeric = all(isinstance(i, (int, float)) for i in _df[_df[size_var] != missing_val][
                 size_var])  # pd.to_numeric(_df[size_var], errors='coerce').notnull().all()
+
+        # if maker is None, and colorbar is True, legend should be False
+        if (marker_var is None):
+            if (colorbar is True):
+                legend = False
 
         trait_vars = [trait_var for trait_var in [hue_var, marker_var, size_var] if
                       ((trait_var != None) and (trait_var in _df.columns))]
@@ -887,12 +891,13 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
         # use hue mapping if supplied
         if 'hue_mapping' in kwargs:
-            palette = kwargs['hue_mapping']
+            palette = kwargs.pop('hue_mapping', None)
         # there should be different control for discrete and continuous hue
         elif hue_var == 'archiveType':
             palette = {key: value[0] for key, value in plot_defaults.items()}
         elif isinstance(hue_var,str): #hue_var) == str:
             hue_data = _df[_df[hue_var] != missing_val]
+
             # If scalar mappable was passed, try to extract components.
             if ax_sm is not None:
                 try:
@@ -904,13 +909,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 except:
                     hue_norm = None
 
+            # should not be changed to else, as the above block can set ax_sm to None
             if ax_sm is None:
-                if cmap != None:
+                if cmap is not None:
                     palette = cmap
                 if len(hue_data[hue_var]) > 0:
                     if hue_var_type_numeric is not True:
-                        # trait_val_types = [True if type(val) in (np.str_, str) else False for val in hue_data[hue_var]]
-                        # if True in trait_val_types:
                         colorbar = False
                         if len(hue_data[hue_var].unique()) < 20:
                             palette = 'tab20'
@@ -935,6 +939,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         if ((type(hue_var) == str) and (type(palette) == dict)):
             residual_traits = [trait for trait in _df[hue_var].unique() if
                                trait not in palette.keys()]
+
             if len(residual_traits) > 0:
                 print(residual_traits)
 
@@ -953,7 +958,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 if 'neighbor' in hue_data.columns:
                     sns.scatterplot(data=hue_data, x=x, y=y, size=size_var,
                                     transform=transform,
-                                    edgecolor=hue_data.edgecolor.values, linewidth=2,
+                                    edgecolor=hue_data.edgecolor.values, linewidth=linewidth,
                                     style=marker_var, hue=hue_var, palette=[missing_d['hue'] for ik in range(len(hue_data))],
                                      ax=ax, legend=False,
                                     **scatter_kwargs)
@@ -997,13 +1002,13 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             if 'neighbor' in hue_data.columns:
                 sns.scatterplot(data=hue_data, x=x, y=y, size=size_var,
                                 transform=transform,
-                                edgecolor=hue_data.edgecolor.values,linewidth=2,
+                                edgecolor=hue_data.edgecolor.values,linewidth=linewidth,
                                 style=marker_var, hue=hue_var, palette=palette, ax=ax, legend=False, **scatter_kwargs)
             if not isinstance(edgecolor, str):
                 edgecolor = None
                 linewidth = 0
             else:
-                linewidth = 1
+                linewidth = linewidth
 
             sns.scatterplot(data=hue_data, x=x, y=y, hue=hue_var, size=size_var, transform=transform,
                             edgecolor=edgecolor,linewidth=linewidth,
@@ -1018,7 +1023,17 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             missing_handles, missing_labels = ax.get_legend_handles_labels()
 
         # h, l= consolidate_legends([ax], hue=hue_var, style =marker_var, size=size_var, colorbar=colorbar)
+        def replace_last(source_string, replace_what, replace_with):
+            head, _sep, tail = source_string.rpartition(replace_what)
+            return head + replace_with + tail
+
         h, l = ax.get_legend_handles_labels()
+        # l = [replace_last(label, ' ', '\n') if len(label)>20 else label for label in l]
+        l = [label.replace(', ', ',\n') if len(label)>20 else label for label in l]
+        if len(l)> 20:
+            ncols=2
+        else:
+            ncols = 1
 
         if ((len(l) == 2) and (l[-1] == 'missing')) or (len(l) < 2):
             legend = False
@@ -1056,10 +1071,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                             # first pass at sig figs approach to number formatting
                             _label = np.format_float_positional(np.float16(pair_l[ik]), unique=True, precision=2)
                         except:
-                            try:
-                                _label = LipdToOntology(pair_l[ik])
-                            except:
-                                _label = pair_l[ik]
+                            _label = pair_l[ik]
+                            if label == 'archiveType':
+                                try:
+                                    _label = LipdToOntology(pair_l[ik])
+                                except:
+                                    pass
                         if _label not in d_leg[key]['labels']:
                             d_leg[key]['labels'].append(_label)
                             d_leg[key]['handles'].append(pair_h[ik])
@@ -1074,6 +1091,15 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 #     # ax_d.pop('leg', None)
                 # else:
                 #     d_leg.pop(hue_var, None)
+        # print(d_leg, d_leg.keys())
+        tmpHandles = []
+        for key in [hue_var, marker_var]:
+            if key in d_leg.keys():
+                for handle in d_leg[key]['handles']:
+                    handle.set_markersize(handle_size)
+            # tmpHandles.append(handle)
+
+        # d_leg[hue_var]['handles'] = tmpHandles
 
         if (legend is True) and (len(d_leg.keys()) > 0):
             # Finally rebuild legend in single list with formatted section headers
@@ -1110,10 +1136,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 handles.append(han)
                 labels.append('')
 
-            if 'loc' not in lgd_kwargs:
+            if 'loc' not in lgd_kwargs.keys():
                 lgd_kwargs['loc'] = 'upper left'
-            if 'bbox_to_anchor' not in lgd_kwargs:
+            if 'bbox_to_anchor' not in lgd_kwargs.keys():
                 lgd_kwargs['bbox_to_anchor'] = (-.1, 1)  # (1, 1)
+            if 'labelspacing' not in lgd_kwargs.keys():
+                lgd_kwargs['labelspacing'] = .275
 
             built_legend = ax_leg.legend(handles, labels, **lgd_kwargs)
             if headers is True:
@@ -1125,9 +1153,6 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
             ax_leg.set_axis_off()
             ax.legend().remove()
-            # if colorbar == False:
-            #     ax_cb.remove()
-            #     ax_d.pop('cb', None)
 
         else:
             ax.legend().remove()

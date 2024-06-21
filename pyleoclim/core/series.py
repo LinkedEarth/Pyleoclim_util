@@ -1063,6 +1063,9 @@ class Series:
         if zorder is not None:
             plot_kwargs.update({'zorder': zorder})
 
+        if self.label is None:
+            legend =False
+
         res = plotting.plot_xy(
             self.time, self.value,
             figsize=figsize, xlabel=xlabel, ylabel=ylabel,
