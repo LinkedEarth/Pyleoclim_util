@@ -36,7 +36,11 @@ class EnsembleSeries(MultipleSeries):
     and visualization (e.g., envelope plot) that are unavailable to other classes.
 
     '''
+    
     def __init__(self, series_list, label=None):
+        for i, ts in enumerate(series_list):
+            if ts.label is None:
+                series_list[i].label = f"#{i}"  # assign labels if missing
         self.series_list = series_list
         self.label = label
 
@@ -1376,7 +1380,7 @@ class EnsembleSeries(MultipleSeries):
         
         if axis == 'value':
             for ts in self.series_list:
-                if ts.label is None:
+                if ts.label is None: # should no longer be necessary now that it's done in __init__
                     df_dict[idx]=ts.value
                 else:
                     df_dict[ts.label]=ts.value
@@ -1384,7 +1388,7 @@ class EnsembleSeries(MultipleSeries):
         
         elif axis == 'time':
             for ts in self.series_list:
-                if ts.label is None:
+                if ts.label is None: # should no longer be necessary now that it's done in __init__
                     df_dict[idx]=ts.time
                 else:
                     df_dict[ts.label]=ts.time
