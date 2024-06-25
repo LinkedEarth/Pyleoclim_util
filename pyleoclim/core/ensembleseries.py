@@ -36,7 +36,12 @@ class EnsembleSeries(MultipleSeries):
     and visualization (e.g., envelope plot) that are unavailable to other classes.
 
     '''
+    
     def __init__(self, series_list, label=None):
+        for i, ts in enumerate(series_list):
+            if ts.label is None:
+                print("assign labels if missing")
+                series_list[i].label = f"#{i}"  # assign labels if missing
         self.series_list = series_list
         self.label = label
 
