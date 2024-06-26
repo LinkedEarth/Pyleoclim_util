@@ -44,24 +44,24 @@ class CaseInsensitiveDict(dict):
 #                      'Other': ['k', 'o']
 #                     }
 
-PLOT_DEFAULT = {'GroundIce': ['slategray', '*'],
-                'GlacierIce': ['deepskyblue', '*'],
+PLOT_DEFAULT = {'GlacierIce': ['deepskyblue', '*'],
+                'GroundIce': ['slategray', '*'],
                      'Borehole': ['#FFD600', 's'],
                      'Coral': ['#FF8B00', 'v'],
                      'Sclerosponge': ['r', 'v'],
                      'Documents': ['#f8d568', 'p'],     
                      'Hybrid': ['#808000', 'H'],
-                     'LakeSediment': ['#8f8fa1', 'o'],
+                     'LakeSediment': ['#1170aa', 'o'],
                      'MarineSediment': ['#8A4513', 'o'],
-                     'FluvialSediment': ['#4169E0','o'],
-                     'TerrestrialSediment': ['#d2b48c','o'],
+                     'FluvialSediment': ['#5fa2ce','o'],
+                     'TerrestrialSediment': ['#57606c','o'],
                      'Speleothem': ['#FF1492', 'd'],
-                     'Wood': ['#32CC32', '^'], 
+                     'Wood': ['#8CD17D', '^'], 
                      'MolluskShell': ['#7b03fc', 'h'],
                      'Peat': ['#8A9A5B', 'X'],
                      'Midden': ['#824E2B', 'X'], 
                      'Shoreline': ['#40826D','o'],
-                     'Instrumental' : ['#8f21d8', '8'],
+                     'Instrumental' : ['#8f21d8', 'D'],
                      'Model' : ['#b4a7d6', "D"],
                      'Other': ['k', 'o']
                     }
