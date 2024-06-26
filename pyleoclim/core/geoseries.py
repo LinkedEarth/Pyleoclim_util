@@ -512,34 +512,51 @@ class GeoSeries(Series):
         # find neighbors
         lats = [ts.lat for ts in mgs.series_list]
         lons = [ts.lon for ts in mgs.series_list]
+        # compute distance from self to all points in supplied catalog
         dist = mapping.compute_dist(self.lat, self.lon, lats, lons)
+        # identify indices of neighbors within specified radius
         neigh_idx = mapping.within_distance(dist, radius)
 
-        neighbors =[mgs.series_list[i] for i in neigh_idx if i !=0]
+        # create a new MultipleGeoSeries object with only the neighbors
+        neighbors =[mgs.series_list[i] for i in neigh_idx]
+        dists = [dist[i] for i in neigh_idx]
         neighbors = MultipleGeoSeries(neighbors)
 
+        # create a dataframe for neighbors and add distance to target
         df = mapping.make_df(neighbors, hue=hue, marker=marker, size=size)
+        df['distance'] = dists
+
+        # create a dataframe for the target
         df_self = mapping.make_df(self, hue=hue, marker=marker, size=size)
+        df_self['distance'] = 0
 
         neighborhood = pd.concat([df, df_self], axis=0)
 
-        # additional columns are added manually
-        neighbor_coloring = ['w' for ik in range(len(neighborhood))]
+        # remove duplicates
+        # keep = "last" is specified to make sure that if the target was included
+        # in the potential neighbor catalog, it is kept as the last record
+        neighborhood = neighborhood.drop_duplicates(keep='last')
 
+        # add a column to specify the status of the record as either neighbor or target
         neighbor_status = ['neighbor' for ik in range(len(neighborhood))]
         neighbor_status[-1] = 'target'
         neighborhood['neighbor_status'] = neighbor_status
 
+        # neighbors are assigned white as edgecolor
+        neighbor_coloring = ['w' for ik in range(len(neighborhood))]
+
+        # if edgecolor is not specified, use black, otherwise, use the specified color
         if edgecolor is None:
             edgecolor = 'k'
             if isinstance(scatter_kwargs, dict):
                 edgecolor = scatter_kwargs.pop('edgecolor', 'k')
 
         neighbor_coloring[-1] = edgecolor
-        neighborhood['original'] =neighbor_coloring
+        neighborhood['edgecolor'] =neighbor_coloring
 
         # plot neighbors
-
+        # in future version, if edgecolor is specified as a dictionary with keys "neighbor" and "target",
+        # and values that are colors, that mapping will be used to color the edges of the points
         fig, ax_d = mapping.scatter_map(neighborhood, fig=fig, gs_slot=gridspec_slot, hue=hue, size=size,
                                         marker=marker, projection=projection,
                                            proj_default=proj_default,
@@ -547,7 +564,7 @@ class GeoSeries(Series):
                                            ocean=ocean, land=land,
                                            figsize=figsize, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
                                            gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
-                                           legend=legend, cmap=cmap, edgecolor=neighborhood['original'].values)
+                                           legend=legend, cmap=cmap, edgecolor=neighborhood['edgecolor'].values)
         return fig, ax_d
     
     def dashboard(self, figsize=[11, 8], gs=None, plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
