@@ -21,27 +21,53 @@ class CaseInsensitiveDict(dict):
     def __getitem__(self, key):
         return super().__getitem__(key.lower().replace(" ", ""))
 
-PLOT_DEFAULT = {'GroundIce': ['#86CDFA', 'h'],
-                     'Borehole': ['#00008b', 'h'],
-                     'Coral': ['#FF8B00', 'o'],
-                     'Documents': ['#f8d568', 'p'],
-                     'GlacierIce': ['#86CDFA', 'd'],
-                     'Hybrid': ['#808000', '*'],
-                     'LakeSediment': ['#8A4513', '^'],
-                     'MarineSediment': ['#8A4513', 's'],
-                     'Sclerosponge': ['r', 'o'],
+# Old one:
+# PLOT_DEFAULT = {'GroundIce': ['#86CDFA', 'h'],
+#                      'Borehole': ['#00008b', 'h'],
+#                      'Coral': ['#FF8B00', 'o'],
+#                      'Documents': ['#f8d568', 'p'],
+#                      'GlacierIce': ['#86CDFA', 'd'],
+#                      'Hybrid': ['#808000', '*'],
+#                      'LakeSediment': ['#8A4513', '^'],
+#                      'MarineSediment': ['#8A4513', 's'],
+#                      'Sclerosponge': ['r', 'o'],
+#                      'Speleothem': ['#FF1492', 'd'],
+#                      'Wood': ['#32CC32', '^'],
+#                      'MolluskShell': ['#FFD600', 'h'],
+#                      'Peat': ['#2F4F4F', '*'],
+#                      'Midden': ['#824E2B', 'o'],
+#                      'FluvialSediment': ['#4169E0','o'],
+#                      'TerrestrialSediment': ['#8A4513','o'],
+#                      'Shoreline': ['#add8e6','o'],
+#                      'Instrumental' : ['#8f21d8', '*'],
+#                      'Model' : ['#b4a7d6', "d"],
+#                      'Other': ['k', 'o']
+#                     }
+
+PLOT_DEFAULT = {'GlacierIce': ['deepskyblue', '*'],
+                'GroundIce': ['slategray', '*'],
+                     'Borehole': ['#FFD600', 's'],
+                     'Coral': ['#FF8B00', 'v'],
+                     'Sclerosponge': ['r', 'v'],
+                     'Documents': ['#f8d568', 'p'],     
+                     'Hybrid': ['#808000', 'H'],
+                     'LakeSediment': ['#1170aa', 'o'],
+                     'MarineSediment': ['#8A4513', 'o'],
+                     'FluvialSediment': ['#5fa2ce','o'],
+                     'TerrestrialSediment': ['#57606c','o'],
                      'Speleothem': ['#FF1492', 'd'],
-                     'Wood': ['#32CC32', '^'],
-                     'MolluskShell': ['#FFD600', 'h'],
-                     'Peat': ['#2F4F4F', '*'],
-                     'Midden': ['#824E2B', 'o'],
-                     'FluvialSediment': ['#4169E0','d'],
-                     'TerrestrialSediment': ['#8A4513','o'],
-                     'Shoreline': ['#add8e6','o'],
-                     'Instrumental' : ['#8f21d8', '*'],
-                     'Model' : ['#b4a7d6', "d"],
+                     'Wood': ['#8CD17D', '^'], 
+                     'MolluskShell': ['#f8d568', 'h'],
+                     'Peat': ['#8A9A5B', 'X'],
+                     'Midden': ['#824E2B', 'X'], 
+                     'Shoreline': ['#40826D','o'],
+                     'Instrumental' : ['#B07AA1', 'D'],
+                     'Model' : ['#E15759', "D"],
                      'Other': ['k', 'o']
                     }
+# as per lipd convention, communicated by David Edge, 06.25.2024
+# var colorPal = {"Borehole":"#FFD600","MolluskShell":"#7b03fc","GlacierIce":"#86CDFA","GroundIce":"#ff6db6","Coral":"#FF8B00","FluvialSediment":"#4169E0","LakeSediment":"#8f8fa1","MarineSediment":"#8A4513","Speleothem":"#FF1492","Midden":"#824E2B","Peat":"#8A9A5B","Sclerosponge":"#D2042D","Shoreline":"#40826D","Wood":"#32CC32","TerrestrialSediment":"#d2b48c"}
+# var shapePal ={"Borehole":"square","MolluskShell":"triangle","GlacierIce":"snowflake","GroundIce":"snowflake","Coral":"triangle-down","FluvialSediment":"circle","LakeSediment":"circle","MarineSediment":"circle","Speleothem":"square","Midden":"diamond","Peat":"triangle-down","Sclerosponge":"triangle","Shoreline":"diamond","Wood":"triangle","TerrestrialSediment":"circle"}
 
 
 """

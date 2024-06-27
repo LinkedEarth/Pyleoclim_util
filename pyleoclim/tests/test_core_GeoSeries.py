@@ -86,7 +86,7 @@ class TestUIGeoSeriesInit:
             print(ts2.value)
             assert ~np.isnan(ts2.value[0])
 
-@pytest.mark.xfail   # will fail until pandas is fixed
+#@pytest.mark.xfail   # will fail until pandas is fixed
 class TestUIGeoSeriesResample():
     ''' test GeoSeries.Resample()
     '''
@@ -111,14 +111,61 @@ class TestUIGeoSeriesMapNeighbors():
         mgs = multiple_pinkgeoseries()
         fig, ax = ts.map_neighbors(mgs, radius=5000)
         pyleo.closefig(fig)
+        
+    @pytest.mark.parametrize('title',[None, False, True, 'Untitled'])    
+    def test_map_neighbors_t2(self, title):
+        PLOT_DEFAULT = pyleo.utils.lipdutils.PLOT_DEFAULT
+        ntypes = len(PLOT_DEFAULT)
 
-class TestUiGeoSeriesMap():
+        lat = np.random.uniform(20,70,ntypes)
+        lon = np.random.uniform(-20,60,ntypes)
+
+        dummy = [1, 2, 3]
+
+        ts = pyleo.GeoSeries(time = dummy, value=dummy, lat=lat.mean(), lon=lon.mean(),
+                             auto_time_params=True, verbose=False, archiveType='Wood',
+                             label='Random Tree')
+        series_list = []
+        for i, key in enumerate(PLOT_DEFAULT.keys()):
+            ser = ts.copy()
+            ser.lat=lat[i]
+            ser.lon=lon[i]
+            ser.archiveType=key
+            ser.label=key
+            series_list.append(ser)
+            
+        mgs = pyleo.MultipleGeoSeries(series_list,time_unit='Years CE', label = 'multi-archive maelstrom')
+
+        fig, ax = ts.map_neighbors(mgs,radius=5000, title = title)
+        
+        if title is None or title == False:
+            assert ax['map'].get_title() == ''
+        elif title == True:
+            assert ax['map'].get_title() == 'multi-archive maelstrom neighbors for Random Tree within 5000 km'
+        else:
+            ax['map'].get_title() == 'Untitled'
+        pyleo.closefig(fig)
+
+class TestUIGeoSeriesMap():
     ''' test GeoSeries.map()
     '''
     
     def test_map_t0(self, pinkgeoseries):
         ts = pinkgeoseries
         fig, ax = ts.map()
+        pyleo.closefig(fig)
+        
+    @pytest.mark.parametrize('title',[None, False, True, 'Untitled'])    
+    def test_map_t1(self, pinkgeoseries, title):
+        ts = pinkgeoseries
+        fig, ax = ts.map(title=title)
+        if title is None or title == False:
+            assert ax['map'].get_title() == ''
+        elif title == True:
+            assert ax['map'].get_title() == 'pink noise geoseries location'
+        else:
+            ax['map'].get_title() == 'Untitled'
+        pyleo.closefig(fig)
         pyleo.closefig(fig)
         
         
@@ -133,7 +180,7 @@ def test_segment():
     assert np.array_equal(mgs.series_list[0].value,gs.value[:4000]) 
     assert np.array_equal(mgs.series_list[1].value,gs.value[5000:]) 
     
-class TestUiGeoSeriesDashboard():
+class TestUIGeoSeriesDashboard():
     ''' test GeoSeries.Dashboard
     '''
     
