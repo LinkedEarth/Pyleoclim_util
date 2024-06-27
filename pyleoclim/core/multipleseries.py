@@ -17,7 +17,7 @@ import warnings
 import numpy as np
 from copy import deepcopy
 
-from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator, FormatStrFormatter)
 import matplotlib.transforms as transforms
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -1605,8 +1605,9 @@ class MultipleSeries:
 
     def stackplot(self, figsize=None, savefig_settings=None, time_unit = None, 
                   xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', 
-                  norm=None, labels='auto', ylabel_fontsize = 8, spine_lw=1.5, grid_lw=0.5,
-                  label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
+                  norm=None, labels='auto', ylabel_fontsize = 8, spine_lw=1.5, 
+                  grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5,
+                  yaxis_style = 'minimal', plot_kwargs=None):
         ''' Stack plot of multiple series
 
         Time units are harmonized prior to plotting. 
@@ -1693,6 +1694,12 @@ class MultipleSeries:
             
             Size for ylabel font. Default is 8, to avoid crowding. 
             
+        yaxis_style: str
+            
+            Style of the y-axis. If 'minimal', only the extreme values are shown, bracketed by 2 ticks.
+            If 'detailed', shows major and minor ticks. 
+            Other strings result in default Matplotlib behavior (depends on the assigned style)
+            
         plot_kwargs: dict or list of dict
         
             Arguments to further customize the plot from matplotlib.pyplot.plot.
@@ -1749,6 +1756,13 @@ class MultipleSeries:
         .. jupyter-execute::
 
             fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
+            
+        Using more detailed ticks on the y axis and larger ylabels:
+
+        .. jupyter-execute::
+
+            fig, ax = ms.stackplot(labels=None, ylabel_fontsize = 12,
+                                   yaxis_style = 'detailed')
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -1832,10 +1846,17 @@ class MultipleSeries:
                 ax[idx].text(label_x_loc, mu, labels[idx], horizontalalignment='right', transform=trans, color=clr, weight='bold')
             elif labels==None:
                 pass
-            ax[idx].set_ylim(ylim)
-            ax[idx].set_yticks(ylim)
-            ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            ax[idx].grid(False)
+            if yaxis_style == 'minimal':
+                ax[idx].set_ylim(ylim)
+                ax[idx].set_yticks(ylim)
+                ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            elif yaxis_style == 'detailed':
+                ax[idx].yaxis.set_minor_locator(AutoMinorLocator())
+                ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+                ax[idx].tick_params(which='major', length=7, width=2)
+                ax[idx].tick_params(which='minor', length=4, width=1, color=clr)
+
+                       
             if idx % 2 == 0:
                 ax[idx].spines['left'].set_visible(True)
                 ax[idx].spines['left'].set_linewidth(spine_lw)
@@ -1858,6 +1879,7 @@ class MultipleSeries:
             ax[idx].tick_params(axis='x', which='both', length=0)
             ax[idx].set_xlabel('')
             ax[idx].set_xticklabels([])
+            ax[idx].grid(False) 
             xt = ax[idx].get_xticks()[1:-1]
             for x in xt:
                 ax[idx].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
