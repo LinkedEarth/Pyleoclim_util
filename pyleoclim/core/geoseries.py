@@ -296,7 +296,7 @@ class GeoSeries(Series):
     
     def map(self, projection='Orthographic', proj_default=True,
             background=True, borders=False, coastline=True, rivers=False, lakes=False, ocean=True,
-            land=True, fig=None, gridspec_slot=None,
+            land=True, fig=None, gridspec_slot=None, title = None,
             figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
@@ -388,17 +388,36 @@ class GeoSeries(Series):
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
             fig, ax = ts.map()
+            
+        By default, the figure has no title. For a title built from the available labels:
+            
+        .. jupyter-execute::
+            
+           fig, ax = ts.map(title=True) 
+           
+        For a custom title, and custom projection:
+            
+        .. jupyter-execute::
+            
+           fig, ax = ts.map(title='Insert title here', projection='RotatedPole',
+                            proj_default={'pole_longitude':0.0, 'pole_latitude':-90.0, 'central_rotated_longitude':45.0}) 
 
 
         '''
         if markersize != None:
             scatter_kwargs['markersize'] = markersize
+            
+        if type(title)==bool:
+            if title == False:
+                title = None
+            else:
+                if self.label is not None:
+                    title = f"{self.label} location"
 
         fig, ax_d = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
-                    proj_default=proj_default,
+                    proj_default=proj_default, title = title,
                     background=background, borders=borders, rivers=rivers, lakes=lakes,
                     ocean=ocean, land=land, coastline=coastline,
                     figsize=figsize, scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
@@ -504,9 +523,22 @@ class GeoSeries(Series):
                                                 archiveType = row['archiveType'], verbose = False, 
                                                 label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
 
-            mgs = pyleo.MultipleGeoSeries(series_list=ts_list,time_unit='years AD') 
+            mgs = pyleo.MultipleGeoSeries(series_list=ts_list,time_unit='years AD',label='Euro2k') 
             gs = ts_list[6] # extract one record as the target one
             gs.map_neighbors(mgs, radius=4000)
+            
+        By default, the figure has no title. For a title built from the available labels:
+            
+        .. jupyter-execute::
+            
+           gs.map_neighbors(mgs, radius=4000, title=True) 
+           
+        For a custom title:
+            
+        .. jupyter-execute::
+            
+           gs.map_neighbors(mgs, radius=4000, title='Insert title here') 
+              
             
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
