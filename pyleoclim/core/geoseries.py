@@ -409,7 +409,7 @@ class GeoSeries(Series):
     
     def map_neighbors(self, mgs, radius=3000, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
-            land=True, fig=None, gridspec_slot=None,
+            land=True, fig=None, gridspec_slot=None, title = None,
             figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor=None,#'w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
@@ -470,6 +470,10 @@ class GeoSeries(Series):
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+            
+        title : bool or str
+            the title for the figure. If True or None, made automatically from the objects' labels. 
+            Set to False for an empty title. 
 
         Returns
         -------
@@ -554,6 +558,14 @@ class GeoSeries(Series):
         neighbor_coloring[-1] = edgecolor
         neighborhood['edgecolor'] =neighbor_coloring
 
+        if type(title)==bool:
+            if title == False:
+                title = None
+            else:
+                if mgs.label is not None and self.label is not None:
+                    title = f"{mgs.label} neighbors for {self.label} within {radius} km"
+            
+
         # plot neighbors
         # in future version, if edgecolor is specified as a dictionary with keys "neighbor" and "target",
         # and values that are colors, that mapping will be used to color the edges of the points
@@ -561,10 +573,12 @@ class GeoSeries(Series):
                                         marker=marker, projection=projection,
                                            proj_default=proj_default,
                                            background=background, borders=borders, rivers=rivers, lakes=lakes,
-                                           ocean=ocean, land=land,
+                                           ocean=ocean, land=land, title = title,
                                            figsize=figsize, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
                                            gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
                                            legend=legend, cmap=cmap, edgecolor=neighborhood['edgecolor'].values)
+        
+        
         return fig, ax_d
     
     def dashboard(self, figsize=[11, 8], gs=None, plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,

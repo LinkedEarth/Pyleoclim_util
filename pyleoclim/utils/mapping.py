@@ -563,7 +563,7 @@ def make_df(geo_ms, hue=None, marker=None, size=None, cols=None, d=None):
 
 
 def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgecolor='k',
-                proj_default=True, projection='auto', crit_dist=5000,
+                proj_default=True, projection='auto', crit_dist=5000, title = None,
                 background=True, borders=False, coastline=True, rivers=False, lakes=False, ocean=True, land=True,
                 figsize=None, scatter_kwargs=None, gridspec_kwargs=None, extent='global', edgecolor_var=None,
                 lgd_kwargs=None, legend=True, colorbar=True, cmap=None, color_scale_type=None,
@@ -681,7 +681,9 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         - 'missing_val_hue', 'missing_val_marker', 'missing_val_label' can all be used to change the way missing values are represented ('k', '?',  are default hue and marker values will be associated with the label: 'missing').
         - 'hue_mapping' and 'marker_mapping' can be used to submit dictionaries mapping hue values to colors and marker values to markers. Does not replace passing a string value for hue or marker.
         - 'scalar_mappable' can be used to pass a matplotlib scalar mappable. See pyleoclim.utils.plotting.make_scalar_mappable for documentation on using the Pyleoclim utility, or the `Matplotlib tutorial on customizing colorbars <https://matplotlib.org/stable/users/explain/colors/colorbar_only.html>`_.
-
+    
+    title : str
+        the title for the figure
 
     Returns
     -------
@@ -1323,9 +1325,12 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     x = 'lon'
     y = 'lat'
     _, ax_d = plot_scatter(df=df, x=x, y=y, hue_var=hue, size_var=size, marker_var=marker, ax_d=ax_d, proj=None,
-                           edgecolor=edgecolor, colorbar=colorbar, color_scale_type=color_scale_type,
+                           edgecolor=edgecolor, colorbar=colorbar, color_scale_type=color_scale_type, title = title,
                            cmap=cmap, scatter_kwargs=scatter_kwargs, legend=legend, lgd_kwargs=lgd_kwargs,
                            **kwargs)  # , **kwargs)
+    if title is not None:
+        ax_d['map'].set_title(title)
+    
     return fig, ax_d
 
 

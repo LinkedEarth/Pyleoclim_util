@@ -57,12 +57,12 @@ PLOT_DEFAULT = {'GlacierIce': ['deepskyblue', '*'],
                      'TerrestrialSediment': ['#57606c','o'],
                      'Speleothem': ['#FF1492', 'd'],
                      'Wood': ['#8CD17D', '^'], 
-                     'MolluskShell': ['#7b03fc', 'h'],
+                     'MolluskShell': ['#f8d568', 'h'],
                      'Peat': ['#8A9A5B', 'X'],
                      'Midden': ['#824E2B', 'X'], 
                      'Shoreline': ['#40826D','o'],
-                     'Instrumental' : ['#8f21d8', 'D'],
-                     'Model' : ['#b4a7d6', "D"],
+                     'Instrumental' : ['#B07AA1', 'D'],
+                     'Model' : ['#E15759', "D"],
                      'Other': ['k', 'o']
                     }
 # as per lipd convention, communicated by David Edge, 06.25.2024
