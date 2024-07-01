@@ -296,7 +296,7 @@ class GeoSeries(Series):
 
     def map(self, projection='Orthographic', proj_default=True,
             background=True, borders=False, coastline=True, rivers=False, lakes=False, ocean=True,
-            land=True, fig=None, gridspec_slot=None,
+            land=True, fig=None, gridspec_slot=None, title = None,
             figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
@@ -388,17 +388,36 @@ class GeoSeries(Series):
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
             fig, ax = ts.map()
+            
+        By default, the figure has no title. For a title built from the available labels:
+            
+        .. jupyter-execute::
+            
+           fig, ax = ts.map(title=True) 
+           
+        For a custom title, and custom projection:
+            
+        .. jupyter-execute::
+            
+           fig, ax = ts.map(title='Insert title here', projection='RotatedPole',
+                            proj_default={'pole_longitude':0.0, 'pole_latitude':-90.0, 'central_rotated_longitude':45.0}) 
 
 
         '''
         if markersize != None:
             scatter_kwargs['markersize'] = markersize
+            
+        if type(title)==bool:
+            if title == False:
+                title = None
+            else:
+                if self.label is not None:
+                    title = f"{self.label} location"
 
         fig, ax_d = mapping.scatter_map(self, hue=hue, size=size, marker=marker, projection=projection,
-                    proj_default=proj_default,
+                    proj_default=proj_default, title = title,
                     background=background, borders=borders, rivers=rivers, lakes=lakes,
                     ocean=ocean, land=land, coastline=coastline,
                     figsize=figsize, scatter_kwargs=scatter_kwargs, gridspec_kwargs=gridspec_kwargs,
@@ -409,7 +428,7 @@ class GeoSeries(Series):
 
     def map_neighbors(self, mgs, radius=3000, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
-            land=True, fig=None, gridspec_slot=None,
+            land=True, fig=None, gridspec_slot=None, title = None,
             figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor=None,#'w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
@@ -470,6 +489,10 @@ class GeoSeries(Series):
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+            
+        title : bool or str
+            the title for the figure. If True or None, made automatically from the objects' labels. 
+            Set to False for an empty title. 
 
         Returns
         -------
@@ -500,10 +523,22 @@ class GeoSeries(Series):
                                                 archiveType = row['archiveType'], verbose = False,
                                                 label=row['dataSetName']+'_'+row['paleoData_variableName']))
 
-            mgs = pyleo.MultipleGeoSeries(series_list=ts_list,time_unit='years AD')
+            mgs = pyleo.MultipleGeoSeries(series_list=ts_list,time_unit='years AD',label='Euro2k') 
             gs = ts_list[6] # extract one record as the target one
             gs.map_neighbors(mgs, radius=4000)
-
+            
+        By default, the figure has no title. For a title built from the available labels:
+            
+        .. jupyter-execute::
+            
+           gs.map_neighbors(mgs, radius=4000, title=True) 
+           
+        For a custom title:
+            
+        .. jupyter-execute::
+            
+           gs.map_neighbors(mgs, radius=4000, title='Insert title here') 
+              
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
         if markersize != None:
@@ -512,42 +547,69 @@ class GeoSeries(Series):
         # find neighbors
         lats = [ts.lat for ts in mgs.series_list]
         lons = [ts.lon for ts in mgs.series_list]
+        # compute distance from self to all points in supplied catalog
         dist = mapping.compute_dist(self.lat, self.lon, lats, lons)
+        # identify indices of neighbors within specified radius
         neigh_idx = mapping.within_distance(dist, radius)
 
-        neighbors =[mgs.series_list[i] for i in neigh_idx if i !=0]
+        # create a new MultipleGeoSeries object with only the neighbors
+        neighbors =[mgs.series_list[i] for i in neigh_idx]
+        dists = [dist[i] for i in neigh_idx]
         neighbors = MultipleGeoSeries(neighbors)
 
+        # create a dataframe for neighbors and add distance to target
         df = mapping.make_df(neighbors, hue=hue, marker=marker, size=size)
+        df['distance'] = dists
+
+        # create a dataframe for the target
         df_self = mapping.make_df(self, hue=hue, marker=marker, size=size)
+        df_self['distance'] = 0
 
         neighborhood = pd.concat([df, df_self], axis=0)
 
-        # additional columns are added manually
-        neighbor_coloring = ['w' for ik in range(len(neighborhood))]
+        # remove duplicates
+        # keep = "last" is specified to make sure that if the target was included
+        # in the potential neighbor catalog, it is kept as the last record
+        neighborhood = neighborhood.drop_duplicates(keep='last')
 
+        # add a column to specify the status of the record as either neighbor or target
         neighbor_status = ['neighbor' for ik in range(len(neighborhood))]
         neighbor_status[-1] = 'target'
         neighborhood['neighbor_status'] = neighbor_status
 
+        # neighbors are assigned white as edgecolor
+        neighbor_coloring = ['w' for ik in range(len(neighborhood))]
+
+        # if edgecolor is not specified, use black, otherwise, use the specified color
         if edgecolor is None:
             edgecolor = 'k'
             if isinstance(scatter_kwargs, dict):
                 edgecolor = scatter_kwargs.pop('edgecolor', 'k')
 
         neighbor_coloring[-1] = edgecolor
-        neighborhood['original'] =neighbor_coloring
+        neighborhood['edgecolor'] =neighbor_coloring
+
+        if type(title)==bool:
+            if title == False:
+                title = None
+            else:
+                if mgs.label is not None and self.label is not None:
+                    title = f"{mgs.label} neighbors for {self.label} within {radius} km"
+            
 
         # plot neighbors
-
+        # in future version, if edgecolor is specified as a dictionary with keys "neighbor" and "target",
+        # and values that are colors, that mapping will be used to color the edges of the points
         fig, ax_d = mapping.scatter_map(neighborhood, fig=fig, gs_slot=gridspec_slot, hue=hue, size=size,
                                         marker=marker, projection=projection,
                                            proj_default=proj_default,
                                            background=background, borders=borders, rivers=rivers, lakes=lakes,
-                                           ocean=ocean, land=land,
+                                           ocean=ocean, land=land, title = title,
                                            figsize=figsize, scatter_kwargs=scatter_kwargs, lgd_kwargs=lgd_kwargs,
                                            gridspec_kwargs=gridspec_kwargs, colorbar=colorbar,
-                                           legend=legend, cmap=cmap, edgecolor=neighborhood['original'].values)
+                                           legend=legend, cmap=cmap, edgecolor=neighborhood['edgecolor'].values)
+        
+        
         return fig, ax_d
 
     def dashboard(self, figsize=[11, 8], gs=None, plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
