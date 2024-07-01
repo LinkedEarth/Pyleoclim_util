@@ -1858,18 +1858,15 @@ class Series:
             scalogram = series.wavelet(freq = 'welch')
 
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
-
+            pyleo.closefig(fig)
 
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
         .. jupyter-execute::
 
-            series = pyleo.utils.load_dataset('SOI')
             psd = series.spectral(freq = 'welch').signif_test(number=20)
-            scalogram = series.wavelet(freq_method = 'welch')
-
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [0,5], ts_plot_kwargs = {'color':'Purple','linewidth':.5}, psd_plot_kwargs = {'color':'Purple','linewidth':1.5})
-
+            pyleo.closefig(fig)
         '''
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

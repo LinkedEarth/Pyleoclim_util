@@ -1,6 +1,6 @@
 """
 The GeoSeries class is a child of Series, with additional metadata latitude (lat) and longitude (lon)
-This unlocks plotting capabilities like map() and dashboard(). 
+This unlocks plotting capabilities like map() and dashboard().
 """
 from ..utils import plotting, mapping, lipdutils, jsonutils, tsbase, tsutils
 from ..core.series import Series
@@ -21,8 +21,8 @@ import warnings
 class GeoSeries(Series):
     '''The GeoSeries class is a child of the Series class, and requires geolocation
     information (latitude, longitude). Elevation is optional, but can be used in mapping, if present.
-    The class also allows for ancillary data and metadata, detailed below. 
-    
+    The class also allows for ancillary data and metadata, detailed below.
+
     Parameters
     ----------
     time : list or numpy.array
@@ -30,16 +30,16 @@ class GeoSeries(Series):
 
     value : list of numpy.array
         values of the dependent variable (y)
-        
+
     lat : float
         latitude N in decimal degrees. Must be in the range [-90;+90]
-        
+
     lon : float
         longitude East in decimal degrees. Must be in the range [-180;+360]
         No conversion is applied as mapping utilities convert to [-180,+180] internally
-       
+
     elevation : float
-        elevation of the sample, in meters above sea level. Negative numbers indicate depth below global mean sea level, therefore.                                                                                          
+        elevation of the sample, in meters above sea level. Negative numbers indicate depth below global mean sea level, therefore.
 
     time_unit : string
         Units for the time vector (e.g., 'years').
@@ -63,54 +63,54 @@ class GeoSeries(Series):
 
     log : dict
         Dictionary of tuples documentating the various transformations applied to the object
-        
+
     keep_log : bool
         Whether to keep a log of applied transformations. False by default
-        
+
     importedFrom : string
-        source of the dataset. If it came from a LiPD file, this could be the datasetID property 
+        source of the dataset. If it came from a LiPD file, this could be the datasetID property
 
     archiveType : string
-        climate archive, one of 'Borehole', 'Coral', 'FluvialSediment', 'GlacierIce', 'GroundIce', 'LakeSediment', 'MarineSediment', 'Midden', 'MolluskShell', 'Peat', 'Sclerosponge', 'Shoreline', 'Speleothem', 'TerrestrialSediment', 'Wood'                                                                                   
+        climate archive, one of 'Borehole', 'Coral', 'FluvialSediment', 'GlacierIce', 'GroundIce', 'LakeSediment', 'MarineSediment', 'Midden', 'MolluskShell', 'Peat', 'Sclerosponge', 'Shoreline', 'Speleothem', 'TerrestrialSediment', 'Wood'
         Reference: https://lipdverse.org/vocabulary/archivetype/
-    
+
     control_archiveType  : [True, False]
-        Whether to standardize the name of the archiveType agains the vocabulary from: https://lipdverse.org/vocabulary/paleodata_proxy/. 
-        If set to True, will only allow for these terms and automatically convert known synonyms to the standardized name. Only standardized variable names will be automatically assigned a color scheme.  
-        Default is False. 
-        
+        Whether to standardize the name of the archiveType agains the vocabulary from: https://lipdverse.org/vocabulary/paleodata_proxy/.
+        If set to True, will only allow for these terms and automatically convert known synonyms to the standardized name. Only standardized variable names will be automatically assigned a color scheme.
+        Default is False.
+
     sensorType : string
         sensor, e.g. a paleoclimate proxy sensor. This property can be used to differentiate between species of foraminifera
-        
+
     observationType : string
         observation type,  e.g. a proxy observation. See https://lipdverse.org/vocabulary/paleodata_proxy/. Note: this is preferred terminology but not enforced
-        
+
     depth : array
         depth at which the values were collected
-        
+
     depth_name : string
-        name of the field, e.g. 'mid-depth', 'top-depth', etc   
-        
+        name of the field, e.g. 'mid-depth', 'top-depth', etc
+
     depth_unit : string
          units of the depth axis, e.g. 'cm'
 
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
         defaults to True
-        
+
     sort_ts : str
         Direction of sorting over the time coordinate; 'ascending' or 'descending'
         Defaults to 'ascending'
-        
+
     verbose : bool
         If True, will print warning messages if there is any
-        
+
     clean_ts : boolean flag
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
          Default is None (marked for deprecation)
-    
-    auto_time_params : bool, 
-        If True, uses tsbase.disambiguate_time_metadata to ensure that time_name and time_unit are usable by Pyleoclim. This may override the provided metadata. 
+
+    auto_time_params : bool,
+        If True, uses tsbase.disambiguate_time_metadata to ensure that time_name and time_unit are usable by Pyleoclim. This may override the provided metadata.
         If False, the provided time_name and time_unit are used. This may break some functionalities (e.g. common_time and convert_time_unit), so use at your own risk.
         If not provided, code will set to True for internal consistency.
 
@@ -129,14 +129,14 @@ class GeoSeries(Series):
 
     '''
 
-    def __init__(self, time, value, lat, lon, elevation = None, time_unit=None, time_name=None, 
-                 value_name=None, value_unit=None, label=None, importedFrom=None, 
-                 archiveType = None, control_archiveType = False, 
+    def __init__(self, time, value, lat, lon, elevation = None, time_unit=None, time_name=None,
+                 value_name=None, value_unit=None, label=None, importedFrom=None,
+                 archiveType = None, control_archiveType = False,
                  sensorType = None, observationType = None,
                  log=None, keep_log=False, verbose=True,
                  depth = None, depth_name = None, depth_unit= None,
                  sort_ts = 'ascending', dropna = True,  clean_ts=False, auto_time_params = None):
-        
+
         # ensure 1D arrays
         if len(time) > 1:
             time = np.squeeze(time)
@@ -145,7 +145,7 @@ class GeoSeries(Series):
         if depth is not None:
             if len(depth) >1:
                 depth = np.squeeze(depth)
-        
+
         #Check that array sizes are equal
         if depth is not None:
             if len(depth) != len(time):
@@ -154,7 +154,7 @@ class GeoSeries(Series):
                 raise ValueError('Depth and value arrays must be the same length')
         if len(time) != len(value):
             raise ValueError('Time and value arrays must be the same length')
-        
+
         if auto_time_params is None:
             auto_time_params = True
             if verbose:
@@ -195,21 +195,21 @@ class GeoSeries(Series):
                 depth = matrix[2,:]
             else:
                 pass
-        
+
         # assign latitude
         if lat is not None:
-            lat = float(lat) 
-            if -90 <= lat <= 90: 
+            lat = float(lat)
+            if -90 <= lat <= 90:
                 self.lat = lat
             else:
                 ValueError('Latitude must be a number in [-90; 90]')
         else:
-            self.lat = None 
-            
+            self.lat = None
+
         # assign longitude
         if lon is not None:
             lon = float(lon)
-            if -180 < lon <= 360:     
+            if -180 < lon <= 360:
                 self.lon = lon
             # elif 180 < lon <= 360:
             #     self.lon = mapping.lon_360_to_180(lon)
@@ -218,25 +218,25 @@ class GeoSeries(Series):
             else:
                 ValueError('Longitude must be a number in [-180,360]')
         else:
-            self.lon = None 
-            
+            self.lon = None
+
         # elevation
         self.elevation = elevation
-        
-        # PSM 
+
+        # PSM
         self.sensorType = sensorType
         self.observationType = observationType
-                
+
         # depth infornation
         self.depth = depth
         self.depth_name = depth_name
         self.depth_unit = depth_unit
-            
+
         #assign all the rest
         super().__init__(time, value, time_unit, time_name, value_name,
                          value_unit, label, importedFrom, archiveType, control_archiveType,
                          log, keep_log, sort_ts, dropna, verbose, clean_ts)
-                      
+
 
     @property
     def metadata(self):
@@ -251,16 +251,16 @@ class GeoSeries(Series):
             label = self.label,
             archiveType = self.archiveType,
             sensorType  = self.sensorType,
-            observationType = self.observationType, 
+            observationType = self.observationType,
             importedFrom = self.importedFrom,
             control_archiveType = self.control_archiveType,
             log = self.log,
         )
-    
-    @classmethod    
+
+    @classmethod
     def from_json(cls, path):
         ''' Creates a pyleoclim.Series from a JSON file
-        
+
         The keys in the JSON file must correspond to the parameter associated with a GeoSeries object
 
         Parameters
@@ -271,36 +271,36 @@ class GeoSeries(Series):
         Returns
         -------
         ts : pyleoclim.core.series.Series
-            A Pyleoclim Series object. 
+            A Pyleoclim Series object.
 
         '''
-        
+
         a = jsonutils.open_json(path)
         b = jsonutils.iterate_through_dict(a, 'GeoSeries')
-        
+
         return cls(**b)
-    
+
     @classmethod
-    def from_Series(lat, lon, elevation=None,sensorType=None,observationType=None, 
+    def from_Series(lat, lon, elevation=None,sensorType=None,observationType=None,
                     depth=None, depth_name=None, depth_unit=None):
-        
+
         print('a')
-        # time, value, lat, lon, elevation = None, time_unit=None, time_name=None, 
-        #              value_name=None, value_unit=None, label=None, importedFrom=None, 
-        #              archiveType = None, control_archiveType = False, 
+        # time, value, lat, lon, elevation = None, time_unit=None, time_name=None,
+        #              value_name=None, value_unit=None, label=None, importedFrom=None,
+        #              archiveType = None, control_archiveType = False,
         #              sensorType = None, observationType = None,
         #              log=None, keep_log=False, verbose=True,
         #              depth = None, depth_name = None, depth_unit= None,
         #              sort_ts = 'ascending', dropna = True,  clean_ts=False, auto_time_params = None
 
-    
+
     def map(self, projection='Orthographic', proj_default=True,
             background=True, borders=False, coastline=True, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None, title = None,
             figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor='w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
-        
+
         ''' Map the location of the record
 
         Parameters
@@ -425,24 +425,24 @@ class GeoSeries(Series):
                     cmap=cmap, edgecolor=edgecolor,
                     fig=fig, gs_slot=gridspec_slot)
         return fig, ax_d
-    
+
     def map_neighbors(self, mgs, radius=3000, projection='Orthographic', proj_default=True,
             background=True, borders=False, rivers=False, lakes=False, ocean=True,
             land=True, fig=None, gridspec_slot=None, title = None,
             figsize=None, marker='archiveType', hue='archiveType', size=None, edgecolor=None,#'w',
             markersize=None, scatter_kwargs=None, cmap=None, colorbar=False, gridspec_kwargs=None,
             legend=True, lgd_kwargs=None, savefig_settings=None):
-        
+
         '''Map all records within a given radius of the object
 
         Parameters
         ----------
         mgs : MultipleGeoSeries
             object containing the series to be considered as neighbors
-            
+
         radius : float
-            search radius for the record, in km. Default is 3000. 
-            
+            search radius for the record, in km. Default is 3000.
+
         projection : str, optional
             The projection to use. The default is 'Orthographic'.
 
@@ -512,7 +512,7 @@ class GeoSeries(Series):
             lipd = load_dir(name='Pages2k')
             df = lipd.get_timeseries_essentials()
             dfs = df.query("archiveType in ('Wood','Documents','Coral','Lake sediment') and paleoData_variableName not in ('year')")
-            
+
             # place in a MultipleGeoSeries object
             ts_list = []
             for _, row in dfs.iterrows():
@@ -520,8 +520,8 @@ class GeoSeries(Series):
                                                 time_name=row['time_variableName'],value_name=row['paleoData_variableName'],
                                                 time_unit=row['time_units'], value_unit=row['paleoData_units'],
                                                 lat = row['geo_meanLat'], lon = row['geo_meanLon'],
-                                                archiveType = row['archiveType'], verbose = False, 
-                                                label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
+                                                archiveType = row['archiveType'], verbose = False,
+                                                label=row['dataSetName']+'_'+row['paleoData_variableName']))
 
             mgs = pyleo.MultipleGeoSeries(series_list=ts_list,time_unit='years AD',label='Euro2k') 
             gs = ts_list[6] # extract one record as the target one
@@ -539,12 +539,11 @@ class GeoSeries(Series):
             
            gs.map_neighbors(mgs, radius=4000, title='Insert title here') 
               
-            
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
         if markersize != None:
             scatter_kwargs['markersize'] = markersize
-            
+
         # find neighbors
         lats = [ts.lat for ts in mgs.series_list]
         lons = [ts.lon for ts in mgs.series_list]
@@ -612,7 +611,7 @@ class GeoSeries(Series):
         
         
         return fig, ax_d
-    
+
     def dashboard(self, figsize=[11, 8], gs=None, plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None,
                   hue='archiveType', marker='archiveType', size=None, scatter_kwargs=None,
@@ -747,20 +746,20 @@ class GeoSeries(Series):
         ax['ts'] = fig.add_subplot(gs[0, :-1])
         plt_kwargs.update({'ax': ax['ts']})
         # use the defaults if color/markers not specified
-        
+
         if self.archiveType is not None:
             archiveType = lipdutils.LipdToOntology(self.archiveType)
             if archiveType not in lipdutils.PLOT_DEFAULT.keys():
-                archiveType = 'Other'                
-        else: 
+                archiveType = 'Other'
+        else:
             archiveType = 'Other'
-        
+
         if 'marker' not in plt_kwargs.keys():
             plt_kwargs.update({'marker': lipdutils.PLOT_DEFAULT[archiveType][1]})
         if 'color' not in plt_kwargs.keys():
             plt_kwargs.update({'color': lipdutils.PLOT_DEFAULT[archiveType][0]})
         ax['ts'] = self.plot(**plt_kwargs)
-        
+
         ymin, ymax = ax['ts'].get_ylim()
 
         # plot the histplot
@@ -769,7 +768,7 @@ class GeoSeries(Series):
         histplt_kwargs.update({'ax': ax['dts']})
         histplt_kwargs.update({'ylabel': 'Counts'})
         histplt_kwargs.update({'vertical': True})
-        if 'color' not in histplt_kwargs.keys():            
+        if 'color' not in histplt_kwargs.keys():
             histplt_kwargs.update({'color': lipdutils.PLOT_DEFAULT[archiveType][0]})
 
         ax['dts'] = self.histplot(**histplt_kwargs)
@@ -815,7 +814,7 @@ class GeoSeries(Series):
         if 'method' in spectral_kwargs.keys():
             pass
         else:
-            spectral_kwargs.update({'method': 'lomb_scargle'}) # unneeded as it is already the default 
+            spectral_kwargs.update({'method': 'lomb_scargle'}) # unneeded as it is already the default
         if 'freq' in spectral_kwargs.keys():
             pass
         else:
@@ -825,7 +824,7 @@ class GeoSeries(Series):
         spectralfig_kwargs = {} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
         spectralfig_kwargs.update({'ax': ax['spec']})
 
-        
+
         ts_preprocess = self.detrend().standardize()
         psd = ts_preprocess.spectral(**spectral_kwargs)
 
@@ -843,7 +842,7 @@ class GeoSeries(Series):
             plotting.savefig(fig, settings=savefig_settings)
 
         return fig, ax
-    
+
     def segment(self, factor=10, verbose = False):
         """Gap detection
 
@@ -856,7 +855,7 @@ class GeoSeries(Series):
         ----------
         factor : float
             The factor that adjusts the threshold for gap detection
-        
+
         verbose : bool
             If True, will print warning messages if there is any
 
@@ -865,12 +864,12 @@ class GeoSeries(Series):
         res : MultiplegGeoSeries or GeoSeries
             If gaps were detected, returns the segments in a MultipleGeoSeries object,
             else, returns the original timeseries.
-            
+
         Examples
         --------
 
         .. jupyter-execute::
-            
+
             import numpy as np
             gs = pyleo.utils.datasets.load_dataset('EDC-dD')
             gs.value[4000:5000] = np.nan # cut a large gap in the middle
@@ -880,12 +879,12 @@ class GeoSeries(Series):
         """
         from ..core.multiplegeoseries import MultipleGeoSeries
         seg_y, seg_t, n_segs = tsutils.ts2segments(self.value,self.time,factor=factor)
-        
+
         if len(seg_y)>1:
             s_list=[]
             for idx,s in enumerate(seg_y):
-                if self.label is not None: 
-                    s_lbl =  self.label + ' segment ' + str(idx+1)  
+                if self.label is not None:
+                    s_lbl =  self.label + ' segment ' + str(idx+1)
                 else:
                     s_lbl =  'segment ' + str(idx+1)
                 s_tmp = self.copy() # copy metadata
@@ -899,40 +898,40 @@ class GeoSeries(Series):
         else:
             raise ValueError('No timeseries detected')
         return res
-    
+
     def resample(self, rule, keep_log = False, **kwargs):
         """
         Run analogue to pandas.Series.resample.
-    
+
         This is a convenience method: doing
-    
+
             ser.resample('AS').mean()
-    
+
         will do the same thing as
-    
+
             ser.pandas_method(lambda x: x.resample('AS').mean())
-        
+
         but will also accept some extra resampling rules, such as `'Ga'` (see below).
-    
+
         Parameters
         ----------
         rule : str
             The offset string or object representing target conversion.
             Can also accept pyleoclim units, such as 'ka' (1000 years),
             'Ma' (1 million years), and 'Ga' (1 billion years).
-    
+
             Check the [pandas resample docs](https://pandas.pydata.org/docs/dev/reference/api/pandas.DataFrame.resample.html)
             for more details.
-    
+
         kwargs : dict
             Any other arguments which will be passed to pandas.Series.resample.
-        
+
         Returns
         -------
         SeriesResampler
             Resampler object, not meant to be used to directly. Instead,
             an aggregation should be called on it, see examples below.
-        
+
         Examples
         --------
 
@@ -942,16 +941,16 @@ class GeoSeries(Series):
             ts5k = ts.resample('1ka').mean()
             fig, ax = ts.plot()
             ts5k.plot(ax=ax,color='C1')
-                
+
         """
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
             raise ValueError(f"Invalid rule provided, got: {rule}")
-    
+
         md = self.metadata
         if md['label'] is not None:
             md['label'] = md['label'] + ' (' + rule + ' resampling)'
-    
+
         multiplier = search.group(1)
         if multiplier == '':
             multiplier = 1
@@ -966,20 +965,20 @@ class GeoSeries(Series):
             rule = f'{1_000_000*multiplier}AS'
         elif unit.lower() in tsbase.MATCH_GA:
             rule = f'{1_000_000_000*multiplier}AS'
-        
+
         ser = self.to_pandas()
-        
+
         return GeoSeriesResampler(rule, ser, md, keep_log, kwargs)
-    
+
 class GeoSeriesResampler:
     """
-    This is only meant to be used internally, and is not meant to 
+    This is only meant to be used internally, and is not meant to
     be public-facing or to be used directly by users.
 
     If users call
 
         ts.resample('1Y').mean()
-    
+
     then they will get back a pyleoclim.GeoSeries, and `GeoSeriesResampler`
     will only be used in an intermediate step. Think of it as an
     implementation detail.
@@ -990,7 +989,7 @@ class GeoSeriesResampler:
         self.metadata = metadata
         self.keep_log = keep_log
         self.kwargs = kwargs
-    
+
     def __getattr__(self, attr):
         attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
         def func(*args, **kwargs):
@@ -1007,5 +1006,3 @@ class GeoSeriesResampler:
                 from_pandas.log += ({len(from_pandas.log): 'resample','rule': self.rule},)
             return from_pandas
         return func
-
-    
