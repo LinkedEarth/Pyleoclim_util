@@ -1757,12 +1757,16 @@ class MultipleSeries:
 
             fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
             
-        Using more detailed ticks on the y axis and larger ylabels:
+        By default, the y axes are kept very minimal to allow stacking many records. In some instances, however,
+        one may want more detailed axes, iwht major and minor ticks. This option can be actived via `yaxis_style`.
+        We also show how to enlarge the ylabels for improved readability:
 
         .. jupyter-execute::
 
             fig, ax = ms.stackplot(labels=None, ylabel_fontsize = 12,
                                    yaxis_style = 'detailed')
+            
+        This approach makes sense with small stacks, but quickly becomes unwieldy with large ones. Use at your own risk!
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
