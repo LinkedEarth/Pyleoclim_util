@@ -456,9 +456,26 @@ class TestMultipleSeriesStackPlot():
     
     @pytest.mark.parametrize('plot_kwargs', [{'marker':'o'},[{'marker':'o'},{'marker':'^'}]])
     def test_StackPlot_t1(self, plot_kwargs):
-    
         ms = load_data()
         fig, ax = ms.stackplot(plot_kwargs=plot_kwargs)
+        pyleo.closefig(fig)
+        
+    @pytest.mark.parametrize('ylims', ['spacious', 'auto'])
+    def test_StackPlot_t2(self, ylims):
+        ms = load_data()
+        fig, ax = ms.stackplot(ylims=ylims)
+        pyleo.closefig(fig)
+        
+    @pytest.mark.parametrize('yticks_minor', [True, False])
+    def test_StackPlot_t3(self, yticks_minor):
+        ms = load_data()
+        fig, ax = ms.stackplot(yticks_minor=yticks_minor)
+        pyleo.closefig(fig)
+        
+    @pytest.mark.parametrize('xticks_minor', [True, False])
+    def test_StackPlot_t4(self, xticks_minor):
+        ms = load_data()
+        fig, ax = ms.stackplot(xticks_minor=xticks_minor)
         pyleo.closefig(fig)
         
 class TestMultipleSeriesSpectral():

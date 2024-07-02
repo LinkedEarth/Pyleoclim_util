@@ -1607,7 +1607,8 @@ class MultipleSeries:
                   xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', 
                   norm=None, labels='auto', ylabel_fontsize = 8, spine_lw=1.5, 
                   grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5,
-                  yaxis_style = 'minimal', plot_kwargs=None):
+                  yticks_minor = False, xticks_minor = False, ylims ='auto',
+                  plot_kwargs=None):
         ''' Stack plot of multiple series
 
         Time units are harmonized prior to plotting. 
@@ -1694,11 +1695,16 @@ class MultipleSeries:
             
             Size for ylabel font. Default is 8, to avoid crowding. 
             
-        yaxis_style: str
-            
-            Style of the y-axis. If 'minimal', only the extreme values are shown, bracketed by 2 ticks.
-            If 'detailed', shows major and minor ticks. 
-            Other strings result in default Matplotlib behavior (depends on the assigned style)
+        yticks_minor : bool
+            Whether the y axes should contain minor ticks (use sparingly!). Default: False
+        
+        xticks_minor : bool 
+            Whether the x axis should contain minor ticks. Default: False
+        
+        ylims : str {'spacious', 'auto'}
+            Method for determining the limits of the y axes. 
+            Default is 'spacious', which is mean +/- 4 x std
+            'auto' activates the Matplotlib default
             
         plot_kwargs: dict or list of dict
         
@@ -1758,13 +1764,13 @@ class MultipleSeries:
             fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
             
         By default, the y axes are kept very minimal to allow stacking many records. In some instances, however,
-        one may want more detailed axes, iwht major and minor ticks. This option can be actived via `yaxis_style`.
-        We also show how to enlarge the ylabels for improved readability:
+        one may want more detailed axes, with major and minor ticks. We also show how to enlarge the ylabels and
+        adjust vertical spacing for improved readability:
 
         .. jupyter-execute::
 
-            fig, ax = ms.stackplot(labels=None, ylabel_fontsize = 12,
-                                   yaxis_style = 'detailed')
+            fig, ax = ms.stackplot(labels=None, ylabel_fontsize = 12, v_shift_factor = 0.9,
+                                   yticks_minor=True, xticks_minor=True, ylims='auto')
             
         This approach makes sense with small stacks, but quickly becomes unwieldy with large ones. Use at your own risk!
 
@@ -1840,9 +1846,9 @@ class MultipleSeries:
 
             mu = np.nanmean(ts.value)
             std = np.nanstd(ts.value)
-            ylim = [mu-4*std, mu+4*std]
             ax[idx].fill_between(ts.time, ts.value, y2=mu, alpha=fill_between_alpha, color=clr)
             trans = transforms.blended_transform_factory(ax[idx].transAxes, ax[idx].transData)
+            
             if labels == 'auto':
                 if ts.label is not None:
                     ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
@@ -1850,15 +1856,20 @@ class MultipleSeries:
                 ax[idx].text(label_x_loc, mu, labels[idx], horizontalalignment='right', transform=trans, color=clr, weight='bold')
             elif labels==None:
                 pass
-            if yaxis_style == 'minimal':
-                ax[idx].set_ylim(ylim)
-                ax[idx].set_yticks(ylim)
-                ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            elif yaxis_style == 'detailed':
+            
+            ylim = [mu-4*std, mu+4*std]
+
+            if ylims == 'spacious':
+                ax[idx].set_ylim(ylim)                
+                
+            if yticks_minor is True:    
                 ax[idx].yaxis.set_minor_locator(AutoMinorLocator())
-                ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-                ax[idx].tick_params(which='major', length=7, width=2)
-                ax[idx].tick_params(which='minor', length=4, width=1, color=clr)
+                ax[idx].tick_params(which='major', length=7, width=1.5)
+                ax[idx].tick_params(which='minor', length=3, width=1, color=clr)
+            else:
+                ax[idx].set_yticks(ylim)
+            ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+                
 
                        
             if idx % 2 == 0:
@@ -1889,44 +1900,30 @@ class MultipleSeries:
                 ax[idx].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
             ax[idx].axhline(y=mu, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
 
-        # subplots_height = 1-height*(1-v_shift_factor)
-        # ax['subplots_canvas'] = fig.add_axes([left, bottom, width, subplots_height],
-        #                                      **{'zorder':-1})
-        # ax['subplots_canvas'].spines['left'].set_visible(False)
-        # ax['subplots_canvas'].spines['right'].set_visible(False)
-        # ax['subplots_canvas'].spines['bottom'].set_visible(False)
-        # ax['subplots_canvas'].set_yticks([])
-        # ax['subplots_canvas'].set_xlim(xlim)
-        # ax['subplots_canvas'].tick_params(axis='x', which='both', length=0)
-        #
-        # ax['subplots_canvas'].set_xlabel('')
-        # ax['subplots_canvas'].set_ylabel('')
-        # ax['subplots_canvas'].set_xticklabels([])
-        # ax['subplots_canvas'].set_yticklabels([])
-        # ax['subplots_canvas'].grid(False)
-
         bottom -= height*(1-v_shift_factor)
         # other subplots are set inside the subplot that controls the time axis
         # trying to make that time axis subplot the whole size of the figure
 
-        x_axis_key = 'x_axis'
-        # x_axis_key = n_ts
-
-        ax[x_axis_key] = fig.add_axes([left, bottom, width, height])
-        ax[x_axis_key].set_xlabel(time_label)
-        ax[x_axis_key].spines['left'].set_visible(False)
-        ax[x_axis_key].spines['right'].set_visible(False)
-        ax[x_axis_key].spines['bottom'].set_visible(True)
-        ax[x_axis_key].spines['bottom'].set_linewidth(spine_lw)
-        ax[x_axis_key].set_yticks([])
-        ax[x_axis_key].patch.set_alpha(0)
-        ax[x_axis_key].set_xlim(xlim)
-        ax[x_axis_key].grid(False)
-        ax[x_axis_key].tick_params(axis='x', which='both', length=3.5)
-        xt = ax[x_axis_key].get_xticks()[1:-1]
+        ax['x_axis'] = fig.add_axes([left, bottom, width, height])
+        ax['x_axis'].set_xlabel(time_label)
+        ax['x_axis'].spines['left'].set_visible(False)
+        ax['x_axis'].spines['right'].set_visible(False)
+        ax['x_axis'].spines['bottom'].set_visible(True)
+        ax['x_axis'].spines['bottom'].set_linewidth(spine_lw)
+        ax['x_axis'].set_yticks([])
+        ax['x_axis'].patch.set_alpha(0)
+        ax['x_axis'].set_xlim(xlim)
+        ax['x_axis'].grid(False)
+        ax['x_axis'].tick_params(axis='x', which='both', length=3.5)
+        xt = ax['x_axis'].get_xticks()[1:-1]
         for x in xt:
-            ax[x_axis_key].axvline(x=x, color='lightgray', linewidth=grid_lw,
+            ax['x_axis'].axvline(x=x, color='lightgray', linewidth=grid_lw,
                                    ls='-', zorder=-1)
+        if xticks_minor is True:
+            ax['x_axis'].xaxis.set_minor_locator(AutoMinorLocator())
+            ax['x_axis'].tick_params(which='major', length=7, width=1.5)
+            ax['x_axis'].tick_params(which='minor', length=3, width=1)
+            
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
