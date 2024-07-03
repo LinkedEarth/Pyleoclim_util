@@ -77,7 +77,7 @@ class MulEnsGeoSeries():
                 ts_ens = pyleo.EnsembleGeoSeries(series_list)
                 ens_list.append(ts_ens)
 
-            mul_ens = pyleo.MulEnsGeoSeries([ts_ens])
+            mul_ens = pyleo.MulEnsGeoSeries(ens_list)
             mul_ens.mcpca(nsim=10,seed=42)'''
         
         common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
