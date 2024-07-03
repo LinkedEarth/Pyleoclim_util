@@ -74,7 +74,7 @@ class MulEnsGeoSeries():
                     ts = pyleo.GeoSeries(time=signal.time, value=signal.value+noise[:,idx], lat=lat, lon=lon, verbose=False)
                     series_list.append(ts)
 
-                ts_ens = pyleo.EnsembleSeries(series_list)
+                ts_ens = pyleo.EnsembleGeoSeries(series_list)
                 ens_list.append(ts_ens)
 
             mul_ens = pyleo.MulEnsGeoSeries([ts_ens])

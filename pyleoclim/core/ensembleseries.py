@@ -219,9 +219,7 @@ class EnsembleSeries(MultipleSeries):
             #Create a random series
             value = np.random.normal(0,1,length)
             time = pyleo.utils.tsmodel.random_time_axis(length)
-            lat = np.random.randint(-90,90)
-            lon = np.random.randint(-180,180)
-            series = pyleo.Series(time=time, value=value, lat=lat, lon=lon, verbose=False)
+            series = pyleo.Series(time=time, value=value, verbose=False)
 
             #Create an ensemble using these objects
             #Note that the time axis of the series object and the number of rows in the age array must match when depth is not passed
@@ -238,9 +236,7 @@ class EnsembleSeries(MultipleSeries):
             age_length = 800
             value = np.random.normal(0,1,age_length)
             time = pyleo.utils.tsmodel.random_time_axis(age_length)
-            lat = np.random.randint(-90,90)
-            lon = np.random.randint(-180,180)
-            series = pyleo.Series(time=time, value=value, lat=lat, lon=lon, verbose=False)
+            series = pyleo.Series(time=time, value=value, verbose=False)
             age_depth = np.arange(age_length)
 
             ens = pyleo.EnsembleSeries.from_PaleoEnsembleArray(series = series,paleo_array=paleo_array,paleo_depth=paleo_depth,age_depth=age_depth,verbose=False)
