@@ -29,3 +29,44 @@ class TestUIMulEnsGeoSeriesMCPCA():
         ens2 = ensemblegeoseries_nans
         m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
         _ = m_ens.mcpca(nsim=10)
+
+class TestUIMulEnsGeoSeriesStackplot():
+    @pytest.mark.parametrize('labels', [None, 'auto', ['soi','nino']])
+    def test_StackPlot_t0(self, ensemblegeoseries_basic, labels):
+        ens1 = ensemblegeoseries_basic
+        ens2 = ensemblegeoseries_basic
+        m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
+        fig, ax = m_ens.stackplot(labels=labels)
+        pyleo.closefig(fig)
+    
+    @pytest.mark.parametrize('plot_kwargs', [{'curve_clr':'red'},[{'qs':[.1,.2,.3,.4,.5]},{'plot_legend':'True'}]])
+    def test_StackPlot_t1(self, ensemblegeoseries_basic, plot_kwargs):
+        ens1 = ensemblegeoseries_basic
+        ens2 = ensemblegeoseries_basic
+        m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
+        fig, ax = m_ens.stackplot(plot_kwargs=plot_kwargs)
+        pyleo.closefig(fig)
+        
+    @pytest.mark.parametrize('ylims', ['spacious', 'auto'])
+    def test_StackPlot_t2(self, ensemblegeoseries_basic, ylims):
+        ens1 = ensemblegeoseries_basic
+        ens2 = ensemblegeoseries_basic
+        m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
+        fig, ax = m_ens.stackplot(ylims=ylims)
+        pyleo.closefig(fig)
+        
+    @pytest.mark.parametrize('yticks_minor', [True, False])
+    def test_StackPlot_t3(self, ensemblegeoseries_basic, yticks_minor):
+        ens1 = ensemblegeoseries_basic
+        ens2 = ensemblegeoseries_basic
+        m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
+        fig, ax = m_ens.stackplot(yticks_minor=yticks_minor)
+        pyleo.closefig(fig)
+        
+    @pytest.mark.parametrize('xticks_minor', [True, False])
+    def test_StackPlot_t4(self, ensemblegeoseries_basic, xticks_minor):
+        ens1 = ensemblegeoseries_basic
+        ens2 = ensemblegeoseries_basic
+        m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
+        fig, ax = m_ens.stackplot(xticks_minor=xticks_minor)
+        pyleo.closefig(fig)
