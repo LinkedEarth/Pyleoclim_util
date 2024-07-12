@@ -176,7 +176,7 @@ class MulEnsGeoSeries():
                   grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, 
                   yticks_minor = False, xticks_minor = False, ylims ='auto',
                   plot_kwargs=None, common_time_kwargs=None):
-        ''' Stack plot of multiple series
+        ''' Stack plot of multiple ensemble series
 
         Time units are harmonized prior to plotting. 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
