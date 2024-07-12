@@ -81,10 +81,10 @@ class EnsembleGeoSeries(EnsembleSeries):
          units of the depth axis, e.g. 'cm'
 
     '''
-    def __init__(self, series_list,lat=None,lon=None,elevation=None,archiveType=None,control_archiveType = False, 
+    def __init__(self, series_list,label=None,lat=None,lon=None,elevation=None,archiveType=None,control_archiveType = False, 
                  sensorType = None, observationType = None, depth = None, depth_name = None, depth_unit= None):
 
-        super().__init__(series_list)
+        super().__init__(series_list,label)
 
         if lat is None:
             # check that all components are GeoSeries
