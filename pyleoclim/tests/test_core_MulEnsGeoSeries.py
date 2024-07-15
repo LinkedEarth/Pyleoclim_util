@@ -70,3 +70,11 @@ class TestUIMulEnsGeoSeriesStackplot():
         m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
         fig, ax = m_ens.stackplot(xticks_minor=xticks_minor)
         pyleo.closefig(fig)
+
+    @pytest.mark.parametrize('plot_style', ['envelope', 'traces'])
+    def test_StackPlot_t4(self, ensemblegeoseries_basic, plot_style):
+        ens1 = ensemblegeoseries_basic
+        ens2 = ensemblegeoseries_basic
+        m_ens = pyleo.MulEnsGeoSeries([ens1,ens2])
+        fig, ax = m_ens.stackplot(plot_style=plot_style)
+        pyleo.closefig(fig)
