@@ -171,7 +171,7 @@ class MulEnsGeoSeries():
         return EnsembleMvD
 
     def stackplot(self, figsize=None, savefig_settings=None, time_unit = None, 
-                  xlim=None, colors=None, cmap='tab10', style= 'envelope',
+                  xlim=None, colors=None, cmap='tab10', plot_style= 'envelope',
                   norm=None, labels='auto', ylabel_fontsize = 8, spine_lw=1.5, 
                   grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, 
                   yticks_minor = False, xticks_minor = False, ylims ='auto',
@@ -180,7 +180,7 @@ class MulEnsGeoSeries():
 
         Time units are harmonized prior to plotting. 
         Functionally, this method is very similar to the stackplot method of MultipleSeries, see the documentation there for more details on customization.
-        Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
+        Note that the plotting plot_style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_plot_style()`.
 
         Parameters
         ----------
@@ -223,9 +223,9 @@ class MulEnsGeoSeries():
             The colormap to use when "colors" is None.
             Note that the function will try to detect continuous or discrete colormaps, and set the norm accordingly.
 
-        style : str; {'envelope', 'traces'}
+        plot_style : str; {'envelope', 'traces'}
 
-            The ensemble plotting style to use. Default is 'envelope'.
+            The ensemble plotting plot_style to use. Default is 'envelope'.
 
         norm : matplotlib.colors.Normalize like
         
@@ -276,7 +276,7 @@ class MulEnsGeoSeries():
             
         plot_kwargs: dict or list of dict
 
-            Arguments to further customize the plot from EnsembleSeries.plot_envelope or EnsembleSeries.plot_traces, depending on the style chosen.
+            Arguments to further customize the plot from EnsembleSeries.plot_envelope or EnsembleSeries.plot_traces, depending on the plot_style chosen.
 
             - Dictionary: Arguments will be applied to all lines in the stackplots
             - List of dictionaries: Allows to customize one line at a time.
@@ -284,7 +284,7 @@ class MulEnsGeoSeries():
         common_time_kwargs : dict
 
             Arguments to pass to the common_time method of the ensemble series.
-            Common time is called to calculate the median of the ensemble series for tick purposes, and is also used if style is set to 'envelope'.
+            Common time is called to calculate the median of the ensemble series for tick purposes, and is also used if plot_style is set to 'envelope'.
 
         Returns
         -------
@@ -362,7 +362,7 @@ class MulEnsGeoSeries():
             mul_ens = pyleo.MulEnsGeoSeries(ens_list)
             mul_ens.stackplot(plot_kwargs={'shade_alpha':0.5})
 
-        If you'd like to plot traces instead, you can use the modify the `style` argument
+        If you'd like to plot traces instead, you can use the modify the `plot_style` argument
 
         .. jupyter-execute::
 
@@ -387,7 +387,7 @@ class MulEnsGeoSeries():
                 ens_list.append(ts_ens)
 
             mul_ens = pyleo.MulEnsGeoSeries(ens_list)
-            mul_ens.stackplot(style='traces')
+            mul_ens.stackplot(plot_style='traces')
         '''
         # Create a figure with a specified size
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -468,7 +468,7 @@ class MulEnsGeoSeries():
             #Convert time unit to target and create shared time axis version of ens
             ens_common = ens.common_time(**common_time_kwargs)
 
-            if style == 'envelope':
+            if plot_style == 'envelope':
                 # Plot the ensemble envelope
                 if 'shade_clr' not in p_kwargs:
                     p_kwargs['shade_clr'] = color
@@ -476,7 +476,7 @@ class MulEnsGeoSeries():
                     p_kwargs['curve_clr'] = color
                 print(p_kwargs)
                 ens_common.plot_envelope(ax=ax[idx], **p_kwargs)
-            elif style == 'traces':
+            elif plot_style == 'traces':
                 # Plot the ensemble traces
                 if 'color' not in p_kwargs:
                     p_kwargs['color'] = color
