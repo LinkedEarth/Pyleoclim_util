@@ -179,6 +179,7 @@ class MulEnsGeoSeries():
         ''' Stack plot of multiple ensemble series
 
         Time units are harmonized prior to plotting. 
+        Functionally, this method is very similar to the stackplot method of MultipleSeries, see the documentation there for more details on customization.
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
 
         Parameters
@@ -297,6 +298,12 @@ class MulEnsGeoSeries():
 
         See also
         --------
+
+        pyleoclim.core.multipleseries.MultipleSeries.stackplot : Stack plot of multiple series
+
+        pyleoclim.core.ensembleseries.EnsembleSeries.plot_envelope : Plotting the envelope of an ensemble of series
+
+        pyleoclim.core.ensembleseries.EnsembleSeries.plot_traces : Plotting the traces of an ensemble of series
 
         pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
