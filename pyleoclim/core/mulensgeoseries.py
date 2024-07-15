@@ -335,6 +335,33 @@ class MulEnsGeoSeries():
             mul_ens = pyleo.MulEnsGeoSeries(ens_list)
             mul_ens.stackplot()
 
+        If you'd like to adjust the plot parameters, you can pass them via the `plot_kwargs` argument.
+
+        .. jupyter-execute::
+            
+            n = 3 # number of ensembles
+            nn = 30 # number of noise realizations
+            nt = 500
+            ens_list = []
+
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal = pyleo.Series(t,v)
+
+            for _ in range(n): 
+                series_list = []
+                lat = np.random.randint(-90,90)
+                lon = np.random.randint(-180,180)
+                for idx in range(nn):  # noise
+                    noise = np.random.randn(nt,nn)*100
+                    ts = pyleo.GeoSeries(time=signal.time, value=signal.value+noise[:,idx], lat=lat, lon=lon, verbose=False)
+                    series_list.append(ts)
+
+                ts_ens = pyleo.EnsembleGeoSeries(series_list)
+                ens_list.append(ts_ens)
+
+            mul_ens = pyleo.MulEnsGeoSeries(ens_list)
+            mul_ens.stackplot(plot_kwargs={'shade_alpha':0.5})
+
         If you'd like to plot traces instead, you can use the modify the `style` argument
 
         .. jupyter-execute::
@@ -379,7 +406,7 @@ class MulEnsGeoSeries():
     
         # Deal with plotting arguments
         if type(plot_kwargs)==dict:
-            plot_kwargs = [plot_kwargs]*n_ts
+            plot_kwargs = [plot_kwargs.copy() for _ in range(n_ts)]
 
         if plot_kwargs is not None and len(plot_kwargs) != n_ts:
             raise ValueError("When passing a list of dictionaries for kwargs arguments, the number of items should be the same as the number of timeseries")
@@ -432,6 +459,8 @@ class MulEnsGeoSeries():
                 p_kwargs = {}
             else:
                 p_kwargs = plot_kwargs[idx]
+
+                print(p_kwargs)
             bottom -= height * v_shift_factor
 
             ax[idx] = fig.add_axes([left, bottom, width, height])
@@ -445,7 +474,7 @@ class MulEnsGeoSeries():
                     p_kwargs['shade_clr'] = color
                 if 'curve_clr' not in p_kwargs:
                     p_kwargs['curve_clr'] = color
-
+                print(p_kwargs)
                 ens_common.plot_envelope(ax=ax[idx], **p_kwargs)
             elif style == 'traces':
                 # Plot the ensemble traces
