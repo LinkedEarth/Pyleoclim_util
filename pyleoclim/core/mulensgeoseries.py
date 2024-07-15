@@ -311,7 +311,7 @@ class MulEnsGeoSeries():
         --------
         
         .. jupyter-execute::
-        
+            
             n = 3 # number of ensembles
             nn = 30 # number of noise realizations
             nt = 500
@@ -334,6 +334,33 @@ class MulEnsGeoSeries():
 
             mul_ens = pyleo.MulEnsGeoSeries(ens_list)
             mul_ens.stackplot()
+
+        If you'd like to plot traces instead, you can use the modify the `style` argument
+
+        .. jupyter-execute::
+
+            n = 3 # number of ensembles
+            nn = 30 # number of noise realizations
+            nt = 500
+            ens_list = []
+
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal = pyleo.Series(t,v)
+
+            for _ in range(n): 
+                series_list = []
+                lat = np.random.randint(-90,90)
+                lon = np.random.randint(-180,180)
+                for idx in range(nn):  # noise
+                    noise = np.random.randn(nt,nn)*100
+                    ts = pyleo.GeoSeries(time=signal.time, value=signal.value+noise[:,idx], lat=lat, lon=lon, verbose=False)
+                    series_list.append(ts)
+
+                ts_ens = pyleo.EnsembleGeoSeries(series_list)
+                ens_list.append(ts_ens)
+
+            mul_ens = pyleo.MulEnsGeoSeries(ens_list)
+            mul_ens.stackplot(style='traces')
         '''
         # Create a figure with a specified size
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
