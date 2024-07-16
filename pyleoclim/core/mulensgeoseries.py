@@ -225,7 +225,7 @@ class MulEnsGeoSeries():
 
         plot_style : str; {'envelope', 'traces'}
 
-            The ensemble plotting plot_style to use. Default is 'envelope'.
+            The ensemble plotting style to use. Default is 'envelope'.
 
         norm : matplotlib.colors.Normalize like
         
@@ -276,7 +276,7 @@ class MulEnsGeoSeries():
             
         plot_kwargs: dict or list of dict
 
-            Arguments to further customize the plot from EnsembleSeries.plot_envelope or EnsembleSeries.plot_traces, depending on the plot_style chosen.
+            Arguments to further customize the plot from EnsembleSeries.plot_envelope or EnsembleSeries.plot_traces, depending on the chosen style.
 
             - Dictionary: Arguments will be applied to all lines in the stackplots
             - List of dictionaries: Allows to customize one line at a time.
