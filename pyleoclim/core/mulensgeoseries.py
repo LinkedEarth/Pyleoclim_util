@@ -460,7 +460,6 @@ class MulEnsGeoSeries():
             else:
                 p_kwargs = plot_kwargs[idx]
 
-                print(p_kwargs)
             bottom -= height * v_shift_factor
 
             ax[idx] = fig.add_axes([left, bottom, width, height])
@@ -474,7 +473,6 @@ class MulEnsGeoSeries():
                     p_kwargs['shade_clr'] = color
                 if 'curve_clr' not in p_kwargs:
                     p_kwargs['curve_clr'] = color
-                print(p_kwargs)
                 ens_common.plot_envelope(ax=ax[idx], **p_kwargs)
             elif plot_style == 'traces':
                 # Plot the ensemble traces
