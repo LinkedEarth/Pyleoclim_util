@@ -632,7 +632,6 @@ class EnsembleGeoSeries(EnsembleSeries):
         if self.archiveType is not None:
             archiveType = lipdutils.LipdToOntology(self.archiveType)
             if archiveType not in lipdutils.PLOT_DEFAULT.keys():
-                print(archiveType)
                 archiveType = 'Other'                
         else: 
             archiveType = 'Other'
