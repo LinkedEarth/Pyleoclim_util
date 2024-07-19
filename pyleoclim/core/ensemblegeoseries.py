@@ -614,8 +614,8 @@ class EnsembleGeoSeries(EnsembleSeries):
         plt_kwargs.update({'ax': ax['ts']})
         # use the defaults if color/markers not specified
         
-        if self.archiveType is not None:
-            archiveType = lipdutils.LipdToOntology(self.archiveType)
+        if self.series_list[0].archiveType is not None:
+            archiveType = lipdutils.LipdToOntology(self.series_list[0].archiveType)
             if archiveType not in lipdutils.PLOT_DEFAULT.keys():
                 archiveType = 'Other'                
         else: 
