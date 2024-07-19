@@ -13,6 +13,8 @@ from ..utils import mapping, lipdutils, plotting
 
 import warnings
 
+from collections import Counter
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -85,6 +87,19 @@ class EnsembleGeoSeries(EnsembleSeries):
                  sensorType = None, observationType = None, depth = None, depth_name = None, depth_unit= None):
 
         super().__init__(series_list,label)
+
+        # Assign archiveType if it isn't passed and it is present in all series in series_list
+        if archiveType is None:
+            if not all([isinstance(ts, GeoSeries) for ts in series_list]):
+                pass
+            else:
+                archiveList = [str(ts.archiveType) for ts in series_list]
+                #Check that they're all the same
+                if all([a == archiveList[0] for a in archiveList]):
+                    archiveType = archiveList[0]
+                #If they aren't, pick the most common one
+                else:
+                    archiveType = Counter(archiveList).most_common(1)[0][0]
 
         if lat is None:
             # check that all components are GeoSeries
@@ -619,8 +634,16 @@ class EnsembleGeoSeries(EnsembleSeries):
             if archiveType not in lipdutils.PLOT_DEFAULT.keys():
                 archiveType = 'Other'                
         else: 
-            archiveType = 'Other'
-        
+            if not all([isinstance(ts, GeoSeries) for ts in self.series_list]):
+                archiveType = 'Other'
+            else:
+                archiveList = [str(ts.archiveType) for ts in self.series_list]
+                #Check that they're all the same
+                if all([a == archiveList[0] for a in archiveList]):
+                    archiveType = archiveList[0]
+                #If they aren't, pick the most common one
+                else:
+                    archiveType = Counter(archiveList).most_common(1)[0][0]
         # if 'marker' not in plt_kwargs.keys():
         #     plt_kwargs.update({'marker': lipdutils.PLOT_DEFAULT[archiveType][1]})
         if 'curve_clr' not in plt_kwargs.keys():

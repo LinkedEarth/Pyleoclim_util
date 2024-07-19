@@ -13,6 +13,7 @@ from ..core.correns import CorrEns
 from ..core.multipleseries import MultipleSeries
 
 import warnings
+warnings.filterwarnings("ignore")
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -666,7 +667,7 @@ class EnsembleSeries(MultipleSeries):
         return corr_ens
 
     def plot_traces(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, num_traces=10, seed=None,
-             xlim=None, ylim=None, linestyle='-', savefig_settings=None, ax=None, plot_legend=True,
+             xlim=None, ylim=None, linestyle='-', savefig_settings=None, ax=None, legend=True,
              color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None):
         '''Plot EnsembleSeries as a subset of traces.
 
@@ -804,8 +805,8 @@ class EnsembleSeries(MultipleSeries):
 
             for idx in random_draw_idx:
                 self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
-                    xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,linestyle='-')
-            ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})',linestyle='-')
+                    xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,linestyle='-', label='_ignore')
+            l1, = ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})',linestyle='-')
 
         if title is not None:
             ax.set_title(title)
@@ -813,10 +814,14 @@ class EnsembleSeries(MultipleSeries):
             if self.label is not None:
                 ax.set_title(self.label)
             
-        if plot_legend:
+        if legend==True:
             lgd_args = {'frameon': False}
             lgd_args.update(lgd_kwargs)
             ax.legend(**lgd_args)
+        elif legend==False:
+            ax.legend().remove()
+        else:
+            raise ValueError('legend should be set to either True or False')
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
