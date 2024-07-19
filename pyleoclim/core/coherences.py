@@ -410,7 +410,7 @@ class Coherence:
                 plotting.savefig(fig, settings=savefig_settings)
             if title is not None and  title != 'auto':
                 fig.suptitle(title)
-            elif title == 'auto' and lbl1 is not None and lbl1 is not None:
+            elif title == 'auto' and lbl1 is not None and lbl2 is not None:
                 title = 'Wavelet coherency ('+self.wave_method.upper() +') between '+ lbl1 + ' and ' + lbl2
                 fig.suptitle(title)
             return fig, ax
