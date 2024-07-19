@@ -634,7 +634,16 @@ class EnsembleGeoSeries(EnsembleSeries):
             if archiveType not in lipdutils.PLOT_DEFAULT.keys():
                 archiveType = 'Other'                
         else: 
-            archiveType = 'Other'
+            if not all([isinstance(ts, GeoSeries) for ts in self.series_list]):
+                archiveType = 'Other'
+            else:
+                archiveList = [str(ts.archiveType) for ts in self.series_list]
+                #Check that they're all the same
+                if all([a == archiveList[0] for a in archiveList]):
+                    archiveType = archiveList[0]
+                #If they aren't, pick the most common one
+                else:
+                    archiveType = Counter(archiveList).most_common(1)[0][0]
         # if 'marker' not in plt_kwargs.keys():
         #     plt_kwargs.update({'marker': lipdutils.PLOT_DEFAULT[archiveType][1]})
         if 'curve_clr' not in plt_kwargs.keys():
