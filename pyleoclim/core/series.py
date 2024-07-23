@@ -767,7 +767,7 @@ class Series:
             new_value = self.copy().value
 
         new_ts.time = new_time
-        new_ts.new_value = new_value
+        new_ts.value = new_value
         new_ts.time_unit = time_unit
         new_ts.time_name = time_name
 
