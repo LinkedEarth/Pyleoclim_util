@@ -1365,7 +1365,7 @@ class MultiplePSD:
                 self.psd_list[idx].plot(
                     in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
                     xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, ax=ax, color='gray', alpha=members_alpha,
-                    zorder=99, linewidth=members_lw,
+                    zorder=99, linewidth=members_lw, label='_ignore'
                 )
             ax.plot(np.nan, np.nan, color='gray', label=f'example members (n={members_plot_num})')
 
