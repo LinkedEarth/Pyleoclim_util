@@ -730,10 +730,27 @@ class MultipleSeries:
 
         return ms
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, method='phaseran', number=1000,
+    def correlation(self, target=None, timespan=None, alpha=0.05, statistic='pearsonr', 
+                    method='phaseran', number=1000, settings=None,
                     fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
+        The significance of the correlation is assessed using one of the following methods:
+
+        1. 'ttest': T-test adjusted for effective sample size, see [1]
+        2. 'ar1sim': AR(1) modeling of x and y (Monte Carlo method)
+        3. 'CN': colored noise (power-law spectrum) modeling of x and y (Monte Carlo method)
+        4. 'phaseran': phase randomization of original inputs. (Monte Carlo method, default), see [2]
+        5. 'built-in': uses built-in method from scipy (function of the statistic used)
+
+        Note: Up to version v0.14.0. ar1sim was called "isopersistent",  phaseran was called "isospectral"
+
+        The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
+        The others are non-parametric, but their computational requirements scale with the number of simulations.
+
+        The choise of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
+
+        
         Parameters
         ----------
         target : pyleoclim.Series, optional
@@ -748,17 +765,29 @@ class MultipleSeries:
         
             The significance level (0.05 by default)
 
+        statistic : str
+            statistic being evaluated. Can use any of the SciPy-supported ones:
+                https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+                Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
+            Default: 'pearsonr'.
+
+        method : str, {'ttest','built-in','ar1sim','phaseran','CN'}
+            method for significance testing. Default is 'phaseran'
+            - 'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
+            - 'built-in' uses the p-value that ships with the SciPy function.
+            - 'ar1sim' (formerly 'isopersistent') tests against an ensemble of AR(1) series fitted to the originals  
+            - 'CN' tests against an ensemble of colored noise series (power-law spectra) fitted to the originals
+            - 'phaseran' (formerly 'isospectral') tests against phase-randomized surrogates (aka the method of Ebisuzaki [2])
+            The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning.
+            Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.
+
         settings : dict
-        
+       
             Parameters for the correlation function (per scipy)
 
         number : int
 
-                the number of simulations (default: 1000)
-
-        method : str, {'ttest', 'ar1sim', 'phaseran' (default)}
-
-                method for significance testing
+            the number of simulations (default: 1000)  
 
         fdr_kwargs : dict
         
@@ -840,7 +869,7 @@ class MultipleSeries:
         print("Looping over "+ str(len(self.series_list)) +" Series in collection")
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
             corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings,
-                                      method=method, number=number,
+                                      method=method, number=number, statistic=statistic,
                                       common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res.r)
             signif_list.append(corr_res.signif)

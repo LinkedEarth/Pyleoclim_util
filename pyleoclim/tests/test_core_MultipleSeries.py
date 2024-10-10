@@ -45,7 +45,7 @@ def gen_colored_noise(alpha=1, nt=100, std=1.0, f0=None, m=None, seed=None):
     v = colored_noise(alpha=alpha, t=t, std=std, f0=f0, m=m, seed=seed)
     return t, v
     
-def load_data():
+def load_ms():
     soi = pyleo.utils.load_dataset('SOI')
     nino = pyleo.utils.load_dataset('NINO3')
     ms = soi & nino
@@ -450,33 +450,55 @@ class TestMultipleSeriesStackPlot():
     @pytest.mark.parametrize('labels', [None, 'auto', ['soi','nino']])
     def test_StackPlot_t0(self, labels):
     
-        ms = load_data()
+        ms = load_ms()
         fig, ax = ms.stackplot(labels=labels)
         pyleo.closefig(fig)
     
     @pytest.mark.parametrize('plot_kwargs', [{'marker':'o'},[{'marker':'o'},{'marker':'^'}]])
     def test_StackPlot_t1(self, plot_kwargs):
-        ms = load_data()
+        ms = load_ms()
         fig, ax = ms.stackplot(plot_kwargs=plot_kwargs)
         pyleo.closefig(fig)
         
     @pytest.mark.parametrize('ylims', ['spacious', 'auto'])
     def test_StackPlot_t2(self, ylims):
-        ms = load_data()
+        ms = load_ms()
         fig, ax = ms.stackplot(ylims=ylims)
         pyleo.closefig(fig)
         
     @pytest.mark.parametrize('yticks_minor', [True, False])
     def test_StackPlot_t3(self, yticks_minor):
-        ms = load_data()
+        ms = load_ms()
         fig, ax = ms.stackplot(yticks_minor=yticks_minor)
         pyleo.closefig(fig)
         
     @pytest.mark.parametrize('xticks_minor', [True, False])
     def test_StackPlot_t4(self, xticks_minor):
-        ms = load_data()
+        ms = load_ms()
         fig, ax = ms.stackplot(xticks_minor=xticks_minor)
         pyleo.closefig(fig)
+        
+        
+class TestMultipleSeriesCorrelation():
+    ''' Test for MultipleSeries.spectral
+    '''
+    @pytest.mark.parametrize('sig_method', ['ttest','built-in','ar1sim','phaseran','CN'])
+    @pytest.mark.parametrize('number', [2,5])
+    def test_correlation_t0(self, sig_method, number):
+        ''' Test the various significance methods
+        '''
+        ms = load_ms()   
+        corr = ms.correlation(method=sig_method,number=number)
+        
+    @pytest.mark.parametrize('stat', ['linregress','pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau'])
+    def test_correlation_t1(self, stat, eps=0.2):
+        ''' Test the various statistics
+        '''
+        ms = load_ms() 
+        if stat == 'weightedtau':
+            corr = ms.correlation(statistic=stat)
+        else:
+            corr = ms.correlation(statistic=stat,method='built-in')
         
 class TestMultipleSeriesSpectral():
     ''' Test for MultipleSeries.spectral
@@ -486,7 +508,7 @@ class TestMultipleSeriesSpectral():
         '''Test the spectral function with pre-generated scalogram objects
         '''
         
-        ms = load_data()
+        ms = load_ms()
         if spec_method == 'cwt':
             ms = ms.interp()
         scals = ms.wavelet(method=spec_method)
@@ -494,25 +516,19 @@ class TestMultipleSeriesSpectral():
  
 class TestToCSV:
     def test_to_csv_default(self):
-        soi = pyleo.utils.load_dataset('SOI')
-        nino = pyleo.utils.load_dataset('NINO3')
-        ms = soi & nino
+        ms = load_ms()
         ms.to_csv()
-        os.unlink('MultipleSeries.csv')
+        os.unlink('MultipleSeries.csv') # clean up after yourself!
     def test_to_csv_label(self):
-        soi = pyleo.utils.load_dataset('SOI')
-        nino = pyleo.utils.load_dataset('NINO3')
-        ms = soi & nino
+        ms = load_ms()
         ms.label='enso series'
         ms.to_csv()
-        os.unlink('enso_series.csv') # this check that the file does exist
+        os.unlink('enso_series.csv') # clean up after yourself!
     def test_to_csv_label_path(self):
-        soi = pyleo.utils.load_dataset('SOI')
-        nino = pyleo.utils.load_dataset('NINO3')
-        ms = soi & nino
+        ms = load_ms()
         ms.label='enso wah wah'
         ms.to_csv(path='./enso.csv')
-        os.unlink('enso.csv') # this check that the file does exist
+        os.unlink('enso.csv') # clean up after yourself!
         
 class TestRemove:
     def test_remove(self):
