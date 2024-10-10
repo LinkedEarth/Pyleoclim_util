@@ -3534,11 +3534,11 @@ class Series:
 
         The significance of the correlation is assessed using one of the following methods:
 
-        1) 'ttest': T-test adjusted for effective sample size, see [1]
-        2) 'ar1sim': AR(1) modeling of x and y (Monte Carlo method)
-        3) 'CN': colored noise (power-law spectrum) modeling of x and y (Monte Carlo method)
-        3) 'phaseran': phase randomization of original inputs. (Monte Carlo method, default), see [2]
-        4) 'built-in': uses built-in method
+        1. 'ttest': T-test adjusted for effective sample size, see [1]
+        2. 'ar1sim': AR(1) modeling of x and y (Monte Carlo method)
+        3. 'CN': colored noise (power-law spectrum) modeling of x and y (Monte Carlo method)
+        4. 'phaseran': phase randomization of original inputs. (Monte Carlo method, default), see [2]
+        5. 'built-in': uses built-in method from scipy (function of the statistic used)
 
         Note: Up to version v0.14.0. ar1sim was called "isopersistent",  phaseran was called "isospectral"
 
@@ -3561,12 +3561,13 @@ class Series:
                 Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
             Default: 'pearsonr'.
 
-        method : str, {'ttest','built-in','ar1sim','phaseran'}
+        method : str, {'ttest','built-in','ar1sim','phaseran','CN'}
             method for significance testing. Default is 'phaseran'
-            * 'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
-            * 'built-in' uses the p-value that ships with the SciPy function.
-            * 'ar1sim' (formerly 'isopersistent') tests against an ensemble of AR(1) seires fitted to the originals  
-            * 'phaseran' (formerly 'isospectral') tests against phase-randomized surrogates (aka the method of Ebisuzaki [2])
+            - 'ttest' implements the T-test with degrees of freedom adjusted for autocorrelation, as done in [1]
+            - 'built-in' uses the p-value that ships with the SciPy function.
+            - 'ar1sim' (formerly 'isopersistent') tests against an ensemble of AR(1) series fitted to the originals  
+            - 'CN' tests against an ensemble of colored noise series (power-law spectra) fitted to the originals
+            - 'phaseran' (formerly 'isospectral') tests against phase-randomized surrogates (aka the method of Ebisuzaki [2])
             The old options 'isopersistent' and 'isospectral' still work, but trigger a deprecation warning.
             Note that 'weightedtau' does not have a known distribution, so the 'built-in' method returns an error in that case.
 

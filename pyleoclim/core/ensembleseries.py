@@ -728,7 +728,7 @@ class EnsembleSeries(MultipleSeries):
 
             Matplotlib axis on which to return the plot. The default is None.
 
-        plot_legend : bool; {True,False}, optional
+        legend : bool; {True,False}, optional
 
             Whether to plot the legend. The default is True.
 
