@@ -189,23 +189,13 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
     b1 = np.sqrt(Q1*dt/N)
 
     NI = np.ndarray((4, 4))
-    NI[0, 0] = N*dt/b1**2
-    NI[1, 1] = dt/b1**2*np.sum(y1*y1)
-    NI[2, 2] = dt/b1**2*np.sum(y2*y2)
-    NI[3, 3] = 3*dt/b1**4*np.sum(R1*R1) - N/b1**2
-    NI[0, 1] = dt/b1**2*np.sum(y1)
-    NI[0, 2] = dt/b1**2*np.sum(y2)
-    NI[0, 3] = 2*dt/b1**3*np.sum(R1)
-    NI[1, 2] = dt/b1**2*np.sum(y1*y2)
-    NI[1, 3] = 2*dt/b1**3*np.sum(R1*y1)
-    NI[2, 3] = 2*dt/b1**3*np.sum(R1*y2)
-
-    NI[1, 0] = NI[0, 1]
-    NI[2, 0] = NI[0, 2]
-    NI[2, 1] = NI[1, 2]
-    NI[3, 0] = NI[0, 3]
-    NI[3, 1] = NI[1, 3]
-    NI[3, 2] = NI[2, 3]
+    # matrix
+    NI = [[N * dt / b1 / b1, dt / b1 / b1 * np.sum(x1), dt / b1 / b1 * np.sum(x2), 2 * dt / b1 ** 3 * np.sum(R1)],
+          [0, dt / b1 / b1 * np.sum(x1 * x1), dt / b1 / b1 * np.sum(x1 * x2), 2 * dt / b1 ** 3 * np.sum(R1 * x1)],
+          [0, 0, dt / b1 / b1 * np.sum(x2 * x2), 2 * dt / b1 ** 3 * np.sum(R1 * x2)],
+          [0, 0, 0, 3 * dt / b1 ** 4 * np.sum(R1 * R1) - N / b1 / b1]]
+    NI[1][0], NI[2][0], NI[2][1], NI[3][0], NI[3][1], NI[3][2] \
+        = NI[0][1], NI[0][2], NI[1][2], NI[0][3], NI[1][3], NI[2][3]
 
     invNI = np.linalg.pinv(NI)
     var_a12 = invNI[2, 2]
