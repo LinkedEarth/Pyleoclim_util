@@ -735,6 +735,8 @@ class MultipleSeries:
                     fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
+        This function recursively applies Series.correlation() to members of the MultipleSeries object.
+
         The significance of the correlation is assessed using one of the following methods:
 
         1. 'ttest': T-test adjusted for effective sample size, see [1]
@@ -748,8 +750,7 @@ class MultipleSeries:
         The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
         The others are non-parametric, but their computational requirements scale with the number of simulations.
 
-        The choise of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
-
+        The False Disvoery Rate method is applied to the assessment of significance when plotting the result. 
         
         Parameters
         ----------
@@ -809,12 +810,23 @@ class MultipleSeries:
         -------
         corr : CorrEns
         
-            the result object
+            the result object, containing the following:
+            - statistic r (array of real numbers)
+            - p-values pval (array of real numbers)
+            - signif (array of booleans)
+            - alpha (significance level)
+            
 
         See also
         --------
+        
+        pyleoclim.core.series.Series.correlation :  Series-level correlation 
 
-        pyleoclim.utils.correlation.corr_sig : Correlation function
+        pyleoclim.utils.correlation.association : SciPy measures of association between variables
+
+        pyleoclim.series.surrogates : parametric and non-parametric surrogates of any Series object
+
+        pyleoclim.multipleseries.common_time : Aligning time axes
 
         pyleoclim.utils.correlation.fdr : FDR function
         

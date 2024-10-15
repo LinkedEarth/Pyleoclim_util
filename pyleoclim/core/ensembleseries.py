@@ -537,7 +537,7 @@ class EnsembleSeries(MultipleSeries):
             The significance level (0.05 by default)
        
         method : str, {'ttest','built-in','ar1sim','phaseran'}
-            method for significance testing. Default is 'ttest'
+            method for significance testing. Default is 'ttest' to lower computational cost, but this is not always the best choice
             
         statistic : str
             The name of the statistic used to measure the association, to be chosen from a subset of
