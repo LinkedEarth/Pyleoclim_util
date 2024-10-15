@@ -3671,65 +3671,72 @@ class Series:
 
         settings = {} if settings is None else settings.copy()
 
-        ms = MultipleSeries([self, target_series])
-        if list(self.time) != list(target_series.time):
-            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
-            ct_args = {'method': 'interp'}
-            ct_args.update(common_time_kwargs)
-            ms = ms.common_time(**ct_args)
-
-        if timespan is None:
-            ts0 = ms.series_list[0]
-            ts1 = ms.series_list[1]
-        else:
-            ts0 = ms.series_list[0].slice(timespan)
-            ts1 = ms.series_list[1].slice(timespan)
-
-        if seed is not None:
-            np.random.seed(seed)
-
-        if method == 'ttest':
-            if statistic == 'pearsonr':
-                stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
-                signif = bool(signf)
-            else:
-                raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
+        if tsbase.overlap(self.time, target_series.time)>0:
+            ms = MultipleSeries([self, target_series])
+            if list(self.time) != list(target_series.time):
                 
-        elif method == 'built-in':
-            if statistic == 'weightedtau':
-                raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
+                common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+                ct_args = {'method': 'interp'}
+                ct_args.update(common_time_kwargs)
+                ms = ms.common_time(**ct_args)
+    
+            if timespan is None:
+                ts0 = ms.series_list[0]
+                ts1 = ms.series_list[1]
             else:
-                res = corrutils.association(ts0.value,ts1.value,statistic, settings)
-                stat = res[0]
-                pval = res.pvalue if len(res) > 1 else np.nan
+                ts0 = ms.series_list[0].slice(timespan)
+                ts1 = ms.series_list[1].slice(timespan)
+    
+            if seed is not None:
+                np.random.seed(seed)
+    
+            if method == 'ttest':
+                if statistic == 'pearsonr':
+                    stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+                    signif = bool(signf)
+                else:
+                    raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
+                    
+            elif method == 'built-in':
+                if statistic == 'weightedtau':
+                    raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
+                else:
+                    res = corrutils.association(ts0.value,ts1.value,statistic, settings)
+                    stat = res[0]
+                    pval = res.pvalue if len(res) > 1 else np.nan
+                    signif = pval <= alpha
+            elif method in supported_surrogates:      
+                if 'nsim' in settings.keys(): # for legacy reasons
+                    raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
+                    number = settings['nsim']
+                    settings.pop('nsim')
+                else:
+                    number = number
+                    
+                # compute correlation statistic
+                stat = corrutils.association(ts0.value,ts1.value,statistic,settings)[0]
+                
+                # establish significance against surrogates
+                stat_surr = np.empty((number))
+                ts0_surr = SurrogateSeries(method=method,number=number)
+                ts0_surr.from_series(ts0)
+                ts1_surr = SurrogateSeries(method=method,number=number)
+                ts1_surr.from_series(ts1)
+                for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
+                    stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
+                                                         ts1_surr.series_list[i].value,statistic, settings)[0]
+                # obtain p-value
+                pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
+                # establish significance
                 signif = pval <= alpha
-        elif method in supported_surrogates:      
-            if 'nsim' in settings.keys(): # for legacy reasons
-                raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
-                number = settings['nsim']
-                settings.pop('nsim')
             else:
-                number = number
-                
-            # compute correlation statistic
-            stat = corrutils.association(ts0.value,ts1.value,statistic,settings)[0]
-            
-            # establish significance against surrogates
-            stat_surr = np.empty((number))
-            ts0_surr = SurrogateSeries(method=method,number=number)
-            ts0_surr.from_series(ts0)
-            ts1_surr = SurrogateSeries(method=method,number=number)
-            ts1_surr.from_series(ts1)
-            for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
-                stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
-                                                     ts1_surr.series_list[i].value,statistic, settings)[0]
-            # obtain p-value
-            pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
-            # establish significance
-            signif = pval <= alpha
+                raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
         else:
-            raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
-
+            warnings.warn('The series do not overlap; default values assigned to object',UserWarning, stacklevel=2)
+            stat = np.nan
+            pval = np.nan
+            signif = None
+            
         corr = Corr(stat, pval, signif, alpha) # assemble Correlation result object
         return corr
 

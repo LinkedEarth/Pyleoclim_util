@@ -662,7 +662,14 @@ class TestUISeriesCorrelation:
         with pytest.raises(ValueError):  
             corr_res = ts1.correlation(ts2, statistic='kendalltau', method= 'ttest')
                                        
-        
+    def test_correlation_t4(self):
+        '''
+        tests that np.nan is returned if two series don't overlap
+        '''
+        gmst = pyleo.utils.load_dataset('HadCRUT5')
+        ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
+        corr = gmst.correlation(ts_13)
+        assert corr.r == np.nan
         
 
 class TestUISeriesCausality:
