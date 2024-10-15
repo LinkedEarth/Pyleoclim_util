@@ -825,7 +825,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             from pyleoclim.utils.tsmodel import colored_noise
             import numpy as np
 
@@ -874,7 +873,7 @@ class MultipleSeries:
             r_list.append(corr_res.r)
             signif_list.append(corr_res.signif)
             p_list.append(corr_res.p)
-
+            
         r_list = np.array(r_list)
         signif_fdr_list = []
         fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
