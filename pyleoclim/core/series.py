@@ -652,8 +652,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             soi = pyleo.utils.load_dataset('SOI')
             NINO3 = pyleo.utils.load_dataset('NINO3')
             soi.equals(NINO3)
@@ -692,6 +690,35 @@ class Series:
                     print(f"{key} property -- left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
 
         return same_data, same_metadata
+    
+    def overlap(self, ts):
+        '''
+        Convenience method to check the degree of overlap between two Series objects
+
+        Parameters
+        ----------
+        ts : pyleo.Series
+            The target series
+
+        Returns
+        -------
+        ovrlp : float
+            length of overlap (negative means overlap deficit) in units of the original object
+        
+        See also
+        --------
+        pyleoclim.utils.tsbase.overlap : compute length of overlap
+
+        '''
+        
+        time_pars_left = tsbase.time_unit_to_datum_exp_dir(self.time_unit,time_name=self.time_name)
+        time_pars_right = tsbase.time_unit_to_datum_exp_dir(ts.time_unit,time_name=ts.time_name)
+        ts_u =  ts.convert_time_unit(time_unit=self.time_unit) if time_pars_left != time_pars_right else ts
+        ovrlp = tsbase.overlap(self.time, ts_u.time)
+        
+        return ovrlp
+        
+                       
     
     def compare(self,ts,row_clr='palegoldenrod'):
         '''
@@ -3739,8 +3766,9 @@ class Series:
             method = 'ar1sim'
 
         settings = {} if settings is None else settings.copy()
-
-        if tsbase.overlap(self.time, target_series.time)>5: # require at least 5-point overlap
+        
+        ovrlp = self.overlap(target_series)
+        if ovrlp>5: # require at least 5-point overlap
             ms = MultipleSeries([self, target_series])
             if list(self.time) != list(target_series.time):
                 
@@ -3801,7 +3829,7 @@ class Series:
             else:
                 raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
         else:
-            warnings.warn('The series do not overlap; default values assigned to object',UserWarning, stacklevel=2)
+            warnings.warn(f'The series have insufficient overlap ({ovrlp} {self.time_unit}); default values assigned to object',UserWarning, stacklevel=2)
             stat = np.nan
             pval = np.nan
             signif = None
