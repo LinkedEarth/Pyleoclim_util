@@ -695,7 +695,7 @@ class Series:
     
     def compare(self,ts,row_clr='palegoldenrod'):
         '''
-        Grapjically compare two Series objects
+        Graphically compare two Series objects
 
         Parameters
         ----------
@@ -707,7 +707,7 @@ class Series:
         fig : Matplotlib figure 
            
         df : pandas dataframe
-            dataframe containing metadata ; identical rows are highlighted
+            dataframe containing metadata ; identical rows are highlighted in Jupyter Notebook
             
         Examples
         --------
@@ -720,7 +720,7 @@ class Series:
             EDC_dD = pyleo.utils.datasets.load_dataset('EDC-dD')
             
             fig, df = GISP2.compare(EDC_dD)
-            df
+            df  # this will display the metadata as a dataframe in a notebook
 
         '''
         time_pars_left = tsbase.time_unit_to_datum_exp_dir(self.time_unit,time_name=self.time_name)
