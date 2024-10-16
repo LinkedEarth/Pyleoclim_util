@@ -877,7 +877,7 @@ class MultipleSeries:
         if target is None:
             target = self.series_list[0]
 
-        print("Looping over "+ str(len(self.series_list)) +" Series in collection")
+        print(f"Looping over {len(self.series_list)} Series in collection")
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
             corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings,
                                       method=method, number=number, statistic=statistic,

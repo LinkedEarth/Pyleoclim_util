@@ -692,6 +692,75 @@ class Series:
                     print(f"{key} property -- left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
 
         return same_data, same_metadata
+    
+    def compare(self,ts,row_clr='palegoldenrod'):
+        '''
+        Grapjically compare two Series objects
+
+        Parameters
+        ----------
+        ts : pyleo.Series
+            The target series
+
+        Returns
+        -------
+        fig : Matplotlib figure 
+           
+        df : pandas dataframe
+            dataframe containing metadata ; identical rows are highlighted
+            
+        Examples
+        --------
+
+        Compare the SOI and NINO3 series
+
+        .. jupyter-execute::
+
+            GISP2 = pyleo.utils.load_dataset('GISP2')
+            EDC_dD = pyleo.utils.datasets.load_dataset('EDC-dD')
+            
+            fig, df = GISP2.compare(EDC_dD)
+            df
+
+        '''
+        time_pars_left = tsbase.time_unit_to_datum_exp_dir(self.time_unit,time_name=self.time_name)
+        time_pars_right = tsbase.time_unit_to_datum_exp_dir(ts.time_unit,time_name=ts.time_name)
+        if time_pars_left == time_pars_right:
+            ovrlp = tsbase.overlap(self.time, ts.time)
+            if ovrlp>5:
+                corr = self.correlation(ts,method='built-in')
+                ttl = f'Shared variance: {100*corr.r**2:3.2f} % over a {ovrlp} {ts.time_unit} overlap'
+            else:
+                ttl = 'No suitable overlap'
+        else:   
+            ttl = 'Incommensurate time units'
+        # plot the two series using dual y axes  (h/t https://stackoverflow.com/a/12059429/4984978)
+        fig, ax = self.plot(color='C0')
+        ax.spines['left'].set_color('C0')
+        ax.yaxis.label.set_color('C0')
+        ax.tick_params(axis='y', colors='C0')
+        ax.legend(loc='upper left')
+        ax2=ax.twinx(); ax2.grid(False)
+        ts.plot(ax=ax2,color='C1')
+        ax2.spines['right'].set_color('C1')
+        ax2.yaxis.label.set_color('C1')
+        ax2.tick_params(axis='y', colors='C1')
+        ax2.legend(loc='upper right')
+        ax.set_title(ttl)
+        
+        # organize metadata as dataframe
+        s1 = pd.Series(list(self.metadata.values()),index=self.metadata.keys())
+        s2 = pd.Series(list(ts.metadata.values()),  index=ts.metadata.keys())
+        df = pd.DataFrame({ser.label: ser for ser in [s1,s2]}).drop(index='label')
+        # highlight identical rows (h/t https://stackoverflow.com/a/68749678/4984978)
+        highlighted_rows = (df.iloc[:,0]==df.iloc[:,1]).map({
+             True: f'background-color: {row_clr}',
+             False: ''
+        })
+        # Apply styles to each column:
+        styler = df.style.apply(lambda _: highlighted_rows)
+ 
+        return fig, styler
 
     def view(self):
         '''
@@ -3671,7 +3740,7 @@ class Series:
 
         settings = {} if settings is None else settings.copy()
 
-        if tsbase.overlap(self.time, target_series.time)>0:
+        if tsbase.overlap(self.time, target_series.time)>5: # require at least 5-point overlap
             ms = MultipleSeries([self, target_series])
             if list(self.time) != list(target_series.time):
                 
