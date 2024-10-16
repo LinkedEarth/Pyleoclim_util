@@ -710,7 +710,6 @@ class Series:
         pyleoclim.utils.tsbase.overlap : compute length of overlap
 
         '''
-        
         time_pars_left = tsbase.time_unit_to_datum_exp_dir(self.time_unit,time_name=self.time_name)
         time_pars_right = tsbase.time_unit_to_datum_exp_dir(ts.time_unit,time_name=ts.time_name)
         ts_u =  ts.convert_time_unit(time_unit=self.time_unit) if time_pars_left != time_pars_right else ts
