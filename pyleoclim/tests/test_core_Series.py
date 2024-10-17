@@ -696,7 +696,7 @@ class TestUISeriesCorrelation:
         gmst = pyleo.utils.load_dataset('HadCRUT5')
         ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
         corr = gmst.correlation(ts_13)
-        assert corr.r == np.nan
+        assert np.isnan(corr.r)
         
 
 class TestUISeriesCausality:

@@ -409,10 +409,11 @@ class TestMultipleSeriesCommonTime:
         seriesList = []
         n = 100
         for j in range(4):
-            v = gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
+            _, v = pyleo.utils.gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
+            #v = gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
             deleted_idx = np.random.choice(range(np.size(time)), ndel, replace=False)
             tu =  np.delete(time.copy(), deleted_idx)
-            vu =  np.delete(v.value, deleted_idx)
+            vu =  np.delete(v, deleted_idx)
             ts = pyleo.Series(time=tu, value=vu,  value_name='Series_'+str(j+1))
             seriesList.append(ts)
     
@@ -428,10 +429,10 @@ class TestMultipleSeriesCommonTime:
         seriesList = []
         n = 100
         for j in range(4):
-            v = gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
+            _, v = pyleo.utils.gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
             deleted_idx = np.random.choice(range(np.size(time)), ndel, replace=False)
             tu =  np.delete(time.copy(), deleted_idx)
-            vu =  np.delete(v.value, deleted_idx)
+            vu =  np.delete(v, deleted_idx)
             ts = pyleo.Series(time=tu, value=vu,  value_name='Series_'+str(j+1))
             seriesList.append(ts)
     

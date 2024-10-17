@@ -536,7 +536,7 @@ class EnsembleSeries(MultipleSeries):
 
             The significance level (0.05 by default)
        
-        method : str, {'ttest','built-in','ar1sim','phaseran'}
+        method : str, {'ttest','built-in','ar1sim','phaseran','CN'}
             method for significance testing. Default is 'ttest' to lower computational cost, but this is not always the best choice
             
         statistic : str
@@ -576,12 +576,13 @@ class EnsembleSeries(MultipleSeries):
 
         See also
         --------
-
-        pyleoclim.utils.correlation.corr_sig : Correlation function
-
+        pyleoclim.core.series.Series.correlation : pairwise correlations
+        
         pyleoclim.utils.correlation.fdr : False Discovery Rate
 
         pyleoclim.core.correns.CorrEns : The correlation ensemble object
+        
+        pyleoclim.core.surrogateseries.SurrogateSeries : surrogate series
 
         Examples
         --------
@@ -612,7 +613,7 @@ class EnsembleSeries(MultipleSeries):
             print(corr_res)
             
         The `print` function tabulates the output, and conveys the p-value according
-        to the correlation test applied ("isospec", by default). To plot the result:
+        to the correlation test applied ("ttest", by default). To plot the result:
         
         .. jupyter-execute::
             
@@ -630,16 +631,22 @@ class EnsembleSeries(MultipleSeries):
             if hasattr(target, 'series_list'):
                 nEns = np.size(target.series_list)
                 if idx < nEns:
-                    value2 = target.series_list[idx].value
-                    time2 = target.series_list[idx].time
+                    ts2 = target.series_list[idx].copy()
+                    #value2 = target.series_list[idx].value
+                    #time2 = target.series_list[idx].time
+                    
                 else:
-                    value2 = target.series_list[idx-nEns].value
-                    time2 = target.series_list[idx-nEns].time
+                    #value2 = target.series_list[idx-nEns].value
+                    #time2 = target.series_list[idx-nEns].time
+                    ts2 = target.series_list[idx-nEns].copy()
             else:
-                value2 = target.value
-                time2 = target.time
-
-            ts2 = Series(time=time2, value=value2, verbose=idx==0, auto_time_params=False)
+                ts2 = target.copy()
+                #value2 = target.value
+                #time2 = target.time
+            
+            #ts2 = target.series_list[idx].copy()
+            #ts2.time = time2; ts2.value = value2 
+            #ts2 = Series(time=time2, value=value2, verbose=idx==0, auto_time_params=False) 
             corr_res = ts1.correlation(ts2, timespan=timespan, method=method,number=number,
                                        statistic=statistic,
                                        settings=settings, mute_pbar=True,
