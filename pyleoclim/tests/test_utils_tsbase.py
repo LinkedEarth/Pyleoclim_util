@@ -163,3 +163,9 @@ def test_convert_datetime_index_nondt_index(dataframe):
             time_unit, 
             time_name=time_name,
             )
+        
+def test_overlap():
+    t1 = np.linspace(1,10)
+    t2 = np.linspace(2.5,8.5)
+    L = tsbase.overlap(t1, t2)
+    assert L == np.ptp(t2)

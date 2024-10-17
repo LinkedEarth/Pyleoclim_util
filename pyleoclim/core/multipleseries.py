@@ -17,7 +17,7 @@ import warnings
 import numpy as np
 from copy import deepcopy
 
-from matplotlib.ticker import (MultipleLocator, AutoMinorLocator, FormatStrFormatter)
+from matplotlib.ticker import (AutoMinorLocator, FormatStrFormatter)
 import matplotlib.transforms as transforms
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -735,6 +735,8 @@ class MultipleSeries:
                     fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
+        This function recursively applies Series.correlation() to members of the MultipleSeries object.
+
         The significance of the correlation is assessed using one of the following methods:
 
         1. 'ttest': T-test adjusted for effective sample size, see [1]
@@ -748,8 +750,9 @@ class MultipleSeries:
         The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
         The others are non-parametric, but their computational requirements scale with the number of simulations.
 
-        The choise of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
-
+        The False Discovery Rate method is applied to the assessment of significance when plotting the result. 
+        
+        If the computation fails, a diagnostic message returns the index and label of the incriminated series. 
         
         Parameters
         ----------
@@ -809,12 +812,23 @@ class MultipleSeries:
         -------
         corr : CorrEns
         
-            the result object
+            the result object, containing the following:
+            - statistic r (array of real numbers)
+            - p-values pval (array of real numbers)
+            - signif (array of booleans)
+            - alpha (significance level)
+            
 
         See also
         --------
+        
+        pyleoclim.core.series.Series.correlation :  Series-level correlation 
 
-        pyleoclim.utils.correlation.corr_sig : Correlation function
+        pyleoclim.utils.correlation.association : SciPy measures of association between variables
+
+        pyleoclim.series.surrogates : parametric and non-parametric surrogates of any Series object
+
+        pyleoclim.multipleseries.common_time : Aligning time axes
 
         pyleoclim.utils.correlation.fdr : FDR function
         
@@ -825,7 +839,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             from pyleoclim.utils.tsmodel import colored_noise
             import numpy as np
 
@@ -866,15 +879,22 @@ class MultipleSeries:
         if target is None:
             target = self.series_list[0]
 
-        print("Looping over "+ str(len(self.series_list)) +" Series in collection")
+        print(f"Looping over {len(self.series_list)} Series in collection")
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
-            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings,
-                                      method=method, number=number, statistic=statistic,
-                                      common_time_kwargs=common_time_kwargs, seed=seed)
-            r_list.append(corr_res.r)
-            signif_list.append(corr_res.signif)
-            p_list.append(corr_res.p)
-
+            try:
+                corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings,
+                                          method=method, number=number, statistic=statistic,
+                                          common_time_kwargs=common_time_kwargs, seed=seed)
+                r_list.append(corr_res.r)
+                signif_list.append(corr_res.signif)
+                p_list.append(corr_res.p)
+            except:
+                ovrlp = ts.overlap(target)
+                print(f"Computation failed for series #{idx}, {ts.label}; overlap is {ovrlp} {ts.time_unit}")
+                r_list.append(np.nan)
+                signif_list.append(None)
+                p_list.append(np.nan)
+            
         r_list = np.array(r_list)
         signif_fdr_list = []
         fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()

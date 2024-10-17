@@ -18,11 +18,8 @@ import numpy as np
 #from pandas.testing import assert_frame_equal
 
 import pytest
-
 import pyleoclim as pyleo
-from pyleoclim.utils.tsmodel import (
-    colored_noise,
-)
+
 
 # a collection of useful functions
 
@@ -45,16 +42,16 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
     ''' Generate colored noise
     '''
     t = np.arange(nt)
-    v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
+    v = pyleo.utils.colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
     return t, v
 
 
 # Tests below
 class TestUIEnsembleSeriesCorrelation():
-    def test_correlation_t0(self):
+    def test_correlation_t0(self, nt = 100):
         '''Test for EnsembleSeries.correlation() when the target is a Series
         '''
-        nt = 100
+        
         t0, v0 = gen_colored_noise(nt=nt)
         t0, noise = gen_normal(nt=nt)
 
