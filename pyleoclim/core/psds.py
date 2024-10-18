@@ -1406,3 +1406,162 @@ class MultiplePSD:
         else:
             return ax
     
+    def plot_traces(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, num_traces=10, seed=None,
+             xlim=None, ylim=None, linestyle='-', savefig_settings=None, ax=None, legend=True,
+             color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None):
+        '''Plot MultiplePSD as a subset of traces.
+
+        Parameters
+        ----------
+        figsize : list, optional
+
+            The figure size. The default is [10, 4].
+
+        xlabel : str, optional
+
+            x-axis label. The default is None.
+
+        ylabel : str, optional
+
+            y-axis label. The default is None.
+
+        title : str, optional
+
+            Plot title. The default is None.
+
+        xlim : list, optional
+
+            x-axis limits. The default is None.
+
+        ylim : list, optional
+
+            y-axis limits. The default is None.
+
+        color : str, optional
+
+            Color of the traces. The default is sns.xkcd_rgb['pale red'].
+
+        alpha : float, optional
+
+            Transparency of the lines representing the multiple members. The default is 0.3.
+
+        linestyle : {'-', '--', '-.', ':', '', (offset, on-off-seq), ...}
+
+            Set the linestyle of the line
+
+        lw : float, optional
+
+            Width of the lines representing the multiple members. The default is 0.5.
+
+        num_traces : int, optional
+
+            Number of traces to plot. The default is 10.
+
+        savefig_settings : dict, optional
+
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+
+        ax : matplotlib.ax, optional
+
+            Matplotlib axis on which to return the plot. The default is None.
+
+        legend : bool; {True,False}, optional
+
+            Whether to plot the legend. The default is True.
+
+        lgd_kwargs : dict, optional
+
+            Parameters for the legend. The default is None.
+
+        seed : int, optional
+
+            Set the seed for the random number generator. Useful for reproducibility. The default is None.
+
+        Returns
+        -------
+        fig : matplotlib.figure
+        
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+        
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        .. jupyter-execute::
+            nn = 30 # number of noise realizations
+            nt = 500 # timeseries length
+            psds = []
+
+            time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            
+            ts = pyleo.Series(time=time, value = signal, verbose=False).standardize()
+            noise = np.random.randn(nt,nn)
+
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=time, value=signal+10*noise[:,idx], verbose=False)
+                psd = ts.spectral()
+                psds.append(psd)
+
+            mPSD = pyleo.MultiplePSD(psds)
+            
+            fig, ax = mPSD.plot_traces()
+
+            '''
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+        
+        num_traces = min(num_traces, len(self.psd_list)) # restrict to the smaller of the two
+
+        # generate default axis labels
+        if xlabel is None:
+            xlabel = 'Frequency'
+
+        if ylabel is None:
+            ylabel = 'Amplitude'
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        if num_traces > 0:
+            if seed is not None:
+                np.random.seed(seed)
+
+            npsd = np.size(self.psd_list)
+            random_draw_idx = np.random.choice(npsd, num_traces, replace=False)
+
+            for idx in random_draw_idx:
+                self.psd_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
+                    xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,linestyle='-', label='_ignore')
+            l1, = ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})',linestyle='-')
+
+        if title is not None:
+            ax.set_title(title)
+            
+        if legend==True:
+            lgd_args = {'frameon': False}
+            lgd_args.update(lgd_kwargs)
+            ax.legend(**lgd_args)
+        elif legend==False:
+            ax.legend().remove()
+        else:
+            raise ValueError('legend should be set to either True or False')
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax

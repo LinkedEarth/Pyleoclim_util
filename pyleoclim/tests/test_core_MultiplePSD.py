@@ -89,3 +89,46 @@ class TestUiMultiplePsdPlotEnvelope:
         psds = ts_surrs.spectral(method='mtm')
         fig, ax = psds.plot_envelope()
         pyleo.closefig(fig)
+
+class TestUiMultiplePsdPlotTraces:
+    ''' Tests for MultiplePSD.plot_traces()
+    '''
+
+    def test_plot_traces_t0(self):
+        ''' Test MultiplePSD.plot_traces() of a list of colored noise
+        '''
+        alphas = np.arange(0.5, 1.5, 0.1)
+        series_list = []
+        for idx, alpha in enumerate(alphas):
+            series_list.append(gen_ts(nt=1000, alpha=alpha))
+
+        ts_surrs = pyleo.MultipleSeries(series_list=series_list)
+        psds = ts_surrs.spectral(method='mtm')
+        fig, ax = psds.plot_traces()
+        pyleo.closefig(fig)
+
+    def test_plot_traces_t1(self):
+        ''' Test MultiplePSD.plot_traces() with different numbers of traces
+        '''
+        alphas = np.arange(0.5, 1.5, 0.1)
+        series_list = []
+        for idx, alpha in enumerate(alphas):
+            series_list.append(gen_ts(nt=1000, alpha=alpha))
+
+        ts_surrs = pyleo.MultipleSeries(series_list=series_list)
+        psds = ts_surrs.spectral(method='mtm')
+        fig, ax = psds.plot_traces(num_traces=5)
+        pyleo.closefig(fig)
+
+    def test_plot_traces_t2(self):
+        ''' Test MultiplePSD.plot_traces() with different random seeds
+        '''
+        alphas = np.arange(0.5, 1.5, 0.1)
+        series_list = []
+        for idx, alpha in enumerate(alphas):
+            series_list.append(gen_ts(nt=1000, alpha=alpha))
+
+        ts_surrs = pyleo.MultipleSeries(series_list=series_list)
+        psds = ts_surrs.spectral(method='mtm')
+        fig, ax = psds.plot_traces(seed=42)
+        pyleo.closefig(fig)
