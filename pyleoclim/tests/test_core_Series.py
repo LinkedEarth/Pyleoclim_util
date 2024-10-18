@@ -466,6 +466,33 @@ class TestUISeriesSlice:
 
         assert min(times) == 10
         assert max(times) == 90
+        
+class TestUISeriesOverlap:
+    '''Test for Series.overlap()
+    '''
+    @pytest.mark.parametrize('offset', [0,6])
+    def test_overlap_same_units(self, offset):
+        
+        t = np.linspace(0,5,num=5)
+        v = t
+        ts1 = pyleo.Series(time=t, value=v, time_unit='years', verbose=False)
+        ts2 = pyleo.Series(time=t+offset, value=v, time_unit='years', verbose=False)
+        ovrlp = ts1.overlap(ts2)
+        
+        if offset == 0: 
+            assert ovrlp == 5.0
+        else:
+            assert ovrlp == -1.0    
+    
+    def test_overlap_different_units(self):
+        t1 = np.linspace(0,5,num=5)
+        v = t1
+        ts1 = pyleo.Series(time=t1, value=v, time_unit='ky BP', verbose=False)
+        ts2 = pyleo.Series(time=t1*1000, value=v, time_unit='y BP', verbose=False)
+        ovrlp = ts1.overlap(ts2)
+        
+        assert np.abs(ovrlp-5) < 1e-3
+
 
 class TestSel:
     @pytest.mark.parametrize(
@@ -662,7 +689,14 @@ class TestUISeriesCorrelation:
         with pytest.raises(ValueError):  
             corr_res = ts1.correlation(ts2, statistic='kendalltau', method= 'ttest')
                                        
-        
+    def test_correlation_t4(self):
+        '''
+        tests that np.nan is returned if two series don't overlap
+        '''
+        gmst = pyleo.utils.load_dataset('HadCRUT5')
+        ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
+        corr = gmst.correlation(ts_13)
+        assert np.isnan(corr.r)
         
 
 class TestUISeriesCausality:

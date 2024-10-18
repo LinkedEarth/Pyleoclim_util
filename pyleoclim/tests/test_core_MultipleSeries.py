@@ -25,10 +25,10 @@ from pyleoclim.utils.tsmodel import colored_noise
 
 # a collection of useful functions
 
-def gen_ts(model, nt, alpha, t=None):
+def gen_ts(model='colored_noise',alpha=1, nt=50, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
-    t, v = pyleo.utils.gen_ts(model=model, nt=nt, alpha=alpha, t=t)
-    ts = pyleo.Series(t, v, verbose=False,auto_time_params=True)
+    t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
+    ts=pyleo.Series(t,v, verbose=False, auto_time_params=True)
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
@@ -409,10 +409,11 @@ class TestMultipleSeriesCommonTime:
         seriesList = []
         n = 100
         for j in range(4):
-            v = gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
+            _, v = pyleo.utils.gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
+            #v = gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
             deleted_idx = np.random.choice(range(np.size(time)), ndel, replace=False)
             tu =  np.delete(time.copy(), deleted_idx)
-            vu =  np.delete(v.value, deleted_idx)
+            vu =  np.delete(v, deleted_idx)
             ts = pyleo.Series(time=tu, value=vu,  value_name='Series_'+str(j+1))
             seriesList.append(ts)
     
@@ -428,10 +429,10 @@ class TestMultipleSeriesCommonTime:
         seriesList = []
         n = 100
         for j in range(4):
-            v = gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
+            _, v = pyleo.utils.gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
             deleted_idx = np.random.choice(range(np.size(time)), ndel, replace=False)
             tu =  np.delete(time.copy(), deleted_idx)
-            vu =  np.delete(v.value, deleted_idx)
+            vu =  np.delete(v, deleted_idx)
             ts = pyleo.Series(time=tu, value=vu,  value_name='Series_'+str(j+1))
             seriesList.append(ts)
     
@@ -499,6 +500,20 @@ class TestMultipleSeriesCorrelation():
             corr = ms.correlation(statistic=stat)
         else:
             corr = ms.correlation(statistic=stat,method='built-in')
+            
+    def test_correlation_t2(self, rho=0.4, nt = 50):
+        ''' Test that everything works fine even without overlap
+        '''     
+        ts1 = gen_ts(nt=nt, alpha=1,seed=333).standardize()
+        # generate series whose correlation with ts1 should be close to rho:
+        v = rho*ts1.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
+        ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
+        ts3 = ts1.copy()
+        ts3.time = ts1.time + nt # make time axes disjoint
+        ms = ts2 & ts3
+        corr = ms.correlation(ts1,method='built-in')
+        corr.plot()  # make sure a plot is produced
+        
         
 class TestMultipleSeriesSpectral():
     ''' Test for MultipleSeries.spectral

@@ -564,3 +564,26 @@ def resolution(x):
         sign = 'mixed'
         
     return (res, stats, sign)
+
+def overlap(t1,t2):
+    '''
+    Computes length of overlap between two time axes. Negative numbers indicate a lack of overlap. 
+    Note that this does not count the number of overlapping time stamps ; it merely
+    checks that the two axes have a nonzero intersection on the real line. 
+    The amount of points in common depends on how densely sampled these axes are.
+
+    Parameters
+    ----------
+    t1 : array
+        time axis 1
+    t2 : array
+        time axis 2 (though order doesn't matter)
+
+    Returns
+    -------
+    L : length of overlap
+
+    '''
+    tmin = np.max([t1.min(), t2.min()])
+    tmax = np.min([t1.max(), t2.max()])
+    return tmax - tmin

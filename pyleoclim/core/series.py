@@ -652,8 +652,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             soi = pyleo.utils.load_dataset('SOI')
             NINO3 = pyleo.utils.load_dataset('NINO3')
             soi.equals(NINO3)
@@ -692,6 +690,103 @@ class Series:
                     print(f"{key} property -- left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
 
         return same_data, same_metadata
+    
+    def overlap(self, ts):
+        '''
+        Convenience method to check the degree of overlap between two Series objects
+
+        Parameters
+        ----------
+        ts : pyleo.Series
+            The target series
+
+        Returns
+        -------
+        ovrlp : float
+            length of overlap (negative means overlap deficit) in units of the original object
+        
+        See also
+        --------
+        pyleoclim.utils.tsbase.overlap : compute length of overlap
+
+        '''
+        time_pars_left = tsbase.time_unit_to_datum_exp_dir(self.time_unit,time_name=self.time_name)
+        time_pars_right = tsbase.time_unit_to_datum_exp_dir(ts.time_unit,time_name=ts.time_name)
+        ts_u =  ts.convert_time_unit(time_unit=self.time_unit) if time_pars_left != time_pars_right else ts
+        ovrlp = tsbase.overlap(self.time, ts_u.time)
+        
+        return ovrlp
+        
+                       
+    
+    def compare(self,ts,row_clr='palegoldenrod'):
+        '''
+        Graphically compare two Series objects
+
+        Parameters
+        ----------
+        ts : pyleo.Series
+            The target series
+
+        Returns
+        -------
+        fig : Matplotlib figure 
+           
+        df : pandas dataframe
+            dataframe containing metadata ; identical rows are highlighted in Jupyter Notebook
+            
+        Examples
+        --------
+
+        Compare the SOI and NINO3 series
+
+        .. jupyter-execute::
+
+            GISP2 = pyleo.utils.load_dataset('GISP2')
+            EDC_dD = pyleo.utils.datasets.load_dataset('EDC-dD')
+            
+            fig, df = GISP2.compare(EDC_dD)
+            df  # this will display the metadata as a dataframe in a notebook
+
+        '''
+        time_pars_left = tsbase.time_unit_to_datum_exp_dir(self.time_unit,time_name=self.time_name)
+        time_pars_right = tsbase.time_unit_to_datum_exp_dir(ts.time_unit,time_name=ts.time_name)
+        if time_pars_left == time_pars_right:
+            ovrlp = tsbase.overlap(self.time, ts.time)
+            if ovrlp>5:
+                corr = self.correlation(ts,method='built-in')
+                ttl = f'Shared variance: {100*corr.r**2:3.2f} % over a {ovrlp} {ts.time_unit} overlap'
+            else:
+                ttl = 'No suitable overlap'
+        else:   
+            ttl = 'Incommensurate time units'
+        # plot the two series using dual y axes  (h/t https://stackoverflow.com/a/12059429/4984978)
+        fig, ax = self.plot(color='C0')
+        ax.spines['left'].set_color('C0')
+        ax.yaxis.label.set_color('C0')
+        ax.tick_params(axis='y', colors='C0')
+        ax.legend(loc='upper left')
+        ax2=ax.twinx(); ax2.grid(False)
+        ts.plot(ax=ax2,color='C1')
+        ax2.spines['right'].set_color('C1')
+        ax2.yaxis.label.set_color('C1')
+        ax2.tick_params(axis='y', colors='C1')
+        ax2.legend(loc='upper right')
+        ax.set_title(ttl)
+        
+        # organize metadata as dataframe
+        s1 = pd.Series(list(self.metadata.values()),index=self.metadata.keys())
+        s2 = pd.Series(list(ts.metadata.values()),  index=ts.metadata.keys())
+        df = pd.DataFrame({ser.label: ser for ser in [s1,s2]}).drop(index='label')
+        # highlight identical rows (h/t https://stackoverflow.com/a/68749678/4984978)
+        highlighted_rows = (df.iloc[:,0]==df.iloc[:,1]).map({
+             True: f'background-color: {row_clr}',
+             False: ''
+        })
+        # Apply styles to each column:
+        styler = df.style.apply(lambda _: highlighted_rows)
+ 
+        return fig, styler
 
     def view(self):
         '''
@@ -3670,66 +3765,74 @@ class Series:
             method = 'ar1sim'
 
         settings = {} if settings is None else settings.copy()
-
-        ms = MultipleSeries([self, target_series])
-        if list(self.time) != list(target_series.time):
-            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
-            ct_args = {'method': 'interp'}
-            ct_args.update(common_time_kwargs)
-            ms = ms.common_time(**ct_args)
-
-        if timespan is None:
-            ts0 = ms.series_list[0]
-            ts1 = ms.series_list[1]
-        else:
-            ts0 = ms.series_list[0].slice(timespan)
-            ts1 = ms.series_list[1].slice(timespan)
-
-        if seed is not None:
-            np.random.seed(seed)
-
-        if method == 'ttest':
-            if statistic == 'pearsonr':
-                stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
-                signif = bool(signf)
-            else:
-                raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
+        
+        ovrlp = self.overlap(target_series)
+        if ovrlp>5: # require at least 5-point overlap
+            ms = MultipleSeries([self, target_series])
+            if list(self.time) != list(target_series.time):
                 
-        elif method == 'built-in':
-            if statistic == 'weightedtau':
-                raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
+                common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+                ct_args = {'method': 'interp'}
+                ct_args.update(common_time_kwargs)
+                ms = ms.common_time(**ct_args)
+    
+            if timespan is None:
+                ts0 = ms.series_list[0]
+                ts1 = ms.series_list[1]
             else:
-                res = corrutils.association(ts0.value,ts1.value,statistic, settings)
-                stat = res[0]
-                pval = res.pvalue if len(res) > 1 else np.nan
+                ts0 = ms.series_list[0].slice(timespan)
+                ts1 = ms.series_list[1].slice(timespan)
+    
+            if seed is not None:
+                np.random.seed(seed)
+    
+            if method == 'ttest':
+                if statistic == 'pearsonr':
+                    stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+                    signif = bool(signf)
+                else:
+                    raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
+                    
+            elif method == 'built-in':
+                if statistic == 'weightedtau':
+                    raise ValueError('The null distribution of this statistic is unknown; please use a non-parametric method to obtain the p-value')
+                else:
+                    res = corrutils.association(ts0.value,ts1.value,statistic, settings)
+                    stat = res[0]
+                    pval = res.pvalue if len(res) > 1 else np.nan
+                    signif = pval <= alpha
+            elif method in supported_surrogates:      
+                if 'nsim' in settings.keys(): # for legacy reasons
+                    raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
+                    number = settings['nsim']
+                    settings.pop('nsim')
+                else:
+                    number = number
+                    
+                # compute correlation statistic
+                stat = corrutils.association(ts0.value,ts1.value,statistic,settings)[0]
+                
+                # establish significance against surrogates
+                stat_surr = np.empty((number))
+                ts0_surr = SurrogateSeries(method=method,number=number)
+                ts0_surr.from_series(ts0)
+                ts1_surr = SurrogateSeries(method=method,number=number)
+                ts1_surr.from_series(ts1)
+                for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
+                    stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
+                                                         ts1_surr.series_list[i].value,statistic, settings)[0]
+                # obtain p-value
+                pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
+                # establish significance
                 signif = pval <= alpha
-        elif method in supported_surrogates:      
-            if 'nsim' in settings.keys(): # for legacy reasons
-                raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
-                number = settings['nsim']
-                settings.pop('nsim')
             else:
-                number = number
-                
-            # compute correlation statistic
-            stat = corrutils.association(ts0.value,ts1.value,statistic,settings)[0]
-            
-            # establish significance against surrogates
-            stat_surr = np.empty((number))
-            ts0_surr = SurrogateSeries(method=method,number=number)
-            ts0_surr.from_series(ts0)
-            ts1_surr = SurrogateSeries(method=method,number=number)
-            ts1_surr.from_series(ts1)
-            for i in tqdm(range(number), desc='Evaluating association on surrogate pairs', total=number, disable=mute_pbar):
-                stat_surr[i] = corrutils.association(ts0_surr.series_list[i].value,
-                                                     ts1_surr.series_list[i].value,statistic, settings)[0]
-            # obtain p-value
-            pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
-            # establish significance
-            signif = pval <= alpha
+                raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
         else:
-            raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
-
+            warnings.warn(f'The series have insufficient overlap ({ovrlp} {self.time_unit}); default values assigned to object',UserWarning, stacklevel=2)
+            stat = np.nan
+            pval = np.nan
+            signif = None
+            
         corr = Corr(stat, pval, signif, alpha) # assemble Correlation result object
         return corr
 
