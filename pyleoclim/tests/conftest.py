@@ -155,7 +155,7 @@ def ensembleseries_science():
     soi = pyleo.utils.load_dataset('SOI')
     ens = pyleo.EnsembleSeries([soi for _ in range(5)])
     for series in ens.series_list:
-        series.value += np.random.randn(len(series))
+        series.value += np.random.randn(len(series.value))
     return ens
 
 @pytest.fixture

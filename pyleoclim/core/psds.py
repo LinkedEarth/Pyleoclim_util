@@ -1406,8 +1406,8 @@ class MultiplePSD:
         else:
             return ax
     
-    def plot_traces(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, num_traces=10, seed=None,
-             xlim=None, ylim=None, linestyle='-', savefig_settings=None, ax=None, legend=True,
+    def plot_traces(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='PSD', title=None, num_traces=10, seed=None,
+             xticks=None, yticks=None, xlim=None, ylim=None, linestyle='-', savefig_settings=None, ax=None, legend=True,
              color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None):
         '''Plot MultiplePSD as a subset of traces.
 
@@ -1416,6 +1416,14 @@ class MultiplePSD:
         figsize : list, optional
 
             The figure size. The default is [10, 4].
+        
+        in_loglog : bool, optional
+            
+            Plot in log space. The default is True.
+            
+        in_period : bool, optional
+                
+            Whether to plot periodicity instead of frequency. The default is True.
 
         xlabel : str, optional
 
@@ -1428,6 +1436,14 @@ class MultiplePSD:
         title : str, optional
 
             Plot title. The default is None.
+        
+        xticks : list, optional
+            
+            x-ticks label. The default is None.
+        
+        yticks : list, optional
+
+            y-ticks label. The default is None.
 
         xlim : list, optional
 
@@ -1525,6 +1541,9 @@ class MultiplePSD:
         
         num_traces = min(num_traces, len(self.psd_list)) # restrict to the smaller of the two
 
+        if num_traces < 2:
+            raise ValueError('Number of traces to plot must be at least 2')
+
         # generate default axis labels
         if xlabel is None:
             xlabel = 'Frequency'
@@ -1543,8 +1562,8 @@ class MultiplePSD:
             random_draw_idx = np.random.choice(npsd, num_traces, replace=False)
 
             for idx in random_draw_idx:
-                self.psd_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
-                    xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,linestyle='-', label='_ignore')
+                self.psd_list[idx].plot(in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
+                    xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, ax=ax, color=color, alpha=alpha,linestyle=linestyle, label='_ignore')
             l1, = ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})',linestyle='-')
 
         if title is not None:
