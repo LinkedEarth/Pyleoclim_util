@@ -812,7 +812,7 @@ class EnsembleSeries(MultipleSeries):
 
             for idx in random_draw_idx:
                 self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
-                    xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,linestyle='-', label='_ignore')
+                    xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,linestyle=linestyle, label='_ignore')
             l1, = ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})',linestyle='-')
 
         if title is not None:
