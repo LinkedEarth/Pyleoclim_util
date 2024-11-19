@@ -3690,7 +3690,9 @@ class Series:
             the result object, containing
 
             - r : float
-                correlation coefficient
+                association metric (typically, correlation coefficient)
+            - r_crit : float
+                critical value of the statistic
             - p : float
                 the p-value
             - signif : bool
@@ -3801,6 +3803,7 @@ class Series:
                     stat = res[0]
                     pval = res.pvalue if len(res) > 1 else np.nan
                     signif = pval <= alpha
+                    
             elif method in supported_surrogates:      
                 if 'nsim' in settings.keys(): # for legacy reasons
                     raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
@@ -3831,9 +3834,10 @@ class Series:
             warnings.warn(f'The series have insufficient overlap ({ovrlp} {self.time_unit}); default values assigned to object',UserWarning, stacklevel=2)
             stat = np.nan
             pval = np.nan
+            stat_crit = np.nan
             signif = None
             
-        corr = Corr(stat, pval, signif, alpha) # assemble Correlation result object
+        corr = Corr(stat, pval, stat_crit, signif, alpha) # assemble Correlation result object
         return corr
 
     def causality(self, target_series, method='liang', timespan=None, settings=None, common_time_kwargs=None):
