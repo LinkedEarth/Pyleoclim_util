@@ -3692,7 +3692,7 @@ class Series:
             - r : float
                 association metric (typically, correlation coefficient)
             - r_crit : float
-                critical value of the statistic
+                critical value of the statistic (unless 'method' = 'built-in', in which case this quantity is not computed, and output as np.nan)
             - p : float
                 the p-value
             - signif : bool
@@ -3790,7 +3790,7 @@ class Series:
     
             if method == 'ttest':
                 if statistic == 'pearsonr':
-                    stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+                    stat, signf, pval, stat_crit = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
                     signif = bool(signf)
                 else:
                     raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
@@ -3828,13 +3828,15 @@ class Series:
                 pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
                 # establish significance
                 signif = pval <= alpha
+                # critical value
+                stat_crit = np.quantile(stat_surr, alpha)
             else:
                 raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
         else:
             warnings.warn(f'The series have insufficient overlap ({ovrlp} {self.time_unit}); default values assigned to object',UserWarning, stacklevel=2)
             stat = np.nan
-            pval = np.nan
             stat_crit = np.nan
+            pval = np.nan
             signif = None
             
         corr = Corr(stat, pval, stat_crit, signif, alpha) # assemble Correlation result object

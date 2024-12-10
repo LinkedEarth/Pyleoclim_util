@@ -81,15 +81,10 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     if method == 'ttest':
         (r, signif, p) = corr_ttest(y1, y2, alpha=alpha)
     elif method == 'isopersistent':
-        
         (r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
     elif method == 'isospectral':
         (r, signif, p) = corr_isospec(y1, y2, alpha=alpha, nsim=nsim)
         
-        
-    # apply this syntax:
-    # wave_res = wave_func[method](self.value, self.time, **args[method])
-
     res={'r':r,'signif':signif,'p':p}    
     
     return res
@@ -178,7 +173,7 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
 # Utilities
 #-----------
 
-def corr_ttest(y1, y2, alpha=0.05):
+def corr_ttest(y1, y2, alpha=0.05, df_min=10):
     """ Estimates the significance of correlations between 2 time series using
     the classical T-test adjusted for effective sample size.
     
@@ -195,6 +190,9 @@ def corr_ttest(y1, y2, alpha=0.05):
         
     alpha : float
         significance level for critical value estimation [default: 0.05]
+        
+    df_min : float
+        threshold for the effective degrees of freedom, under which things are not computed
 
     Returns
     -------
@@ -226,17 +224,20 @@ def corr_ttest(y1, y2, alpha=0.05):
     Ney1 = N * (1-g1) / (1+g1)
     Ney2 = N * (1-g2) / (1+g2)
 
-    Ne = stats.mstats.gmean([Ney1+Ney2])
-    assert Ne >= 10, 'Too few effective d.o.f. to apply this method!'
+    Ne = stats.mstats.gmean([Ney1,Ney2])
+    assert Ne >= df_min, 'Too few effective d.o.f. to apply this method!'
 
     df = Ne - 2
     t = np.abs(r) * np.sqrt(df/(1-r**2))
 
     pval = 2 * stats.t.cdf(-np.abs(t), df)
+    
+    tcrit = stats.t.ppf(1-alpha,df)
+    rcrit = np.sign(r)*tcrit*np.sqrt(1/(1+(df/tcrit)**2))
 
     signif = pval <= alpha
 
-    return r, signif, pval
+    return r, signif, pval, rcrit
 
 def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
     ''' Computes the Pearson's correlation between two timeseries, and their significance using Ar(1) modeling.
