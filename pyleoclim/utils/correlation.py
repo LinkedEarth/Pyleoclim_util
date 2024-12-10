@@ -233,7 +233,7 @@ def corr_ttest(y1, y2, alpha=0.05, df_min=10):
     pval = 2 * stats.t.cdf(-np.abs(t), df)
     
     tcrit = stats.t.ppf(1-alpha,df)
-    rcrit = np.sign(r)*tcrit*np.sqrt(1/(1+(df/tcrit)**2))
+    rcrit = np.sign(r)*tcrit*np.sqrt(1/(1+df/tcrit**2))
 
     signif = pval <= alpha
 
