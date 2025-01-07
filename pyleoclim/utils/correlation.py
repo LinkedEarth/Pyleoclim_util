@@ -228,12 +228,12 @@ def corr_ttest(y1, y2, alpha=0.05, df_min=10):
     assert Ne >= df_min, 'Too few effective d.o.f. to apply this method!'
 
     df = Ne - 2
-    t = np.abs(r) * np.sqrt(df/(1-r**2))
-
-    pval = 2 * stats.t.cdf(-np.abs(t), df)
+    t = r*np.sqrt(df/(1-r**2))
+    
+    pval = stats.t.cdf(-np.abs(t), df) # one sided T-test ; leverage symmetry of T distribution
     
     tcrit = stats.t.ppf(1-alpha,df)
-    rcrit = np.sign(r)*tcrit*np.sqrt(1/(1+df/tcrit**2))
+    rcrit = np.sign(r)*np.sqrt(tcrit**2/(df*(1+tcrit**2)))
 
     signif = pval <= alpha
 

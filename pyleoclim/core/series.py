@@ -3803,6 +3803,7 @@ class Series:
                     stat = res[0]
                     pval = res.pvalue if len(res) > 1 else np.nan
                     signif = pval <= alpha
+                    stat_crit = np.nan
                     
             elif method in supported_surrogates:      
                 if 'nsim' in settings.keys(): # for legacy reasons
@@ -3829,7 +3830,10 @@ class Series:
                 # establish significance
                 signif = pval <= alpha
                 # critical value
-                stat_crit = np.quantile(stat_surr, alpha)
+                if stat < 0:
+                    stat_crit = np.quantile(stat_surr, alpha)
+                else:
+                    stat_crit = np.quantile(stat_surr, 1-alpha)
             else:
                 raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
         else:
