@@ -724,6 +724,24 @@ class TestUISeriesCorrelation:
                   
         assert np.abs((corr_res.r_crit -r_crit)/r_crit) < 0.1
         
+    @pytest.mark.parametrize('sig_method', ['ttest','built-in','ar1sim','phaseran','CN'])
+    def test_correlation_t6(self, sig_method, number=10, eps=0.1):
+        ''' Test the various significance methods
+        '''
+        nt = 100
+        rho = 0.4 # target correlation
+        ts1 = gen_ts(nt=nt,alpha=1,seed=333).standardize()
+        # generate series whose correlation with ts1 should be close to rho:
+        v = rho*ts1.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
+        ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
+
+        corr_res = ts1.correlation(ts2, method= sig_method, number=number)
+        
+        if sig_method == 'built-in':
+            assert np.isnan(corr_res.r_crit)
+        else:
+            assert np.isfinite(corr_res.r_crit)
+        
 
 class TestUISeriesCausality:
     ''' Test Series.causality()
