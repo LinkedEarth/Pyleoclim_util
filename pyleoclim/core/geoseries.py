@@ -344,7 +344,25 @@ class GeoSeries(Series):
             Draws major lakes.
             If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
             Default is off (False).
+        
+        fig : matplotlib.pyplot.figure, optional
+            See matplotlib.pyplot.figure <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib-pyplot-figure>_.
+            The default is None.
 
+        gridspec_slot : Gridspec slot, optional
+            If generating a map for a multi-plot, pass a gridspec slot.
+            The default is None.
+        
+        title : string
+            Title for the plot. Default is None
+        
+        size : string, optional
+            Grouping variable that will produce points with different sizes. Expects to be associated with numeric values (e.g., 'elevation' has values). Any data without a value for the size variable will be filtered out.
+            The default is None.
+        
+        edgecolor : color (string) or list of rgba tuples, optional
+            Color of marker edge. The default is 'w'.
+            
         figsize : list or tuple, optional
             The size of the figure. The default is None.
 
@@ -361,6 +379,18 @@ class GeoSeries(Series):
 
         scatter_kwargs : dict, optional
             Parameters for the scatter plot. The default is None.
+        
+        cmap : string or list, optional
+            Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_.
+            The default is None.
+        
+        colorbar : bool, optional
+            Whether the draw a colorbar on the figure if the data associated with hue are numeric.
+            Default is True.
+        
+        gridspec_kwargs : dict, optional
+            Function assumes the possibility of a colorbar, map, and legend. A list of floats associated with the keyword `width_ratios` will assume the first (index=0) is the relative width of the colorbar, the second to last (index = -2) is the relative width of the map, and the last (index = -1) is the relative width of the area for the legend.
+            For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>`_. The default is None.
 
         legend :  bool; {True, False}, optional
             Whether to plot the legend. The default is True.
@@ -406,8 +436,10 @@ class GeoSeries(Series):
 
 
         '''
+        scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
+        
         if markersize != None:
-            scatter_kwargs['markersize'] = markersize
+            scatter_kwargs['s'] = markersize
             
         if type(title)==bool:
             if title == False:

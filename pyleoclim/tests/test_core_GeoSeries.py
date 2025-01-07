@@ -167,6 +167,10 @@ class TestUIGeoSeriesMap():
             ax['map'].get_title() == 'Untitled'
         pyleo.closefig(fig)
         pyleo.closefig(fig)
+    
+    def test_map_t2(self,pinkgeoseries):
+        ts = pinkgeoseries
+        fig,ax = ts.map(markersize=100)
         
         
 def test_segment():
