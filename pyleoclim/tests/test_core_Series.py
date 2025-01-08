@@ -28,6 +28,7 @@ test_dirpath = pathlib.Path(__file__).parent.absolute()
 
 import pyleoclim as pyleo
 import pyleoclim.utils.tsbase as tsbase
+import pyleoclim.utils.tsmodel as tsmodel
 
 
 
@@ -697,6 +698,49 @@ class TestUISeriesCorrelation:
         ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
         corr = gmst.correlation(ts_13)
         assert np.isnan(corr.r)
+        
+    def test_correlation_t5(self):
+        '''
+        Check that `ttest` method returns an analytically-sensible critical value
+        '''
+        ts=pyleo.utils.load_dataset('SOI').standardize()
+        rho = 0.6; tcrit = 1.96  # use quantile of standard normal bc nu is so large
+        # generate series whose correlation with ts1 should be close to rho:
+        v2 = rho*ts.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=len(ts.time))
+        ts2 = pyleo.Series(time=ts.time, value=v2, verbose=False, auto_time_params=True)
+        corr_res = ts.correlation(ts2, method= 'ttest')
+        import scipy.stats as stats
+        g1 = tsmodel.ar1_fit_evenly(ts.value)
+        g2 = tsmodel.ar1_fit_evenly(v2)
+        N = len(ts.value)
+        
+        Ney1 = N * (1-g1) / (1+g1)
+        Ney2 = N * (1-g2) / (1+g2)
+        
+        Ne = stats.mstats.gmean([Ney1,Ney2])
+        df = Ne -2
+        
+        r_crit = np.sqrt(tcrit**2/(df*(1+tcrit**2)))
+                  
+        assert np.abs((corr_res.r_crit -r_crit)/r_crit) < 0.1
+        
+    @pytest.mark.parametrize('sig_method', ['ttest','built-in','ar1sim','phaseran','CN'])
+    def test_correlation_t6(self, sig_method, number=10, eps=0.1):
+        ''' Test the various significance methods
+        '''
+        nt = 100
+        rho = 0.4 # target correlation
+        ts1 = gen_ts(nt=nt,alpha=1,seed=333).standardize()
+        # generate series whose correlation with ts1 should be close to rho:
+        v = rho*ts1.value + np.sqrt(1-rho**2)*np.random.normal(loc=0, scale=1, size=nt)
+        ts2 = pyleo.Series(time=ts1.time, value=v, verbose=False, auto_time_params=True)
+
+        corr_res = ts1.correlation(ts2, method= sig_method, number=number)
+        
+        if sig_method == 'built-in':
+            assert np.isnan(corr_res.r_crit)
+        else:
+            assert np.isfinite(corr_res.r_crit)
         
 
 class TestUISeriesCausality:

@@ -3690,7 +3690,9 @@ class Series:
             the result object, containing
 
             - r : float
-                correlation coefficient
+                association metric (typically, correlation coefficient)
+            - r_crit : float
+                critical value of the statistic (unless 'method' = 'built-in', in which case this quantity is not computed, and output as np.nan)
             - p : float
                 the p-value
             - signif : bool
@@ -3788,7 +3790,7 @@ class Series:
     
             if method == 'ttest':
                 if statistic == 'pearsonr':
-                    stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+                    stat, signf, pval, stat_crit = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
                     signif = bool(signf)
                 else:
                     raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
@@ -3801,6 +3803,8 @@ class Series:
                     stat = res[0]
                     pval = res.pvalue if len(res) > 1 else np.nan
                     signif = pval <= alpha
+                    stat_crit = np.nan
+                    
             elif method in supported_surrogates:      
                 if 'nsim' in settings.keys(): # for legacy reasons
                     raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
@@ -3825,15 +3829,21 @@ class Series:
                 pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
                 # establish significance
                 signif = pval <= alpha
+                # critical value
+                if stat < 0:
+                    stat_crit = np.quantile(stat_surr, alpha)
+                else:
+                    stat_crit = np.quantile(stat_surr, 1-alpha)
             else:
                 raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
         else:
             warnings.warn(f'The series have insufficient overlap ({ovrlp} {self.time_unit}); default values assigned to object',UserWarning, stacklevel=2)
             stat = np.nan
+            stat_crit = np.nan
             pval = np.nan
             signif = None
             
-        corr = Corr(stat, pval, signif, alpha) # assemble Correlation result object
+        corr = Corr(stat, pval, stat_crit, signif, alpha) # assemble Correlation result object
         return corr
 
     def causality(self, target_series, method='liang', timespan=None, settings=None, common_time_kwargs=None):
