@@ -1928,7 +1928,7 @@ def freq_vector_scale(ts, dj=0.25, s0=None,j1=None, mother='MORLET',param=None):
 
     j = np.arange(0, j1 + 1)
     scale = s0 * 2. ** (j * dj)
-    freq = 1. / (fourier_factor * scale)       
+    freq = np.sort(1. / (fourier_factor * scale)) # ensure increasing order     
 
     return freq
 
