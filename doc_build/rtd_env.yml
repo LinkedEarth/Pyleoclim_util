@@ -1,4 +1,8 @@
 name: rtd_env
+# Required
+version: 2
+sphinx:
+  configuration: docs/conf.py
 channels:
   - conda-forge
   - defaults
