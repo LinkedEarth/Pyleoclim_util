@@ -15,7 +15,11 @@ The GeoSeries class takes this one step further, enabling geolocation and associ
 These classes allow Pyleoclim to readily analyze datasets stored in the Linked Paleo Data (`LiPD <http://lipd.net>`_) format, through the `PyLiPD <https://pylipd.readthedocs.io/en/latest/>`_ package.
 In particular, the package can make use of age ensembles and uses them for time-uncertain analysis. The age ensembles must however be generated externally, e.g. through the `GeoChronR <http://nickmckay.github.io/GeoChronR/>`_ package, which natively stores them as ensemble tables in LiPD.
 
-Pyleoclim is by no means limited to LiPD-formatted data, and has been used in astronomy, finance, and robotics. Indeed, Pyleoclim is the workhorse supporting more general `machine-learning functionalities <https://github.com/KnowledgeCaptureAndDiscovery/autoTS>`_ for all manner of timeseries.
+However, Pyleoclim is by no means limited to LiPD-formatted data, and has been used in astronomy, finance, and robotics. Indeed, Pyleoclim is the workhorse supporting more general `machine-learning functionalities <https://github.com/KnowledgeCaptureAndDiscovery/autoTS>`_ for all manner of timeseries.
+
+This documentation explains the basic usage of Pyleoclim functionalities. A progressive introduction to scientific uses of the package is available at `PyleoTutorials <http://linked.earth/PyleoTutorials/>`_. 
+Examples of scientific use are given `this paper <https://doi.org/10.1029/2022PA004509>`_.  A growing collection of research-grade workflows using Pyleoclim and the LinkedEarth research ecosystem are available as `PaleoBooks <http://linked.earth/PaleoBooks/>`_, with video tutorials on the LinkedEarth `YouTube channel <https://www.youtube.com/watch?v=LJaQBFMK2-Q&list=PL93NbaRnKAuF4WpIQf-4y_U4lo-GqcrcW>`_. 
+Python novices are encouraged to follow these `self-paced tutorials <http://linked.earth/LeapFROGS>`_ before trying Pyleoclim.
 
 Getting Started
 ===============
