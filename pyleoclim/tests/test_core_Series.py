@@ -1040,7 +1040,7 @@ class TestUISeriesWaveletCoherence():
        tau = ts1.time[::10]
        _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'tau':tau})
        
-    @pytest.mark.parametrize('freq', [None,np.linspace(1/100,1/2,num=20),'log', 'nfft', 'welch'])
+    @pytest.mark.parametrize('freq', [None,np.linspace(1/100,1/2,num=20),'log', 'nfft', 'welch','scale'])
     def test_xwave_t7(self, freq):
        ''' Test Series.wavelet_coherence() with freq method argument
        '''
