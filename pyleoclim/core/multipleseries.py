@@ -13,6 +13,8 @@ from ..core.psds import MultiplePSD
 from ..core.multivardecomp import MultivariateDecomp
 from ..core.resolutions import MultipleResolution
 
+from concurrent.futures import ProcessPoolExecutor #parallel processing library
+
 import warnings
 import numpy as np
 from copy import deepcopy
@@ -26,6 +28,46 @@ import pandas as pd
 from tqdm import tqdm
 from scipy import stats
 from statsmodels.multivariate.pca import PCA
+
+def _run_parallel_spectral(args):
+    """Helper function to call Series.spectral in parallel."""
+    s, idx, scalogram_list, method, settings, freq, freq_kwargs, label, verbose = args
+
+    # Check if scalogram_list is provided and the index is within bounds
+    if scalogram_list and idx < len(scalogram_list.scalogram_list):
+        return s.spectral(
+            method=method,
+            settings=settings,
+            freq=freq,
+            freq_kwargs=freq_kwargs,
+            label=label,
+            verbose=verbose,
+            scalogram=scalogram_list.scalogram_list[idx],
+        )
+
+    # Default case: no scalogram passed
+    return s.spectral(
+        method=method,
+        settings=settings,
+        freq=freq,
+        freq_kwargs=freq_kwargs,
+        label=label,
+        verbose=verbose,
+    )
+
+def _run_parallel_wavelet(args):
+    """Private helper function to call Series.wavelet in parallel."""
+    s, method, settings, freq, freq_kwargs, verbose = args
+
+    # Perform wavelet analysis
+    return s.wavelet(
+        method=method,
+        settings=settings,
+        freq=freq,
+        freq_kwargs=freq_kwargs,
+        verbose=verbose,
+    )
+
 
 class MultipleSeries:
     '''MultipleSeries object.
@@ -1341,32 +1383,33 @@ class MultipleSeries:
             ms_psd.plot()
                     
         '''
+                
+        # main function
         settings = {} if settings is None else settings.copy()
-
-        psd_list = []
+        psd_list =[]
+        
         if method in ['wwz','cwt'] and scalogram_list:
             scalogram_list_len = len(scalogram_list.scalogram_list)
             series_len = len(self.series_list)
 
-            #In the case where the scalogram list and series list are the same we can re-use scalograms in a one to one fashion
-            #OR if the scalogram list is longer than the series list we use as many scalograms from the scalogram list as we need
-            if scalogram_list_len >= series_len:
-                for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
-                    psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
-                    psd_list.append(psd_tmp)
-            #If the scalogram list isn't as long as the series list, we re-use all the scalograms we can and then calculate the rest
-            elif scalogram_list_len < series_len:
-                for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
-                    if idx < scalogram_list_len:
-                        psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
-                        psd_list.append(psd_tmp)
-                    else:
-                        psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
-                        psd_list.append(psd_tmp)
+            # Prepare arguments for parallel execution
+            args = [
+                (s, idx, scalogram_list if scalogram_list_len >= series_len else None, method, settings, freq, freq_kwargs, label, verbose)
+                for idx, s in enumerate(self.series_list)
+                ]
         else:
-            for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
-                psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
-                psd_list.append(psd_tmp)
+            args = [
+                (s, idx, None, method, settings, freq, freq_kwargs, label, verbose)
+                for idx, s in enumerate(self.series_list)
+                ]
+            
+            
+       # Parallel processing with ProcessPoolExecutor
+        with ProcessPoolExecutor() as executor:
+            psd_list = list(tqdm(executor.map(_run_parallel_spectral, args), 
+                         total=len(args), 
+                         desc='Performing spectral analysis on individual series', 
+                         position=0, leave=True, disable=mute_pbar))
 
         psds = MultiplePSD(psd_list=psd_list)
 
@@ -1454,10 +1497,24 @@ class MultipleSeries:
         '''
         settings = {} if settings is None else settings.copy()
 
-        scal_list = []
-        for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, verbose=verbose)
-            scal_list.append(scal_tmp)
+        # Prepare arguments for parallel execution
+        args = [
+            (s, method, settings, freq, freq_kwargs, verbose)
+            for s in self.series_list
+        ]
+
+        # Use ProcessPoolExecutor for parallel execution
+        with ProcessPoolExecutor() as executor:
+            scal_list = list(
+                tqdm(
+                    executor.map(_run_parallel_wavelet, args),
+                    total=len(args),
+                    desc='Performing wavelet analysis on individual series',
+                    position=0,
+                    leave=True,
+                    disable=mute_pbar,
+                )
+            )
 
         scals = MultipleScalogram(scalogram_list=scal_list)
 

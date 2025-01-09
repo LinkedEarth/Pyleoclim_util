@@ -7,6 +7,13 @@ It includes wavelet transform coherency and cross-wavelet transform.
 from ..utils import plotting
 from ..utils import wavelet as waveutils
 from ..core.scalograms import Scalogram, MultipleScalogram
+import dill
+import multiprocessing
+
+# Set `dill` as the pickler for multiprocessing
+multiprocessing.set_start_method("fork", force=True)  # Use "fork" (most compatible with dill)
+multiprocessing.get_context("fork").reduce = dill.dumps
+multiprocessing.get_context("fork").rebuild = dill.loads
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,6 +26,26 @@ from matplotlib import gridspec
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
 import warnings
+
+from concurrent.futures import ProcessPoolExecutor #parallel processing library
+
+def _run_wavelet_coherence(args):
+    """Helper function for parallel wavelet coherence computation."""
+    surr1_series, surr2_series, wave_method, wave_args = args
+    return surr1_series.wavelet_coherence(
+        surr2_series, method=wave_method, settings=wave_args
+    )
+
+def _run_global_coherence(args):
+    """Helper function for computing global coherence between surrogate series."""
+    surr_series1, surr_series2, wavelet_kwargs = args
+    return surr_series1.global_coherence(surr_series2, wavelet_kwargs=wavelet_kwargs).global_coh
+
+class _DillProcessPoolExecutor(ProcessPoolExecutor):
+    """Custom ProcessPoolExecutor using dill for serialization."""
+    def __init__(self, *args, **kwargs):
+        ctx = multiprocessing.get_context("fork")
+        super().__init__(mp_context=ctx, *args, **kwargs)
 
 class Coherence:
     '''Coherence object, meant to receive the WTC and XWT part of Series.wavelet_coherence()
@@ -689,6 +716,7 @@ class Coherence:
             coh.signif_test(method='phaseran').plot() 
         '''
         from ..core.surrogateseries import SurrogateSeries
+        from ..core.series import Series #This is necessary for the multiprocessing pickling process!!! DO NOT REMOVE!!!!!
         
         if number == 0:
             return self
@@ -700,16 +728,32 @@ class Coherence:
         surr2 = SurrogateSeries(method=method,number=number, seed=seed)
         surr2.from_series(self.timeseries2)
         
-        # adjust time axis
+        # Prepare arguments for parallel processing
+        args = [
+            (
+                surr1.series_list[i],
+                surr2.series_list[i],
+                self.wave_method,
+                self.wave_args,
+            )
+            for i in range(number)
+        ]
 
-        wtcs, xwts = [], []
 
-        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=number, disable=mute_pbar):
-            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i],
-                                                             method  = self.wave_method,
-                                                             settings = self.wave_args)
-            wtcs.append(coh_tmp.wtc)
-            xwts.append(coh_tmp.xwt)
+        # Perform wavelet coherence calculations in parallel
+        with _DillProcessPoolExecutor() as executor:
+            results = list(
+                tqdm(
+                    executor.map(_run_wavelet_coherence, args),
+                    total=number,
+                    desc="Performing wavelet coherence on surrogate pairs",
+                    disable=mute_pbar,
+                )
+            )
+
+        # Split results into wtcs and xwts
+        wtcs = [result.wtc for result in results]
+        xwts = [result.xwt for result in results]
 
         wtcs = np.array(wtcs)
         xwts = np.array(xwts)
@@ -976,13 +1020,29 @@ class GlobalCoherence:
             'method':self.coh.wave_method,
         }
 
-        for i in range(number):
-            surr_series1 = surr1.series_list[i]
-            surr_series2 = surr2.series_list[i]
-            surr_coh = surr_series1.global_coherence(surr_series2,wavelet_kwargs=wavelet_kwargs)
-            coh_array[i,:] = surr_coh.global_coh
-        
-        quantiles = mquantiles(coh_array,qs,axis=0)
+        # Prepare arguments for parallel processing
+        args = [
+            (surr1.series_list[i], surr2.series_list[i], wavelet_kwargs)
+            for i in range(number)
+        ]
+    
+        # Use DillProcessPoolExecutor for parallel execution
+        with _DillProcessPoolExecutor() as executor:
+            results = list(
+                tqdm(
+                    executor.map(_run_global_coherence, args),
+                    total=number,
+                    desc="Computing global coherence for surrogate pairs",
+                    disable=False,
+                )
+            )
+    
+        # Collect results into coh_array
+        for i, result in enumerate(results):
+            coh_array[i, :] = result
+
+        # Compute quantiles
+        quantiles = mquantiles(coh_array, qs, axis=0)
         new.signif_qs = quantiles.data
         new.signif_method = method
         new.qs = qs
