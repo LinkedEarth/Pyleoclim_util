@@ -1517,6 +1517,7 @@ class MultiplePSD:
         --------
 
         .. jupyter-execute::
+            
             nn = 30 # number of noise realizations
             nt = 500 # timeseries length
             psds = []

@@ -45,6 +45,7 @@ setup(
         "beautifulsoup4",
         "scipy",
         "requests",
+        "dill",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.11",
 )
