@@ -11,9 +11,9 @@ import dill
 import multiprocessing
 
 # Set `dill` as the pickler for multiprocessing
-multiprocessing.set_start_method("fork", force=True)  # Use "fork" (most compatible with dill)
-multiprocessing.get_context("fork").reduce = dill.dumps
-multiprocessing.get_context("fork").rebuild = dill.loads
+multiprocessing.set_start_method("spawn", force=True)  # Use "fork" (most compatible with dill)
+multiprocessing.get_context("spawn").reduce = dill.dumps
+multiprocessing.get_context("spawn").rebuild = dill.loads
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,6 +28,7 @@ from scipy.stats.mstats import mquantiles
 import warnings
 
 from concurrent.futures import ProcessPoolExecutor #parallel processing library
+from contextlib import contextmanager
 
 def _run_wavelet_coherence(args):
     """Helper function for parallel wavelet coherence computation."""
@@ -41,11 +42,11 @@ def _run_global_coherence(args):
     surr_series1, surr_series2, wavelet_kwargs = args
     return surr_series1.global_coherence(surr_series2, wavelet_kwargs=wavelet_kwargs).global_coh
 
-class _DillProcessPoolExecutor(ProcessPoolExecutor):
-    """Custom ProcessPoolExecutor using dill for serialization."""
-    def __init__(self, *args, **kwargs):
-        ctx = multiprocessing.get_context("fork")
-        super().__init__(mp_context=ctx, *args, **kwargs)
+@contextmanager
+def _get_process_pool():
+    ctx = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(mp_context=ctx) as executor:
+        yield executor
 
 class Coherence:
     '''Coherence object, meant to receive the WTC and XWT part of Series.wavelet_coherence()
@@ -741,7 +742,7 @@ class Coherence:
 
 
         # Perform wavelet coherence calculations in parallel
-        with _DillProcessPoolExecutor() as executor:
+        with _get_process_pool() as executor:
             results = list(
                 tqdm(
                     executor.map(_run_wavelet_coherence, args),
@@ -1027,7 +1028,7 @@ class GlobalCoherence:
         ]
     
         # Use DillProcessPoolExecutor for parallel execution
-        with _DillProcessPoolExecutor() as executor:
+        with _get_process_pool() as executor:
             results = list(
                 tqdm(
                     executor.map(_run_global_coherence, args),
