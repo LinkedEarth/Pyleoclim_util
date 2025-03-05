@@ -153,7 +153,7 @@ class PSD:
 
         method : str; {'ar1asym','ar1sim','uar1'}
 
-            Method to generate surrogates. AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution. The default is AR1sim
+            Method to generate surrogates. ar1sim (default) uses simulated timeseries with similar persistence. ar1asym represents the closed form solution. uar1 is experimental.
 
         seed : int, optional
 
