@@ -417,12 +417,13 @@ class Series:
             metadata['value_name'] = ser.name if ser.name is not None else 'value'
 
         if isinstance(ser.index, pd.DatetimeIndex):
-            if ser.index.unit != 's':
+            if ser.index.unit == 's':
+                index = ser.index
+            else:    
                 index = ser.index.as_unit('s')
                 if verbose:
-                    warnings.warn("Datetime dtype was converted to datetime64[s]")
-            else:
-                ser.index
+                    warnings.warn("The index dtype was converted to datetime64[s]")
+                        
             time = tsbase.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
         else:
             raise ValueError('The provided index must be a proper DatetimeIndex object')
