@@ -410,17 +410,17 @@ class Series:
         The method then returns a new Series object with the converted time and values, and the provided metadata.
         """
 
+        # First fill metadata gaps
+        if 'time_name' not in metadata:
+            metadata['time_name'] = ser.index.name if ser.index.name is not None else 'time'
+        if 'value_name' not in metadata:
+            metadata['value_name'] = ser.name if ser.name is not None else 'value'
+
         if isinstance(ser.index, pd.DatetimeIndex):
             index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index
             time = tsbase.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
         else:
             raise ValueError('The provided index must be a proper DatetimeIndex object')
-
-        # metadata gap-filling. This does not handle the edge case where the keys exist but the entries are None
-        if 'time_name' not in metadata.keys():
-            metadata['time_name'] = ser.index.name
-        if 'value_name' not in metadata.keys():
-            metadata['value_name'] = ser.name
 
         return cls(time=time,value=ser.values, **metadata,
                    sort_ts = None, dropna = False, verbose=False)
