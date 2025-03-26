@@ -152,7 +152,7 @@ def gen_normal():
 
 
 @pytest.fixture
-def gen_evenly_spaced(gen_sine_wave):
+def gen_evenly_spaced():
     """Generate evenly spaced timeseries data (using cosine by default)"""
 
     def _gen(length=10, pattern="cosine"):
