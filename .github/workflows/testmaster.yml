@@ -35,4 +35,4 @@ jobs:
       run: |
         conda activate pyleo
         pip install pytest-cov
-        pytest --cov=pyleoclim/tests -svv -W ignore::UserWarning
+        pytest pyleoclim/tests --cov --cov-config=.coveragerc -svv -W ignore::UserWarning
