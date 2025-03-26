@@ -1,4 +1,4 @@
-''' Tests for pyleoclim.core.ui.Coherence
+"""Tests for pyleoclim.core.ui.Coherence
 
 Naming rules:
 1. class: Test{filename}{Class}{method} with appropriate camel case
@@ -11,114 +11,111 @@ Notes on how to test:
 3. execute `pytest {file_path}::{TestClass}::{test_method}` in terminal to perform a specific test class/method inside the specified file
 4. after `pip install pytest-xdist`, one may execute "pytest -n 4" to test in parallel with number of workers specified by `-n`
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
-'''
-#import pandas as pd
+"""
+
+# import pandas as pd
 
 import pytest
+
 import pyleoclim as pyleo
 
 # Tests below
-      
+
+
 class TestUiCoherencePlot:
-    ''' Tests for Coherence.plot()
-    '''
+    """Tests for Coherence.plot()"""
 
     def test_plot_t0(self, gen_ts):
-        ''' Test Coherence.plot with default parameters
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
+        """Test Coherence.plot with default parameters"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
         coh = ts2.wavelet_coherence(ts1)
-        fig,ax = coh.plot()
+        fig, ax = coh.plot()
         pyleo.closefig(fig)
-        
-    @pytest.mark.parametrize('method', ['ar1sim','phaseran','uar1','CN'])
+
+    @pytest.mark.parametrize("method", ["ar1sim", "phaseran", "uar1", "CN"])
     def test_plot_t1(self, gen_ts, method):
-        ''' Test Coherence.plot WTC with significance
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
+        """Test Coherence.plot WTC with significance"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
         coh = ts2.wavelet_coherence(ts1)
-        
-        coh_signif = coh.signif_test(number=10, method=method, qs = [0.8, 0.9, .95])
-        fig,ax = coh_signif.plot(signif_thresh=0.99)
+
+        coh_signif = coh.signif_test(number=10, method=method, qs=[0.8, 0.9, 0.95])
+        fig, ax = coh_signif.plot(signif_thresh=0.99)
         pyleo.closefig(fig)
-        
+
     def test_plot_t2(self, gen_ts):
-        ''' Test Coherence.plot XWT with significance
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
+        """Test Coherence.plot XWT with significance"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
         coh = ts2.wavelet_coherence(ts1)
-        
+
         coh_signif = coh.signif_test(number=10)
-        fig,ax = coh_signif.plot(var='xwt')
+        fig, ax = coh_signif.plot(var="xwt")
         pyleo.closefig(fig)
-        
+
+
 class TestUiCoherenceDashboard:
-    ''' Tests for Coherence.dashboard()
-    '''        
+    """Tests for Coherence.dashboard()"""
+
     def test_dashboard_t0(self, gen_ts):
-        ''' Test Coherence.dashboard() with default parameters
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
+        """Test Coherence.dashboard() with default parameters"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
         coh = ts2.wavelet_coherence(ts1)
-        fig,ax  = coh.dashboard()
+        fig, ax = coh.dashboard()
         pyleo.closefig(fig)
-        
+
     def test_dashboard_t1(self, gen_ts):
-        ''' Test Coherence.dashboard() with optional parameter
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
+        """Test Coherence.dashboard() with optional parameter"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
         coh = ts2.wavelet_coherence(ts1)
-        fig, ax = coh.dashboard(wavelet_plot_kwargs={'contourf_style':{'cmap': 'cividis'}})
+        fig, ax = coh.dashboard(
+            wavelet_plot_kwargs={"contourf_style": {"cmap": "cividis"}}
+        )
         pyleo.closefig(fig)
-        
+
+
 class TestUiCoherencePhaseStats:
-    ''' Tests for Coherence.phase_stats()
-    '''        
+    """Tests for Coherence.phase_stats()"""
+
     def test_phasestats_t0(self, gen_ts):
-        ''' Test Coherence.phase_stats() with default parameters
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
+        """Test Coherence.phase_stats() with default parameters"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
         coh = ts2.wavelet_coherence(ts1)
-        _ = coh.phase_stats(scales=[2,8])
-        
+        _ = coh.phase_stats(scales=[2, 8])
+
+
 class TestUiGlobalCoherencePlot:
-    ''' Tests for GlobalCoherence.plot()
-    '''
+    """Tests for GlobalCoherence.plot()"""
 
     def test_plot_t0(self, gen_ts):
-        ''' Test GlobalCoherence.plot with various parameters
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
+        """Test GlobalCoherence.plot with various parameters"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
         coh = ts1.global_coherence(ts2)
-        fig,ax = coh.plot()
+        fig, ax = coh.plot()
         pyleo.closefig(fig)
 
     def test_plot_t1(self, gen_ts):
-        ''' Test GlobalCoherence.plot with signif tests
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
+        """Test GlobalCoherence.plot with signif tests"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
         coh = ts1.global_coherence(ts2).signif_test(number=1)
-        fig,ax = coh.plot()
+        fig, ax = coh.plot()
         pyleo.closefig(fig)
 
-class TestUiGlobalCoherenceSignifTest:
-    ''' Tests for GlobalCoherence.signif_test()
-    '''
 
-    @pytest.mark.parametrize('method',['ar1sim','phaseran','CN'])
-    @pytest.mark.parametrize('number',[1,10])
-    @pytest.mark.parametrize('qs',[[.95],[.05,.95]])
-    def test_signiftest_t0(self,method,number, qs,gen_ts):
-        ''' Test GlobalCoherence.signif_test
-        '''
-        ts1 = gen_ts
-        ts2 = gen_ts
-        _ = ts1.global_coherence(ts2).signif_test(method=method,number=number,qs=qs)
+class TestUiGlobalCoherenceSignifTest:
+    """Tests for GlobalCoherence.signif_test()"""
+
+    @pytest.mark.parametrize("method", ["ar1sim", "phaseran", "CN"])
+    @pytest.mark.parametrize("number", [1, 10])
+    @pytest.mark.parametrize("qs", [[0.95], [0.05, 0.95]])
+    def test_signiftest_t0(self, method, number, qs, gen_ts):
+        """Test GlobalCoherence.signif_test"""
+        ts1 = gen_ts()
+        ts2 = gen_ts()
+        _ = ts1.global_coherence(ts2).signif_test(method=method, number=number, qs=qs)

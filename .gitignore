@@ -18,4 +18,8 @@ __pycache__
 *.html
 *.js
 *.png
+
+.coverage.*
+.coverage
+
 CLAUDE.md
