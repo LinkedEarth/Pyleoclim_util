@@ -1,5 +1,7 @@
 """Tests for pyleoclim.core.ui.Series
 
+All test fixtures defined in conftest.py
+
 Naming rules:
 1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}

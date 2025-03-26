@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+#from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -6,7 +6,7 @@ import pytest
 
 import pyleoclim as pyleo
 
-# ==== Base fixtures for generating data ====
+# ==== Base fixtures for generating testing datasets ====
 
 
 @pytest.fixture
