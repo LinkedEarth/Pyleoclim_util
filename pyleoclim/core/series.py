@@ -379,7 +379,7 @@ class Series:
         )
 
     @classmethod
-    def from_pandas(cls, ser, metadata):
+    def from_pandas(cls, ser, metadata, verbose=True):
         """
         Class method to create a Series object from a pandas Series.
 
@@ -389,11 +389,13 @@ class Series:
             The pandas Series object to convert. The index must be a DatetimeIndex.
         metadata : dict
             A dictionary containing metadata for the Series. If 'time_name' or 'value_name' are not provided, defaults to the name of the index and the name of the pandas Series, respectively.
-
+        verbose : bool
+            If True (default), will print warning messages if there are any
+        
         Returns
         -------
         Series
-            The created Series object.
+            The created Series object. 
 
         Raises
         ------
@@ -405,22 +407,26 @@ class Series:
 
         This method first checks if the index of the pandas Series is a DatetimeIndex. If it is, it converts the index to seconds if it's not already in that unit. Then it converts the datetime index to a time array using the 'time_unit' and 'time_name' from the metadata.
 
-
-
         The method then returns a new Series object with the converted time and values, and the provided metadata.
         """
 
+        # First fill metadata gaps
+        if 'time_name' not in metadata:
+            metadata['time_name'] = ser.index.name if ser.index.name is not None else 'time'
+        if 'value_name' not in metadata:
+            metadata['value_name'] = ser.name if ser.name is not None else 'value'
+
         if isinstance(ser.index, pd.DatetimeIndex):
-            index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index
+            if ser.index.unit == 's':
+                index = ser.index
+            else:    
+                index = ser.index.as_unit('s')
+                if verbose:
+                    warnings.warn("The index dtype was converted to datetime64[s]")
+                        
             time = tsbase.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
         else:
             raise ValueError('The provided index must be a proper DatetimeIndex object')
-
-        # metadata gap-filling. This does not handle the edge case where the keys exist but the entries are None
-        if 'time_name' not in metadata.keys():
-            metadata['time_name'] = ser.index.name
-        if 'value_name' not in metadata.keys():
-            metadata['value_name'] = ser.name
 
         return cls(time=time,value=ser.values, **metadata,
                    sort_ts = None, dropna = False, verbose=False)
@@ -2355,7 +2361,7 @@ class Series:
         Parameters
         ----------
         verbose : bool
-            If True, will print warning messages if there is any
+            If True, will print warning messages if there are any
 
         keep_log : Boolean
             if True, adds this step and its parameters to the series log.
