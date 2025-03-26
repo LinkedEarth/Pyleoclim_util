@@ -32,7 +32,9 @@ class TestUIMultipleSeriesDetrend:
     )
     def test_detrend_t1(self, detrend_method, gen_colored_noise):
         alpha = 1
-        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        ts0 = gen_colored_noise(nt=550, alpha=alpha)
+        t = ts0.time
+        v = ts0.value
         # Trends
         slope = 1e-5
         slope1 = 2e-5
@@ -116,11 +118,8 @@ class TestMultipleSeriesStandardize:
     only now we are running the test on series in a MultipleSeries object"""
 
     def test_standardize(self, gen_colored_noise):
-        t_0, v_0 = gen_colored_noise(std=10)
-        t_1, v_1 = gen_colored_noise(std=20)
-
-        ts_0 = pyleo.Series(time=t_0, value=v_0, auto_time_params=True, verbose=False)
-        ts_1 = pyleo.Series(time=t_1, value=v_1, auto_time_params=True, verbose=False)
+        ts_0 = gen_colored_noise(std=10)
+        ts_1 = gen_colored_noise(std=20)
 
         serieslist = [ts_0, ts_1]
 
@@ -133,6 +132,11 @@ class TestMultipleSeriesStandardize:
 
         y_axis_0 = ts_M_std.series_list[0].value
         y_axis_1 = ts_M_std.series_list[1].value
+
+        t_0 = ts_0.time
+        t_1 = ts_1.time
+        v_0 = ts_0.value
+        v_1 = ts_1.value
 
         assert_array_equal(x_axis_0, t_0)
         assert_array_equal(x_axis_1, t_1)
@@ -148,11 +152,8 @@ class TestMultipleSeriesBin:
     """
 
     def test_bin(self, gen_colored_noise):
-        t_0, v_0 = gen_colored_noise()
-        t_1, v_1 = gen_colored_noise()
-
-        ts_0 = pyleo.Series(time=t_0, value=v_0)
-        ts_1 = pyleo.Series(time=t_1, value=v_1)
+        ts_0 = gen_colored_noise()
+        ts_1 = gen_colored_noise()
 
         serieslist = [ts_0, ts_1]
 
@@ -173,11 +174,8 @@ class TestMultipleSeriesInterp:
     """
 
     def test_interp(self, gen_colored_noise):
-        t_0, v_0 = gen_colored_noise()
-        t_1, v_1 = gen_colored_noise()
-
-        ts_0 = pyleo.Series(time=t_0, value=v_0)
-        ts_1 = pyleo.Series(time=t_1, value=v_1)
+        ts_0 = gen_colored_noise()
+        ts_1 = gen_colored_noise()
 
         serieslist = [ts_0, ts_1]
 
@@ -198,11 +196,8 @@ class TestMultipleSeriesGkernel:
     """
 
     def test_gkernel(self, gen_colored_noise):
-        t_0, v_0 = gen_colored_noise()
-        t_1, v_1 = gen_colored_noise()
-
-        ts_0 = pyleo.Series(time=t_0, value=v_0)
-        ts_1 = pyleo.Series(time=t_1, value=v_1)
+        ts_0 = gen_colored_noise()
+        ts_1 = gen_colored_noise()
 
         serieslist = [ts_0, ts_1]
 
@@ -364,11 +359,8 @@ class TestMultipleSeriesCommonTime:
 
     @pytest.mark.parametrize("method", ["bin", "interp", "gkernel"])
     def test_common_time_t0(self, method, gen_colored_noise):
-        t_0, v_0 = gen_colored_noise()
-        t_1, v_1 = gen_colored_noise()
-
-        ts_0 = pyleo.Series(time=t_0, value=v_0)
-        ts_1 = pyleo.Series(time=t_1, value=v_1)
+        ts_0 = gen_colored_noise()
+        ts_1 = gen_colored_noise()
 
         serieslist = [ts_0, ts_1]
 
