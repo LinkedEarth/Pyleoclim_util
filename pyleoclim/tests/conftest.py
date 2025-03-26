@@ -119,7 +119,8 @@ def gen_colored_noise():
             m=m,
             seed=random_seed,
         )
-        return t, v
+        ts = pyleo.Series(t, v, verbose=False, auto_time_params=True)
+        return ts
 
     return _gen
 
@@ -131,7 +132,8 @@ def gen_sine_wave():
     def _gen(period=10, nt=100, amplitude=1, offset=0):
         t = np.linspace(1, nt, nt)
         v = amplitude * np.sin(2 * np.pi * t / period) + offset
-        return t, v
+        ts = pyleo.Series(t, v, verbose=False, auto_time_params=True)
+        return ts
 
     return _gen
 
@@ -165,7 +167,8 @@ def gen_evenly_spaced(gen_sine_wave):
             v = np.ones(length)
         else:  # random
             v = np.random.randn(length)
-        return t, v
+        ts = pyleo.Series(t, v, verbose=False, auto_time_params=True)
+        return ts
 
     return _gen
 
@@ -181,7 +184,8 @@ def gen_unevenly_spaced():
         elif pattern == "random":
             t = np.sort(np.random.rand(length) * length)
             v = np.ones(length)
-        return t, v
+        ts = pyleo.Series(t, v, verbose=False, auto_time_params=True)
+        return ts
 
     return _gen
 
@@ -248,8 +252,7 @@ def create_geoseries():
 @pytest.fixture
 def evenly_spaced_series(gen_evenly_spaced):
     """Series with evenly spaced time axis (cosine function)"""
-    t, v = gen_evenly_spaced(length=10, pattern="cosine")
-    series = pyleo.Series(time=t, value=v, verbose=False, auto_time_params=True)
+    series = gen_evenly_spaced(length=10, pattern="cosine")
     series.label = "cosine"
     return series
 
@@ -257,19 +260,15 @@ def evenly_spaced_series(gen_evenly_spaced):
 @pytest.fixture
 def unevenly_spaced_series(gen_unevenly_spaced):
     """Series with unevenly spaced time axis"""
-    t, v = gen_unevenly_spaced(length=10, pattern="squared")
-    series = pyleo.Series(time=t, value=v, verbose=False, auto_time_params=True)
+    series = gen_unevenly_spaced(length=10, pattern="squared")
     return series
 
 
 @pytest.fixture
 def unevenly_spaced_series_nans(gen_unevenly_spaced):
     """Series with unevenly spaced time axis and NaN values"""
-    t, v = gen_unevenly_spaced(length=10, pattern="squared")
-    v[2:4] = np.nan
-    series = pyleo.Series(
-        time=t, value=v, dropna=False, verbose=False, auto_time_params=True
-    )
+    series = gen_unevenly_spaced(length=10, pattern="squared")
+    series.value[2:4] = np.nan
     return series
 
 
@@ -346,8 +345,12 @@ def multiple_pinkgeoseries():
 @pytest.fixture
 def multipleseries_basic():
     """Basic MultipleSeries with two simple series"""
-    ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]))
-    ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]))
+    ts1 = pyleo.Series(
+        time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), auto_time_params=True
+    )
+    ts2 = pyleo.Series(
+        time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), auto_time_params=True
+    )
     ms = pyleo.MultipleSeries([ts1, ts2])
     return ms
 
@@ -357,12 +360,14 @@ def multipleseries_nans():
     """MultipleSeries containing a series with NaN values"""
     t1 = np.arange(1, 10)
     v1 = np.ones(len(t1))
-    ts1 = pyleo.Series(time=t1, value=v1)
+    ts1 = pyleo.Series(time=t1, value=v1, auto_time_params=True)
 
     t2 = np.arange(1, 10)
     v2 = np.ones(len(t1))
     v2[2:4] = np.nan
-    ts2 = pyleo.Series(time=t2, value=v2, dropna=False, verbose=False)
+    ts2 = pyleo.Series(
+        time=t2, value=v2, dropna=False, verbose=False, auto_time_params=True
+    )
     ms = pyleo.MultipleSeries([ts1, ts2])
     return ms
 
@@ -383,8 +388,12 @@ def multipleseries_science():
 @pytest.fixture
 def ensembleseries_basic():
     """Basic EnsembleSeries with two simple series"""
-    ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]))
-    ts2 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 8, 1]))
+    ts1 = pyleo.Series(
+        time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), auto_time_params=True
+    )
+    ts2 = pyleo.Series(
+        time=np.array([1, 2, 4]), value=np.array([7, 8, 1]), auto_time_params=True
+    )
     ens = pyleo.EnsembleSeries([ts1, ts2])
     return ens
 
@@ -399,7 +408,9 @@ def ensembleseries_nans():
     t2 = np.arange(1, 10)
     v2 = np.ones(len(t1))
     v2[2:4] = np.nan
-    ts2 = pyleo.Series(time=t2, value=v2, dropna=False, verbose=False)
+    ts2 = pyleo.Series(
+        time=t2, value=v2, dropna=False, verbose=False, auto_time_params=True
+    )
     ens = pyleo.EnsembleSeries([ts1, ts2])
     return ens
 
@@ -422,8 +433,12 @@ def ensembleseries_science(random_seed):
 def ensemblegeoseries_basic():
     """Basic EnsembleGeoSeries with two GeoSeries"""
     time = np.arange(50)
-    ts1 = pyleo.GeoSeries(time=time, value=np.random.randn(len(time)), lat=0, lon=0)
-    ts2 = pyleo.GeoSeries(time=time, value=np.random.randn(len(time)), lat=0, lon=0)
+    ts1 = pyleo.GeoSeries(
+        time=time, value=np.random.randn(len(time)), lat=0, lon=0, auto_time_params=True
+    )
+    ts2 = pyleo.GeoSeries(
+        time=time, value=np.random.randn(len(time)), lat=0, lon=0, auto_time_params=True
+    )
     ens = pyleo.EnsembleGeoSeries([ts1, ts2])
     return ens
 
@@ -433,11 +448,19 @@ def ensemblegeoseries_nans():
     """EnsembleGeoSeries with NaN values"""
     t1 = np.arange(50)
     v1 = np.random.randn(len(t1))
-    ts1 = pyleo.GeoSeries(time=t1, value=v1, lat=0, lon=0)
+    ts1 = pyleo.GeoSeries(time=t1, value=v1, lat=0, lon=0, auto_time_params=True)
 
     t2 = np.arange(50)
     v2 = np.random.randn(len(t2))
     v2[2:4] = np.nan
-    ts2 = pyleo.GeoSeries(time=t2, value=v2, dropna=False, verbose=False, lat=0, lon=0)
+    ts2 = pyleo.GeoSeries(
+        time=t2,
+        value=v2,
+        dropna=False,
+        verbose=False,
+        lat=0,
+        lon=0,
+        auto_time_params=True,
+    )
     ens = pyleo.EnsembleGeoSeries([ts1, ts2])
     return ens
