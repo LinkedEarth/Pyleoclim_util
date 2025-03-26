@@ -21,4 +21,5 @@ __pycache__
 
 .coverage.*
 .coverage
+
 CLAUDE.md

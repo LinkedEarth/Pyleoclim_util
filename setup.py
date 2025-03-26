@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup, find_packages
 
-version = '1.1.0b0'
+version = '1.3.0b0'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -45,6 +45,7 @@ setup(
         "beautifulsoup4",
         "scipy",
         "requests",
+        "dill",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.11",
 )

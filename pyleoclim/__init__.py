@@ -14,7 +14,7 @@ import pyleoclim.utils as utils
 from .core import *
 
 from .utils.plotting import *
-set_style(style='journal', font_scale=1.4)
+#set_style(style='journal', font_scale=1.4)
 
 # get the version
 from importlib.metadata import version
