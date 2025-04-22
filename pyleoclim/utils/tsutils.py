@@ -1807,7 +1807,9 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
     if detrend == 'none' or detrend is False or detrend is None:
         ys_d = ys
     else:
-        ys_d = detrend(ys, ts, method=detrend, sg_kwargs=sg_kwargs)
+        # Circumvent naming conflict between detrend the function and detrend the argument
+        from . import detrend as detrend_ts
+        ys_d = detrend_ts(ys, ts, method=detrend, sg_kwargs=sg_kwargs)[0]
 
     if standardize:
         res, _, _ = std(ys_d)
