@@ -92,13 +92,13 @@ MultipleScalogram (pyleoclim.MultipleScalogram)
 Coherence (pyleoclim.Coherence)
 """""""""""""""""""""""""""""""
 
-.. autoclass:: pyleoclim.core.coherence.Coherence
+.. autoclass:: pyleoclim.core.coherences.Coherence
    :members:
 
-SpectralCoherence (pyleoclim.GlobalCoherence)
+GlobalCoherence (pyleoclim.GlobalCoherence)
 """""""""""""""""""""""""""""""""""""""""""""""
 
-.. autoclass:: pyleoclim.core.globalcoherence.GlobalCoherence
+.. autoclass:: pyleoclim.core.coherences.GlobalCoherence
    :members:
 
 Corr (pyleoclim.Corr)
