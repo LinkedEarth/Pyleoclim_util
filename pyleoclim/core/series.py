@@ -1684,7 +1684,8 @@ class Series:
             if window_length % 2 == 0:
                 window_length += 1   # window length needs to be an odd integer
             args['savitzky-golay'] = {'window_length': window_length}
-            args[method].update(kwargs)
+        
+        args[method].update(kwargs)
 
         new_val = method_func[method](y, **args[method])
         new.value = new_val + mu # restore the mean

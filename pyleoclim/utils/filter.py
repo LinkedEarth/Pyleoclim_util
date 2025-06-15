@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 import numpy as np
-import statsmodels.api as sm
+from statsmodels.tsa.arima.model import ARIMA
 from scipy import signal
 
 from .tsbase import (
@@ -173,24 +173,24 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
     pyleoclim.utils.filter.firwin : Applies a Finite Impulse Response filter with frequency fc, with padding
     
     """
-    padLength =  np.round(len(ts)*padFrac).astype(np.int64)
+    padLength = int(np.round(len(ts)*padFrac))
 
     if is_evenly_spaced(ts)==False:
         raise ValueError("ts needs to be composed of even increments")
     else:
-        dt = np.diff(ts)[0] # computp time interval
+        dt = np.diff(ts)[0] # compute time interval
     
     #time axis
     tp = np.arange(ts[0]-padLength*dt,ts[-1]+padLength*dt+dt,dt)
     
     if method == 'ARIMA':
         # fit ARIMA model
-        fwd_mod = sm.tsa.ARIMA(ys,params).fit()  # model with time going forward
-        bwd_mod = sm.tsa.ARIMA(np.flip(ys,0),params).fit()  # model with time going backwards
+        fwd_mod = ARIMA(ys, order=params).fit()  # model with time going forward
+        bwd_mod = ARIMA(np.flip(ys,0), order=params).fit()  # model with time going backwards
 
         # predict forward & backward
-        fwd_pred  = fwd_mod.forecast(padLength); yf = fwd_pred[0]
-        bwd_pred  = bwd_mod.forecast(padLength); yb = np.flip(bwd_pred[0],0)
+        yf = fwd_mod.forecast(padLength)
+        yb = np.flip(bwd_mod.forecast(padLength))
 
         # extend time series
         yp = np.empty(len(tp))
