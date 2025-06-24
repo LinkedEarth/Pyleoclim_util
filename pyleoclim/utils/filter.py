@@ -186,7 +186,7 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
     if method == 'ARIMA':
         # fit ARIMA model
         fwd_mod = ARIMA(ys, order=params).fit()  # model with time going forward
-        bwd_mod = ARIMA(np.flip(ys,0), order=params).fit()  # model with time going backwards
+        bwd_mod = ARIMA(np.flip(ys), order=params).fit()  # model with time going backwards
 
         # predict forward & backward
         yf = fwd_mod.forecast(padLength)
