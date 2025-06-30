@@ -3632,7 +3632,7 @@ class Series:
     def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran',
                     number=1000, timespan=None,  settings=None, seed=None, 
                     common_time_kwargs=None, mute_pbar=False):
-        ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID) as per [1]
+        ''' Estimates the correlation and its associated significance between two time series (not necessarily IID) as per [1]
 
         The significance of the correlation is assessed using one of the following methods:
 
@@ -3644,10 +3644,10 @@ class Series:
 
         Note: Up to version v0.14.0. ar1sim was called "isopersistent",  phaseran was called "isospectral"
 
-        The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
+        The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances (Gaussian, identically distributed data and moderate autocorrelation). 
         The others are non-parametric, but their computational requirements scale with the number of simulations.
 
-        The choise of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
+        The choice of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
 
         Parameters
         ----------
@@ -3837,10 +3837,7 @@ class Series:
                 # establish significance
                 signif = pval <= alpha
                 # critical value
-                if stat < 0:
-                    stat_crit = np.quantile(stat_surr, alpha)
-                else:
-                    stat_crit = np.quantile(stat_surr, 1-alpha)
+                stat_crit = np.sign(stat) * np.quantile(np.abs(stat_surr), 1-alpha)
             else:
                 raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
         else:
