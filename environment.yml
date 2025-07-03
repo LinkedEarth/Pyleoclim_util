@@ -8,6 +8,7 @@ dependencies:
   - python=3.11.0
   - cartopy
   - numba
+  - scipy<1.16
   - pyyaml
   - requests
   - scikit-learn

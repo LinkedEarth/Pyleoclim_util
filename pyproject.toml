@@ -1,0 +1,43 @@
+[project]
+name = "pyleoclim"
+version = "1.3.0b0"
+description = "Python Package for the Analysis of Paleoclimate Data"
+readme = "README.md"
+license = { text = "GPL-3.0" }
+authors = [
+  { name = "Deborah Khider", email = "khider@usc.edu" },
+  { name = "Julien Emile-Geay" },
+  { name = }
+]
+requires-python = ">=3.11"
+dependencies = [
+  "rdflib",
+  "pandas",
+  "doi2bib",
+  "pybtex",
+  "tqdm",
+  "bagit",
+  "numpy",
+  "bibtexparser",
+  "beautifulsoup4",
+  "requests"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pylipd*"]
+exclude = ["test_data*", "lipdverse_data*", "compilation_analysis*", "examples*", "docs*", "build*", "dist*"]
+
+[tool.setuptools.package-data]
+"pylipd" = ["data/**/*.lpd", "globals/*.json"]
+
+[project.urls]
+Homepage = "https://github.com/linkedearth/pylipd"
+Issues = "https://github.com/linkedearth/pylipd/issues"
+
+[build-system]
+requires = ["setuptools>=69.0.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+license-files = []
