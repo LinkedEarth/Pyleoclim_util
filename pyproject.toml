@@ -14,7 +14,7 @@ authors = [
   { name = "Pratheek Athreya"},
   { name = "Daniel Garijo"},
   { name = "Lionel Voirol"},
-  { name = "Robert McGibbon"}
+  { name = "Robert McGibbon"},
   { name = "Dominik Stiller"}
 ]
 requires-python = ">=3.11"
@@ -40,8 +40,6 @@ dependencies = [
   "dill",
 ]
 
-readme = "README.md"
-
 [tool.setuptools.packages.find]
 where = ["."]  # Look for packages starting from the root directory
 include = ["pyleoclim*"]  # Include packages that match this pattern
@@ -53,6 +51,7 @@ exclude = ["tests*", "docs*"]  # Exclude these patterns
 [project.urls]
 Homepage = "https://github.com/linkedearth/pyleoclim_util"
 Issues = "https://github.com/linkedearth/pyleoclim_util/issues"
+Documentation = "https://pyleoclim-util.readthedocs.io/en/latest/"
 
 [build-system]
 requires = ["setuptools>=69.0.2", "wheel"]
