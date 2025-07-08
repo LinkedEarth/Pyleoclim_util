@@ -40,6 +40,9 @@ dependencies = [
   "dill",
 ]
 
+[project.optional-dependencies]
+dev = ["IPython", "pytest"]
+
 [tool.setuptools.packages.find]
 where = ["."]  # Look for packages starting from the root directory
 include = ["pyleoclim*"]  # Include packages that match this pattern
