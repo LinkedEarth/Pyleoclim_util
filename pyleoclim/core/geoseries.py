@@ -945,7 +945,7 @@ class GeoSeries(Series):
 
         but will also accept some extra resampling rules, such as `'Ga'` (see below).
         
-        NOTE: this feature is broken until [this pandas bug](https://github.com/pandas-dev/pandas/issues/57427) is fixed. 
+        NOTE: this feature may break until [this pandas bug](https://github.com/pandas-dev/pandas/issues/57427) is fixed. 
 
         Parameters
         ----------
