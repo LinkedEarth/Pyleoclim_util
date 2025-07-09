@@ -933,7 +933,7 @@ class GeoSeries(Series):
 
     def resample(self, rule, keep_log = False, **kwargs):
         """
-        Run analogue to pandas.Series.resample.
+        Analogue to pandas.Series.resample.
 
         This is a convenience method: doing
 
@@ -944,6 +944,8 @@ class GeoSeries(Series):
             ser.pandas_method(lambda x: x.resample('AS').mean())
 
         but will also accept some extra resampling rules, such as `'Ga'` (see below).
+        
+        NOTE: this feature is broken until [this pandas bug](https://github.com/pandas-dev/pandas/issues/57427) is fixed. 
 
         Parameters
         ----------
