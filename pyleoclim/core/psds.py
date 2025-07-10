@@ -185,7 +185,6 @@ class PSD:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             psd = soi.standardize().spectral('mtm',settings={'NW':2})
             psd_sim = psd.signif_test(number=20)
@@ -368,7 +367,6 @@ class PSD:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             t, v = pyleo.utils.tsmodel.gen_ts(model='colored_noise')
             ts = pyleo.Series(time=t, value= v, label = 'fractal noise, unit slope', verbose=False)
             psd = ts.detrend().spectral(method='cwt')
@@ -426,8 +424,6 @@ class PSD:
         Generate colored noise with scaling exponent equals to unity, and test the impact of anti-aliasing filter
 
         .. jupyter-execute::
-
-            import pyleoclim as pyleo
 
             t, v = pyleo.utils.tsmodel.gen_ts('colored_noise', alpha=1, m=1e5) # m=1e5 leads to aliasing
             ts = pyleo.Series(time=t, value=v, label='colored noise', verbose=False)
@@ -1327,8 +1323,6 @@ class MultiplePSD:
 
         .. jupyter-execute::
             
-            import pyleoclim as pyleo
-            import numpy as np
             nn = 30 # number of noise realizations
             nt = 500 # timeseries length
             psds = []

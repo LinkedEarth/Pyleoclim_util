@@ -91,7 +91,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Pyleoclim'
-copyright = '2017-2023, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James'
+copyright = '2017-2025, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James'
 author = 'Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo, Jun Hu, Jordan Landers'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -411,3 +411,5 @@ epub_exclude_files = ['search.html']
     #  html_theme = 'sphinxdoc'
 #  else:
     #  html_theme = 'sphinxdoc'
+    
+ 

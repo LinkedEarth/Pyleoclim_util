@@ -136,11 +136,8 @@ class SsaRes:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             ts = pyleo.utils.load_dataset('SOI')
-            ssa = ts.ssa()
-            
+            ssa = ts.ssa() 
             fig, ax = ssa.screeplot()
 
         '''
@@ -225,7 +222,6 @@ class SsaRes:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts  = pyleo.utils.load_dataset('SOI')
             ssa = ts.ssa()
             

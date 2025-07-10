@@ -293,7 +293,6 @@ class Coherence:
         .. jupyter-execute::
 
 
-            import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
@@ -649,7 +648,6 @@ class Coherence:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
@@ -819,7 +817,6 @@ class Coherence:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
@@ -1048,7 +1045,6 @@ class Coherence:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
             coh = ts_air.wavelet_coherence(ts_nino)

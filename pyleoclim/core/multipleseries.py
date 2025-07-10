@@ -163,8 +163,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -201,8 +199,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            import numpy as np
             ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo', verbose=False)
             ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar', verbose=False)
             ms = pyleo.MultipleSeries([ts1, ts2])
@@ -230,8 +226,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            import numpy as np
             ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1', verbose=False)
             ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2', verbose=False)
             ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3', verbose=False)
@@ -269,8 +263,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            import numpy as np
             ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1', verbose=False)
             ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2', verbose=False)
             ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3', verbose=False)
@@ -303,7 +295,6 @@ class MultipleSeries:
         
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -387,7 +378,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -431,7 +421,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             NINO3 = pyleo.utils.load_dataset('NINO3')
             ms = pyleo.MultipleSeries([soi], label = 'ENSO')
@@ -464,7 +453,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -493,7 +481,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo        
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -525,7 +512,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -580,7 +566,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -673,9 +658,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import numpy as np
-            import pyleoclim as pyleo
-            import matplotlib.pyplot as plt
             from pyleoclim.utils.tsmodel import colored_noise
 
             # create 2 incompletely sampled series
@@ -694,6 +676,7 @@ class MultipleSeries:
             # create MS object from the list
             ms = pyleo.MultipleSeries(serieslist)
 
+            import matplotlib.pyplot as plt
             fig, ax = plt.subplots(2,2,sharex=True,sharey=True, figsize=(10,8))
             ax = ax.flatten()
             # apply common_time with default parameters
@@ -993,7 +976,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1068,7 +1050,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = (soi & nino).common_time()
@@ -1156,7 +1137,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1209,7 +1189,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1264,7 +1243,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1852,7 +1830,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -2294,7 +2271,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -2549,8 +2525,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             co2ts = pyleo.utils.load_dataset('AACO2')
             lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
@@ -2561,8 +2535,6 @@ class MultipleSeries:
         
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            
             co2ts = pyleo.utils.load_dataset('AACO2')
             lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
@@ -2688,8 +2660,6 @@ class MultipleSeries:
         To create a resolution object, apply the .resolution() method to a Series object with `statistic=None`.
 
         .. jupyter-execute::
-
-            import pyleoclim as pyleo
 
             co2ts = pyleo.utils.load_dataset('AACO2')
             edc = pyleo.utils.load_dataset('EDC-dD')

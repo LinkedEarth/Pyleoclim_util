@@ -164,7 +164,6 @@ class Scalogram:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             series = pyleo.utils.load_dataset('SOI')
             scalogram = series.wavelet()
             scalogram_copy = scalogram.copy()
@@ -285,10 +284,8 @@ class Scalogram:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
             scalogram = ts.wavelet()
-
             fig,ax = scalogram.plot()
 
         '''
@@ -465,15 +462,11 @@ class Scalogram:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
+            scalogram = ts.wavelet().signif_test(number=2, export_scal=True)
             
         By setting export_scal to True, the noise realizations used to generate the significance test will be saved. 
-        These come in handy for generating summary plots and for running significance tests on spectral objects.
-        
-        .. jupyter-execute::
-                
-            scalogram = ts.wavelet().signif_test(number=2, export_scal=True)
+        These come in handy for generating summary plots and for running significance tests on spectral objects.        
 
         '''
         
