@@ -23,3 +23,5 @@ __pycache__
 .coverage
 
 CLAUDE.md
+*.gz
+*.whl

@@ -1552,11 +1552,8 @@ class TestUISeriesSort:
         assert np.all(np.diff(ts.time) >= 0)
 
 
-# @pytest.mark.xfail
-
-
+@pytest.mark.skipif(pd.__version__ > "2.1.4", reason="this bug https://github.com/pandas-dev/pandas/issues/57427")
 class TestResample:
-
     @pytest.mark.parametrize("rule", pyleo.utils.tsbase.MATCH_A)
     def test_resample_simple(self, rule, dataframe_dt, soi_metadata):
         ser = dataframe_dt.loc[:, 0]
@@ -1635,7 +1632,7 @@ class TestResample:
     #     assert np.abs(result_ser.index.to_numpy() - expected_ser.index.to_numpy()).max() <= 10
     #     np.testing.assert_array_equal(result_ser.to_numpy(), expected_ser.to_numpy())
     #     assert result.metadata == expected_metadata
-
+    
     def test_resample_invalid(self, dataframe_dt, basic_metadata):
         ser = dataframe_dt.loc[:, 0]
         ts = pyleo.Series.from_pandas(ser, basic_metadata)

@@ -1,4 +1,4 @@
-cff-version: 1.2.0
+cff-version: 1.2.1
 message: "If you use this software, please cite it as below."
 authors:
   - family-names: "Khider"
@@ -26,9 +26,14 @@ authors:
   - family-names: "Voirol"
     given-names: "Lionel"
     orcid: "https://orcid.org/0000-0003-1696-1407"
+  - family-names: "Stiller"
+    given-names: "Dominik"
+    orcid: "https://orcid.org/0009-0003-3206-3735"
+
+    
 
 title: "Pyleoclim: A Python package for the analysis and visualization of paleoclimate data"
-version: v1.2.0
+version: v1.2.1
 doi: 10.5281/zenodo.1205661
-date-released: 2025-01-31
+date-released: 2025-07-09
 url: "https://github.com/LinkedEarth/Pyleoclim_util"

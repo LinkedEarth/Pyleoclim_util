@@ -20,6 +20,7 @@ Notes on how to test:
 import pytest
 import pyleoclim as pyleo
 import numpy as np
+import pandas as pd
 
 # multiple_pinkgeoseries fixture is now defined in conftest.py
 
@@ -64,7 +65,7 @@ class TestUIGeoSeriesInit:
             print(ts2.value)
             assert ~np.isnan(ts2.value[0])
 
-#@pytest.mark.xfail   # will fail until pandas is fixed
+@pytest.mark.skipif(pd.__version__ > "2.1.4", reason="this bug https://github.com/pandas-dev/pandas/issues/57427")
 class TestUIGeoSeriesResample():
     ''' test GeoSeries.Resample()
     '''
