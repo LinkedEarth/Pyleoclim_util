@@ -7,7 +7,7 @@ Tutorials (and functional science examples) for Pyleoclim exist in the form of:
 
 * Jupyter Notebooks, which are found on the following repositories:
 
-  * `PyleoTutorials <http://linked.earth/PyleoTutorials/>`_ contains notebooks demonstrating simple workflows with Pyleoclim:
+  * `PyleoTutorials <http://linked.earth/PyleoTutorials/>`_ contains notebooks demonstrating simple workflows with Pyleoclim, such as:
 
     * Loading data from different formats into Pyleoclim objects
 
@@ -15,7 +15,7 @@ Tutorials (and functional science examples) for Pyleoclim exist in the form of:
 
     * Timeseries analysis such as spectral analysis, wavelet analysis, coherence, singular spectrum analysis, paleo-aware correlation
 
-  * `PaleoBooks <https://github.com/LinkedEarth/PaleoBooks>`_ will contain more advanced scientific workflows featuring Pyleoclim. Check for updates in 2023.
+  * `PaleoBooks <https://linked.earth/PaleoBooks/>`_ contain more advanced scientific workflows, some featuring Pyleoclim. 
 
   * `Pyleoclim paper notebooks <https://github.com/LinkedEarth/PyleoclimPaper>`_ highlights three scientific case studies featuring Pyleoclim.
 

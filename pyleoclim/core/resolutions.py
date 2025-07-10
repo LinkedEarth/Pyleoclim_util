@@ -559,8 +559,6 @@ class MultipleResolution:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             co2ts = pyleo.utils.load_dataset('AACO2')
             edc = pyleo.utils.load_dataset('EDC-dD')
             ms = edc & co2ts # create MS object
@@ -643,8 +641,6 @@ class MultipleResolution:
         --------
 
         ..jupyter-execute::
-
-            import pyleoclim as pyleo
 
             co2ts = pyleo.utils.load_dataset('AACO2')
             edc = pyleo.utils.load_dataset('EDC-dD')

@@ -11,18 +11,8 @@ from ..utils import plotting
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-#from matplotlib import cm
-#from itertools import cycle
-#import matplotlib.lines as mlines
 import numpy as np
-#import warnings
 
-#import matplotlib.pyplot as plt
-#import matplotlib as mpl
-#from matplotlib import cm
-#from itertools import cycle
-#import matplotlib.lines as mlines
-#import copy
 
 
 class MultipleGeoSeries(MultipleSeries):
