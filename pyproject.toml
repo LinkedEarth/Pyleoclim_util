@@ -1,6 +1,6 @@
 [project]
 name = "pyleoclim"
-version = "1.2.1"
+version = "1.2.1b0"
 description = "Python Package for the Analysis of Paleoclimate Data"
 readme = "README.md"
 license = { text = "GPL-3.0" }
