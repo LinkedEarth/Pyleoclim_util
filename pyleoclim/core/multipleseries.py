@@ -676,6 +676,7 @@ class MultipleSeries:
             # create MS object from the list
             ms = pyleo.MultipleSeries(serieslist)
 
+            import matplotlib.pyplot as plt
             fig, ax = plt.subplots(2,2,sharex=True,sharey=True, figsize=(10,8))
             ax = ax.flatten()
             # apply common_time with default parameters

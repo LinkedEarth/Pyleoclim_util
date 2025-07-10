@@ -135,8 +135,17 @@ class Series:
     --------
     Import the Southern Oscillation Index (SOI) and display a quick synopsis:
 
+     .. jupyter-execute::
+         :hide-code:
+         import pyleoclim as pyleo 
+         import numpy as np
+         import matplotlib.pyplot as plt
+         import warnings
+         warnings.filterwarnings('ignore')
+        
     .. jupyter-execute::
 
+        import pyleoclim as pyleo
         soi = pyleo.utils.load_dataset('SOI')
         soi.view()
 
@@ -799,7 +808,7 @@ class Series:
         --------
 
         Plot the HadCRUT5 Global Mean Surface Temperature
-
+     
         .. jupyter-execute::
 
             ts = pyleo.utils.load_dataset('HadCRUT5')
@@ -1359,20 +1368,13 @@ class Series:
         References
         ----------
 
-        .. [1] Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
-        dynamics, with applications to paleoclimatic time series, Physica D, 35,
-        395–424.
+        .. [1] Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear dynamics, with applications to paleoclimatic time series, Physica D, 35, 395–424.
 
-        .. [2] Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
-        A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
-        Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
-        1003–1052, doi:10.1029/2000RG000092.
+        .. [2] Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann, A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002), Advanced spectral methods for climatic time series, Rev. Geophys., 40(1), 1003–1052, doi:10.1029/2000RG000092.
 
-        .. [3] Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
-        oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
+        .. [3] Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
 
-        .. [4] Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with
-        missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
+        .. [4] Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
 
         See also
         --------
@@ -1392,7 +1394,6 @@ class Series:
 
             ts = pyleo.utils.load_dataset('SOI')
             fig, ax = ts.plot()
-
             nino_ssa = ts.ssa(M=60)
 
         The result of this operation yields an SsaRes object, which comes with dedicated methods.
@@ -1431,13 +1432,11 @@ class Series:
         are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. 
         This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 14 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
-            * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, 
-            you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. 
-            In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves dominant features and excludes the rest.
+            * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies,  you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves dominant features and excludes the rest.
             * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
 
         Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, 
-        introduced by [4]_ to identify SSA modes that rise above what one would expect from "red noise", 
+        introduced by [3]_ to identify SSA modes that rise above what one would expect from "red noise", 
         specifically an AR(1) process). To run it, simply provide the parameter nMC, ideally large enough
         to get decent statistics. Here let's use nMC = 1000. The result will be stored in the eigval_q array, 
         which has the same length as eigval, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
@@ -1569,6 +1568,7 @@ class Series:
 
         .. jupyter-execute::
 
+            import numpy as np
             t = np.linspace(0, 1, 1000)
             sig1 = np.sin(2*np.pi*10*t)
             sig2 = np.sin(2*np.pi*20*t)
