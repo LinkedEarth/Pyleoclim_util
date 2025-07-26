@@ -2399,6 +2399,166 @@ class Series:
                 new.log=()
             new.log += ({len(new.log):'sort', 'ascending': ascending},)
         return new
+    
+    def annualize(self, months=list(range(1, 13)), min_res=0.25, partial_years=False):
+        '''
+        Annualize subannual data by averaging values within specified months for each year.
+        
+        This method converts subannual time series data to annual resolution by grouping
+        data by year and taking the arithmetic mean of values from specified months.
+        Handles negative month values to span across year boundaries.
+        
+        Parameters
+        ----------
+        months : list of int, optional
+            List of months to include in the annual aggregation. Can include negative
+            values for previous year months (e.g., [-12, 1, 2] means Dec of year n,
+            Jan and Feb of year n+1). Default is [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].
+        min_res : float, optional
+            Minimum resolution threshold (in years) to determine if data is subannual.
+            Default is 0.25 (quarterly or finer resolution required).
+        partial_years : bool, optional
+            Whether to include edge years with incomplete month coverage.
+            If False (default), drop years that don't have all specified months.
+            If True, use available subset of months for edge years.
+        
+        Returns
+        -------
+        Series
+            A new Series object with annualized data.
+            
+        Raises
+        ------
+        ValueError
+            If months contains invalid month numbers (not -12 to 12, excluding 0).
+            If the time axis cannot be interpreted as datetime.
+            If data is not subannual (median resolution >= min_res).
+            If time_unit does not contain "Year".
+        
+        Examples
+        --------
+        >>> # Annualize using all months (default)
+        >>> annual_series = series.annualize()
+        
+        >>> # Annualize using only summer months (JJA)
+        >>> summer_annual = series.annualize(months=[6, 7, 8])
+        
+        >>> # Annualize using DJF (Dec-Jan-Feb) spanning year boundary
+        >>> winter_annual = series.annualize(months=[-12, 1, 2])
+        
+        >>> # Include partial years at edges
+        >>> annual_partial = series.annualize(partial_years=True)
+        
+        Notes
+        -----
+        - This method requires subannual data (median resolution < min_res)
+        - Negative month values refer to months in the previous year
+        - The resulting time axis will use January 1st of each year as the time stamp
+        - Years with insufficient data are handled according to partial_years setting
+        '''
+    
+        # Check if data is subannual using Resolution class
+        if not hasattr(self, 'time_unit') or 'year' not in self.time_unit.lower():
+            raise ValueError("time_unit must contain 'Year' to attempt annualization")
+        
+        try:
+            dt = self.resolution().describe()['median']
+            if dt > min_res:
+                raise ValueError(f"Data appears to be annual or coarser (median resolution: {dt:.3f} years >= {min_res}). Cannot annualize.")
+        except Exception as e:
+            raise ValueError(f"Could not determine data resolution: {e}")
+        
+        # Set default months if not provided
+        if months is None:
+            months = list(range(1, 13))
+        
+        # Validate months parameter
+        if not isinstance(months, (list, tuple)):
+            raise ValueError("months must be a list or tuple of integers")
+        
+        if not all(isinstance(m, int) and -12 <= m <= 12 and m != 0 for m in months):
+            raise ValueError("months must contain integers between -12 and 12 (excluding 0)")
+        
+        # Convert to pandas Series using existing method
+        try:
+            series = self.to_pandas()
+        except Exception as e:
+            raise ValueError(f"Could not convert Series to pandas: {e}")
+        
+        # Ensure the index is datetime
+        if not hasattr(series.index, 'month'):
+            try:
+                series.index = pd.to_datetime(series.index)
+            except Exception as e:
+                raise ValueError(f"Could not convert time axis to datetime: {e}")
+        
+        # Handle negative months by creating a shifted dataset
+        series_expanded = series.copy()
+        
+        # Separate positive and negative months
+        pos_months = [m for m in months if m > 0]
+        neg_months = [m for m in months if m < 0]
+        
+        # For negative months, we need to shift years
+        if neg_months:
+            # Convert negative months to positive (e.g., -12 -> 12, -1 -> 11)
+            neg_months_pos = [12 + m if m < 0 else m for m in neg_months]
+            
+            # Create mask for negative months but assign them to the following year
+            neg_mask = series.index.month.isin(neg_months_pos)
+            series_neg = series[neg_mask].copy()
+            
+            # Shift the year forward by 1 for negative months
+            series_neg.index = series_neg.index + pd.DateOffset(years=1)
+            
+            # Combine original data (for positive months) with shifted data (for negative months)
+            series_expanded = pd.concat([series, series_neg]).sort_index()
+        
+        # Create month filter including both positive and negative months
+        if pos_months and neg_months:
+            # For negative months, they're now in the correct year, so use positive equivalents
+            neg_months_pos = [12 + m if m < 0 else m for m in neg_months]
+            all_months = pos_months + neg_months_pos
+        elif pos_months:
+            all_months = pos_months
+        else:  # only negative months
+            all_months = [12 + m if m < 0 else m for m in neg_months]
+        
+        # Filter data to include only specified months
+        month_mask = series_expanded.index.month.isin(all_months)
+        series_filtered = series_expanded[month_mask]
+        
+        if series_filtered.empty:
+            raise ValueError("No data found for the specified months")
+        
+        # Group by year and calculate mean
+        yearly_groups = series_filtered.groupby(series_filtered.index.year)
+        
+        # Handle partial years
+        if not partial_years:
+            # Only keep years that have all specified months
+            expected_count = len(months)
+            year_counts = yearly_groups.size()
+            complete_years = year_counts[year_counts == expected_count].index
+            yearly_groups = series_filtered[series_filtered.index.year.isin(complete_years)].groupby(series_filtered[series_filtered.index.year.isin(complete_years)].index.year)
+        
+        # Calculate annual means
+        annual_data = yearly_groups.mean()
+        
+        if annual_data.empty:
+            raise ValueError("No complete years found with the specified months. Consider setting partial_years=True.")
+        
+        # Create new Series by copying self and replacing time/value
+        annual_series = self.copy()
+        annual_series.time = annual_data.index.values
+        annual_series.value = annual_data.values
+        
+        # Update label to indicate annualization
+        if self.label:
+            annual_series.label = f"{self.label} (annualized)"
+        
+        return annual_series
+    
 
     def gaussianize(self, keep_log = False):
         ''' Gaussianizes the timeseries (i.e. maps its values to a standard normal)
