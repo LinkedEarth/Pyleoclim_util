@@ -2501,9 +2501,9 @@ class Series:
         
         # For negative months, we need to shift years
         if neg_months:
-            # Convert negative months to positive (e.g., -12 -> 12, -1 -> 11)
-            neg_months_pos = [12 + m if m < 0 else m for m in neg_months]
-            
+            # Convert negative months to positive (e.g., -12 -> 12, -11 -> 11)
+            #neg_months_pos = [12 + m if m < 0 else m for m in neg_months]
+            neg_months_pos = [-m for m in neg_months]
             # Create mask for negative months but assign them to the following year
             neg_mask = series.index.month.isin(neg_months_pos)
             series_neg = series[neg_mask].copy()
@@ -2517,12 +2517,13 @@ class Series:
         # Create month filter including both positive and negative months
         if pos_months and neg_months:
             # For negative months, they're now in the correct year, so use positive equivalents
-            neg_months_pos = [12 + m if m < 0 else m for m in neg_months]
+            #neg_months_pos = [12 + m if m < 0 else m for m in neg_months]
             all_months = pos_months + neg_months_pos
         elif pos_months:
             all_months = pos_months
         else:  # only negative months
-            all_months = [12 + m if m < 0 else m for m in neg_months]
+            raise ValueError("Positive months required")
+            #all_months = [12 + m if m < 0 else m for m in neg_months]
         
         # Filter data to include only specified months
         month_mask = series_expanded.index.month.isin(all_months)
