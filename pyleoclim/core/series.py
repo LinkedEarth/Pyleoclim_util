@@ -126,7 +126,7 @@ class Series:
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
          Default is None (marked for deprecation)
 
-    auto_time_params : bool,
+    auto_time_params : bool
         If True, uses tsbase.disambiguate_time_metadata to ensure that time_name and time_unit are usable by Pyleoclim. This may override the provided metadata.
         If False, the provided time_name and time_unit are used. This may break some functionalities (e.g. common_time and convert_time_unit), so use at your own risk.
         If not provided, code will set to True for internal consistency.
@@ -2418,9 +2418,9 @@ class Series:
             Minimum resolution threshold (in years) to determine if data is subannual.
             Default is 0.25 (quarterly or finer resolution required).
         partial_years : bool, optional
-            Whether to include edge years with incomplete month coverage.
+            Whether to include years with incomplete month coverage into averages.
             If False (default), drop years that don't have all specified months.
-            If True, use available subset of months for edge years.
+            If True, use available subset of months for each year
         
         Returns
         -------
@@ -2433,27 +2433,21 @@ class Series:
             If months contains invalid month numbers (not -12 to 12, excluding 0).
             If the time axis cannot be interpreted as datetime.
             If data is not subannual (median resolution >= min_res).
+            If time axis is retrograde 
             If time_unit does not contain "Year".
         
         Examples
         --------
-        >>> # Annualize using all months (default)
-        >>> annual_series = series.annualize()
-        
-        >>> # Annualize using only summer months (JJA)
-        >>> summer_annual = series.annualize(months=[6, 7, 8])
-        
-        >>> # Annualize using DJF (Dec-Jan-Feb) spanning year boundary
-        >>> winter_annual = series.annualize(months=[-12, 1, 2])
-        
-        >>> # Include partial years at edges
-        >>> annual_partial = series.annualize(partial_years=True)
+        .. jupyter-execute::
+
+            ts = pyleo.utils.load_dataset('SOI')
+            ts_slice = ts.slice([1972, 1998])
+            print("New time bounds:",ts_slice.time.min(),ts_slice.time.max())
         
         Notes
         -----
         - This method requires subannual data (median resolution < min_res)
         - Negative month values refer to months in the previous year
-        - The resulting time axis will use January 1st of each year as the time stamp
         - Years with insufficient data are handled according to partial_years setting
         '''
     
@@ -2461,12 +2455,16 @@ class Series:
         if not hasattr(self, 'time_unit') or 'year' not in self.time_unit.lower():
             raise ValueError("time_unit must contain 'Year' to attempt annualization")
         
-        try:
-            dt = self.resolution().describe()['median']
-            if dt > min_res:
-                raise ValueError(f"Data appears to be annual or coarser (median resolution: {dt:.3f} years >= {min_res}). Cannot annualize.")
-        except Exception as e:
-            raise ValueError(f"Could not determine data resolution: {e}")
+        if not 0 <= min_res <= 0.5: 
+            raise ValueError(f"min_res must be in (0, 0.5); got {min_res}")
+        
+        # Check for suitable time axis properties
+        dt = self.resolution().describe()['median']
+        if dt >= min_res:
+            raise ValueError(f"Data appears to be too coarse (median resolution: {dt:.1f} years >= {min_res}) for meaningful averages.")
+        if dt < 0:
+            warnings.warn("Series was retrograde; it has been sorted in ascending order so annualization runs properly",RuntimeWarning)
+            self = self.sort()
         
         # Set default months if not provided
         if months is None:
@@ -2522,8 +2520,7 @@ class Series:
         elif pos_months:
             all_months = pos_months
         else:  # only negative months
-            raise ValueError("Positive months required")
-            #all_months = [12 + m if m < 0 else m for m in neg_months]
+            raise ValueError("Positive months are required")
         
         # Filter data to include only specified months
         month_mask = series_expanded.index.month.isin(all_months)
@@ -2537,17 +2534,32 @@ class Series:
         
         # Handle partial years
         if not partial_years:
-            # Only keep years that have all specified months
-            expected_count = len(months)
-            year_counts = yearly_groups.size()
-            complete_years = year_counts[year_counts == expected_count].index
-            yearly_groups = series_filtered[series_filtered.index.year.isin(complete_years)].groupby(series_filtered[series_filtered.index.year.isin(complete_years)].index.year)
-        
+            # Only keep years that have exactly the requested months
+            complete_years = []
+            for year, group in yearly_groups:
+                available_months = set(group.index.month)
+                required_months = set(all_months)
+                if available_months == required_months:
+                    complete_years.append(year)
+            
+            # Filter to only complete years
+            if complete_years:
+                series_filtered = series_filtered[series_filtered.index.year.isin(complete_years)]
+                yearly_groups = series_filtered.groupby(series_filtered.index.year)
         # Calculate annual means
         annual_data = yearly_groups.mean()
         
+        # Add this after the annual_data calculation but before checking if it's empty
+        total_possible_years = len(set(series_filtered.index.year))
+        years_kept = len(annual_data)
+        years_dropped = total_possible_years - years_kept
+
+        if years_dropped > 0.3 * total_possible_years:
+            warnings.warn(f"Dropped {years_dropped} of {total_possible_years} years due to incomplete data", RuntimeWarning)
+                
         if annual_data.empty:
             raise ValueError("No complete years found with the specified months. Consider setting partial_years=True.")
+            
         
         # Create new Series by copying self and replacing time/value
         annual_series = self.copy()

@@ -16,7 +16,7 @@ Notes on how to test:
 """
 
 import datetime as dt
-import os
+import os, re
 import pathlib
 
 # import scipy.io as sio
@@ -413,6 +413,209 @@ class TestUISeriesClean:
 
         assert time[len(time) - 1] >= time[0]
         assert len(time) == len(value)
+
+
+
+class TestSeriesAnnualize:   # Written mostly by Claude AI
+    """Test Series annualize method with various parameter combinations and edge cases"""
+    
+    def test_annualize_default_all_months(self):
+        """Test annualization with default parameters (all months)"""
+        ts = pyleo.utils.load_dataset("SOI")
+        annual_ts = ts.annualize()
+        
+        # Check that result is annual resolution
+        resolution = annual_ts.resolution().describe()['median']
+        assert resolution >= 0.9  # Should be approximately 1 year
+        
+        # Check that time axis contains years
+        assert len(annual_ts.time) > 0
+        assert annual_ts.label.endswith("(annualized)")
+    
+    @pytest.mark.parametrize("months", [
+        [6, 7, 8],  # JJA summer
+        [12, 1, 2],  # DJF winter (no negatives)
+        [3, 4, 5],   # MAM spring
+        [9, 10, 11]  # SON autumn
+    ])
+    def test_annualize_seasonal_months(self, months):
+        """Test annualization with seasonal month selections"""
+        ts = pyleo.utils.load_dataset("SOI")
+        annual_ts = ts.annualize(months=months)
+        
+        # Should produce fewer years due to seasonal filtering
+        assert len(annual_ts.time) <= len(ts.time) / 12
+        assert annual_ts.label.endswith("(annualized)")
+    
+    def test_annualize_negative_months_djf(self):
+        """Test annualization with negative months spanning year boundary (DJF)"""
+        ts = pyleo.utils.load_dataset("SOI")
+        annual_ts = ts.annualize(months=[-12, 1, 2])
+        
+        # Should work and produce reasonable number of years
+        assert len(annual_ts.time) > 0
+        # Should be fewer years than total due to edge effects
+        assert len(annual_ts.time) < len(set(ts.datetime_index.year))
+    
+    def test_annualize_negative_months_ndjf(self):
+        """Test annualization with multiple negative months (NDJF)"""
+        ts = pyleo.utils.load_dataset("SOI")
+        annual_ts = ts.annualize(months=[-11, -12, 1, 2])
+        
+        assert len(annual_ts.time) > 0
+        assert annual_ts.label.endswith("(annualized)")
+    
+    def test_annualize_partial_years_false(self):
+        """Test annualization with partial_years=False (default)"""
+        ts = pyleo.utils.load_dataset("SOI")
+        # Use months that might not be complete at edges
+        annual_ts = ts.annualize(months=[1, 2, 3], partial_years=False)
+        
+        # Should drop incomplete years
+        assert len(annual_ts.time) > 0
+        # Each remaining year should have exactly 3 months of data
+    
+    def test_annualize_partial_years_true(self):
+        """Test annualization with partial_years=True"""
+        ts = pyleo.utils.load_dataset("SOI")
+        annual_ts_false = ts.annualize(months=[1, 2, 3], partial_years=False)
+        annual_ts_true = ts.annualize(months=[1, 2, 3], partial_years=True)
+        
+        # partial_years=True should include more years
+        assert len(annual_ts_true.time) >= len(annual_ts_false.time)
+    
+    @pytest.mark.parametrize("min_res", [0.1, 0.5, 1.0])
+    def test_annualize_min_res_threshold(self, min_res):
+        """Test annualization with different resolution thresholds"""
+        ts = pyleo.utils.load_dataset("SOI")
+        
+        if min_res == 1.0:
+            # Should raise error for high threshold
+            with pytest.raises(ValueError, match=re.escape("min_res must be in (0, 0.5); got 1.0")):
+                ts.annualize(min_res=min_res)
+        else:
+            # Should work for reasonable thresholds
+            annual_ts = ts.annualize(min_res=min_res)
+            assert len(annual_ts.time) > 0
+    
+    def test_annualize_single_month(self):
+        """Test annualization with single month"""
+        ts = pyleo.utils.load_dataset("SOI")
+        annual_ts = ts.annualize(months=[7])  # July only
+        
+        assert len(annual_ts.time) > 0
+        # Should have roughly one value per year with July data
+    
+    def test_annualize_invalid_months_out_of_range(self):
+        """Test annualization with invalid month numbers"""
+        ts = pyleo.utils.load_dataset("SOI")
+        
+        with pytest.raises(ValueError, match="months must contain integers between -12 and 12"):
+            ts.annualize(months=[13, 14])
+        
+        with pytest.raises(ValueError, match="months must contain integers between -12 and 12"):
+            ts.annualize(months=[-13, -14])
+        
+        with pytest.raises(ValueError, match="months must contain integers between -12 and 12"):
+            ts.annualize(months=[0])  # Zero not allowed
+    
+    def test_annualize_invalid_months_type(self):
+        """Test annualization with invalid month parameter types"""
+        ts = pyleo.utils.load_dataset("SOI")
+        
+        with pytest.raises(ValueError, match="months must be a list or tuple"):
+            ts.annualize(months="invalid")
+        
+        with pytest.raises(ValueError, match="months must be a list or tuple"):
+            ts.annualize(months=7)
+    
+    def test_annualize_no_positive_months(self):
+        """Test annualization with only negative months"""
+        ts = pyleo.utils.load_dataset("SOI")
+        
+        with pytest.raises(ValueError, match="Positive months are required"):
+            ts.annualize(months=[-12, -11, -10])
+    
+    def test_annualize_no_data_for_months(self):
+        """Test annualization when no data exists for specified months"""
+        # Create a series with limited time range
+        ts = pyleo.utils.load_dataset("SOI")
+        # Truncate to only have data from one season
+        start_idx = 100
+        end_idx = 110
+        ts_short = pyleo.Series(
+            time=ts.time[start_idx:end_idx],
+            value=ts.value[start_idx:end_idx],
+            time_unit=ts.time_unit,
+            label="Short series",
+            auto_time_params = True,
+            verbose= False
+        )
+        
+        # Try to annualize with months that don't exist in the short series
+        with pytest.raises(ValueError, match=re.escape("No complete years found with the specified months. Consider setting partial_years=True.")):
+            ts_short.annualize(months=[6, 7, 8])
+    
+    def test_annualize_annual_data_error(self, gen_normal):
+        """Test that annualization fails on already annual data"""
+        # Create annual data
+        ts = gen_normal()
+        
+        with pytest.raises(ValueError, match=re.escape("Data appears to be too coarse (median resolution: 1.0 years >= 0.25) for meaningful averages.")):
+            ts.annualize()
+    
+    def test_annualize_wrong_time_unit(self):
+        """Test that annualization fails without 'Year' in time_unit"""
+        ts = pyleo.utils.load_dataset("SOI")
+        ts_bad = ts.copy()
+        ts_bad.time_unit = "days"  # Remove 'Year' from time_unit
+        
+        with pytest.raises(ValueError, match="time_unit must contain 'Year'"):
+            ts_bad.annualize()
+    
+    def test_annualize_retrograde_series(self):
+        """Test that annualization fails on retrograde (decreasing) time series"""
+        ts = pyleo.utils.load_dataset("SOI")
+        # Reverse the time axis to make it retrograde
+        ts_retro = ts.sort(ascending=False)
+        
+        with pytest.warns(RuntimeWarning, match="Series was retrograde; it has been sorted in ascending order so annualization runs properly"):
+            ts_retro.annualize()
+    
+    def test_annualize_no_complete_years(self):
+        """Test when no complete years exist with specified months"""
+        soi = pyleo.utils.load_dataset("SOI")
+        inc = soi.sel(time=slice(1951, 1953))
+        # Create a scenario where no complete years exist
+        # Use a very restrictive month selection that's unlikely to have complete coverage
+        
+        with pytest.raises(ValueError, match="No complete years found"):
+            # This should fail for some edge case datasets
+            tsa = inc.annualize(months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], partial_years=False)
+    
+    @pytest.mark.parametrize("ds_name", ["SOI", "NINO3"])
+    def test_annualize_preserve_metadata(self, ds_name):
+        """Test that annualization preserves important metadata"""
+        ts = pyleo.utils.load_dataset(ds_name)
+        annual_ts = ts.annualize()
+        
+        # Check that important attributes are preserved
+        assert annual_ts.time_unit == ts.time_unit
+        assert annual_ts.value_unit == ts.value_unit
+        assert annual_ts.value_name == ts.value_name
+        assert f"{ts.label} (annualized)" == annual_ts.label
+    
+    def test_annualize_time_axis_format(self):
+        """Test that the output time axis has correct format"""
+        ts = pyleo.utils.load_dataset("SOI")
+        annual_ts = ts.annualize()
+        
+        # Time should be integer years
+        assert all(isinstance(t, (int, np.integer)) for t in annual_ts.time)
+        # Time should be in ascending order
+        assert all(annual_ts.time[i] <= annual_ts.time[i+1] for i in range(len(annual_ts.time)-1))
+
+
 
 
 class TestUISeriesGaussianize:
