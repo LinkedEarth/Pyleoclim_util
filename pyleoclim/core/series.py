@@ -2428,23 +2428,54 @@ class Series:
         -------
         Series
             A new Series object with annualized data.
-            
-    
         
         Examples
         --------
+        1) Annual average
         .. jupyter-execute::
+ 
+            soi = pyleo.utils.load_dataset('SOI')
+            dt = soi.resolution().describe()['median']
+            print(f"The series' resolution is {dt*12:.0f} month")
 
-            ts = pyleo.utils.load_dataset('SOI')
-            ts_slice = ts.slice([1972, 1998])
-            print("New time bounds:",ts_slice.time.min(),ts_slice.time.max())
+            soi_a = soi.annualize()
+            dta = soi_a.resolution().describe()['median']
+            print(f"The series' resolution is now {dta:.0f} year")
+            fig, ax = soi.plot(title='Jan-Dec averaging')
+            soi_a.plot(marker='o',ax=ax)
+
+        2) JJA average : straightforward
+        .. jupyter-execute::
+            
+            soi_jja = soi.annualize(months=[6, 7 , 8])
+            fig, ax = soi.plot(title='JJA averaging')
+            soi_jja.plot(marker='o',ax=ax, label='JJA average')
+
+        3) DJF average : straddles a year; handles it gracefully
+        .. jupyter-execute::
+            
+            soi_djf = soi.annualize(months=[12, 1 , 2])
+            fig, ax = soi.plot(title='DJF averaging')
+            soi_djf.plot(marker='o',ax=ax, label='DJF average')
+
+        4) Varying the fraction of required months
+        .. jupyter-execute::
+            
+            AprMar = [4,5,6,7,8,9,10,11,12,1,2,3]
+            soi_am_default = soi.annualize(months=AprMar)
+            soi_am_stringent = soi.annualize(months=AprMar,frac_req_months=0.9)
+
+            fig, ax = soi.plot(title='Apr-Mar averaging')
+            soi_am_default.plot(marker='o',ax=ax, label='Apr-Mar, $f=2/3$')
+            soi_am_stringent.plot(marker='o',ax=ax, label='Apr-Mar, $f=0.9$')
+        
+        We see that insisting on a very high fraction of available months will result in dropped years 
         
         Notes
         -----
-        - This method requires subannual data (median resolution < min_res)
+        - This method requires subannual data (median resolution <= min_res)
         - Months must be consecutive to define a clear averaging period
-        - Years with insufficient data are handled according to partial_years setting
-        - Uses weighted averaging to account for uneven temporal spacing
+        - Uses weighted averaging to account for potentially uneven temporal spacing
         '''
         
         # Check if data is subannual using Resolution class
