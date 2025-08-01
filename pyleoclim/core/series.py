@@ -2400,41 +2400,36 @@ class Series:
             new.log += ({len(new.log):'sort', 'ascending': ascending},)
         return new
     
-    def annualize(self, months=list(range(1, 13)), min_res=0.25, partial_years=False):
+    def annualize(self, months=list(range(1, 13)), min_res=0.25, frac_req_months=2/3):
         '''
         Annualize subannual data by averaging values within specified months for each year.
         
-        This method converts subannual time series data to annual resolution by grouping
-        data by year and taking the arithmetic mean of values from specified months.
-        Handles negative month values to span across year boundaries.
+        This method converts subannual time series data to annual resolution by computing
+        weighted averages of values from specified months using the custom_year_averages
+        utility function.
         
         Parameters
         ----------
         months : list of int, optional
-            List of months to include in the annual aggregation. Can include negative
-            values for previous year months (e.g., [-12, 1, 2] means Dec of year n,
-            Jan and Feb of year n+1). Default is [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].
+            List of months to include in the annual aggregation. Must be consecutive
+            months either within a calendar year or spanning across years (e.g., 
+            [10, 11, 12, 1, 2, 3] for Oct-Mar). Default is a calendar average, [1 ... 12].
         min_res : float, optional
             Minimum resolution threshold (in years) to determine if data is subannual.
             Default is 0.25 (quarterly or finer resolution required).
-        partial_years : bool, optional
-            Whether to include years with incomplete month coverage into averages.
-            If False (default), drop years that don't have all specified months.
-            If True, use available subset of months for each year
+        frac_req_months : float, optional
+            Minimum fraction of requested months that must be present for a year to be included.
+            Default is 2/3 (67%). For example, if requesting 12 months, at least 8 months must be 
+            present. If requesting 3 months (e.g., DJF), at least 2 months must be present.
+            Years that do not meet this threshold are dropped from the resulting series.
+            Set to 1.0 to require all months, or lower values (e.g., 1/3) for more lenient inclusion.
         
         Returns
         -------
         Series
             A new Series object with annualized data.
             
-        Raises
-        ------
-        ValueError
-            If months contains invalid month numbers (not -12 to 12, excluding 0).
-            If the time axis cannot be interpreted as datetime.
-            If data is not subannual (median resolution >= min_res).
-            If time axis is retrograde 
-            If time_unit does not contain "Year".
+    
         
         Examples
         --------
@@ -2447,10 +2442,11 @@ class Series:
         Notes
         -----
         - This method requires subannual data (median resolution < min_res)
-        - Negative month values refer to months in the previous year
+        - Months must be consecutive to define a clear averaging period
         - Years with insufficient data are handled according to partial_years setting
+        - Uses weighted averaging to account for uneven temporal spacing
         '''
-    
+        
         # Check if data is subannual using Resolution class
         if not hasattr(self, 'time_unit') or 'year' not in self.time_unit.lower():
             raise ValueError("time_unit must contain 'Year' to attempt annualization")
@@ -2463,7 +2459,7 @@ class Series:
         if dt >= min_res:
             raise ValueError(f"Data appears to be too coarse (median resolution: {dt:.1f} years >= {min_res}) for meaningful averages.")
         if dt < 0:
-            warnings.warn("Series was retrograde; it has been sorted in ascending order so annualization runs properly",RuntimeWarning)
+            warnings.warn("Series was retrograde; it has been sorted in ascending order so annualization runs properly", RuntimeWarning)
             self = self.sort()
         
         # Set default months if not provided
@@ -2474,8 +2470,63 @@ class Series:
         if not isinstance(months, (list, tuple)):
             raise ValueError("months must be a list or tuple of integers")
         
-        if not all(isinstance(m, int) and -12 <= m <= 12 and m != 0 for m in months):
-            raise ValueError("months must contain integers between -12 and 12 (excluding 0)")
+        if not all(isinstance(m, int) and 1 <= m <= 12 for m in months):
+            raise ValueError("months must contain integers between 1 and 12")
+        
+        if len(months) == 0:
+            raise ValueError("months cannot be empty")
+        
+        # Check if months are consecutive (allowing for year-end wrapping)
+        def is_consecutive_with_wrap(months_list):
+            """Check if months are consecutive, allowing wrapping around year boundary"""
+            if len(months_list) <= 1:
+                return True
+            
+            # Check normal consecutive case
+            is_normal_consecutive = True
+            for i in range(1, len(months_list)):
+                if months_list[i] != months_list[i-1] + 1:
+                    is_normal_consecutive = False
+                    break
+            
+            if is_normal_consecutive:
+                return True
+            
+            # Check wrap-around case (e.g., [11, 12, 1, 2] or [12, 1, 2])
+            # Find where the wrap occurs (where month decreases)
+            wrap_point = None
+            for i in range(1, len(months_list)):
+                if months_list[i] < months_list[i-1]:
+                    if wrap_point is None:
+                        wrap_point = i
+                    else:
+                        return False  # Multiple wraps not allowed
+            
+            if wrap_point is None:
+                return False  # No wrap found but not consecutive
+            
+            # Check consecutive before wrap
+            for i in range(1, wrap_point):
+                if months_list[i] != months_list[i-1] + 1:
+                    return False
+            
+            # Check consecutive after wrap
+            for i in range(wrap_point + 1, len(months_list)):
+                if months_list[i] != months_list[i-1] + 1:
+                    return False
+            
+            # Check that the wrap makes sense (December -> January)
+            if months_list[wrap_point-1] == 12 and months_list[wrap_point] == 1:
+                return True
+            
+            return False
+        
+        if not is_consecutive_with_wrap(months):
+            raise ValueError("months must be consecutive (e.g., [1,2,3] or [11,12,1,2])")
+        
+        # Determine start and end months (use original order, not sorted)
+        start_month = months[0]
+        end_month = months[-1]
         
         # Convert to pandas Series using existing method
         try:
@@ -2490,80 +2541,69 @@ class Series:
             except Exception as e:
                 raise ValueError(f"Could not convert time axis to datetime: {e}")
         
-        # Handle negative months by creating a shifted dataset
-        series_expanded = series.copy()
+        # Use the new custom_year_averages function
+        try:
+            annual_data = tsutils.custom_year_averages(
+                data=series,
+                start_month=start_month,
+                end_month=end_month,
+                years=None  # Use all available years
+            )
+        except Exception as e:
+            raise ValueError(f"Failed to compute annual averages: {e}")
         
-        # Separate positive and negative months
-        pos_months = [m for m in months if m > 0]
-        neg_months = [m for m in months if m < 0]
+        # Apply frac_req_months filtering
+        # Filter out years that don't meet the minimum fraction requirement
+        sufficient_years = []
         
-        # For negative months, we need to shift years
-        if neg_months:
-            # Convert negative months to positive (e.g., -12 -> 12, -11 -> 11)
-            #neg_months_pos = [12 + m if m < 0 else m for m in neg_months]
-            neg_months_pos = [-m for m in neg_months]
-            # Create mask for negative months but assign them to the following year
-            neg_mask = series.index.month.isin(neg_months_pos)
-            series_neg = series[neg_mask].copy()
+        for year in annual_data.index:
+            # Determine the date range for this year's period
+            if start_month <= end_month:
+                # Same calendar year
+                period_start = pd.Timestamp(year=year, month=start_month, day=1)
+                period_end = pd.Timestamp(year=year, month=end_month, day=28)  # Use 28 to be safe
+            else:
+                # Spans calendar years
+                period_start = pd.Timestamp(year=year-1, month=start_month, day=1)
+                period_end = pd.Timestamp(year=year, month=end_month, day=28)  # Use 28 to be safe
             
-            # Shift the year forward by 1 for negative months
-            series_neg.index = series_neg.index + pd.DateOffset(years=1)
+            # Get data for this period
+            period_mask = (series.index >= period_start) & (series.index <= period_end)
+            period_data = series[period_mask]
             
-            # Combine original data (for positive months) with shifted data (for negative months)
-            series_expanded = pd.concat([series, series_neg]).sort_index()
-        
-        # Create month filter including both positive and negative months
-        if pos_months and neg_months:
-            # For negative months, they're now in the correct year, so use positive equivalents
-            #neg_months_pos = [12 + m if m < 0 else m for m in neg_months]
-            all_months = pos_months + neg_months_pos
-        elif pos_months:
-            all_months = pos_months
-        else:  # only negative months
-            raise ValueError("Positive months are required")
-        
-        # Filter data to include only specified months
-        month_mask = series_expanded.index.month.isin(all_months)
-        series_filtered = series_expanded[month_mask]
-        
-        if series_filtered.empty:
-            raise ValueError("No data found for the specified months")
-        
-        # Group by year and calculate mean
-        yearly_groups = series_filtered.groupby(series_filtered.index.year)
-        
-        # Handle partial years
-        if not partial_years:
-            # Only keep years that have exactly the requested months
-            complete_years = []
-            for year, group in yearly_groups:
-                available_months = set(group.index.month)
-                required_months = set(all_months)
-                if available_months == required_months:
-                    complete_years.append(year)
+            if len(period_data) == 0:
+                continue
             
-            # Filter to only complete years
-            if complete_years:
-                series_filtered = series_filtered[series_filtered.index.year.isin(complete_years)]
-                yearly_groups = series_filtered.groupby(series_filtered.index.year)
-        # Calculate annual means
-        annual_data = yearly_groups.mean()
+            # Count available months (works for any temporal resolution, not just monthly)
+            available_months = set(period_data.index.month)
+            required_months = set(months)
+            available_required_months = available_months.intersection(required_months)
+            
+            # Calculate fraction of required months that are present
+            fraction_present = len(available_required_months) / len(required_months)
+            
+            if fraction_present >= frac_req_months:
+                sufficient_years.append(year)
         
-        # Add this after the annual_data calculation but before checking if it's empty
-        total_possible_years = len(set(series_filtered.index.year))
-        years_kept = len(annual_data)
-        years_dropped = total_possible_years - years_kept
-
-        if years_dropped > 0.3 * total_possible_years:
-            warnings.warn(f"Dropped {years_dropped} of {total_possible_years} years due to incomplete data", RuntimeWarning)
-                
+        # Filter annual_data to only include years with sufficient data
+        if sufficient_years:
+            annual_data = annual_data[annual_data.index.isin(sufficient_years)]
+        else:
+            annual_data = pd.Series([], dtype=float, name=annual_data.name)
+        
+        # Report dropped years
+        total_years_before = len(tsutils.custom_year_averages(series, start_month, end_month, years=None).index)
+        dropped_years = total_years_before - len(annual_data)
+        
+        if dropped_years > 0:
+            warnings.warn(f"Dropped {dropped_years} of {total_years_before} years due to insufficient data coverage (< {frac_req_months:.1%} of requested months)", RuntimeWarning)
+        
         if annual_data.empty:
-            raise ValueError("No complete years found with the specified months. Consider setting partial_years=True.")
-            
+            raise ValueError(f"No years found with sufficient data coverage (>= {frac_req_months:.1%} of requested months). Consider lowering frac_req_months.")
         
         # Create new Series by copying self and replacing time/value
         annual_series = self.copy()
-        annual_series.time = annual_data.index.values
+        annual_series.time = annual_data.index.values.astype(float)
         annual_series.value = annual_data.values
         
         # Update label to indicate annualization

@@ -17,8 +17,8 @@ __all__ = [
     'detect_outliers_DBSCAN',
     'detect_outliers_kmeans',
     'remove_outliers',
-    'phaseran',
-    'phaseran2'
+    'phaseran2',
+    'custom_year_averages'
 ]
 
 import numpy as np
@@ -2171,9 +2171,8 @@ def custom_year_averages(
         # Use the ending year as the index (standard for fiscal years)
         results[year] = weighted_avg
     
-    #datetime_index = pd.to_datetime(years)
-    # export indexd by year
-    return pd.Series(list(results.values()), index=years, name=data.name or 'weighted_average')
+    # Return results only for years that have data
+    return pd.Series(list(results.values()), index=list(results.keys()), name=data.name or 'weighted_average')
 
 
 def _calculate_weighted_average(
