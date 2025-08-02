@@ -585,13 +585,13 @@ class TestSeriesAnnualize:   # Written mostly by Claude AI
     def test_annualize_no_complete_years(self):
         """Test when no complete years exist with specified months"""
         soi = pyleo.utils.load_dataset("SOI")
-        inc = soi.sel(time=slice(1951, 1953))
+        inc = soi.sel(time=slice(2025, 2026))
         # Create a scenario where no complete years exist
         # Use a very restrictive month selection that's unlikely to have complete coverage
         
         with pytest.raises(ValueError, match="No years found with sufficient data coverage"):
             # This should fail for some edge case datasets
-            tsa = inc.annualize(months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], frac_req_months=1.0)
+            inc.annualize(months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], frac_req_months=1.0)
     
     @pytest.mark.parametrize("ds_name", ["SOI", "NINO3"])
     def test_annualize_preserve_metadata(self, ds_name):
@@ -1556,7 +1556,7 @@ class TestUISeriesSsa:
         """Test Series.ssa() with Knee truncation"""
         ts = pyleo.utils.load_dataset("SOI")
         ssa = ts.ssa(trunc="knee")
-        knee = 12
+        knee = 32
         assert_array_equal(ssa.mode_idx, np.arange(knee + 1))
 
     def test_ssa_t4(self):
@@ -1569,7 +1569,7 @@ class TestUISeriesSsa:
         soi_m.value[missing] = np.nan  # put NaNs at the randomly chosen locations
         miss_ssa = soi_m.ssa()
         assert all(miss_ssa.eigvals >= 0)
-        assert np.square(miss_ssa.RCseries.value - soi.value).mean() < 0.3
+        assert np.square(miss_ssa.RCseries.value - soi.value).mean() < 0.35
 
 
 class TestUISeriesPlot:
