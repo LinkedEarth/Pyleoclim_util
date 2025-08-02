@@ -2463,13 +2463,13 @@ class Series:
             
             AprMar = [4,5,6,7,8,9,10,11,12,1,2,3]
             soi_am_default = soi.annualize(months=AprMar)
-            soi_am_stringent = soi.annualize(months=AprMar,frac_req_months=0.9)
+            soi_am_stringent = soi.annualize(months=AprMar,frac_req_months=1.0)
 
-            fig, ax = soi.plot(title='Apr-Mar averaging')
+            fig, ax = soi.plot(title='Apr-Mar averaging', xlim = [2000, 2026])
             soi_am_default.plot(marker='o',ax=ax, label='Apr-Mar, $f=2/3$')
-            soi_am_stringent.plot(marker='o',ax=ax, label='Apr-Mar, $f=0.9$')
+            soi_am_stringent.plot(marker='o',ax=ax, label='Apr-Mar, $f=1.0$')
         
-        We see that insisting on a very high fraction of available months will result in dropped years 
+        The last year is incomplete months, so insisting on complete coverage results in dropping it 
         
         Notes
         -----

@@ -1,9 +1,12 @@
 SOI:
-  filename: 'soi_data'
+  filename: 'soi.long'
   file_extension: 'csv'
   pandas_kwargs:
     skiprows: 0
-    header: 1
+    header: 0
+    parse_dates: [0]
+    index_col: 0
+    skipfooter: 1
   pyleo_kwargs:
     time_name: 'time'
     time_unit: 'year C.E.'
@@ -11,8 +14,8 @@ SOI:
     value_unit: 'mb'
     label: 'Southern Oscillation Index'
     archiveType: 'Instrumental'
-  time_column: 1
-  value_column: 2
+  time_column: 0
+  value_column: ' SOI from CRU  missing value -99.99 https://psl.noaa.gov/data/timeseries/month/'
 
 NINO3:
   filename: 'wtc_test_data_nino_even'
