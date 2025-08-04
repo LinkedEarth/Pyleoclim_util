@@ -97,14 +97,15 @@ def load_dataset(name):
     
     Returns
     -------
-    pyleoclim_util.Series of the dataset
+    Series object
 
     Examples
     --------
 
     .. jupyter-execute::
-        from pyleoclim.utils.datasets import load_dataset
-        pyleo_series = load_dataset('LR04')
+        
+        LR04 = pyleo.utils.load_dataset('LR04')
+        LR04.view()
 
     """
     # load the metadata for this dataset
@@ -123,46 +124,87 @@ def load_dataset(name):
         # load into pandas
         df = pd.read_csv(path, **pandas_kwargs)
 
-        # use iloc if we're given an int
-        if isinstance(time_column, int):
-            time=df.iloc[:, time_column]
-        # use column name otherwise
-        else:
-            # if its a column
-            if time_column in df.columns:
-                time = df[time_column]
+        # Check if the index is a DatetimeIndex - if so, use from_pandas()
+        if isinstance(df.index, pd.DatetimeIndex):
+            # Filter out rows with NaT (Not a Time) values and missing data
+            valid_mask = df.index.notna()
+            if isinstance(value_column, int):
+                value_series = df.iloc[:, value_column]
             else:
-                time = df.Index
-
-        if isinstance(value_column, int):
-            value=df.iloc[:, value_column]
+                value_series = df[value_column]
+            
+            # Also filter out rows where values are NaN
+            valid_mask = valid_mask & value_series.notna()
+            
+            # Apply the mask to get clean data
+            clean_index = df.index[valid_mask]
+            clean_values = value_series[valid_mask]
+            
+            # Create a pandas Series with the clean DatetimeIndex
+            pandas_series = pd.Series(clean_values.values, index=clean_index)
+            
+            # Use from_pandas() method which handles DatetimeIndex properly
+            if 'lat' in pyleo_kwargs.keys() and 'lon' in pyleo_kwargs.keys():
+                if pyleo_kwargs['lat'] is not None and pyleo_kwargs['lon'] is not None:
+                    ts = pyleo.GeoSeries.from_pandas(
+                        pandas_series,
+                        metadata=pyleo_kwargs,
+                        verbose=False
+                    )
+                else:
+                    ts = pyleo.Series.from_pandas(
+                        pandas_series,
+                        metadata=pyleo_kwargs,
+                        verbose=False
+                    )
+            else:
+                ts = pyleo.Series.from_pandas(
+                    pandas_series,
+                    metadata=pyleo_kwargs,
+                    verbose=False
+                )
         else:
-            value = df[value_column]
-        
-        if 'lat' in pyleo_kwargs.keys() and 'lon' in pyleo_kwargs.keys():
-            if pyleo_kwargs['lat'] is not None and pyleo_kwargs['lon'] is not None:
-                ts=pyleo.GeoSeries(
+            # Original logic for non-DatetimeIndex data
+            # use iloc if we're given an int
+            if isinstance(time_column, int):
+                time=df.iloc[:, time_column]
+            # use column name otherwise
+            else:
+                # if its a column
+                if time_column in df.columns:
+                    time = df[time_column]
+                else:
+                    time = df.Index
+
+            if isinstance(value_column, int):
+                value=df.iloc[:, value_column]
+            else:
+                value = df[value_column]
+            
+            if 'lat' in pyleo_kwargs.keys() and 'lon' in pyleo_kwargs.keys():
+                if pyleo_kwargs['lat'] is not None and pyleo_kwargs['lon'] is not None:
+                    ts=pyleo.GeoSeries(
+                        time=time, 
+                        value=value,
+                        **pyleo_kwargs, 
+                        verbose=False
+                    )
+                else:
+                   ts=pyleo.Series(
+                       time=time, 
+                       value=value,
+                       **pyleo_kwargs, 
+                       verbose=False
+                   ) 
+
+            else:
+                # convert to pyleo.Series
+                ts=pyleo.Series(
                     time=time, 
                     value=value,
                     **pyleo_kwargs, 
                     verbose=False
                 )
-            else:
-               ts=pyleo.Series(
-                   time=time, 
-                   value=value,
-                   **pyleo_kwargs, 
-                   verbose=False
-               ) 
-
-        else:
-            # convert to pyleo.Series
-            ts=pyleo.Series(
-                time=time, 
-                value=value,
-                **pyleo_kwargs, 
-                verbose=False
-            )
     # if this is a json
     elif metadata['file_extension'] == 'json':
         ts=jsonutils.json_to_PyleoObj(str(path), 'Series')

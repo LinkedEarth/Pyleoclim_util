@@ -2067,6 +2067,7 @@ def custom_year_averages(
     
         import pandas as pd
         import numpy as np
+        import pyleoclim.utils.tsutils as ut
         
         # Create sample monthly data
         dates = pd.date_range('2020-01-01', '2023-12-31', freq='M')
@@ -2075,35 +2076,35 @@ def custom_year_averages(
         
         # Example 1: Single year (int)
         # Compute Jan-Mar average for 2021 only
-        avg_single = custom_year_averages(ts, 1, 3, years=2021)
+        avg_single = ut.custom_year_averages(ts, 1, 3, years=2021)
         print("Single year (2021):")
         print(avg_single)
         print()
         
         # Example 2: List of specific years
         # Compute Apr-Mar averages for selected years
-        avg_list = custom_year_averages(ts, 4, 3, years=[2021, 2023])
+        avg_list = ut.custom_year_averages(ts, 4, 3, years=[2021, 2023])
         print("Specific years [2021, 2023]:")
         print(avg_list)
         print()
         
         # Example 3: Range of years
         # Compute Oct-Sep averages for consecutive years
-        avg_range = custom_year_averages(ts, 10, 9, years=range(2021, 2024))
+        avg_range = ut.custom_year_averages(ts, 10, 9, years=range(2021, 2024))
         print("Range of years (2021-2023):")
         print(avg_range)
         print()
         
         # Example 4: All available years (None - default)
         # Compute Jan-Dec averages for all years in data
-        avg_all = custom_year_averages(ts, 1, 12, years=None)
+        avg_all = ut.custom_year_averages(ts, 1, 12, years=None)
         print("All available years (None):")
         print(avg_all)
         print()
         
         # Example 5: Straddling periods with different year specifications
         # Apr-Mar periods: year refers to the March year
-        avg_straddle = custom_year_averages(ts, 4, 3, years=range(2021, 2024))
+        avg_straddle = ut.custom_year_averages(ts, 4, 3, years=range(2021, 2024))
         print("Straddling periods (Apr-Mar), years 2021-2023:")
         print(avg_straddle)
     
@@ -2119,7 +2120,7 @@ def custom_year_averages(
         daily_ts = pd.Series(daily_values, index=daily_dates, name='daily_data')
         
         # Compute weighted average (accounts for uneven spacing)
-        daily_avg = custom_year_averages(daily_ts, 1, 3, years=2021)
+        daily_avg = ut.custom_year_averages(daily_ts, 1, 3, years=2021)
         print("Daily data with uneven spacing (Jan-Mar 2021):")
         print(f"Weighted average: {daily_avg.iloc[0]:.2f}")
         print(f"Simple mean: {daily_ts.mean():.2f}")

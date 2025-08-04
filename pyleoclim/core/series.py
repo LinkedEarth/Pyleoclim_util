@@ -2431,7 +2431,8 @@ class Series:
         
         Examples
         --------
-        1) Annual average
+        1) Calendar average
+    
         .. jupyter-execute::
  
             soi = pyleo.utils.load_dataset('SOI')
@@ -2444,7 +2445,8 @@ class Series:
             fig, ax = soi.plot(title='Jan-Dec averaging')
             soi_a.plot(marker='o',ax=ax)
 
-        2) JJA average : straightforward
+        2) JJA average (straightforward)
+    
         .. jupyter-execute::
             
             soi_jja = soi.annualize(months=[6, 7 , 8])
@@ -2452,6 +2454,7 @@ class Series:
             soi_jja.plot(marker='o',ax=ax, label='JJA average')
 
         3) DJF average : straddles a year; handles it gracefully
+    
         .. jupyter-execute::
             
             soi_djf = soi.annualize(months=[12, 1 , 2])
@@ -2459,17 +2462,18 @@ class Series:
             soi_djf.plot(marker='o',ax=ax, label='DJF average')
 
         4) Varying the fraction of required months
+    
         .. jupyter-execute::
             
             AprMar = [4,5,6,7,8,9,10,11,12,1,2,3]
             soi_am_default = soi.annualize(months=AprMar)
-            soi_am_stringent = soi.annualize(months=AprMar,frac_req_months=0.9)
+            soi_am_stringent = soi.annualize(months=AprMar,frac_req_months=1.0)
 
-            fig, ax = soi.plot(title='Apr-Mar averaging')
+            fig, ax = soi.plot(title='Apr-Mar averaging', xlim = [2000, 2026])
             soi_am_default.plot(marker='o',ax=ax, label='Apr-Mar, $f=2/3$')
-            soi_am_stringent.plot(marker='o',ax=ax, label='Apr-Mar, $f=0.9$')
+            soi_am_stringent.plot(marker='o',ax=ax, label='Apr-Mar, $f=1.0$')
         
-        We see that insisting on a very high fraction of available months will result in dropped years 
+        The last year is incomplete, so insisting on complete coverage results in dropping it 
         
         Notes
         -----
@@ -3458,11 +3462,11 @@ class Series:
         Examples
         --------
 
-        Wavelet analysis on the evenly-spaced SOI record. The CWT method will be applied by default.
+        Wavelet analysis on the evenly-spaced NINO3 record. The CWT method will be applied by default.
 
         .. jupyter-execute::
 
-            ts = pyleo.utils.load_dataset('SOI')
+            ts = pyleo.utils.load_dataset('NINO3')
             scal1 = ts.wavelet()
             scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
             fig, ax = scal_signif.plot()
