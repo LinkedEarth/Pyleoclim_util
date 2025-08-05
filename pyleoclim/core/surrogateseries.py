@@ -115,7 +115,7 @@ class SurrogateSeries(EnsembleSeries):
         Examples
         --------
         
-        SOI = pyleo.utils.load_dataset('SOI')
+        SOI = pyleo.utils.load_dataset('SOI').interp()
         SOI_surr = pyleo.SurrogateSeries(method='phaseran', number=4) 
         SOI_surr.from_series(SOI)
         fig, ax = SOI_surr.plot_traces()

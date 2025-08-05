@@ -164,7 +164,7 @@ class Scalogram:
 
         .. jupyter-execute::
 
-            series = pyleo.utils.load_dataset('SOI')
+            series = pyleo.utils.load_dataset('NINO3')
             scalogram = series.wavelet()
             scalogram_copy = scalogram.copy()
 
@@ -284,7 +284,7 @@ class Scalogram:
 
         .. jupyter-execute::
 
-            ts = pyleo.utils.load_dataset('SOI')
+            ts = pyleo.utils.load_dataset('NINO3')
             scalogram = ts.wavelet()
             fig,ax = scalogram.plot()
 
@@ -462,7 +462,7 @@ class Scalogram:
 
         .. jupyter-execute::
 
-            ts = pyleo.utils.load_dataset('SOI')
+            ts = pyleo.utils.load_dataset('NINO3')
             scalogram = ts.wavelet().signif_test(number=2, export_scal=True)
             
         By setting export_scal to True, the noise realizations used to generate the significance test will be saved. 
