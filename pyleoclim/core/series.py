@@ -954,7 +954,6 @@ class Series:
         axis : str, optional
             The axis along which the Series will be flipped. The default is 'value'.
             Other acceptable options are 'time' or 'both'.
-            TODO: enable time flipping after paleopandas is released
 
         keep_log : Boolean
             if True, adds this transformation to the series log.
@@ -1392,7 +1391,7 @@ class Series:
 
         .. jupyter-execute::
 
-            ts = pyleo.utils.load_dataset('SOI')
+            ts = pyleo.utils.load_dataset('NINO3')
             fig, ax = ts.plot()
             nino_ssa = ts.ssa(M=60)
 
@@ -1406,7 +1405,7 @@ class Series:
         This highlights a few common properties of SSA:
             * the eigenvalues are in descending order
             * their uncertainties are proportional to the eigenvalues themselves
-            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties.
+            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered 
             * after a point (here i=15), the eigenvalues appear to reach a floor, explaining a very small amount of variance.
 
         Summing the variance of the first 14 modes, we get:
@@ -1423,7 +1422,7 @@ class Series:
 
             RCmat = nino_ssa.RCmat[:,:14]
             RCk = (RCmat-RCmat.mean()).sum(axis=1) + ts.value.mean()
-            fig, ax = ts.plot(title='SOI')
+            fig, ax = ts.plot(title='NINO3')
             ax.plot(nino_ssa.orig.time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
 
@@ -1452,7 +1451,7 @@ class Series:
             fig, ax = nino_mcssa.screeplot()
             print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
-        This suggests that modes 1-5 fall above the red noise benchmark, but so do a few others. To inspect mode 1 (index 0), just type:
+        This suggests that modes 1-2 fall above the red noise benchmark, but so 5-9. To inspect mode 1 (index 0), just type:
 
         .. jupyter-execute::
 
@@ -1731,8 +1730,6 @@ class Series:
         .. jupyter-execute::
 
             ts = pyleo.utils.load_dataset('SOI')
-            fig, ax = ts.plot()
-
             fig, ax = ts.histplot()
 
         '''
@@ -1943,7 +1940,7 @@ class Series:
 
         .. jupyter-execute::
 
-            series = pyleo.utils.load_dataset('SOI')
+            series = pyleo.utils.load_dataset('NINO3')
             psd = series.spectral(freq = 'welch')
             scalogram = series.wavelet(freq = 'welch')
 

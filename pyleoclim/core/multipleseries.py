@@ -378,9 +378,9 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            soi = pyleo.utils.load_dataset('SOI')
+            air = pyleo.utils.load_dataset('AIR')
             nino = pyleo.utils.load_dataset('NINO3')
-            ms = soi & nino
+            ms = air & nino
             ms_filter = ms.filter(method='lanczos',cutoff_scale=20)
 
         '''
@@ -1370,9 +1370,9 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            soi = pyleo.utils.load_dataset('SOI')
+            air = pyleo.utils.load_dataset('AIR')
             nino = pyleo.utils.load_dataset('NINO3')
-            ms = soi & nino
+            ms = air & nino
             ms_psd = ms.spectral(method='mtm')
             ms_psd.plot()
                     
