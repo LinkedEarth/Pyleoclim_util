@@ -185,8 +185,9 @@ class PSD:
 
         .. jupyter-execute::
 
-            nino3 = pyleo.utils.load_dataset('NINO3')
-            psd = nino3.standardize().spectral('mtm',settings={'NW':2})
+            import pyleoclim as pyleo
+            soi = pyleo.utils.load_dataset('SOI')
+            psd = soi.standardize().spectral('mtm',settings={'NW':2})
             psd_sim = psd.signif_test(number=20)
             fig, ax = psd_sim.plot()
 
@@ -211,13 +212,13 @@ class PSD:
             
         .. jupyter-execute::
                 
-            scalogram = nino3.standardize().wavelet().signif_test(number=20, export_scal=True)
+            scalogram = soi.standardize().wavelet().signif_test(number=20, export_scal=True)
 
         The psd can be calculated by using the previously generated scalogram
         
         .. jupyter-execute::
                 
-            psd_scal = nino3.standardize().spectral(scalogram=scalogram)
+            psd_scal = soi.standardize().spectral(scalogram=scalogram)
 
         The same scalogram can then be passed to do significance testing. 
         Pyleoclim will dig through the scalogram object to find the saved 
@@ -367,6 +368,7 @@ class PSD:
 
         .. jupyter-execute::
 
+            import pyleoclim as pyleo
             t, v = pyleo.utils.tsmodel.gen_ts(model='colored_noise')
             ts = pyleo.Series(time=t, value= v, label = 'fractal noise, unit slope', verbose=False)
             psd = ts.detrend().spectral(method='cwt')
@@ -425,6 +427,8 @@ class PSD:
 
         .. jupyter-execute::
 
+            import pyleoclim as pyleo
+
             t, v = pyleo.utils.tsmodel.gen_ts('colored_noise', alpha=1, m=1e5) # m=1e5 leads to aliasing
             ts = pyleo.Series(time=t, value=v, label='colored noise', verbose=False)
 
@@ -460,8 +464,8 @@ class PSD:
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None,
-             legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
-             plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1,
+             legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,signif_kwargs=None,
+             plot_kwargs=None, signif_clr='red', signif_alpha=1, signif_linestyles=['--', '-.', ':'], signif_linewidth=1,
              plot_beta=True, beta_kwargs=None):
 
         '''Plots the PSD estimates and signif level if included
@@ -582,6 +586,10 @@ class PSD:
 
             width of the significance line. The default is 1.
 
+        signif_alpha : float, optional
+
+            Transparency of the significance line. The default is 1.
+
         plot_beta : bool; {True, False}, optional
 
             If True and self.beta_est_res is not None, then the scaling slope line will be plotted
@@ -632,6 +640,7 @@ class PSD:
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
         beta_kwargs = {} if beta_kwargs is None else beta_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+        signif_kwargs = {} if signif_kwargs is None else signif_kwargs.copy()
 
         if label is None:
             if plot_beta and self.beta_est_res is not None:
@@ -744,10 +753,38 @@ class PSD:
                 if transpose:
                     signif_x_axis, signif_y_axis = signif_y_axis, signif_x_axis
 
-                plot_kwargs = {'label': f'{signif_method_label[self.signif_method]}, {q.label} threshold',
+                if 'c' in signif_kwargs.keys():
+                    signif_clr = signif_kwargs['c']
+                elif 'color' in signif_kwargs.keys():
+                    signif_clr = signif_kwargs['color']
+
+                if 'linestyle' in signif_kwargs.keys():
+                    signif_linestyle = signif_kwargs['linestyle']
+                elif 'ls' in signif_kwargs.keys():
+                    signif_linestyle = signif_kwargs['ls']
+                else:
+                    signif_linestyle=signif_linestyles[i % 3]
+
+                if 'lw' in signif_kwargs.keys():
+                    signif_linewidth = signif_kwargs['lw']
+                elif 'linewidth' in signif_kwargs.keys():
+                    signif_linewidth = signif_kwargs['linewidth']
+
+                if 'alpha' in signif_kwargs.keys():
+                    signif_alpha = signif_kwargs['alpha']
+
+
+
+                # if 'label' in signif_kwargs.keys():
+                #     labe = f'{signif_method_label[self.signif_method]}, {q.label} threshold'
+                label = f'{signif_method_label[self.signif_method]}, {q.label} threshold'
+
+
+                plot_kwargs = {'label': label,#f'{signif_method_label[self.signif_method]}, {q.label} threshold',
                                'color': signif_clr,
-                               'linestyle': signif_linestyles[i%3],
-                               'linewidth': signif_linewidth}
+                               'linestyle': signif_linestyle,
+                               'linewidth': signif_linewidth,
+                               'alpha': signif_alpha}
 
                 ax = plotting.plot_xy(
                     signif_x_axis, signif_y_axis,
@@ -1323,6 +1360,8 @@ class MultiplePSD:
 
         .. jupyter-execute::
             
+            import pyleoclim as pyleo
+            import numpy as np
             nn = 30 # number of noise realizations
             nt = 500 # timeseries length
             psds = []
@@ -1511,7 +1550,6 @@ class MultiplePSD:
         --------
 
         .. jupyter-execute::
-            
             nn = 30 # number of noise realizations
             nt = 500 # timeseries length
             psds = []
