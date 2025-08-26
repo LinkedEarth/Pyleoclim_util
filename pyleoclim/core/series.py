@@ -2368,6 +2368,27 @@ class Series:
             new.log += ({len(new.log):'clean', 'verbose': verbose},)
         return new
 
+    def drop_na(self):
+        ''' Remove NaN values while preserving temporal order
+        
+        Unlike clean(), this method only removes NaN values without sorting the data.
+
+        Returns
+        -------
+        Series : Series
+            Series object with NaN values removed
+            
+        See Also
+        --------
+        clean : Remove NaNs and sort by time
+
+        '''
+        new = self.copy()
+        valid_mask = ~(np.isnan(self.time) | np.isnan(self.value))
+        new.time = self.time[valid_mask]
+        new.value = self.value[valid_mask]
+        return new
+
     def sort(self, verbose=False, ascending = True, keep_log = False):
         ''' Ensure timeseries is set to a monotonically increasing axis.
             If the time axis is prograde to begin with, no transformation is applied.

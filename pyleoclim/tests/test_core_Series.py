@@ -414,6 +414,30 @@ class TestUISeriesClean:
         assert time[len(time) - 1] >= time[0]
         assert len(time) == len(value)
 
+    def test_drop_na(self, gen_normal):
+        """Test drop_na method"""
+        
+        # Generate data
+        ts = gen_normal()
+        
+        # Add NaN values to test drop_na functionality
+        v = ts.value.copy()
+        v[1] = np.nan
+        v[3] = np.nan
+        ts_with_nans = pyleo.Series(time=ts.time, value=v, dropna=False)
+        
+        # Call function for testing
+        ts_clean = ts_with_nans.drop_na()
+        
+        # Isolate time and value components
+        time = ts_clean.__dict__["time"]
+        value = ts_clean.__dict__["value"]
+        
+        assert len(time) == len(value)
+        assert len(time) == 98  # Original 100 - 2 NaNs = 98
+        assert not np.any(np.isnan(time))
+        assert not np.any(np.isnan(value))
+
 
 
 class TestSeriesAnnualize:   # Written mostly by Claude AI
