@@ -3936,8 +3936,6 @@ class Series:
         See also
         --------
 
-        pyleoclim.utils.correlation.corr_sig : Correlation function (marked for deprecation)
-
         pyleoclim.utils.correlation.association : SciPy measures of association between variables
 
         pyleoclim.series.surrogates : parametric and non-parametric surrogates of any Series object

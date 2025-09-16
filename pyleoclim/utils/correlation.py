@@ -5,89 +5,87 @@ Relevant functions for correlation analysis
 """
 
 __all__ = [
-    'corr_sig',
     'fdr',
     'association'
 ]
 
 import numpy as np
 import scipy.stats as stats
-from sklearn import preprocessing
-from .tsmodel import ar1_fit_evenly, isopersistent_rn
-from .tsutils import phaseran
+from .tsmodel import ar1_fit_evenly
+#from .tsutils import phaseran
 
 
-def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
-    """ Estimates the Pearson's correlation and associated significance between two non IID time series
+# def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
+#     """ Estimates the Pearson's correlation and associated significance between two non IID time series
     
-    The significance of the correlation is assessed using one of the following methods:
+#     The significance of the correlation is assessed using one of the following methods:
         
-    1) 'ttest': T-test adjusted for effective sample size. 
-        This is a parametric test (data are Gaussian and identically distributed) with a rather ad-hoc adjustment. 
-        It is instantaneous but makes a lot of assumptions about the data, many of which may not be met.
-    2) 'isopersistent': AR(1) modeling of x and y.
-        This is a parametric test as well (series follow an AR(1) model) but 
-        solves the issue by direct simulation. 
-    3) 'isospectral': phase randomization of original inputs. (default)
-        This is a non-parametric method, assuming only wide-sense stationarity
+#     1) 'ttest': T-test adjusted for effective sample size. 
+#         This is a parametric test (data are Gaussian and identically distributed) with a rather ad-hoc adjustment. 
+#         It is instantaneous but makes a lot of assumptions about the data, many of which may not be met.
+#     2) 'isopersistent': AR(1) modeling of x and y.
+#         This is a parametric test as well (series follow an AR(1) model) but 
+#         solves the issue by direct simulation. 
+#     3) 'isospectral': phase randomization of original inputs. (default)
+#         This is a non-parametric method, assuming only wide-sense stationarity
         
-    For 2 and 3, computational requirements scale with nsim.
-    When possible, nsim should be at least 1000. 
+#     For 2 and 3, computational requirements scale with nsim.
+#     When possible, nsim should be at least 1000. 
 
-    Parameters
-    ----------
-    y1 : array
-        vector of (real) numbers of same length as y2, no NaNs allowed
+#     Parameters
+#     ----------
+#     y1 : array
+#         vector of (real) numbers of same length as y2, no NaNs allowed
         
-    y2 : array
-        vector of (real) numbers of same length as y1, no NaNs allowed
+#     y2 : array
+#         vector of (real) numbers of same length as y1, no NaNs allowed
         
-    nsim : int
-        the number of simulations [default: 1000]
+#     nsim : int
+#         the number of simulations [default: 1000]
         
-    method : str; {'ttest','isopersistent','isospectral' (default)}
-        method for significance testing
+#     method : str; {'ttest','isopersistent','isospectral' (default)}
+#         method for significance testing
         
-    alpha : float
-        significance level for critical value estimation [default: 0.05]
+#     alpha : float
+#         significance level for critical value estimation [default: 0.05]
 
-    Returns
-    -------
-    res : dict 
-        the result dictionary, containing
+#     Returns
+#     -------
+#     res : dict 
+#         the result dictionary, containing
 
-        - r : float
-            correlation coefficient
-        - p : float 
-            the p-value
-        - signif : bool
-            true if significant; false otherwise
-            Note that signif = True if and only if p <= alpha.
+#         - r : float
+#             correlation coefficient
+#         - p : float 
+#             the p-value
+#         - signif : bool
+#             true if significant; false otherwise
+#             Note that signif = True if and only if p <= alpha.
          
-    See also
-    --------
+#     See also
+#     --------
 
-    pyleoclim.utils.correlation.corr_ttest : Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size
-    pyleoclim.utils.correlation.corr_isopersist : Computes correlation between two timeseries, and their significance using Ar(1) modeling
-    pyleoclim.utils.correlation.corr_isospec : Estimates the significance of the correlation using phase randomization
-    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
+#     pyleoclim.utils.correlation.corr_ttest : Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size
+#     pyleoclim.utils.correlation.corr_isopersist : Computes correlation between two timeseries, and their significance using Ar(1) modeling
+#     pyleoclim.utils.correlation.corr_isospec : Estimates the significance of the correlation using phase randomization
+#     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
      
-    """
-    y1 = np.array(y1, dtype=float)
-    y2 = np.array(y2, dtype=float)
+#     """
+#     y1 = np.array(y1, dtype=float)
+#     y2 = np.array(y2, dtype=float)
 
-    assert np.size(y1) == np.size(y2), 'The size of y1 and y2 should be the same'
+#     assert np.size(y1) == np.size(y2), 'The size of y1 and y2 should be the same'
 
-    if method == 'ttest':
-        (r, signif, p) = corr_ttest(y1, y2, alpha=alpha)
-    elif method == 'isopersistent':
-        (r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
-    elif method == 'isospectral':
-        (r, signif, p) = corr_isospec(y1, y2, alpha=alpha, nsim=nsim)
+#     if method == 'ttest':
+#         (r, signif, p) = corr_ttest(y1, y2, alpha=alpha)
+#     elif method == 'isopersistent':
+#         (r, signif, p) = corr_isopersist(y1, y2, alpha=alpha, nsim=nsim)
+#     elif method == 'isospectral':
+#         (r, signif, p) = corr_isospec(y1, y2, alpha=alpha, nsim=nsim)
         
-    res={'r':r,'signif':signif,'p':p}    
+#     res={'r':r,'signif':signif,'p':p}    
     
-    return res
+#     return res
 
 def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
     ''' Determine significance based on the false discovery rate
@@ -239,155 +237,155 @@ def corr_ttest(y1, y2, alpha=0.05, df_min=10):
 
     return r, signif, pval, rcrit
 
-def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
-    ''' Computes the Pearson's correlation between two timeseries, and their significance using Ar(1) modeling.
+# def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
+#     ''' Computes the Pearson's correlation between two timeseries, and their significance using Ar(1) modeling.
     
-    The significance is gauged via a non-parametric (Monte Carlo) simulation of
-    correlations with nsim AR(1) processes with identical persistence
-    properties as x and y ; the measure of which is the lag-1 autocorrelation (g).
+#     The significance is gauged via a non-parametric (Monte Carlo) simulation of
+#     correlations with nsim AR(1) processes with identical persistence
+#     properties as x and y ; the measure of which is the lag-1 autocorrelation (g).
 
-    Parameters
-    ----------
-    y1 : array
-        vectors of (real) numbers with identical length, no NaNs allowed
+#     Parameters
+#     ----------
+#     y1 : array
+#         vectors of (real) numbers with identical length, no NaNs allowed
         
-    y2 : array
-        vectors of (real) numbers with identical length, no NaNs allowed
+#     y2 : array
+#         vectors of (real) numbers with identical length, no NaNs allowed
         
-    alpha : float
-        significance level for critical value estimation [default: 0.05]
+#     alpha : float
+#         significance level for critical value estimation [default: 0.05]
         
-    nsim : int
-        number of simulations [default: 1000]
+#     nsim : int
+#         number of simulations [default: 1000]
 
-    Returns
-    -------
-    r : float
-        correlation between x and y
+#     Returns
+#     -------
+#     r : float
+#         correlation between x and y
         
-    signif : bool
-        true (1) if significant; false (0) otherwise
+#     signif : bool
+#         true (1) if significant; false (0) otherwise
         
-    pval : float
-        test p-value (the probability of the test statstic exceeding the observed one by chance alone)
+#     pval : float
+#         test p-value (the probability of the test statstic exceeding the observed one by chance alone)
 
-    Notes
-    -----
+#     Notes
+#     -----
 
-    The probability of obtaining a test statistic at least as extreme as the one actually observed,
-    assuming that the null hypothesis is true.
-    The test is 1 tailed on |r|: Ho = { |r| = 0 }, Ha = { |r| > 0 }
-    The test is rejected (signif = 1) if pval <= alpha, otherwise signif=0;
-    (Some Rights Reserved) Hepta Technologies, 2009
-    v1.0 USC, Aug 10 2012, based on corr_signif.
+#     The probability of obtaining a test statistic at least as extreme as the one actually observed,
+#     assuming that the null hypothesis is true.
+#     The test is 1 tailed on |r|: Ho = { |r| = 0 }, Ha = { |r| > 0 }
+#     The test is rejected (signif = 1) if pval <= alpha, otherwise signif=0;
+#     (Some Rights Reserved) Hepta Technologies, 2009
+#     v1.0 USC, Aug 10 2012, based on corr_signif.
     
-    See also
-    --------
+#     See also
+#     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.corr_ttest: Estimates Pearson's correlation and associated significance using a t-test
-    pyleoclim.utils.correlation.corr_isospec : Estimates Pearson's correlation and associated significance using 
-    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
+#     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+#     pyleoclim.utils.correlation.corr_ttest: Estimates Pearson's correlation and associated significance using a t-test
+#     pyleoclim.utils.correlation.corr_isospec : Estimates Pearson's correlation and associated significance using 
+#     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
-    '''
+#     '''
 
-    r = stats.pearsonr(y1, y2)[0]
-    ra = np.abs(r)
+#     r = stats.pearsonr(y1, y2)[0]
+#     ra = np.abs(r)
 
-    y1_red, g1 = isopersistent_rn(y1, nsim)
-    y2_red, g2 = isopersistent_rn(y2, nsim)
+#     y1_red, g1 = isopersistent_rn(y1, nsim)
+#     y2_red, g2 = isopersistent_rn(y2, nsim)
 
-    rs = np.zeros(nsim)
-    for i in np.arange(nsim):
-        rs[i] = stats.pearsonr(y1_red[:, i], y2_red[:, i])[0]
+#     rs = np.zeros(nsim)
+#     for i in np.arange(nsim):
+#         rs[i] = stats.pearsonr(y1_red[:, i], y2_red[:, i])[0]
 
-    rsa = np.abs(rs)
+#     rsa = np.abs(rs)
 
-    xi = np.linspace(0, 1.1*np.max([ra, np.max(rsa)]), 200)
-    kde = stats.gaussian_kde(rsa)
-    prob = kde(xi).T
+#     xi = np.linspace(0, 1.1*np.max([ra, np.max(rsa)]), 200)
+#     kde = stats.gaussian_kde(rsa)
+#     prob = kde(xi).T
 
-    diff = np.abs(ra - xi)
-    #  min_diff = np.min(diff)
-    pos = np.argmin(diff)
+#     diff = np.abs(ra - xi)
+#     #  min_diff = np.min(diff)
+#     pos = np.argmin(diff)
 
-    pval = np.trapz(prob[pos:], xi[pos:])
+#     pval = np.trapz(prob[pos:], xi[pos:])
 
-    rcrit = np.percentile(rsa, 100*(1-alpha))
-    signif = ra >= rcrit
+#     rcrit = np.percentile(rsa, 100*(1-alpha))
+#     signif = ra >= rcrit
 
-    return r, signif, pval
+#     return r, signif, pval
 
 
-def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
-    ''' Estimates the significance of the correlation using phase randomization
+# def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
+#     ''' Estimates the significance of the correlation using phase randomization
 
-    Estimates the significance of correlations between non IID
-    time series by phase randomization of original inputs.
-    This function creates 'nsim' random time series that have the same power
-    spectrum as the original time series but random phases.
+#     Estimates the significance of correlations between non IID
+#     time series by phase randomization of original inputs.
+#     This function creates 'nsim' random time series that have the same power
+#     spectrum as the original time series but random phases.
 
-    Parameters
-    ----------
-    y1 : array
-        vectors of (real) numbers with identical length, no NaNs allowed
+#     Parameters
+#     ----------
+#     y1 : array
+#         vectors of (real) numbers with identical length, no NaNs allowed
         
-    y2 : array
-        vectors of (real) numbers with identical length, no NaNs allowed
+#     y2 : array
+#         vectors of (real) numbers with identical length, no NaNs allowed
         
-    alpha : float
-        significance level for critical value estimation [default: 0.05]
+#     alpha : float
+#         significance level for critical value estimation [default: 0.05]
         
-    nsim : int
-        number of simulations [default: 1000]
+#     nsim : int
+#         number of simulations [default: 1000]
 
-    Returns
-    -------
-    r : float
-        correlation between y1 and y2
+#     Returns
+#     -------
+#     r : float
+#         correlation between y1 and y2
         
-    signif : bool
-        true (1) if significant; false (0) otherwise
+#     signif : bool
+#         true (1) if significant; false (0) otherwise
         
-    F : float
-        Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
+#     F : float
+#         Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
 
-    See also
-    --------
+#     See also
+#     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.corr_ttest : Estimates Pearson's correlation and associated significance using a t-test
-    pyleoclim.utils.correlation.corr_isopersist : Estimates Pearson's correlation and associated significance using AR(1) simulations
-    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
+#     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+#     pyleoclim.utils.correlation.corr_ttest : Estimates Pearson's correlation and associated significance using a t-test
+#     pyleoclim.utils.correlation.corr_isopersist : Estimates Pearson's correlation and associated significance using AR(1) simulations
+#     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
     
-    References
-    ----------
+#     References
+#     ----------
 
-    - Ebisuzaki, W, 1997: A method to estimate the statistical significance of a correlation when the data are serially correlated. J. of Climate, 10, 2147-2153.
+#     - Ebisuzaki, W, 1997: A method to estimate the statistical significance of a correlation when the data are serially correlated. J. of Climate, 10, 2147-2153.
     
-    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7 (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
-    '''
-    r = stats.pearsonr(y1, y2)[0]
+#     - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7 (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
+#     '''
+#     r = stats.pearsonr(y1, y2)[0]
 
-    # generate phase-randomized samples using the Theiler & Prichard method
-    Y1surr = phaseran(y1, nsim)
-    Y2surr = phaseran(y2, nsim)
+#     # generate phase-randomized samples using the Theiler & Prichard method
+#     Y1surr = phaseran(y1, nsim)
+#     Y2surr = phaseran(y2, nsim)
 
-    # compute correlations
-    Y1s = preprocessing.scale(Y1surr)
-    Y2s = preprocessing.scale(Y2surr)
+#     # compute correlations
+#     Y1s = preprocessing.scale(Y1surr)
+#     Y2s = preprocessing.scale(Y2surr)
 
-    n = np.size(y1)
-    C = np.dot(np.transpose(Y1s), Y2s) / (n-1)
-    rSim = np.diag(C)
+#     n = np.size(y1)
+#     C = np.dot(np.transpose(Y1s), Y2s) / (n-1)
+#     rSim = np.diag(C)
 
-    # compute fraction of values higher than observed
-    F = np.sum(np.abs(rSim) >= np.abs(r)) / nsim
+#     # compute fraction of values higher than observed
+#     F = np.sum(np.abs(rSim) >= np.abs(r)) / nsim
 
-    # establish significance
-    signif = F < alpha  # significant or not?
+#     # establish significance
+#     signif = F < alpha  # significant or not?
 
-    return r, signif, F
+#     return r, signif, F
 
 
 ''' The FDR procedures translated from fdr.R by Dr. Chris Paciorek (https://www.stat.berkeley.edu/~paciorek/research/code/code.html)
