@@ -1,14 +1,14 @@
 # Development environment. This environment includes all the required
 # packages for this repo including running the test suite.
-name: pyleo
+name: pyleo2025
 channels:
   - default
   - conda-forge
 dependencies:
-  - python=3.11.0
+  - python=3.13.0
   - cartopy
   - numba
-  - scipy<1.16
+  - scipy
   - pyyaml
   - requests
   - scikit-learn
