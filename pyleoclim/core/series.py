@@ -4206,7 +4206,7 @@ class Series:
 
     #     pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
     #     pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
-    #     pyleoclim.utils.tsutils.phaseran2 : phase randomization
+    #     pyleoclim.utils.tsutils.phaseran : phase randomization
     #     pyleoclim.utils.tsutils.random_time_axis : random time index vector according to a specific probability model
 
     #     '''
@@ -4248,7 +4248,7 @@ class Series:
 
     #     elif method == 'phaseran':
     #         if self.is_evenly_spaced() and time_pattern != "random":
-    #             y_surr = tsutils.phaseran2(self.value, number)
+    #             y_surr = tsutils.phaseran(self.value, number)
     #         else:
     #             raise ValueError("Phase-randomization presently requires evenly-spaced series.")
 

@@ -17,7 +17,7 @@ __all__ = [
     'detect_outliers_DBSCAN',
     'detect_outliers_kmeans',
     'remove_outliers',
-    'phaseran2',
+    'phaseran',
     'custom_year_averages'
 ]
 
@@ -1904,82 +1904,82 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
     return time_axis
 
 
-def phaseran(recblk, nsurr):
-    ''' Simultaneous phase randomization of a set of time series
-    
-    It creates blocks of surrogate data with the same second order properties as the original
-    time series dataset by transforming the original data into the frequency domain, randomizing the
-    phases simultaneoulsy across the time series and converting the data back into the time domain. 
-    
-    Written by Carlos Gias for MATLAB
+# def phaseran(recblk, nsurr):
+#     ''' Simultaneous phase randomization of a set of time series
+#     
+#     It creates blocks of surrogate data with the same second order properties as the original
+#     time series dataset by transforming the original data into the frequency domain, randomizing the
+#     phases simultaneoulsy across the time series and converting the data back into the time domain. 
+#     
+#     Written by Carlos Gias for MATLAB
+# 
+#     http://www.mathworks.nl/matlabcentral/fileexchange/32621-phase-randomization/content/phaseran.m
+# 
+#     Parameters
+#     ----------
+#     recblk : numpy array
+#         2D array , Row: time sample. Column: recording.
+#         An odd number of time samples (height) is expected.
+#         If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
+#         The class must be double and it must be nonsparse.
+#     
+#     nsurr : int
+#         is the number of image block surrogates that you want to generate.
+# 
+#     Returns
+#     -------
+#     surrblk : numpy array
+#         3D multidimensional array image block with the surrogate datasey along the third dimension
+# 
+#     See also
+#     --------
+# 
+#     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+#     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
+# 
+#     References
+#     ----------
+# 
+#     - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7
+#     
+#     - Carlos Gias (2020). Phase randomization, MATLAB Central File Exchange
+#     '''
+#     # Get parameters
+#     nfrms = recblk.shape[0]
+# 
+#     if nfrms % 2 == 0:
+#         nfrms = nfrms-1
+#         recblk = recblk[0:nfrms]
+# 
+#     len_ser = int((nfrms-1)/2)
+#     interv1 = np.arange(1, len_ser+1)
+#     interv2 = np.arange(len_ser+1, nfrms)
+# 
+#     # Fourier transform of the original dataset
+#     fft_recblk = np.fft.fft(recblk)
+# 
+#     surrblk = np.zeros((nfrms, nsurr))
+# 
+#     #  for k in tqdm(np.arange(nsurr)):
+#     for k in np.arange(nsurr):
+#         ph_rnd = np.random.rand(len_ser)
+# 
+#         # Create the random phases for all the time series
+#         ph_interv1 = np.exp(2*np.pi*1j*ph_rnd)
+#         ph_interv2 = np.conj(np.flipud(ph_interv1))
+# 
+#         # Randomize all the time series simultaneously
+#         fft_recblk_surr = np.copy(fft_recblk)
+#         fft_recblk_surr[interv1] = fft_recblk[interv1] * ph_interv1
+#         fft_recblk_surr[interv2] = fft_recblk[interv2] * ph_interv2
+# 
+#         # Inverse transform
+#         surrblk[:, k] = np.real(np.fft.ifft(fft_recblk_surr))
+# 
+#     return surrblk
 
-    http://www.mathworks.nl/matlabcentral/fileexchange/32621-phase-randomization/content/phaseran.m
 
-    Parameters
-    ----------
-    recblk : numpy array
-        2D array , Row: time sample. Column: recording.
-        An odd number of time samples (height) is expected.
-        If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
-        The class must be double and it must be nonsparse.
-    
-    nsurr : int
-        is the number of image block surrogates that you want to generate.
-
-    Returns
-    -------
-    surrblk : numpy array
-        3D multidimensional array image block with the surrogate datasey along the third dimension
-
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
-
-    References
-    ----------
-
-    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7
-    
-    - Carlos Gias (2020). Phase randomization, MATLAB Central File Exchange
-    '''
-    # Get parameters
-    nfrms = recblk.shape[0]
-
-    if nfrms % 2 == 0:
-        nfrms = nfrms-1
-        recblk = recblk[0:nfrms]
-
-    len_ser = int((nfrms-1)/2)
-    interv1 = np.arange(1, len_ser+1)
-    interv2 = np.arange(len_ser+1, nfrms)
-
-    # Fourier transform of the original dataset
-    fft_recblk = np.fft.fft(recblk)
-
-    surrblk = np.zeros((nfrms, nsurr))
-
-    #  for k in tqdm(np.arange(nsurr)):
-    for k in np.arange(nsurr):
-        ph_rnd = np.random.rand(len_ser)
-
-        # Create the random phases for all the time series
-        ph_interv1 = np.exp(2*np.pi*1j*ph_rnd)
-        ph_interv2 = np.conj(np.flipud(ph_interv1))
-
-        # Randomize all the time series simultaneously
-        fft_recblk_surr = np.copy(fft_recblk)
-        fft_recblk_surr[interv1] = fft_recblk[interv1] * ph_interv1
-        fft_recblk_surr[interv2] = fft_recblk[interv2] * ph_interv2
-
-        # Inverse transform
-        surrblk[:, k] = np.real(np.fft.ifft(fft_recblk_surr))
-
-    return surrblk
-
-
-def phaseran2(y, nsurr):
+def phaseran(y, nsurr):
     '''
     Phase randomization of a time series y, of even or odd length. 
     
