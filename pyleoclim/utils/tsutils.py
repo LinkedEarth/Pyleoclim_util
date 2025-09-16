@@ -1934,7 +1934,6 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
 #     See also
 #     --------
 # 
-#     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
 #     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 # 
 #     References
@@ -2001,7 +2000,6 @@ def phaseran(y, nsurr):
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     References

@@ -130,7 +130,6 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     
 
     References
@@ -206,9 +205,6 @@ def corr_ttest(y1, y2, alpha=0.05, df_min=10):
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.corr_isopersist : Estimate Pearson's correlation and associated significance using AR(1)
-    pyleoclim.utils.correlation.corr_isospec : Estimate Pearson's correlation and associated significance using phase randomization
     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     """
@@ -409,7 +405,6 @@ def fdr_basic(pvals,qlevel=0.05):
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
 
     References
@@ -459,7 +454,6 @@ def fdr_master(pvals, qlevel=0.05, method='original'):
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
 
     References
@@ -496,7 +490,6 @@ def storey(edf_quantile, pvals):
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
 
     References
@@ -545,7 +538,6 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
 
     References
