@@ -1,6 +1,6 @@
 # Development environment. This environment includes all the required
 # packages for this repo including running the test suite.
-name: pyleo2025
+name: pyleo
 channels:
   - default
   - conda-forge
