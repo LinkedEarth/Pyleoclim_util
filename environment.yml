@@ -19,7 +19,7 @@ dependencies:
   - wget
   - pip
   - pip:
-   - pytest
+    - pytest
     - pyhht
     - dill
     - '-e .'
