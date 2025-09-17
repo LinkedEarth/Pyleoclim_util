@@ -18,8 +18,8 @@ dependencies:
   - tqdm
   - wget
   - pip
-  - pytest
   - pip:
+   - pytest
     - pyhht
     - dill
     - '-e .'
