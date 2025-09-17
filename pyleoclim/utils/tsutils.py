@@ -1316,7 +1316,7 @@ def gaussianize(ys):
 
     # Create a blank copy of the array.
     yg = copy.deepcopy(ys)
-    yg[:] = np.NAN
+    yg[:] = np.nan
 
     nz = np.logical_not(np.isnan(ys))
     index = np.argsort(ys[nz])
