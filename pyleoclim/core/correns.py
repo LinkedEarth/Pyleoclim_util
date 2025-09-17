@@ -80,9 +80,8 @@ class CorrEns:
 
     See also
     --------
-
-    pyleoclim.utils.correlation.corr_sig : Correlation function
     
+    pyleoclim.utils.correlation.association : workhorse function to compute various metrics of association
     pyleoclim.utils.correlation.fdr : FDR (False Discovery Rate) function
     '''
 

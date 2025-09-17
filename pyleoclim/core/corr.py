@@ -62,9 +62,8 @@ class Corr:
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Correlation function
-    
     pyleoclim.utils.correlation.fdr : FDR function
+    pyleoclim.utils.correlation.association : workhorse function to compute various metrics of association
     '''
 
     def __init__(self, r, p, r_crit, signif, alpha, p_fmt_td=0.01, p_fmt_style='exp'):
