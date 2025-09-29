@@ -8,7 +8,7 @@ dependencies:
   - python=3.11.0
   - cartopy
   - numba
-  - scipy<1.16
+  - scipy
   - pyyaml
   - requests
   - scikit-learn
@@ -18,8 +18,8 @@ dependencies:
   - tqdm
   - wget
   - pip
-  - pytest
   - pip:
+    - pytest
     - pyhht
     - dill
     - '-e .'

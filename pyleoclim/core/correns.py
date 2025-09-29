@@ -201,7 +201,7 @@ class CorrEns:
 
         # put everything into a dataframe to be able to use seaborn
             
-        data = np.empty((len(self.r),3)); data[:] = np.NaN
+        data = np.empty((len(self.r),3)); data[:] = np.nan
         col  = [f'p < {self.alpha} (w/ FDR)',f'p < {self.alpha} (w/o FDR)', f'p ≥ {self.alpha}']
         data[self.signif_fdr,0] = r_signif_fdr        
         data[self.signif, 1] = r_signif
