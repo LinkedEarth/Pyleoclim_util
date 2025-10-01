@@ -833,7 +833,7 @@ def make_annotation_ax(fig, ax, loc='overlay',
 import matplotlib.patches as mpatches
 
 
-def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend=True):
+def highlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend=True):
     ''' Hightlights intervals
 
     This function highlights intervals.
@@ -875,12 +875,12 @@ def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend
 
         ax=pyleo.utils.plotting.make_annotation_ax(fig, ax, ax_name = 'highlighted_intervals', zorder=-1)
         intervals = [[3, 8], [12, 18], [30, 31], [40,43], [49, 60], [60, 65]]
-        ax['highlighted_intervals'] = pyleo.utils.plotting.hightlight_intervals(ax['highlighted_intervals'], intervals,
+        ax['highlighted_intervals'] = pyleo.utils.plotting.highlight_intervals(ax['highlighted_intervals'], intervals,
             color='g', alpha=.1)
 
     '''
 
-    if isinstance(intervals[0], list) is False:
+    if isinstance(intervals[0], (list, np.ndarray)) is False:
         intervals = [intervals]
 
     handles = []
@@ -890,25 +890,26 @@ def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend
     new_alphas = []
 
     xlims = ax.get_xlim()
-
     for ik, _ts in enumerate(intervals):
-        if isinstance(color, list) is True:
+        if isinstance(color, (list, np.ndarray)) is True:
             c = color[ik]
         else:
             c = color
 
-        if '#' in c:
+        if c in mpl.colors.CSS4_COLORS:
+            c = mpl.colors.CSS4_COLORS[c]
+        elif isinstance(c, str) and c.startswith('#'):
             c = mpl.colors.to_rgba(c)
 
         new_colors.append(c)
 
-        if isinstance(alpha, list) is True:
+        if isinstance(alpha, (list, np.ndarray)) is True:
             a = alpha[ik]
         else:
             a = alpha
         new_alphas.append(a)
 
-        if isinstance(labels, list) is True:
+        if isinstance(labels, (list, np.ndarray)) is True:
             label = labels[ik]
         else:
             label = ''
@@ -920,6 +921,7 @@ def hightlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend
             if _ts[0] < xlims[0]:
                 _ts[0] = xlims[0]
         else:
+            print(_ts[0], _ts[1], xlims[0], xlims[1])
             if _ts[1] < xlims[1]:
                 _ts[1] = xlims[1]
             if _ts[0] > xlims[0]:
