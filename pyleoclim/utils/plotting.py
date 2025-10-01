@@ -18,6 +18,13 @@ from collections import defaultdict
 from pathlib import Path
 
 from ..utils import lipdutils
+from rdflib import Graph, Namespace, URIRef, Literal
+from rdflib.namespace import SKOS, RDF
+import pandas as pd
+import matplotlib.colors as mcolors
+import matplotlib.patches as mpatches
+
+
 
 DATA_DIR = Path(__file__).parents[1].joinpath("data").resolve()
 
@@ -830,7 +837,6 @@ def make_annotation_ax(fig, ax, loc='overlay',
     return ax_d
 
 
-import matplotlib.patches as mpatches
 
 
 def highlight_intervals(ax, intervals, labels=None, color='g', alpha=.3, legend=True):
@@ -1462,368 +1468,755 @@ def tidy_labels(label):
     ''' Tidy up the label string'''
     return label.rstrip().lstrip().rstrip(',').lstrip(',')
 
+TIME = Namespace("http://www.w3.org/2006/time#")
+SCHEMA = Namespace("https://schema.org/")
+GTS = Namespace("http://resource.geosciml.org/ontology/timescale/gts#")
 
-def check_text_fits_in_span(fig, ax, interval, label, fontsize=12, verbose=False):
+def _first(it):
+    for x in it:
+        return x
+    return None
+
+def _localname(term):
+    s = str(term)
+    if "#" in s:
+        return s.rsplit("#", 1)[1]
+    return s.rstrip("/").rsplit("/", 1)[-1]
+
+def _find_ns_for_local(graph: Graph, local: str):
     """
-    Checks if the given text can fit within the interval [x1, x2] when plotted.
+    Find a predicate in the graph whose localname == `local` and
+    return its namespace base as an rdflib Namespace. Fallback to None.
+    """
+    for s, p, o in graph.triples((None, None, None)):
+        if isinstance(p, URIRef) and _localname(p) == local:
+            base = str(p)[: -len(local)]
+            return Namespace(base)
+    return None
+
+def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl") -> pd.DataFrame:
+    g = Graph()
+    g.parse(ttl_path_or_url, format="turtle")
+
+    # Resolve namespaces robustly
+    ischart_ns = _find_ns_for_local(g, "inMYA")  # e.g., https://w3id.org/isc/isc2020#
+    if ischart_ns is None:
+        # Hard fallback (current ICS charts use this)
+        ischart_ns = Namespace("https://w3id.org/isc/isc2020#")
+
+    # Rank mapping to your requested Rank labels
+    rank_map = {
+        "Eon": "Eon", "Eonothem": "Eon",
+        "Era": "Era", "Erathem": "Era",
+        "Period": "Period", "System": "Period",
+        "Epoch": "Epoch", "Series": "Epoch",
+        "Age": "Stage", "Stage": "Stage",
+        "Subepoch": "Subepoch", "Subseries": "Subepoch",
+        "Substage": "Substage", "Subperiod": "Subperiod",
+    }
+
+    rows = []
+
+    # An interval concept typically has skos:prefLabel and gts:rank
+    for subj in set(g.subjects(SKOS.prefLabel, None)):
+        rank_uri = _first(g.objects(subj, GTS.rank))
+        if rank_uri is None:
+            continue  # skip non-interval resources
+
+        # Type
+        rank_local = _localname(rank_uri)
+        Rank = rank_map.get(rank_local, rank_local)
+
+        # Name
+        name_lit = _first(g.objects(subj, SKOS.prefLabel))
+        Name = str(name_lit) if name_lit is not None else ""
+
+        # Abbrev: skos:notation (typed literal is fine)
+        notation = _first(g.objects(subj, SKOS.notation))
+        Abbrev = str(notation) if notation is not None else ""
+
+        # Color (hex) if present
+        col = _first(g.objects(subj, SCHEMA.color))
+        Color = str(col) if col is not None else ""
+
+        # Helper to read a boundary node (blank node or URI) → inMYA float
+        def boundary_ma(node_pred):
+            node = _first(g.objects(subj, node_pred))
+            if node is None:
+                return None
+            # find a predicate with localname 'inMYA' under this node
+            val = None
+            for p, o in g.predicate_objects(node):
+                if _localname(p) == "inMYA":
+                    val = o
+                    break
+            try:
+                return float(val) if val is not None else None
+            except Exception:
+                return None
+
+        start_ma = boundary_ma(TIME.hasBeginning)
+        end_ma   = boundary_ma(TIME.hasEnd)
+
+        # UpperBoundary (younger/smaller Ma), LowerBoundary (older/larger Ma)
+        UpperBoundary = LowerBoundary = None
+        if start_ma is not None and end_ma is not None:
+            UpperBoundary = min(start_ma, end_ma)
+            LowerBoundary = max(start_ma, end_ma)
+        elif start_ma is not None:
+            UpperBoundary = start_ma
+        elif end_ma is not None:
+            UpperBoundary = end_ma
+
+        # Keep intervals only
+        if not Name or (UpperBoundary is None and LowerBoundary is None):
+            continue
+
+        rows.append({
+            "Rank": Rank,
+            "Name": Name,
+            "Abbrev": Abbrev,
+            "Color": Color,
+            "UpperBoundary": UpperBoundary,
+            "LowerBoundary": LowerBoundary
+        })
+
+    df = pd.DataFrame(rows).dropna(subset=["Name", "Rank"])
+    # Optional: order types, youngest first within each type
+    type_order = ["Eon", "Era", "Period", "Epoch", "Stage", "Subepoch", "Substage", "Subperiod"]
+    df["Rank"] = pd.Categorical(df["Rank"], categories=type_order + sorted(set(df["Rank"]) - set(type_order)), ordered=True)
+    df = df.sort_values(["Rank", "UpperBoundary"], na_position="last").reset_index(drop=True)
+    return df
+
+def apply_custom_traits(df, specs, target_col="Abbrev"):
+    """
+    Apply custom overrides to a DataFrame by matching on traits.
 
     Parameters
     ----------
-    ax : matplotlib.axes.Axes
-        The axis where the span is plotted.
-
-    x1, x2 : float
-        The interval in which the text should fit.
-
-    text : str
-        The text to check.
-
-    fontsize : int, optional
-        Font size to test the fitting, default is 12.
+    df : pandas.DataFrame
+        Must include the target column and all columns named in specs.
+    specs : list of dict
+        Each dict has at least the target_col key plus one or more
+        trait columns used for matching.
+        Example: {"Type":"Period", "Name":"Cambrian", "Abbrev":"Cam."}
+    target_col : str, default "Abbrev"
+        The column to update.
 
     Returns
     -------
-    bool
-        True if text fits within [x1, x2], False otherwise.
+    pandas.DataFrame
+        Copy of df with updates applied.
     """
-    if verbose is True:
-        print('fontsize', fontsize, 'label', label, 'interval', interval)
-    fig.canvas.draw()  # Ensure text positioning updates
+    df = df.copy()
+    if not isinstance(specs, list):
+        specs = [specs]
+    for spec in specs:
+        if target_col not in spec:
+            raise ValueError(f"Spec {spec} missing '{target_col}' key")
+
+        # Start with all True, then AND each condition
+        mask = pd.Series(True, index=df.index)
+        for col, val in spec.items():
+            if col == target_col:
+                continue
+            mask &= df[col] == val
+
+        df.loc[mask, target_col] = spec[target_col]
+    return df
+
+def text_loc(fig, ax, rect, label_text, width, yloc):
+    '''
+    Determine if the label fits inside or outside the bar.
+
+    Parameters
+    ----------
+    fig : matplotlib.figure.Figure
+        The figure object.
+    ax : matplotlib.axes.Axes
+        The axis where the bar is plotted.
+    rect : matplotlib.patches.Rectangle
+        The rectangle (bar) object.
+    label_text : str
+        The text label to check.
+    width : float
+        The width of the bar in data coordinates.
+    yloc : float
+        The y location of the bar in data coordinates.
+
+    Returns
+    -------
+    str
+        'inside' if the label fits inside the bar, 'outside' otherwise.
+
+    '''
+
+
+    text = ax.text(yloc, rect.get_y() + rect.get_height() / 2, label_text,
+                   va='center', ha='left', fontstretch='expanded')
+
+    # Transform data width into display coords
     renderer = fig.canvas.get_renderer()
+    bar_disp = ax.transData.transform((width, 0)) - ax.transData.transform((0, 0))
+    bar_width_pixels = bar_disp[0]
 
-    # text_width1 = get_label_width(ax, label, buffer=0., fontsize=fontsize, verbose=verbose)
+    # Get label width in pixels
+    bbox = text.get_window_extent(renderer=renderer)
+    label_width_pixels = bbox.width
 
-    # Create a test text object (invisible)
-    test_text = ax.text(0, 0, label, ha='center', va='center', alpha=0, **{'fontsize': fontsize})
-
-    # Get text bounding box in display (pixel) coordinates
-    bbox = test_text.get_window_extent(renderer=renderer)
-
-    # Convert bbox from display units to data units
-    bbox_data = ax.transData.inverted().transform(bbox)
-    text_x_min, _ = bbox_data[0]
-    text_x_max, _ = bbox_data[1]
-
-    text_width = np.abs(text_x_max - text_x_min)  # Text width in data coordinates
-    test_text.remove()  # Clean up test text
-
-    # Compare text width with the available span width
-    x1, x2 = interval
-    span_width = np.abs(x2 - x1)
-    if verbose is True:
-        # print('get_label_width version', 'text width', text_width1, 'span width', span_width,
-        #       'fits?', text_width1 <= span_width)
-        print('native version', 'text width', text_width, 'span width', span_width,
-              'fits?', text_width <= span_width)
-
-    return text_width <= span_width
-
-
-def add_geol_labels(fig, _ax, ldf, key='Periods', y_gts=None,
-                    fontsize=10, allow_abbreviations=True, orientation='north', verbose=False):
-    ax = _ax[key]
-    xlims = ax.get_xlim()
-
-    ax_outside_labels = None
-
-    no_fits = defaultdict(list)
-    for i in range(len(ldf)):
-        ageStart = ldf.Start[i]
-        ageEnd = ldf.End[i]
-        ageMean = .5 * (ldf.Start[i] + ldf.End[i])
-        ageColor = ldf.Color[i]
-
-        ageHandle = ldf.Name[i]
-
-        ylims = ax.get_ylim()
-        if y_gts is None:
-            h = np.diff(ax.get_ylim())[0]
-            y_gts = .5 * h  # ylims[0]
-
-        if xlims[0] < xlims[1]:
-            left_age = min([ageStart, ageEnd])
-            right_age = max([ageStart, ageEnd])
-
-            if left_age < xlims[0]:
-                left_age = xlims[0]
-                fall_back_bound_ageMean = right_age - .5 * np.abs(right_age - left_age)
-                time_value = max([ageMean, fall_back_bound_ageMean])
-
-            elif right_age > xlims[1]:
-                right_age = xlims[1]
-                fall_back_bound_ageMean = left_age + .5 * np.abs(right_age - left_age)
-                time_value = min([ageMean, fall_back_bound_ageMean])
-            else:
-                time_value = ageMean
-
-        else:
-            left_age = max([ageStart, ageEnd])
-            right_age = min([ageStart, ageEnd])
-
-            if left_age > xlims[0]:
-                left_age = xlims[0]
-                fall_back_bound_ageMean = right_age + .5 * np.abs(right_age - left_age)
-                time_value = min([ageMean, fall_back_bound_ageMean])
-            elif right_age < xlims[1]:
-                right_age = xlims[1]
-                fall_back_bound_ageMean = left_age - .5 * np.abs(right_age - left_age)
-                time_value = max([ageMean, fall_back_bound_ageMean])
-            else:
-                time_value = ageMean
-
-        if isinstance(ageHandle, str) == False:
-            ageHandle = ''
-        text_obj = ax.text(time_value, y_gts, ageHandle,
-                           ha='center',
-                           va='center',
-                           fontsize=fontsize,
-                           rotation=0)
-        if verbose is True:
-            print(ageHandle, time_value, y_gts, 'left', left_age, 'right', right_age)
-        fit_bool = check_text_fits_in_span(fig, ax, [left_age, right_age], ageHandle,
-                                           verbose=verbose)  # check_fits(ax, rect, text_obj)
-        if fit_bool == False:
-            text_obj.remove()
-
-            if allow_abbreviations == False:
-                no_fits['handle'].append(ageHandle)
-                no_fits['time_value'].append(time_value)
-                if ax_outside_labels is None:
-                    # _ax=pyleo.utils.plotting.make_annotation_ax(fig, _ax, ax_name = 'outside_labels', height=.06,
-                    #                            loc='above', v_offset=.02,zorder=-2)
-                    ax_outside_labels = True
-                    # _ax['outside_labels'].spines['top'].set_visible(False)
-
-            else:
-                ageHandle = ldf.Abbrev[i]
-                fit_bool = check_text_fits_in_span(fig, ax, [left_age, right_age], ageHandle,
-                                                   verbose=verbose)  # check_fits(ax, rect, text_obj)
-                if fit_bool == True:
-                    if isinstance(ageHandle, str) == False:
-                        ageHandle = ''
-                    text_obj = ax.text(time_value, y_gts, ageHandle,
-                                       # fontname='TeX Gyre Heros',
-                                       ha='center',
-                                       va='center',
-                                       fontsize=fontsize,
-                                       rotation=0)
-                else:
-                    try:
-                        text_obj.remove()
-                    except:
-                        if verbose is True:
-                            print('text_obj already removed')
-
-    if ax_outside_labels is not None:
-        if verbose is True:
-            print('adding outside labels', _ax['outside_labels'].get_ylim())
-        if orientation == 'south':
-            valign = 'top'
-        else:
-            valign = 'bottom'
-            orientation = 'north'
-        _ax['outside_labels'] = label_intervals(
-            fig, _ax['outside_labels'],
-            no_fits['handle'], no_fits['time_value'],
-            orientation=orientation, baseline=1, height=0.35, buffer=0.12,
-            linestyle_kwargs={'color': 'gray'}, text_kwargs={'fontsize': fontsize, 'va': valign})
-        #
-
-
-def set_placement(loc, epochs, periods, stages):
-    label_d = {'epochs': epochs, 'periods': periods, 'stages': stages}
-    ik = 0
-    for key in ['stages', 'epochs', 'periods']:
-        if label_d[key] is True:
-            label_d[key] = ik
-            if loc == 'above':
-                ik += 1
-            if loc == 'below':
-                ik -= 1
-
-    stages = label_d['stages']
-    epochs = label_d['epochs']
-    periods = label_d['periods']
-    return epochs, periods, stages
-
-
-def get_v_offsets(loc, height, num_offsets, v_offset_0=None):
-    v_offset_d = {}
-    if loc == 'above':
-        v_offset_0 = v_offset_0 if v_offset_0 is not None else .01
-        v_offset_d['v_offset_0'] = v_offset_0
-        for ik in range(num_offsets):
-            v_offset_d[ik] = v_offset_0  # + ik*height
-
+    if label_width_pixels < bar_width_pixels:
+        loc = 'inside'
     else:
-        v_offset_0 = v_offset_0 if v_offset_0 is not None else -.01
-        v_offset_d['v_offset_0'] = v_offset_0
-        for ik in range(num_offsets):
-            v_offset_d[-ik] = v_offset_0  # - ik*height
+        loc = 'outside'
+    text.remove()
+    return loc
 
-    return v_offset_d  # {'v_offset_0': v_offset_0, 'inner':v_offset_inner, 'outer':v_offset_outer}
-
-
-def summarize_geol(grp):
-    """
-    Function to summarize the geologic time scale data.
-    """
-    group_name = [col for col in ['Period', 'Epoch', 'Stage'] if col in grp.columns][0]
-    color_var = group_name + '_Color'
-    abbrev_var = group_name + '_Abbrev'
-    return pd.Series({
-        'Name': grp[group_name].iloc[0],
-        'End': grp['UpperBoundary'].min(),
-        'Start': grp['LowerBoundary'].max(),
-        'Abbrev': grp[abbrev_var].iloc[0],
-        'Color': grp[color_var].iloc[0]
-    })
-
-
-def add_GTS(fig, ax, epochs, periods=False, stages=False, allow_abbreviations=True, location='below', height=.045,
-            v_offset=None, fontsize=10, verbose=False, zorder=-2):
-    """
-    Add the Geologic Time Scale (GTS) to a matplotlib figure.
+def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', label_pref='full',
+            allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=12, edgecolor='k',
+            edgewidth=0, alpha=1,
+            gts_url = "https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl"):
+    '''
+    Adds the Geologic Time Scale (GTS) to the plot.
     Parameters
     ----------
     fig : matplotlib.figure.Figure
-        The figure to which the GTS will be added.
-    ax : matplotlib.axes.Axes
-        The axes to which the GTS will be added.
-    epochs : bool
-        If True, add epochs to the GTS.
-    periods : bool
-        If True, add periods to the GTS.
-    stages : bool
-        If True, add stages to the GTS.
-    allow_abbreviations : bool
-        If True, allow abbreviations for the GTS labels.
-    location : str
-        The location of the GTS labels, either 'above' or 'below'.
-    height : float
-        The height of the GTS labels.
+        The figure object where the GTS will be added.
+    ax : dict
+        The axis where the GTS will be plotted.
+    GTS_df : pd.DataFrame, optional
+        DataFrame containing the GTS data with columns for 'Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary'.
+        If None, the function will load the ICS chart from the provided URL.
+    Ranks : list of str, optional
+        List of ranks to include (e.g., ['Period', 'Epoch', 'Stage']). If None, defaults to ['Period', 'Epoch', 'Stage'].
+    time_units : str, optional
+        Time units of the GTS data. Supported: 'Ma' (default), 'ka', 'Ga'.
+    location : str, optional
+        Specifies whether to place the GTS above or below the plot. Default is 'above'.
+    label_pref : str, optional
+        Preference for labels: 'full' (default) for full names, 'abbrev' for abbreviations.
+    allow_abbreviations : bool, optional
+        If True, allows abbreviations for labels that don't fit. Default is True.
+    ax_name : str, optional
+        Name of the axis to create for the GTS. Default is 'gts'.
     v_offset : float, optional
-        The vertical offset for the GTS labels. If None, a default value will be used.
-    fontsize : int
-        The font size for the GTS labels.
-    verbose : bool
-        If True, print additional information for debugging.
-    zorder : int
-        The z-order for the GTS labels, determining their drawing order relative to other elements.
+        Vertical offset for the GTS labels. Default is 0.
+    height : float, optional
+        Height of the GTS annotation area. Default is 0.05.
+    text_color : str or None, optional
+        Color of the text labels. If None, the function will choose a contrasting color based on the bar color. Default is None.
+    fontsize : int, optional
+        Font size for the GTS labels. Default is 12.
+    edgecolor : str, optional
+        Color of the bar edges. Default is 'k' (black).
+    edgewidth : float, optional
+        Width of the bar edges. Default is 0.
+    alpha : float, optional
+        Transparency of the bars. Default is 1 (opaque).
+    gts_url : str, optional
+        URL to load the ICS chart if GTS_df is None. Default is the ICS chart URL.
     Returns
     -------
     fig : matplotlib.figure.Figure
-        The figure with the GTS added.
-    ax : matplotlib.axes.Axes
-        The axes with the GTS added.
-    Notes
-    -----
-    This function reads the Geologic Time Scale data from a CSV file named 'GTS_updated.csv'.
-    The CSV file should contain columns for 'Stage', 'UpperBoundary', 'LowerBoundary', 'Period_Abbrev',
-    'Epoch_Abbrev', 'Stage_Abbrev', 'Period_Color', 'Epoch_Color', and 'Stage_Color'.
-    The function highlights intervals for stages, epochs, and periods based on the boundaries defined in the CSV file.
-    The function also adds labels for stages, epochs, and periods to the specified axes.
-    If the `allow_abbreviations` parameter is set to False, the full names of stages, epochs, and periods will be used.
+        The figure object with the GTS added.
+    ax : dict
+        The axis dictionary with the GTS axis added.
+
 
     Examples
     --------
+
     .. jupyter-execute::
 
         import pyleoclim as pyleo
-        import matplotlib.pyplot as plt
 
         ts_18 = pyleo.utils.load_dataset('cenogrid_d18O')
         ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
         ms = pyleo.MultipleSeries([ts_18, ts_13], label='Cenogrid', time_unit='ma BP')
 
-        fig, ax = ms.stackplot(figsize=(8, 5),linewidth=0.5, fill_between_alpha=0)
+        fig, ax = ms.stackplot(figsize=(10, 5),linewidth=0.5, fill_between_alpha=0)
+        ax[0].invert_yaxis() # d18O is traditionally inverted
 
         for ik, ax_name in enumerate(ax.keys()):
+            ax[ax_name].grid(visible=False)
             ax[ax_name].invert_xaxis()
-        ax[0].invert_yaxis()
 
-        fig, ax = pyleo.utils.plotting.add_GTS(fig, ax, epochs=True, periods=True, stages=True,
-                                          allow_abbreviations=False, location='below', height=0.04,
-                                          v_offset=0.01, fontsize=10)
-    """
+        GTS_df = pyleo.utils.load_ics_chart_to_df()
 
-    GT_csv = 'GTS_updated.csv'
-    gt_path = DATA_DIR.joinpath(f"{GT_csv}")
-    GTS_df = pd.read_csv(gt_path)
-    GTS_df[['UpperBoundary', 'LowerBoundary']] = GTS_df[['UpperBoundary', 'LowerBoundary']].apply(pd.to_numeric,
-                                                                                                  errors='coerce')
+        GTS_df = pyleo.utils.apply_custom_traits(GTS_df, {'Rank':'Epoch', 'Name':'Pliocene', 'Abbrev':'Plio'}, target_col="Abbrev")
+        fig, ax = pyleo.utils.add_GTS(fig, ax, time_units='Ma', GTS_df=GTS_df, location='above', label_pref='full',
+                    allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=12, edgecolor='k',
+                    edgewidth=0, alpha=1)
 
-    num_offsets = epochs + periods + stages
-    offsets = get_v_offsets(location, height, num_offsets, v_offset)
-    height_num = epochs + periods + stages + 1
-    if allow_abbreviations is False:
-        height = height_num * height + offsets['v_offset_0']
-        ax = make_annotation_ax(fig, ax, ax_name='outside_labels', height=height,
-                                                     loc=location, v_offset=offsets['v_offset_0'], zorder=zorder)
-        ax['outside_labels'].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
+    '''
+
+    if GTS_df is not None:
+        assert isinstance(GTS_df, pd.DataFrame)
+        assert all(col in GTS_df.columns for col in ['Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary']), "GTS_df must contain columns: ['Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary']"
+        assert GTS_df['UpperBoundary'].dtype in [np.float64, np.float32, np.int64, np.int32], "GTS_df 'UpperBoundary' must be numeric"
+        assert GTS_df['LowerBoundary'].dtype in [np.float64, np.float32, np.int64, np.int32], "GTS_df 'LowerBoundary' must be numeric"
+        duration = GTS_df['LowerBoundary']-GTS_df['UpperBoundary']
+        assert all(duration >= 0), "GTS_df 'LowerBoundary' must be greater than (further back in time) or equal to 'UpperBoundary (more modern)'"
+
+    if GTS_df is None:
+        GTS_df = load_ics_chart_to_df(gts_url)
+        if time_units not in  ['Ma', 'Mya', 'My']:
+            if time_units in ['ka', 'kya', 'ky']:
+                GTS_df['UpperBoundary'] = GTS_df['UpperBoundary'] * 1e3
+                GTS_df['LowerBoundary'] = GTS_df['LowerBoundary'] * 1e3
+            elif time_units in ['Ga', 'Gya', 'Gy']:
+                GTS_df['UpperBoundary'] = GTS_df['UpperBoundary'] * 1e-3
+                GTS_df['LowerBoundary'] = GTS_df['LowerBoundary'] * 1e-3
+            else:
+                raise ValueError(f"Unsupported time_units '{time_units}'. Supported: 'Ma', 'ka', 'Ga'.")
+
+    if Ranks is None:
+        Ranks = ['Period', 'Epoch', 'Stage']
 
     xlims = ax['x_axis'].get_xlim()
-    print(xlims)
-    epochs_loc, periods_loc, stages_loc = set_placement(location, epochs, periods, stages)
-    for loc in [stages_loc, epochs_loc, periods_loc]:
-        if loc is False:
-            continue
-        if loc == stages_loc:
-            stage_ax_name = -stages_loc + 1000  # 'Stages'
-            ax =make_annotation_ax(fig, ax, ax_name=stage_ax_name, height=height,
-                                                         loc=location, v_offset=offsets[stages_loc], zorder=zorder)
-            ax[stage_ax_name].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
-            ax[stage_ax_name].set_xlim(xlims)
-            ax[stage_ax_name].grid(visible=False)
+    # expects upper to be smaller than lower
+    need_to_swap = False
+    if xlims[0] > xlims[1]:
+        need_to_swap = True
 
-            ldf = GTS_df[['Stage', 'UpperBoundary', 'LowerBoundary', 'Period_Abbrev', 'Epoch_Abbrev', 'Stage_Abbrev',
-                          'Period_Color', 'Epoch_Color', 'Stage_Color']].groupby('Stage').apply(
-                summarize_geol).sort_values('End').reset_index()
-            ldf = ldf.loc[ldf.End <= max(xlims)]
-            intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
-            ax[stage_ax_name] = hightlight_intervals(ax[stage_ax_name], intervals, color=ldf['Color'].values, alpha=1)
-            add_geol_labels(fig, ax, ldf, key=stage_ax_name, y_gts=.5, fontsize=fontsize,
-                            allow_abbreviations=allow_abbreviations, verbose=verbose)
-            ax[stage_ax_name].grid(False)
+    upper_lim = min(xlims)
+    lower_lim = max(xlims)
+    xlims = (upper_lim, lower_lim)
 
-        elif loc == epochs_loc:
-            epoch_ax_name = -epochs_loc + 1000  # 'Epochs'
-            ax = make_annotation_ax(fig, ax, ax_name=epoch_ax_name, height=height,
-                                                         loc=location, v_offset=offsets[epochs_loc],
-                                                         zorder=zorder)
-            ax[epoch_ax_name].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
-            ax[epoch_ax_name].set_xlim(xlims)
+    # filter to only the range of interest
+    sub_df = GTS_df[GTS_df['Rank'].isin(Ranks)]
+    sub_df = sub_df[(sub_df['UpperBoundary'] < lower_lim) & (sub_df['LowerBoundary'] > upper_lim)]
+    sub_df['UpperBoundary'] = sub_df['UpperBoundary'].apply(lambda x: max([x, upper_lim]))
+    sub_df['LowerBoundary'] = sub_df['LowerBoundary'].apply(lambda x: min([x, lower_lim]))
+    sub_df['duration'] = np.abs(sub_df['UpperBoundary'] - sub_df['LowerBoundary'])
+    sub_df.sort_values('LowerBoundary', ascending=False, inplace=True)
 
-            ldf = GTS_df[['Epoch', 'UpperBoundary', 'LowerBoundary', 'Period_Abbrev', 'Epoch_Abbrev', 'Stage_Abbrev',
-                          'Period_Color', 'Epoch_Color', 'Stage_Color']].groupby('Epoch').apply(
-                summarize_geol).sort_values('End').reset_index()
-            ldf = ldf.loc[ldf.End <= max(xlims)]
-            intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
-            ax[epoch_ax_name] = hightlight_intervals(ax[epoch_ax_name], intervals, color=ldf['Color'].values, alpha=1)
-            add_geol_labels(fig, ax, ldf, key=epoch_ax_name, y_gts=.45, fontsize=fontsize,
-                            allow_abbreviations=allow_abbreviations, orientation='north', verbose=verbose)
-            ax[epoch_ax_name].grid(False)
+    num_offsets = len(Ranks)
+    zorder = 10
 
-        elif loc == periods_loc:
-            period_ax_name = -periods_loc + 1000  # 'Periods'
-            ax = make_annotation_ax(fig, ax, ax_name=period_ax_name, height=height,
-                                                         loc=location, v_offset=offsets[periods_loc],
-                                                         zorder=zorder)
-            ax[period_ax_name].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
-            ax[period_ax_name].set_xlim(xlims)
-            ax[period_ax_name].grid(visible=False)
+    ax = pyleo.utils.plotting.make_annotation_ax(fig, ax, ax_name=ax_name, height=height * num_offsets,
+                                                 loc=location, v_offset=v_offset, zorder=zorder)
+    ax[ax_name].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
 
-            ldf = GTS_df[['Period', 'UpperBoundary', 'LowerBoundary', 'Period_Abbrev', 'Epoch_Abbrev', 'Stage_Abbrev',
-                          'Period_Color', 'Epoch_Color', 'Stage_Color']].groupby('Period').apply(
-                summarize_geol).sort_values('End').reset_index()
-            ldf = ldf.loc[ldf.End <= max(xlims)]
-            intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
-            ax[period_ax_name] = hightlight_intervals(ax[period_ax_name], intervals, color=ldf['Color'].values, alpha=1)
-            add_geol_labels(fig, ax, ldf, key=period_ax_name, y_gts=.5, fontsize=fontsize,
-                            allow_abbreviations=allow_abbreviations, verbose=verbose)
-            ax[period_ax_name].grid(False)
+    for ik, ax_key in enumerate(ax.keys()):
+        ax[ax_key].grid(visible=False)
+        ax[ax_key].set_xlim(xlims)
+
+    k = 0
+    text_color_flag = text_color
+    for unit, sub_sub_df in sub_df.groupby('Rank'):
+        for i, row in sub_sub_df.iterrows():
+            color = row.Color
+            (r, g, b) = mcolors.to_rgb(color)
+            width = row.duration
+            y_loc = k * height
+            rects = ax[ax_name].barh(y_loc, width=width, left=row.UpperBoundary, height=height, color=color,
+                                   edgecolor=edgecolor, linewidth=edgewidth, alpha=alpha)
+
+            # Render label to get its size in pixels
+            abbrev_loc = text_loc(fig, ax[ax_name], rects[0], row.Abbrev, width, y_loc)
+            full_label_loc = text_loc(fig, ax[ax_name], rects[0], row.Name, width, y_loc)
+
+            loc = 'outside'
+            label = ''
+            if label_pref == 'abbrev':
+                loc = abbrev_loc
+                label = row.Abbrev
+            else:
+                if full_label_loc == 'inside':
+                    loc = full_label_loc
+                    label = row.Name
+                elif allow_abbreviations is True:
+                    if abbrev_loc == 'inside':
+                        loc = abbrev_loc
+                        label = row.Abbrev
+
+            if loc == 'inside':
+                if text_color_flag is None:
+                    text_color = 'w' if r * g * b < 0.5 else 'darkgrey'
+                    if b < .50:
+                        if r * g > 0.85:
+                            text_color = 'darkgrey'
+                    elif r < .5:
+                        if g * b > 0.85:
+                            text_color = 'darkgrey'
+
+                ax[ax_name].bar_label(rects, labels=[label], label_type='center', color=text_color, fontsize=fontsize)
+
+        k += 1
+
+    if location == 'below':
+        ax[ax_name].invert_yaxis()
+
+    for ik, ax_key in enumerate(ax.keys()):
+        ax[ax_key].grid(False)
+        if need_to_swap is True:
+            ax[ax_key].invert_xaxis()
 
     return fig, ax
+
+
+# def check_text_fits_in_span(fig, ax, interval, label, fontsize=12, verbose=False):
+#     """
+#     Checks if the given text can fit within the interval [x1, x2] when plotted.
+#
+#     Parameters
+#     ----------
+#     ax : matplotlib.axes.Axes
+#         The axis where the span is plotted.
+#
+#     x1, x2 : float
+#         The interval in which the text should fit.
+#
+#     text : str
+#         The text to check.
+#
+#     fontsize : int, optional
+#         Font size to test the fitting, default is 12.
+#
+#     Returns
+#     -------
+#     bool
+#         True if text fits within [x1, x2], False otherwise.
+#     """
+#     if verbose is True:
+#         print('fontsize', fontsize, 'label', label, 'interval', interval)
+#     fig.canvas.draw()  # Ensure text positioning updates
+#     renderer = fig.canvas.get_renderer()
+#
+#     # text_width1 = get_label_width(ax, label, buffer=0., fontsize=fontsize, verbose=verbose)
+#
+#     # Create a test text object (invisible)
+#     test_text = ax.text(0, 0, label, ha='center', va='center', alpha=0, **{'fontsize': fontsize})
+#
+#     # Get text bounding box in display (pixel) coordinates
+#     bbox = test_text.get_window_extent(renderer=renderer)
+#
+#     # Convert bbox from display units to data units
+#     bbox_data = ax.transData.inverted().transform(bbox)
+#     text_x_min, _ = bbox_data[0]
+#     text_x_max, _ = bbox_data[1]
+#
+#     text_width = np.abs(text_x_max - text_x_min)  # Text width in data coordinates
+#     test_text.remove()  # Clean up test text
+#
+#     # Compare text width with the available span width
+#     x1, x2 = interval
+#     span_width = np.abs(x2 - x1)
+#     if verbose is True:
+#         # print('get_label_width version', 'text width', text_width1, 'span width', span_width,
+#         #       'fits?', text_width1 <= span_width)
+#         print('native version', 'text width', text_width, 'span width', span_width,
+#               'fits?', text_width <= span_width)
+#
+#     return text_width <= span_width
+
+
+# first attempt at managing outside labels
+# def add_geol_labels(fig, _ax, ldf, key='Periods', y_gts=None,
+#                     fontsize=10, allow_abbreviations=True, orientation='north', verbose=False):
+#     ax = _ax[key]
+#     xlims = ax.get_xlim()
+#
+#     ax_outside_labels = None
+#
+#     no_fits = defaultdict(list)
+#     for i in range(len(ldf)):
+#         ageStart = ldf.Start[i]
+#         ageEnd = ldf.End[i]
+#         ageMean = .5 * (ldf.Start[i] + ldf.End[i])
+#         ageColor = ldf.Color[i]
+#
+#         ageHandle = ldf.Name[i]
+#
+#         ylims = ax.get_ylim()
+#         if y_gts is None:
+#             h = np.diff(ax.get_ylim())[0]
+#             y_gts = .5 * h  # ylims[0]
+#
+#         if xlims[0] < xlims[1]:
+#             left_age = min([ageStart, ageEnd])
+#             right_age = max([ageStart, ageEnd])
+#
+#             if left_age < xlims[0]:
+#                 left_age = xlims[0]
+#                 fall_back_bound_ageMean = right_age - .5 * np.abs(right_age - left_age)
+#                 time_value = max([ageMean, fall_back_bound_ageMean])
+#
+#             elif right_age > xlims[1]:
+#                 right_age = xlims[1]
+#                 fall_back_bound_ageMean = left_age + .5 * np.abs(right_age - left_age)
+#                 time_value = min([ageMean, fall_back_bound_ageMean])
+#             else:
+#                 time_value = ageMean
+#
+#         else:
+#             left_age = max([ageStart, ageEnd])
+#             right_age = min([ageStart, ageEnd])
+#
+#             if left_age > xlims[0]:
+#                 left_age = xlims[0]
+#                 fall_back_bound_ageMean = right_age + .5 * np.abs(right_age - left_age)
+#                 time_value = min([ageMean, fall_back_bound_ageMean])
+#             elif right_age < xlims[1]:
+#                 right_age = xlims[1]
+#                 fall_back_bound_ageMean = left_age - .5 * np.abs(right_age - left_age)
+#                 time_value = max([ageMean, fall_back_bound_ageMean])
+#             else:
+#                 time_value = ageMean
+#
+#         if isinstance(ageHandle, str) == False:
+#             ageHandle = ''
+#         text_obj = ax.text(time_value, y_gts, ageHandle,
+#                            ha='center',
+#                            va='center',
+#                            fontsize=fontsize,
+#                            rotation=0)
+#         if verbose is True:
+#             print(ageHandle, time_value, y_gts, 'left', left_age, 'right', right_age)
+#         fit_bool = check_text_fits_in_span(fig, ax, [left_age, right_age], ageHandle,
+#                                            verbose=verbose)  # check_fits(ax, rect, text_obj)
+#         if fit_bool == False:
+#             text_obj.remove()
+#
+#             if allow_abbreviations == False:
+#                 no_fits['handle'].append(ageHandle)
+#                 no_fits['time_value'].append(time_value)
+#                 if ax_outside_labels is None:
+#                     # _ax=pyleo.utils.plotting.make_annotation_ax(fig, _ax, ax_name = 'outside_labels', height=.06,
+#                     #                            loc='above', v_offset=.02,zorder=-2)
+#                     ax_outside_labels = True
+#                     # _ax['outside_labels'].spines['top'].set_visible(False)
+#
+#             else:
+#                 ageHandle = ldf.Abbrev[i]
+#                 fit_bool = check_text_fits_in_span(fig, ax, [left_age, right_age], ageHandle,
+#                                                    verbose=verbose)  # check_fits(ax, rect, text_obj)
+#                 if fit_bool == True:
+#                     if isinstance(ageHandle, str) == False:
+#                         ageHandle = ''
+#                     text_obj = ax.text(time_value, y_gts, ageHandle,
+#                                        # fontname='TeX Gyre Heros',
+#                                        ha='center',
+#                                        va='center',
+#                                        fontsize=fontsize,
+#                                        rotation=0)
+#                 else:
+#                     try:
+#                         text_obj.remove()
+#                     except:
+#                         if verbose is True:
+#                             print('text_obj already removed')
+#
+#     if ax_outside_labels is not None:
+#         if verbose is True:
+#             print('adding outside labels', _ax['outside_labels'].get_ylim())
+#         if orientation == 'south':
+#             valign = 'top'
+#         else:
+#             valign = 'bottom'
+#             orientation = 'north'
+#         _ax['outside_labels'] = label_intervals(
+#             fig, _ax['outside_labels'],
+#             no_fits['handle'], no_fits['time_value'],
+#             orientation=orientation, baseline=1, height=0.35, buffer=0.12,
+#             linestyle_kwargs={'color': 'gray'}, text_kwargs={'fontsize': fontsize, 'va': valign})
+#         #
+#
+
+# def set_placement(loc, epochs, periods, stages):
+#     label_d = {'epochs': epochs, 'periods': periods, 'stages': stages}
+#     ik = 0
+#     for key in ['stages', 'epochs', 'periods']:
+#         if label_d[key] is True:
+#             label_d[key] = ik
+#             if loc == 'above':
+#                 ik += 1
+#             if loc == 'below':
+#                 ik -= 1
+#
+#     stages = label_d['stages']
+#     epochs = label_d['epochs']
+#     periods = label_d['periods']
+#     return epochs, periods, stages
+#
+
+# def get_v_offsets(loc, height, num_offsets, v_offset_0=None):
+#     v_offset_d = {}
+#     if loc == 'above':
+#         v_offset_0 = v_offset_0 if v_offset_0 is not None else .01
+#         v_offset_d['v_offset_0'] = v_offset_0
+#         for ik in range(num_offsets):
+#             v_offset_d[ik] = v_offset_0  # + ik*height
+#
+#     else:
+#         v_offset_0 = v_offset_0 if v_offset_0 is not None else -.01
+#         v_offset_d['v_offset_0'] = v_offset_0
+#         for ik in range(num_offsets):
+#             v_offset_d[-ik] = v_offset_0  # - ik*height
+#
+#     return v_offset_d  # {'v_offset_0': v_offset_0, 'inner':v_offset_inner, 'outer':v_offset_outer}
+
+
+# def summarize_geol(grp):
+#     """
+#     Function to summarize the geologic time scale data.
+#     """
+#     group_name = [col for col in ['Period', 'Epoch', 'Stage'] if col in grp.columns][0]
+#     color_var = group_name + '_Color'
+#     abbrev_var = group_name + '_Abbrev'
+#     return pd.Series({
+#         'Name': grp[group_name].iloc[0],
+#         'End': grp['UpperBoundary'].min(),
+#         'Start': grp['LowerBoundary'].max(),
+#         'Abbrev': grp[abbrev_var].iloc[0],
+#         'Color': grp[color_var].iloc[0]
+#     })
+
+
+# def add_GTS(fig, ax, epochs, periods=False, stages=False, allow_abbreviations=True, location='below', height=.045,
+#             v_offset=None, fontsize=10, verbose=False, zorder=-2):
+#     """
+#     Add the Geologic Time Scale (GTS) to a matplotlib figure.
+#     Parameters
+#     ----------
+#     fig : matplotlib.figure.Figure
+#         The figure to which the GTS will be added.
+#     ax : matplotlib.axes.Axes
+#         The axes to which the GTS will be added.
+#     epochs : bool
+#         If True, add epochs to the GTS.
+#     periods : bool
+#         If True, add periods to the GTS.
+#     stages : bool
+#         If True, add stages to the GTS.
+#     allow_abbreviations : bool
+#         If True, allow abbreviations for the GTS labels.
+#     location : str
+#         The location of the GTS labels, either 'above' or 'below'.
+#     height : float
+#         The height of the GTS labels.
+#     v_offset : float, optional
+#         The vertical offset for the GTS labels. If None, a default value will be used.
+#     fontsize : int
+#         The font size for the GTS labels.
+#     verbose : bool
+#         If True, print additional information for debugging.
+#     zorder : int
+#         The z-order for the GTS labels, determining their drawing order relative to other elements.
+#     Returns
+#     -------
+#     fig : matplotlib.figure.Figure
+#         The figure with the GTS added.
+#     ax : matplotlib.axes.Axes
+#         The axes with the GTS added.
+#     Notes
+#     -----
+#     This function reads the Geologic Time Scale data from a CSV file named 'GTS_updated.csv'.
+#     The CSV file should contain columns for 'Stage', 'UpperBoundary', 'LowerBoundary', 'Period_Abbrev',
+#     'Epoch_Abbrev', 'Stage_Abbrev', 'Period_Color', 'Epoch_Color', and 'Stage_Color'.
+#     The function highlights intervals for stages, epochs, and periods based on the boundaries defined in the CSV file.
+#     The function also adds labels for stages, epochs, and periods to the specified axes.
+#     If the `allow_abbreviations` parameter is set to False, the full names of stages, epochs, and periods will be used.
+#
+#     Examples
+#     --------
+#     .. jupyter-execute::
+#
+#         import pyleoclim as pyleo
+#         import matplotlib.pyplot as plt
+#
+#         ts_18 = pyleo.utils.load_dataset('cenogrid_d18O')
+#         ts_13 = pyleo.utils.load_dataset('cenogrid_d13C')
+#         ms = pyleo.MultipleSeries([ts_18, ts_13], label='Cenogrid', time_unit='ma BP')
+#
+#         fig, ax = ms.stackplot(figsize=(8, 5),linewidth=0.5, fill_between_alpha=0)
+#
+#         for ik, ax_name in enumerate(ax.keys()):
+#             ax[ax_name].invert_xaxis()
+#         ax[0].invert_yaxis()
+#
+#         fig, ax = pyleo.utils.plotting.add_GTS(fig, ax, epochs=True, periods=True, stages=True,
+#                                           allow_abbreviations=False, location='below', height=0.04,
+#                                           v_offset=0.01, fontsize=10)
+#     """
+#
+#     GT_csv = 'GTS_updated.csv'
+#     gt_path = DATA_DIR.joinpath(f"{GT_csv}")
+#     GTS_df = pd.read_csv(gt_path)
+#     GTS_df[['UpperBoundary', 'LowerBoundary']] = GTS_df[['UpperBoundary', 'LowerBoundary']].apply(pd.to_numeric,
+#                                                                                                   errors='coerce')
+#
+#     num_offsets = epochs + periods + stages
+#     offsets = get_v_offsets(location, height, num_offsets, v_offset)
+#     height_num = epochs + periods + stages + 1
+#     if allow_abbreviations is False:
+#         height = height_num * height + offsets['v_offset_0']
+#         ax = make_annotation_ax(fig, ax, ax_name='outside_labels', height=height,
+#                                                      loc=location, v_offset=offsets['v_offset_0'], zorder=zorder)
+#         ax['outside_labels'].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
+#
+#     xlims = ax['x_axis'].get_xlim()
+#     print(xlims)
+#     epochs_loc, periods_loc, stages_loc = set_placement(location, epochs, periods, stages)
+#     for loc in [stages_loc, epochs_loc, periods_loc]:
+#         if loc is False:
+#             continue
+#         if loc == stages_loc:
+#             stage_ax_name = -stages_loc + 1000  # 'Stages'
+#             ax =make_annotation_ax(fig, ax, ax_name=stage_ax_name, height=height,
+#                                                          loc=location, v_offset=offsets[stages_loc], zorder=zorder)
+#             ax[stage_ax_name].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
+#             ax[stage_ax_name].set_xlim(xlims)
+#             ax[stage_ax_name].grid(visible=False)
+#
+#             ldf = GTS_df[['Stage', 'UpperBoundary', 'LowerBoundary', 'Period_Abbrev', 'Epoch_Abbrev', 'Stage_Abbrev',
+#                           'Period_Color', 'Epoch_Color', 'Stage_Color']].groupby('Stage').apply(
+#                 summarize_geol).sort_values('End').reset_index()
+#             ldf = ldf.loc[ldf.End <= max(xlims)]
+#             intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
+#             ax[stage_ax_name] = hightlight_intervals(ax[stage_ax_name], intervals, color=ldf['Color'].values, alpha=1)
+#             add_geol_labels(fig, ax, ldf, key=stage_ax_name, y_gts=.5, fontsize=fontsize,
+#                             allow_abbreviations=allow_abbreviations, verbose=verbose)
+#             ax[stage_ax_name].grid(False)
+#
+#         elif loc == epochs_loc:
+#             epoch_ax_name = -epochs_loc + 1000  # 'Epochs'
+#             ax = make_annotation_ax(fig, ax, ax_name=epoch_ax_name, height=height,
+#                                                          loc=location, v_offset=offsets[epochs_loc],
+#                                                          zorder=zorder)
+#             ax[epoch_ax_name].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
+#             ax[epoch_ax_name].set_xlim(xlims)
+#
+#             ldf = GTS_df[['Epoch', 'UpperBoundary', 'LowerBoundary', 'Period_Abbrev', 'Epoch_Abbrev', 'Stage_Abbrev',
+#                           'Period_Color', 'Epoch_Color', 'Stage_Color']].groupby('Epoch').apply(
+#                 summarize_geol).sort_values('End').reset_index()
+#             ldf = ldf.loc[ldf.End <= max(xlims)]
+#             intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
+#             ax[epoch_ax_name] = hightlight_intervals(ax[epoch_ax_name], intervals, color=ldf['Color'].values, alpha=1)
+#             add_geol_labels(fig, ax, ldf, key=epoch_ax_name, y_gts=.45, fontsize=fontsize,
+#                             allow_abbreviations=allow_abbreviations, orientation='north', verbose=verbose)
+#             ax[epoch_ax_name].grid(False)
+#
+#         elif loc == periods_loc:
+#             period_ax_name = -periods_loc + 1000  # 'Periods'
+#             ax = make_annotation_ax(fig, ax, ax_name=period_ax_name, height=height,
+#                                                          loc=location, v_offset=offsets[periods_loc],
+#                                                          zorder=zorder)
+#             ax[period_ax_name].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
+#             ax[period_ax_name].set_xlim(xlims)
+#             ax[period_ax_name].grid(visible=False)
+#
+#             ldf = GTS_df[['Period', 'UpperBoundary', 'LowerBoundary', 'Period_Abbrev', 'Epoch_Abbrev', 'Stage_Abbrev',
+#                           'Period_Color', 'Epoch_Color', 'Stage_Color']].groupby('Period').apply(
+#                 summarize_geol).sort_values('End').reset_index()
+#             ldf = ldf.loc[ldf.End <= max(xlims)]
+#             intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
+#             ax[period_ax_name] = hightlight_intervals(ax[period_ax_name], intervals, color=ldf['Color'].values, alpha=1)
+#             add_geol_labels(fig, ax, ldf, key=period_ax_name, y_gts=.5, fontsize=fontsize,
+#                             allow_abbreviations=allow_abbreviations, verbose=verbose)
+#             ax[period_ax_name].grid(False)
+#
+#     return fig, ax
 
 # def get_label_width(ax, label, buffer=0., fontsize=10., verbose=False):
 #     renderer = ax.figure.canvas.get_renderer()
