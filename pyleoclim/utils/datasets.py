@@ -201,7 +201,7 @@ def _find_ns_for_local(graph: Graph, local: str):
             return Namespace(base)
     return None
 
-def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl") -> pd.DataFrame:
+def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl", time_units='Ma') -> pd.DataFrame:
     g = Graph()
     g.parse(ttl_path_or_url, format="turtle")
 
@@ -293,6 +293,20 @@ def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-
     type_order = ["Eon", "Era", "Period", "Epoch", "Stage", "Subepoch", "Substage", "Subperiod"]
     df["Rank"] = pd.Categorical(df["Rank"], categories=type_order + sorted(set(df["Rank"]) - set(type_order)), ordered=True)
     df = df.sort_values(["Rank", "UpperBoundary"], na_position="last").reset_index(drop=True)
+
+    if time_units not in ['Ma', 'Mya', 'My']:
+        if time_units in ['a', 'ya', 'y', 'yr']:
+            df['UpperBoundary'] = df['UpperBoundary'] * 1e6
+            df['LowerBoundary'] = df['LowerBoundary'] * 1e6
+        elif time_units in ['ka', 'kya', 'ky', 'kyr']:
+            df['UpperBoundary'] = df['UpperBoundary'] * 1e3
+            df['LowerBoundary'] = df['LowerBoundary'] * 1e3
+        elif time_units in ['Ga', 'Gya', 'Gy', 'Gyr']:
+            df['UpperBoundary'] = df['UpperBoundary'] * 1e-3
+            df['LowerBoundary'] = df['LowerBoundary'] * 1e-3
+        else:
+            raise ValueError(f"Unsupported time_units '{time_units}'. Supported: 'Ma', 'ka', 'Ga'.")
+
     return df
 
 def apply_custom_traits(df, specs, target_col="Abbrev"):
