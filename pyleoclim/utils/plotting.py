@@ -4,7 +4,7 @@
 Plotting utilities, leveraging Matplotlib.
 """
 
-__all__ = ['set_style', 'closefig', 'savefig']
+__all__ = ['set_style', 'closefig', 'savefig', 'add_GTS']
 
 import matplotlib.pyplot as plt
 import pathlib
@@ -16,6 +16,7 @@ import collections.abc
 import copy
 from collections import defaultdict
 from pathlib import Path
+import re
 
 from ..utils import lipdutils
 from ..utils import datasets
@@ -1503,10 +1504,12 @@ def text_loc(fig, ax, rect, label_text, width, yloc):
     renderer = fig.canvas.get_renderer()
     bar_disp = ax.transData.transform((width, 0)) - ax.transData.transform((0, 0))
     bar_width_pixels = bar_disp[0]
+    bar_height_pixels = bar_disp[1]
 
     # Get label width in pixels
     bbox = text.get_window_extent(renderer=renderer)
     label_width_pixels = bbox.width
+    label_height_pixels = bbox.height
 
     if label_width_pixels < bar_width_pixels:
         loc = 'inside'
@@ -1515,9 +1518,9 @@ def text_loc(fig, ax, rect, label_text, width, yloc):
     text.remove()
     return loc
 
-def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', label_pref='full',
-            allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=12, edgecolor='k',
-            edgewidth=0, alpha=1,
+def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', label_pref='full',
+            allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=None, edgecolor='k',
+            edgewidth=0, alpha=1,zorder=10,reverse_rank_order=False,
             gts_url = "https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl"):
     '''
     Adds the Geologic Time Scale (GTS) to the plot.
@@ -1530,14 +1533,14 @@ def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', 
     GTS_df : pd.DataFrame, optional
         DataFrame containing the GTS data with columns for 'Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary'.
         If None, the function will load the ICS chart from the provided URL.
-    Ranks : list of str, optional
+    ranks : list of str, optional
         List of ranks to include (e.g., ['Period', 'Epoch', 'Stage']). If None, defaults to ['Period', 'Epoch', 'Stage'].
     time_units : str, optional
         Time units of the GTS data. Supported: 'Ma' (default), 'ka', 'Ga'.
     location : str, optional
         Specifies whether to place the GTS above or below the plot. Default is 'above'.
     label_pref : str, optional
-        Preference for labels: 'full' (default) for full names, 'abbrev' for abbreviations.
+        Preference for labels: 'full' (default) for full names, 'abbrev' for abbreviations, 'none' for no labels (only colors).
     allow_abbreviations : bool, optional
         If True, allows abbreviations for labels that don't fit. Default is True.
     ax_name : str, optional
@@ -1556,6 +1559,8 @@ def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', 
         Width of the bar edges. Default is 0.
     alpha : float, optional
         Transparency of the bars. Default is 1 (opaque).
+    zorder : int, optional
+        Z-order for the GTS axis. Default is 10.
     gts_url : str, optional
         URL to load the ICS chart if GTS_df is None. Default is the ICS chart URL.
     Returns
@@ -1593,6 +1598,13 @@ def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', 
 
     '''
 
+    if isinstance(ax, dict) is False:
+        ax = {0: ax}
+    if fontsize is None:
+        pattern = re.compile(r".*(labelsize|fontsize).*")
+        fontsize_options = mpl.rcParams.find_all(pattern)
+        fontsize = min([value for value in fontsize_options.values() if isinstance(value, (int, float))])
+
     if GTS_df is not None:
         assert isinstance(GTS_df, pd.DataFrame)
         assert all(col in GTS_df.columns for col in ['Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary']), "GTS_df must contain columns: ['Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary']"
@@ -1602,21 +1614,16 @@ def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', 
         assert all(duration >= 0), "GTS_df 'LowerBoundary' must be greater than (further back in time) or equal to 'UpperBoundary (more modern)'"
 
     if GTS_df is None:
-        GTS_df = datasets.load_ics_chart_to_df(gts_url)
-        if time_units not in  ['Ma', 'Mya', 'My']:
-            if time_units in ['ka', 'kya', 'ky']:
-                GTS_df['UpperBoundary'] = GTS_df['UpperBoundary'] * 1e3
-                GTS_df['LowerBoundary'] = GTS_df['LowerBoundary'] * 1e3
-            elif time_units in ['Ga', 'Gya', 'Gy']:
-                GTS_df['UpperBoundary'] = GTS_df['UpperBoundary'] * 1e-3
-                GTS_df['LowerBoundary'] = GTS_df['LowerBoundary'] * 1e-3
-            else:
-                raise ValueError(f"Unsupported time_units '{time_units}'. Supported: 'Ma', 'ka', 'Ga'.")
+        GTS_df = datasets.load_ics_chart_to_df(gts_url, time_units=time_units)
 
-    if Ranks is None:
-        Ranks = ['Period', 'Epoch', 'Stage']
+    if ranks is None:
+        ranks = ['Period', 'Epoch', 'Stage']
 
-    xlims = ax['x_axis'].get_xlim()
+    if 'x_axis' in ax.keys():
+        xlims = ax['x_axis'].get_xlim()
+    else:
+        xlims = ax[0].get_xlim()
+
     # expects upper to be smaller than lower
     need_to_swap = False
     if xlims[0] > xlims[1]:
@@ -1627,45 +1634,50 @@ def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', 
     xlims = (upper_lim, lower_lim)
 
     # filter to only the range of interest
-    sub_df = GTS_df[GTS_df['Rank'].isin(Ranks)]
+    sub_df = GTS_df[GTS_df['Rank'].isin(ranks)]
     sub_df = sub_df[(sub_df['UpperBoundary'] < lower_lim) & (sub_df['LowerBoundary'] > upper_lim)]
     sub_df['UpperBoundary'] = sub_df['UpperBoundary'].apply(lambda x: max([x, upper_lim]))
     sub_df['LowerBoundary'] = sub_df['LowerBoundary'].apply(lambda x: min([x, lower_lim]))
     sub_df['duration'] = np.abs(sub_df['UpperBoundary'] - sub_df['LowerBoundary'])
     sub_df.sort_values('LowerBoundary', ascending=False, inplace=True)
 
-    num_offsets = len(Ranks)
-    zorder = 10
+    num_ranks = len(ranks)
 
-    ax = make_annotation_ax(fig, ax, ax_name=ax_name, height=height * num_offsets,
+    # create the annotation axis
+    ax = make_annotation_ax(fig, ax, ax_name=ax_name, height=height * num_ranks,
                                                  loc=location, v_offset=v_offset, zorder=zorder)
     ax[ax_name].spines[['top', 'bottom', 'left', 'right']].set_visible(False)
 
+    # set limits and grid to make sure x-axis is increasing (will reverse at end if needed)
     for ik, ax_key in enumerate(ax.keys()):
         ax[ax_key].grid(visible=False)
         ax[ax_key].set_xlim(xlims)
 
     k = 0
-    text_color_flag = text_color
-    for unit, sub_sub_df in sub_df.groupby('Rank'):
-        for i, row in sub_sub_df.iterrows():
+    text_color_flag = text_color # None means auto, otherwise use specified color
+    for unit, unit_df in sub_df.groupby('Rank'):
+        for i, row in unit_df.iterrows():
             color = row.Color
             (r, g, b) = mcolors.to_rgb(color)
-            width = row.duration
-            y_loc = k * height
+            width = row.duration # width of the bar in data coords
+            y_loc = k * height # y location of the bar
             rects = ax[ax_name].barh(y_loc, width=width, left=row.UpperBoundary, height=height, color=color,
                                    edgecolor=edgecolor, linewidth=edgewidth, alpha=alpha)
+
+            if label_pref == 'none':
+                continue
 
             # Render label to get its size in pixels
             abbrev_loc = text_loc(fig, ax[ax_name], rects[0], row.Abbrev, width, y_loc)
             full_label_loc = text_loc(fig, ax[ax_name], rects[0], row.Name, width, y_loc)
 
-            loc = 'outside'
-            label = ''
-            if label_pref == 'abbrev':
+
+            loc, label = 'outside', '' # default to outside with no label
+            if label_pref in ['abbrev', 'abbreviation']:
                 loc = abbrev_loc
                 label = row.Abbrev
             else:
+                # full label preferred, but if it doesn't fit, try abbrev if allowed
                 if full_label_loc == 'inside':
                     loc = full_label_loc
                     label = row.Name
@@ -1688,7 +1700,7 @@ def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', 
 
         k += 1
 
-    if location == 'below':
+    if reverse_rank_order is True:
         ax[ax_name].invert_yaxis()
 
     for ik, ax_key in enumerate(ax.keys()):
@@ -1696,8 +1708,9 @@ def add_GTS(fig, ax, GTS_df=None, Ranks=None, time_units='Ma',location='above', 
         if need_to_swap is True:
             ax[ax_key].invert_xaxis()
 
-    return fig, ax
 
+    return fig, ax
+# could test with [p.get_width() for p in ax['gts'].patches]
 
 # def check_text_fits_in_span(fig, ax, interval, label, fontsize=12, verbose=False):
 #     """
