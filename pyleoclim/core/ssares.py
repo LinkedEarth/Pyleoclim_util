@@ -132,15 +132,12 @@ class SsaRes:
         Examples
         --------
 
-        Plot the SSA eigenvalue spectrum of the Southern Oscillation Index:
+        Plot the SSA eigenvalue spectrum of the NINO3 index:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
-            ts = pyleo.utils.load_dataset('SOI')
-            ssa = ts.ssa()
-            
+            ts = pyleo.utils.load_dataset('NINO3')
+            ssa = ts.ssa() 
             fig, ax = ssa.screeplot()
 
         '''
@@ -221,12 +218,11 @@ class SsaRes:
         Examples
         --------
 
-        Plot the first SSA mode of the Southern Oscillation Index:
+        Plot the first SSA mode of the NINO3 index:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            ts  = pyleo.utils.load_dataset('SOI')
+            ts  = pyleo.utils.load_dataset('NINO3')
             ssa = ts.ssa()
             
             fig, ax = ssa.modeplot()

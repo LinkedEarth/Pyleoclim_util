@@ -18,7 +18,7 @@ __all__ = [
     'detect_outliers_kmeans',
     'remove_outliers',
     'phaseran',
-    'phaseran2'
+    'custom_year_averages'
 ]
 
 import numpy as np
@@ -26,17 +26,20 @@ from numpy import pi
 import pandas as pd
 import warnings
 import copy
+from typing import Union, Optional
+import calendar
+# Scipy
 from scipy import special
 from scipy import signal
 from scipy import interpolate
 from scipy.interpolate import splrep, splev
 from scipy import stats
+# scikit-learn
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.neighbors import LocalOutlierFactor
-#import matplotlib.pyplot as plt
 
 import statsmodels.tsa.stattools as sms
 
@@ -1313,7 +1316,7 @@ def gaussianize(ys):
 
     # Create a blank copy of the array.
     yg = copy.deepcopy(ys)
-    yg[:] = np.NAN
+    yg[:] = np.nan
 
     nz = np.logical_not(np.isnan(ys))
     index = np.argsort(ys[nz])
@@ -1807,7 +1810,9 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
     if detrend == 'none' or detrend is False or detrend is None:
         ys_d = ys
     else:
-        ys_d = detrend(ys, ts, method=detrend, sg_kwargs=sg_kwargs)
+        # Circumvent naming conflict between detrend the function and detrend the argument
+        from . import detrend as detrend_ts
+        ys_d = detrend_ts(ys, ts, method=detrend, sg_kwargs=sg_kwargs)[0]
 
     if standardize:
         res, _, _ = std(ys_d)
@@ -1899,82 +1904,81 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
     return time_axis
 
 
-def phaseran(recblk, nsurr):
-    ''' Simultaneous phase randomization of a set of time series
-    
-    It creates blocks of surrogate data with the same second order properties as the original
-    time series dataset by transforming the original data into the frequency domain, randomizing the
-    phases simultaneoulsy across the time series and converting the data back into the time domain. 
-    
-    Written by Carlos Gias for MATLAB
+# def phaseran(recblk, nsurr):
+#     ''' Simultaneous phase randomization of a set of time series
+#     
+#     It creates blocks of surrogate data with the same second order properties as the original
+#     time series dataset by transforming the original data into the frequency domain, randomizing the
+#     phases simultaneoulsy across the time series and converting the data back into the time domain. 
+#     
+#     Written by Carlos Gias for MATLAB
+# 
+#     http://www.mathworks.nl/matlabcentral/fileexchange/32621-phase-randomization/content/phaseran.m
+# 
+#     Parameters
+#     ----------
+#     recblk : numpy array
+#         2D array , Row: time sample. Column: recording.
+#         An odd number of time samples (height) is expected.
+#         If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
+#         The class must be double and it must be nonsparse.
+#     
+#     nsurr : int
+#         is the number of image block surrogates that you want to generate.
+# 
+#     Returns
+#     -------
+#     surrblk : numpy array
+#         3D multidimensional array image block with the surrogate datasey along the third dimension
+# 
+#     See also
+#     --------
+# 
+#     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
+# 
+#     References
+#     ----------
+# 
+#     - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7
+#     
+#     - Carlos Gias (2020). Phase randomization, MATLAB Central File Exchange
+#     '''
+#     # Get parameters
+#     nfrms = recblk.shape[0]
+# 
+#     if nfrms % 2 == 0:
+#         nfrms = nfrms-1
+#         recblk = recblk[0:nfrms]
+# 
+#     len_ser = int((nfrms-1)/2)
+#     interv1 = np.arange(1, len_ser+1)
+#     interv2 = np.arange(len_ser+1, nfrms)
+# 
+#     # Fourier transform of the original dataset
+#     fft_recblk = np.fft.fft(recblk)
+# 
+#     surrblk = np.zeros((nfrms, nsurr))
+# 
+#     #  for k in tqdm(np.arange(nsurr)):
+#     for k in np.arange(nsurr):
+#         ph_rnd = np.random.rand(len_ser)
+# 
+#         # Create the random phases for all the time series
+#         ph_interv1 = np.exp(2*np.pi*1j*ph_rnd)
+#         ph_interv2 = np.conj(np.flipud(ph_interv1))
+# 
+#         # Randomize all the time series simultaneously
+#         fft_recblk_surr = np.copy(fft_recblk)
+#         fft_recblk_surr[interv1] = fft_recblk[interv1] * ph_interv1
+#         fft_recblk_surr[interv2] = fft_recblk[interv2] * ph_interv2
+# 
+#         # Inverse transform
+#         surrblk[:, k] = np.real(np.fft.ifft(fft_recblk_surr))
+# 
+#     return surrblk
 
-    http://www.mathworks.nl/matlabcentral/fileexchange/32621-phase-randomization/content/phaseran.m
 
-    Parameters
-    ----------
-    recblk : numpy array
-        2D array , Row: time sample. Column: recording.
-        An odd number of time samples (height) is expected.
-        If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
-        The class must be double and it must be nonsparse.
-    
-    nsurr : int
-        is the number of image block surrogates that you want to generate.
-
-    Returns
-    -------
-    surrblk : numpy array
-        3D multidimensional array image block with the surrogate datasey along the third dimension
-
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
-
-    References
-    ----------
-
-    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7
-    
-    - Carlos Gias (2020). Phase randomization, MATLAB Central File Exchange
-    '''
-    # Get parameters
-    nfrms = recblk.shape[0]
-
-    if nfrms % 2 == 0:
-        nfrms = nfrms-1
-        recblk = recblk[0:nfrms]
-
-    len_ser = int((nfrms-1)/2)
-    interv1 = np.arange(1, len_ser+1)
-    interv2 = np.arange(len_ser+1, nfrms)
-
-    # Fourier transform of the original dataset
-    fft_recblk = np.fft.fft(recblk)
-
-    surrblk = np.zeros((nfrms, nsurr))
-
-    #  for k in tqdm(np.arange(nsurr)):
-    for k in np.arange(nsurr):
-        ph_rnd = np.random.rand(len_ser)
-
-        # Create the random phases for all the time series
-        ph_interv1 = np.exp(2*np.pi*1j*ph_rnd)
-        ph_interv2 = np.conj(np.flipud(ph_interv1))
-
-        # Randomize all the time series simultaneously
-        fft_recblk_surr = np.copy(fft_recblk)
-        fft_recblk_surr[interv1] = fft_recblk[interv1] * ph_interv1
-        fft_recblk_surr[interv2] = fft_recblk[interv2] * ph_interv2
-
-        # Inverse transform
-        surrblk[:, k] = np.real(np.fft.ifft(fft_recblk_surr))
-
-    return surrblk
-
-
-def phaseran2(y, nsurr):
+def phaseran(y, nsurr):
     '''
     Phase randomization of a time series y, of even or odd length. 
     
@@ -1992,6 +1996,15 @@ def phaseran2(y, nsurr):
     -------
     ysurr: array nt x nsurr
         Array of y surrogates
+        
+    See also
+    --------
+
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
+
+    References
+    ----------
+    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994) Physical Review Letters, Vol 73, Number 7
 
     '''
     from scipy.fft import fft, ifft
@@ -2020,5 +2033,216 @@ def phaseran2(y, nsurr):
             
     return ysurr
     
+def custom_year_averages(
+    data: pd.Series,
+    start_month: int,
+    end_month: int,
+    years: Optional[Union[int, list, range]] = None
+) -> pd.Series:
+    """
+    Compute weighted averages over custom year periods that may straddle calendar years.
+    
+    Parameters
+    ----------
+    data : pd.Series
+        Time series data with DatetimeIndex. Can be daily or monthly frequency.
+    start_month : int
+        Starting month of the custom year (1-12).
+    end_month : int
+        Ending month of the custom year (1-12).
+    years : int, list, range, or None
+        Year(s) for which to compute averages. If None, computes for all available years.
+        For straddling periods (e.g., Apr-Mar), year refers to the year of the end month.
+    
+    Returns
+    -------
+    pd.Series
+        Series index by year, with weighted averages as values.
+        
+    Examples
+    --------
+    .. jupyter-execute::
+    
+        import pandas as pd
+        import numpy as np
+        import pyleoclim.utils.tsutils as ut
+        
+        # Create sample monthly data
+        dates = pd.date_range('2020-01-01', '2023-12-31', freq='M')
+        values = np.arange(len(dates))  # Sequential values for clarity
+        ts = pd.Series(values, index=dates, name='monthly_values')
+        
+        # Example 1: Single year (int)
+        # Compute Jan-Mar average for 2021 only
+        avg_single = ut.custom_year_averages(ts, 1, 3, years=2021)
+        print("Single year (2021):")
+        print(avg_single)
+        print()
+        
+        # Example 2: List of specific years
+        # Compute Apr-Mar averages for selected years
+        avg_list = ut.custom_year_averages(ts, 4, 3, years=[2021, 2023])
+        print("Specific years [2021, 2023]:")
+        print(avg_list)
+        print()
+        
+        # Example 3: Range of years
+        # Compute Oct-Sep averages for consecutive years
+        avg_range = ut.custom_year_averages(ts, 10, 9, years=range(2021, 2024))
+        print("Range of years (2021-2023):")
+        print(avg_range)
+        print()
+        
+        # Example 4: All available years (None - default)
+        # Compute Jan-Dec averages for all years in data
+        avg_all = ut.custom_year_averages(ts, 1, 12, years=None)
+        print("All available years (None):")
+        print(avg_all)
+        print()
+        
+        # Example 5: Straddling periods with different year specifications
+        # Apr-Mar periods: year refers to the March year
+        avg_straddle = ut.custom_year_averages(ts, 4, 3, years=range(2021, 2024))
+        print("Straddling periods (Apr-Mar), years 2021-2023:")
+        print(avg_straddle)
+    
+    .. jupyter-execute::
+    
+        # Daily data example with uneven spacing
+        daily_dates = pd.to_datetime([
+            '2021-01-01', '2021-01-05', '2021-01-20',
+            '2021-02-01', '2021-02-15', '2021-02-28',
+            '2021-03-05', '2021-03-25', '2021-03-31'
+        ])
+        daily_values = [10, 15, 20, 25, 30, 35, 40, 45, 50]
+        daily_ts = pd.Series(daily_values, index=daily_dates, name='daily_data')
+        
+        # Compute weighted average (accounts for uneven spacing)
+        daily_avg = ut.custom_year_averages(daily_ts, 1, 3, years=2021)
+        print("Daily data with uneven spacing (Jan-Mar 2021):")
+        print(f"Weighted average: {daily_avg.iloc[0]:.2f}")
+        print(f"Simple mean: {daily_ts.mean():.2f}")
+        print("(Note: weighted average accounts for time intervals between observations)")
+    """
+    if not isinstance(data.index, pd.DatetimeIndex):
+        raise ValueError("Data must have a DatetimeIndex")
+    
+    if not (1 <= start_month <= 12 and 1 <= end_month <= 12):
+        raise ValueError("Months must be between 1 and 12")
+    
+    # Determine if the period straddles calendar years
+    straddles_year = start_month > end_month
+    
+    # Get available years from data
+    data_years = sorted(data.index.year.unique())
+    
+    if years is None:
+        if straddles_year:
+            # For straddling periods, we need data from both years
+            years = [y for y in data_years if y > min(data_years)]
+        else:
+            years = data_years
+    elif isinstance(years, int):
+        years = [years]
+    
+    results = {}
+    
+    for year in years:
+        if straddles_year:
+            # Period spans two calendar years (e.g., Apr 2020 to Mar 2021)
+            start_date = pd.Timestamp(year=year-1, month=start_month, day=1)
+            end_date = pd.Timestamp(year=year, month=end_month, day=calendar.monthrange(year, end_month)[1])
+        else:
+            # Period within single calendar year
+            start_date = pd.Timestamp(year=year, month=start_month, day=1)
+            end_date = pd.Timestamp(year=year, month=end_month, day=calendar.monthrange(year, end_month)[1])
+        
+        # Filter data for this period
+        mask = (data.index >= start_date) & (data.index <= end_date)
+        period_data = data[mask]
+        
+        if len(period_data) == 0:
+            continue
+            
+        # Calculate weighted average
+        weighted_avg = _calculate_weighted_average(period_data, start_date, end_date)
+        
+        # Use the ending year as the index (standard for fiscal years)
+        results[year] = weighted_avg
+    
+    # Return results only for years that have data
+    return pd.Series(list(results.values()), index=list(results.keys()), name=data.name or 'weighted_average')
+
+
+def _calculate_weighted_average(
+    data: pd.Series, 
+    period_start: pd.Timestamp, 
+    period_end: pd.Timestamp
+) -> float:
+    """
+    Calculate weighted average where weights are based on time intervals.
+    
+    For monthly data, each month gets equal weight regardless of days.
+    For other frequencies, weights are based on time intervals.
+    """
+    if len(data) == 0:
+        return np.nan
+    
+    if len(data) == 1:
+        return data.iloc[0]
+    
+    # Sort data by index
+    data = data.sort_index()
+    timestamps = data.index.to_series()
+    
+    # Check if this looks like monthly data (all timestamps are month-ends)
+    is_monthly = all(
+        ts.day == calendar.monthrange(ts.year, ts.month)[1] 
+        for ts in timestamps
+    )
+    
+    if is_monthly:
+        # For monthly data, give each month equal weight
+        return data.mean()
+    
+    # For non-monthly data, use time-interval weighting
+    intervals = []
+    
+    for i, ts in enumerate(timestamps):
+        if i == 0:
+            # First observation: from period start to midpoint with next
+            if len(timestamps) > 1:
+                interval_end = ts + (timestamps.iloc[i+1] - ts) / 2
+            else:
+                interval_end = period_end
+            interval_start = period_start
+        elif i == len(timestamps) - 1:
+            # Last observation: from midpoint with previous to period end
+            interval_start = timestamps.iloc[i-1] + (ts - timestamps.iloc[i-1]) / 2
+            interval_end = period_end
+        else:
+            # Middle observations: from midpoint with previous to midpoint with next
+            interval_start = timestamps.iloc[i-1] + (ts - timestamps.iloc[i-1]) / 2
+            interval_end = ts + (timestamps.iloc[i+1] - ts) / 2
+        
+        # Ensure intervals don't extend beyond the period
+        interval_start = max(interval_start, period_start)
+        interval_end = min(interval_end, period_end)
+        
+        interval_duration = (interval_end - interval_start).total_seconds()
+        intervals.append(max(interval_duration, 0))  # Ensure non-negative
+    
+    weights = np.array(intervals)
+    
+    # Handle case where all weights are zero
+    if weights.sum() == 0:
+        return data.mean()
+    
+    # Calculate weighted average
+    weighted_sum = (data.values * weights).sum()
+    total_weight = weights.sum()
+    
+    return weighted_sum / total_weight
+
 
 

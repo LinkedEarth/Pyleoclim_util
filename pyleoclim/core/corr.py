@@ -39,10 +39,13 @@ class Corr:
     Parameters
     ----------
     r: float
-        the correlation coefficient
-
+        the metric of association (see https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests)
+             
     p: float
         the p-value
+    
+    r_crit : float
+        critical value for significance
 
     p_fmt_td: float
         the threshold for p-value formatting (0.01 by default, i.e., if p<0.01, will print "< 0.01" instead of "0")
@@ -59,14 +62,14 @@ class Corr:
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Correlation function
-    
     pyleoclim.utils.correlation.fdr : FDR function
+    pyleoclim.utils.correlation.association : workhorse function to compute various metrics of association
     '''
 
-    def __init__(self, r, p, signif, alpha, p_fmt_td=0.01, p_fmt_style='exp'):
+    def __init__(self, r, p, r_crit, signif, alpha, p_fmt_td=0.01, p_fmt_style='exp'):
         self.r = r
         self.p = p
+        self.r_crit = r_crit
         self.p_fmt_td = p_fmt_td
         self.p_fmt_style = p_fmt_style
         self.signif = bool(signif) # coerce as Boolean
@@ -84,7 +87,8 @@ class Corr:
         formatted_p = pval_format(self.p, threshold=self.p_fmt_td, style=self.p_fmt_style)
 
         table = {
-            'correlation': [self.r],
+            'statistic': [self.r],
+            'critical value': [self.r_crit],
             'p-value': [formatted_p],
             f'signif. (α: {self.alpha})': [self.signif],
         }

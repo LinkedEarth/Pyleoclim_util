@@ -1,9 +1,16 @@
 name: Upload Python Package
 
 on:
+  # Run automatically *once* when a release is published (not on draft/created/edited events)
   release:
-    branches: [ master ]
+    types: [published]
+  # Still allow manual trigger from the Actions tab
   workflow_dispatch:
+
+# Prevent duplicate runs for the same ref (e.g., if a release is republished)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -15,11 +22,18 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine
+        # Install latest packaging tooling so that PEP639 (license-expression / license-file)
+        # metadata fields are recognised by wheel and Twine.
+        pip install --no-cache-dir --upgrade build wheel
+        pip install --no-cache-dir --upgrade "twine>=5.0.0" "pkginfo>=1.9.7"
     - name: Build and publish
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py sdist bdist_wheel
+        rm -rf build/ dist/
+        python -m build
+        # 'twine check' currently fails on valid PEP 639 metadata (License-Expression/License-File)
+        # Run it non-blocking so build proceeds, then upload to PyPI.
+        twine check dist/* || echo "twine check produced warnings – continuing"
         twine upload dist/*

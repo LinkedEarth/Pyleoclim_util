@@ -110,12 +110,12 @@ class SurrogateSeries(EnsembleSeries):
 
         pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
 
-        pyleoclim.utils.tsutils.phaseran2 : phase randomization
+        pyleoclim.utils.tsutils.phaseran : phase randomization
         
         Examples
         --------
         
-        SOI = pyleo.utils.load_dataset('SOI')
+        SOI = pyleo.utils.load_dataset('SOI').interp()
         SOI_surr = pyleo.SurrogateSeries(method='phaseran', number=4) 
         SOI_surr.from_series(SOI)
         fig, ax = SOI_surr.plot_traces()
@@ -140,7 +140,7 @@ class SurrogateSeries(EnsembleSeries):
 
         elif self.method == 'phaseran':
             if target_series.is_evenly_spaced():
-                y_surr = tsutils.phaseran2(target_series.value, self.number)
+                y_surr = tsutils.phaseran(target_series.value, self.number)
             else:
                 raise ValueError("Phase-randomization presently requires evenly-spaced series.")
 
@@ -222,8 +222,6 @@ class SurrogateSeries(EnsembleSeries):
         --------
 
         .. jupyter-execute::
-
-            import pyleoclim as pyleo
 
             ar1 = pyleo.SurrogateSeries(method='ar1sim', number=10)
             ar1.from_param(length=100, param = [2,2])

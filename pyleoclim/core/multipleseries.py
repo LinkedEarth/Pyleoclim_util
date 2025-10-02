@@ -13,6 +13,8 @@ from ..core.psds import MultiplePSD
 from ..core.multivardecomp import MultivariateDecomp
 from ..core.resolutions import MultipleResolution
 
+from concurrent.futures import ProcessPoolExecutor #parallel processing library
+
 import warnings
 import numpy as np
 from copy import deepcopy
@@ -26,6 +28,62 @@ import pandas as pd
 from tqdm import tqdm
 from scipy import stats
 from statsmodels.multivariate.pca import PCA
+
+import dill
+import multiprocessing
+
+# Set `dill` as the pickler for multiprocessing
+multiprocessing.set_start_method("spawn", force=True)  
+multiprocessing.get_context("spawn").reduce = dill.dumps
+multiprocessing.get_context("spawn").rebuild = dill.loads
+
+from contextlib import contextmanager
+
+@contextmanager
+def _get_process_pool():
+    ctx = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(mp_context=ctx) as executor:
+        yield executor
+
+
+def _run_parallel_spectral(args):
+    """Helper function to call Series.spectral in parallel."""
+    s, idx, scalogram_list, method, settings, freq, freq_kwargs, label, verbose = args
+
+    # Check if scalogram_list is provided and the index is within bounds
+    if scalogram_list and idx < len(scalogram_list.scalogram_list):
+        return s.spectral(
+            method=method,
+            settings=settings,
+            freq=freq,
+            freq_kwargs=freq_kwargs,
+            label=label,
+            verbose=verbose,
+            scalogram=scalogram_list.scalogram_list[idx],
+        )
+
+    # Default case: no scalogram passed
+    return s.spectral(
+        method=method,
+        settings=settings,
+        freq=freq,
+        freq_kwargs=freq_kwargs,
+        label=label,
+        verbose=verbose,
+    )
+
+def _run_parallel_wavelet(args):
+    """Private helper function to call Series.wavelet in parallel."""
+    s, method, settings, freq, freq_kwargs, verbose = args
+
+    # Perform wavelet analysis
+    return s.wavelet(
+        method=method,
+        settings=settings,
+        freq=freq,
+        freq_kwargs=freq_kwargs,
+        verbose=verbose,
+    )
 
 class MultipleSeries:
     '''MultipleSeries object.
@@ -105,8 +163,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -143,8 +199,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            import numpy as np
             ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo', verbose=False)
             ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar', verbose=False)
             ms = pyleo.MultipleSeries([ts1, ts2])
@@ -172,8 +226,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            import numpy as np
             ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1', verbose=False)
             ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2', verbose=False)
             ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3', verbose=False)
@@ -211,8 +263,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            import numpy as np
             ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1', verbose=False)
             ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2', verbose=False)
             ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3', verbose=False)
@@ -245,7 +295,6 @@ class MultipleSeries:
         
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -329,10 +378,9 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            soi = pyleo.utils.load_dataset('SOI')
+            air = pyleo.utils.load_dataset('AIR')
             nino = pyleo.utils.load_dataset('NINO3')
-            ms = soi & nino
+            ms = air & nino
             ms_filter = ms.filter(method='lanczos',cutoff_scale=20)
 
         '''
@@ -373,7 +421,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             NINO3 = pyleo.utils.load_dataset('NINO3')
             ms = pyleo.MultipleSeries([soi], label = 'ENSO')
@@ -406,7 +453,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -435,7 +481,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo        
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -467,7 +512,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -522,7 +566,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -615,9 +658,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import numpy as np
-            import pyleoclim as pyleo
-            import matplotlib.pyplot as plt
             from pyleoclim.utils.tsmodel import colored_noise
 
             # create 2 incompletely sampled series
@@ -636,6 +676,7 @@ class MultipleSeries:
             # create MS object from the list
             ms = pyleo.MultipleSeries(serieslist)
 
+            import matplotlib.pyplot as plt
             fig, ax = plt.subplots(2,2,sharex=True,sharey=True, figsize=(10,8))
             ax = ax.flatten()
             # apply common_time with default parameters
@@ -935,7 +976,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1010,7 +1050,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = (soi & nino).common_time()
@@ -1098,7 +1137,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1151,7 +1189,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1206,7 +1243,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -1334,43 +1370,42 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            soi = pyleo.utils.load_dataset('SOI')
+            air = pyleo.utils.load_dataset('AIR')
             nino = pyleo.utils.load_dataset('NINO3')
-            ms = soi & nino
+            ms = air & nino
             ms_psd = ms.spectral(method='mtm')
             ms_psd.plot()
                     
         '''
+                
+        # main function
         settings = {} if settings is None else settings.copy()
-
-        psd_list = []
+        psd_list =[]
+        
         if method in ['wwz','cwt'] and scalogram_list:
             scalogram_list_len = len(scalogram_list.scalogram_list)
             series_len = len(self.series_list)
 
-            #In the case where the scalogram list and series list are the same we can re-use scalograms in a one to one fashion
-            #OR if the scalogram list is longer than the series list we use as many scalograms from the scalogram list as we need
-            if scalogram_list_len >= series_len:
-                for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
-                    psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
-                    psd_list.append(psd_tmp)
-            #If the scalogram list isn't as long as the series list, we re-use all the scalograms we can and then calculate the rest
-            elif scalogram_list_len < series_len:
-                for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
-                    if idx < scalogram_list_len:
-                        psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
-                        psd_list.append(psd_tmp)
-                    else:
-                        psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
-                        psd_list.append(psd_tmp)
+            # Prepare arguments for parallel execution
+            args = [
+                (s, idx, scalogram_list if scalogram_list_len >= series_len else None, method, settings, freq, freq_kwargs, label, verbose)
+                for idx, s in enumerate(self.series_list)
+                ]
         else:
-            for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
-                psd_tmp = s.spectral(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
-                psd_list.append(psd_tmp)
+            args = [
+                (s, idx, None, method, settings, freq, freq_kwargs, label, verbose)
+                for idx, s in enumerate(self.series_list)
+                ]
+            
+            
+       # Parallel processing with ProcessPoolExecutor
+        with _get_process_pool() as executor:
+            psd_list = list(tqdm(executor.map(_run_parallel_spectral, args), 
+                         total=len(args), 
+                         desc='Performing spectral analysis on individual series', 
+                         position=0, leave=True, disable=mute_pbar))
 
-        psds = MultiplePSD(psd_list=psd_list)
-
-        return psds
+        return MultiplePSD(psd_list=psd_list)
 
     def wavelet(self, method='cwt', settings={}, freq=None, freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
@@ -1452,16 +1487,29 @@ class MultipleSeries:
             wav = ms.wavelet(method='wwz')
 
         '''
+        
         settings = {} if settings is None else settings.copy()
-
-        scal_list = []
-        for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings, freq=freq, freq_kwargs=freq_kwargs, verbose=verbose)
-            scal_list.append(scal_tmp)
-
-        scals = MultipleScalogram(scalogram_list=scal_list)
-
-        return scals
+        
+        # Prepare arguments for parallel execution
+        args = [
+            (s, method, settings, freq, freq_kwargs, verbose)
+            for s in self.series_list
+        ]
+        
+        # Parallel processing of the wavelet functionality
+        with _get_process_pool() as executor:
+            scal_list = list(
+                tqdm(
+                    executor.map(_run_parallel_wavelet, args),
+                    total=len(args),
+                    desc='Performing wavelet analysis on individual series',
+                    position=0,
+                    leave=True,
+                    disable=mute_pbar,
+                )
+            )
+        
+        return MultipleScalogram(scalogram_list=scal_list)
 
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None,
@@ -1782,7 +1830,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -2224,7 +2271,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
@@ -2479,8 +2525,6 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             co2ts = pyleo.utils.load_dataset('AACO2')
             lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
@@ -2491,8 +2535,6 @@ class MultipleSeries:
         
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            
             co2ts = pyleo.utils.load_dataset('AACO2')
             lr04 = pyleo.utils.load_dataset('LR04')
             edc = pyleo.utils.load_dataset('EDC-dD')
@@ -2618,8 +2660,6 @@ class MultipleSeries:
         To create a resolution object, apply the .resolution() method to a Series object with `statistic=None`.
 
         .. jupyter-execute::
-
-            import pyleoclim as pyleo
 
             co2ts = pyleo.utils.load_dataset('AACO2')
             edc = pyleo.utils.load_dataset('EDC-dD')

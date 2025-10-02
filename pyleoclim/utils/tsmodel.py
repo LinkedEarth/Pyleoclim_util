@@ -298,7 +298,6 @@ def isopersistent_rn(y, p):
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     Notes
@@ -340,7 +339,6 @@ def sm_ar1_sim(n, p, g, sig):
     See also
     --------
 
-    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     '''

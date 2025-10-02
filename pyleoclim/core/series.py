@@ -126,7 +126,7 @@ class Series:
          set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
          Default is None (marked for deprecation)
 
-    auto_time_params : bool,
+    auto_time_params : bool
         If True, uses tsbase.disambiguate_time_metadata to ensure that time_name and time_unit are usable by Pyleoclim. This may override the provided metadata.
         If False, the provided time_name and time_unit are used. This may break some functionalities (e.g. common_time and convert_time_unit), so use at your own risk.
         If not provided, code will set to True for internal consistency.
@@ -135,6 +135,14 @@ class Series:
     --------
     Import the Southern Oscillation Index (SOI) and display a quick synopsis:
 
+     .. jupyter-execute::
+         :hide-code:
+         import pyleoclim as pyleo 
+         import numpy as np
+         import matplotlib.pyplot as plt
+         import warnings
+         warnings.filterwarnings('ignore')
+        
     .. jupyter-execute::
 
         import pyleoclim as pyleo
@@ -335,9 +343,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            import numpy as np
-
             ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
             ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
             ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
@@ -379,7 +384,7 @@ class Series:
         )
 
     @classmethod
-    def from_pandas(cls, ser, metadata):
+    def from_pandas(cls, ser, metadata, verbose=True):
         """
         Class method to create a Series object from a pandas Series.
 
@@ -389,11 +394,13 @@ class Series:
             The pandas Series object to convert. The index must be a DatetimeIndex.
         metadata : dict
             A dictionary containing metadata for the Series. If 'time_name' or 'value_name' are not provided, defaults to the name of the index and the name of the pandas Series, respectively.
-
+        verbose : bool
+            If True (default), will print warning messages if there are any
+        
         Returns
         -------
         Series
-            The created Series object.
+            The created Series object. 
 
         Raises
         ------
@@ -405,22 +412,26 @@ class Series:
 
         This method first checks if the index of the pandas Series is a DatetimeIndex. If it is, it converts the index to seconds if it's not already in that unit. Then it converts the datetime index to a time array using the 'time_unit' and 'time_name' from the metadata.
 
-
-
         The method then returns a new Series object with the converted time and values, and the provided metadata.
         """
 
+        # First fill metadata gaps
+        if 'time_name' not in metadata:
+            metadata['time_name'] = ser.index.name if ser.index.name is not None else 'time'
+        if 'value_name' not in metadata:
+            metadata['value_name'] = ser.name if ser.name is not None else 'value'
+
         if isinstance(ser.index, pd.DatetimeIndex):
-            index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index
+            if ser.index.unit == 's':
+                index = ser.index
+            else:    
+                index = ser.index.as_unit('s')
+                if verbose:
+                    warnings.warn("The index dtype was converted to datetime64[s]")
+                        
             time = tsbase.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
         else:
             raise ValueError('The provided index must be a proper DatetimeIndex object')
-
-        # metadata gap-filling. This does not handle the edge case where the keys exist but the entries are None
-        if 'time_name' not in metadata.keys():
-            metadata['time_name'] = ser.index.name
-        if 'value_name' not in metadata.keys():
-            metadata['value_name'] = ser.name
 
         return cls(time=time,value=ser.values, **metadata,
                    sort_ts = None, dropna = False, verbose=False)
@@ -470,8 +481,6 @@ class Series:
         --------
 
         .. jupyter-execute::
-
-            import pyleoclim as pyleo
 
             LR04 = pyleo.utils.load_dataset('LR04')
             LR04.to_csv()
@@ -567,7 +576,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
             ts.to_json('soi.json')
 
@@ -800,10 +808,8 @@ class Series:
         --------
 
         Plot the HadCRUT5 Global Mean Surface Temperature
-
+     
         .. jupyter-execute::
-
-            import pyleoclim as pyleo
 
             ts = pyleo.utils.load_dataset('HadCRUT5')
             ts.view()
@@ -925,8 +931,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             ts = pyleo.utils.load_dataset('SOI')
             ts.stats()
 
@@ -950,7 +954,6 @@ class Series:
         axis : str, optional
             The axis along which the Series will be flipped. The default is 'value'.
             Other acceptable options are 'time' or 'both'.
-            TODO: enable time flipping after paleopandas is released
 
         keep_log : Boolean
             if True, adds this transformation to the series log.
@@ -964,8 +967,6 @@ class Series:
         --------
 
         .. jupyter-execute::
-
-             import pyleoclim as pyleo
 
              ts = pyleo.utils.load_dataset('SOI')
              tsf = ts.flip(keep_log=True)
@@ -1098,8 +1099,6 @@ class Series:
         Plot the SOI record
 
         .. jupyter-execute::
-
-            import pyleoclim as pyleo
 
             ts = pyleo.utils.load_dataset('SOI')
             fig, ax = ts.plot()
@@ -1313,14 +1312,14 @@ class Series:
         ''' Singular Spectrum Analysis
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
-        This implementation  uses the method of [1], with applications presented in [2].
-        Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
-        The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
+        This implementation  uses the method of [1]_, with applications presented in [2]_.
+        Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3]_.
+        The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]_).
 
         Parameters
         ----------
         M : int, optional
-            window size. The default is None (10% of the length of the series).
+            window size. The default is None , which will use 10% of the length of the series.
 
         MC : int, optional
             Number of iteration in the Monte-Carlo process. The default is 0.
@@ -1332,13 +1331,12 @@ class Series:
             if present, truncates the expansion to a level K < M owing to one of 4 criteria:
                 1. 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
                 2. 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
-                3. 'var': first K modes that explain at least var_thresh % of the variance.
-            Default is None, which bypasses truncation (K = M)
-                4. 'knee': Wherever the "knee" of the screeplot occurs.
-            Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
+                3. 'var': first K modes that explain at least var_thresh % of the variance. Default is None, which bypasses truncation (K = M)
+                4. 'knee': Wherever the "knee" of the screeplot occurs. (See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_)
+            
+            The knee method is recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
             While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton,
             then the knee-finding method is a good compromise between objectivity and efficiency.
-            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
 
         var_thresh : float
             variance threshold for reconstruction (only impactful if trunc is set to 'var')
@@ -1369,20 +1367,13 @@ class Series:
         References
         ----------
 
-        [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
-        dynamics, with applications to paleoclimatic time series, Physica D, 35,
-        395–424.
+        .. [1] Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear dynamics, with applications to paleoclimatic time series, Physica D, 35, 395–424.
 
-        [2]_ Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
-        A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
-        Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
-        1003–1052, doi:10.1029/2000RG000092.
+        .. [2] Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann, A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002), Advanced spectral methods for climatic time series, Rev. Geophys., 40(1), 1003–1052, doi:10.1029/2000RG000092.
 
-        [3]_ Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
-        oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
+        .. [3] Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
 
-        [4]_ Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with
-        missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
+        .. [4] Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
 
         See also
         --------
@@ -1400,49 +1391,54 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
-            ts = pyleo.utils.load_dataset('SOI')
+            ts = pyleo.utils.load_dataset('NINO3')
             fig, ax = ts.plot()
-
             nino_ssa = ts.ssa(M=60)
 
-        Let us now see how to make use of all these arrays. The first step is to inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
+        The result of this operation yields an SsaRes object, which comes with dedicated methods.
+        To inspect the eigenvalue spectrum, we use `scree_plot()`. 
 
         .. jupyter-execute::
 
             fig, ax = nino_ssa.screeplot()
 
-        This highlights a few common phenomena with SSA:
+        This highlights a few common properties of SSA:
             * the eigenvalues are in descending order
             * their uncertainties are proportional to the eigenvalues themselves
-            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet
-            * around i=15, the eigenvalues appear to reach a floor, and all subsequent eigenvalues explain a very small amount of variance.
+            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered 
+            * after a point (here i=15), the eigenvalues appear to reach a floor, explaining a very small amount of variance.
 
-        So, summing the variance of the first 14 modes, we get:
+        Summing the variance of the first 14 modes, we get:
 
         .. jupyter-execute::
 
             print(nino_ssa.pctvar[:14].sum())
 
-        That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 14 columns:
+        That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. 
+        This means that we can focus our attention on these modes and capture most of the interesting behavior. 
+        To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 14 columns:
 
         .. jupyter-execute::
 
             RCmat = nino_ssa.RCmat[:,:14]
             RCk = (RCmat-RCmat.mean()).sum(axis=1) + ts.value.mean()
-            fig, ax = ts.plot(title='SOI')
+            fig, ax = ts.plot(title='NINO3')
             ax.plot(nino_ssa.orig.time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
 
-        Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
+        Indeed, these first few modes capture the vast majority of the low-frequency behavior, 
+        including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) 
+        are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. 
+        This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 14 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
-            * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves features and excludes others (i.e, a filter).
+            * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies,  you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves dominant features and excludes the rest.
             * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
 
-        Monte-Carlo SSA
-
-        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identify SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here let's use MC = 1000. The result will be stored in the eigval_q array, which has the same length as eigval, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
+        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, 
+        introduced by [3]_ to identify SSA modes that rise above what one would expect from "red noise", 
+        specifically an AR(1) process). To run it, simply provide the parameter nMC, ideally large enough
+        to get decent statistics. Here let's use nMC = 1000. The result will be stored in the eigval_q array, 
+        which has the same length as eigval, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
 
         .. jupyter-execute::
 
@@ -1455,7 +1451,7 @@ class Series:
             fig, ax = nino_mcssa.screeplot()
             print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
-        This suggests that modes 1-5 fall above the red noise benchmark, but so do a few others. To inspect mode 1 (index 0), just type:
+        This suggests that modes 1-2 fall above the red noise benchmark, but so 5-9. To inspect mode 1 (index 0), just type:
 
         .. jupyter-execute::
 
@@ -1468,7 +1464,7 @@ class Series:
             fig, ax = ts.plot()
             nino_mcssa.RCseries.plot(ax=ax)
 
-        For other truncation methods, see http://linked.earth/PyleoTutorials/notebooks/L2_singular_spectrum_analysis.html
+        For more details, see the `PyleoTutorial <http://linked.earth/PyleoTutorials/notebooks/L2_singular_spectrum_analysis.html>_`
 
         '''
 
@@ -1519,10 +1515,10 @@ class Series:
         Parameters
         ----------
         method : str, {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
-            the filtering method
+            the filtering method:
             - 'butterworth': a Butterworth filter (default = 3rd order)
             - 'savitzky-golay': Savitzky-Golay filter
-            - 'firwin': finite impulse response filter design using the window method, with default window as Hamming
+            - 'firwin': finite impulse response filter design using the `window method <https://docs.scipy.org/doc/scipy-1.15.3/reference/signal.windows.html#module-scipy.signal.windows>`_, with default window as Hamming
             - 'lanczos': Lanczos zero-phase filter
 
         cutoff_freq : float or list
@@ -1571,9 +1567,7 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             import numpy as np
-
             t = np.linspace(0, 1, 1000)
             sig1 = np.sin(2*np.pi*10*t)
             sig2 = np.sin(2*np.pi*20*t)
@@ -1610,7 +1604,7 @@ class Series:
         .. jupyter-execute::
 
             fig, ax = ts.plot(label='mix')
-            ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
+            ts.filter(cutoff_freq=[15, 25], method='firwin', window='hann').plot(ax=ax, label='After 15-25 Hz band-pass filter')
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
 
@@ -1678,7 +1672,8 @@ class Series:
             if window_length % 2 == 0:
                 window_length += 1   # window length needs to be an odd integer
             args['savitzky-golay'] = {'window_length': window_length}
-            args[method].update(kwargs)
+        
+        args[method].update(kwargs)
 
         new_val = method_func[method](y, **args[method])
         new.value = new_val + mu # restore the mean
@@ -1734,10 +1729,7 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
-            fig, ax = ts.plot()
-
             fig, ax = ts.histplot()
 
         '''
@@ -1948,7 +1940,7 @@ class Series:
 
         .. jupyter-execute::
 
-            series = pyleo.utils.load_dataset('SOI')
+            series = pyleo.utils.load_dataset('NINO3')
             psd = series.spectral(freq = 'welch')
             scalogram = series.wavelet(freq = 'welch')
 
@@ -2355,7 +2347,7 @@ class Series:
         Parameters
         ----------
         verbose : bool
-            If True, will print warning messages if there is any
+            If True, will print warning messages if there are any
 
         keep_log : Boolean
             if True, adds this step and its parameters to the series log.
@@ -2404,6 +2396,254 @@ class Series:
                 new.log=()
             new.log += ({len(new.log):'sort', 'ascending': ascending},)
         return new
+    
+    def annualize(self, months=list(range(1, 13)), min_res=0.25, frac_req_months=2/3):
+        '''
+        Annualize subannual data by averaging values within specified months for each year.
+        
+        This method converts subannual time series data to annual resolution by computing
+        weighted averages of values from specified months using the custom_year_averages
+        utility function.
+        
+        Parameters
+        ----------
+        months : list of int, optional
+            List of months to include in the annual aggregation. Must be consecutive
+            months either within a calendar year or spanning across years (e.g., 
+            [10, 11, 12, 1, 2, 3] for Oct-Mar). Default is a calendar average, [1 ... 12].
+        min_res : float, optional
+            Minimum resolution threshold (in years) to determine if data is subannual.
+            Default is 0.25 (quarterly or finer resolution required).
+        frac_req_months : float, optional
+            Minimum fraction of requested months that must be present for a year to be included.
+            Default is 2/3 (67%). For example, if requesting 12 months, at least 8 months must be 
+            present. If requesting 3 months (e.g., DJF), at least 2 months must be present.
+            Years that do not meet this threshold are dropped from the resulting series.
+            Set to 1.0 to require all months, or lower values (e.g., 1/3) for more lenient inclusion.
+        
+        Returns
+        -------
+        Series
+            A new Series object with annualized data.
+        
+        Examples
+        --------
+        1) Calendar average
+    
+        .. jupyter-execute::
+ 
+            soi = pyleo.utils.load_dataset('SOI')
+            dt = soi.resolution().describe()['median']
+            print(f"The series' resolution is {dt*12:.0f} month")
+
+            soi_a = soi.annualize()
+            dta = soi_a.resolution().describe()['median']
+            print(f"The series' resolution is now {dta:.0f} year")
+            fig, ax = soi.plot(title='Jan-Dec averaging')
+            soi_a.plot(marker='o',ax=ax)
+
+        2) JJA average (straightforward)
+    
+        .. jupyter-execute::
+            
+            soi_jja = soi.annualize(months=[6, 7 , 8])
+            fig, ax = soi.plot(title='JJA averaging')
+            soi_jja.plot(marker='o',ax=ax, label='JJA average')
+
+        3) DJF average : straddles a year; handles it gracefully
+    
+        .. jupyter-execute::
+            
+            soi_djf = soi.annualize(months=[12, 1 , 2])
+            fig, ax = soi.plot(title='DJF averaging')
+            soi_djf.plot(marker='o',ax=ax, label='DJF average')
+
+        4) Varying the fraction of required months
+    
+        .. jupyter-execute::
+            
+            AprMar = [4,5,6,7,8,9,10,11,12,1,2,3]
+            soi_am_default = soi.annualize(months=AprMar)
+            soi_am_stringent = soi.annualize(months=AprMar,frac_req_months=1.0)
+
+            fig, ax = soi.plot(title='Apr-Mar averaging', xlim = [2000, 2026])
+            soi_am_default.plot(marker='o',ax=ax, label='Apr-Mar, $f=2/3$')
+            soi_am_stringent.plot(marker='o',ax=ax, label='Apr-Mar, $f=1.0$')
+        
+        The last year is incomplete, so insisting on complete coverage results in dropping it 
+        
+        Notes
+        -----
+        - This method requires subannual data (median resolution <= min_res)
+        - Months must be consecutive to define a clear averaging period
+        - Uses weighted averaging to account for potentially uneven temporal spacing
+        '''
+        
+        # Check if data is subannual using Resolution class
+        if not hasattr(self, 'time_unit') or 'year' not in self.time_unit.lower():
+            raise ValueError("time_unit must contain 'Year' to attempt annualization")
+        
+        if not 0 <= min_res <= 0.5: 
+            raise ValueError(f"min_res must be in (0, 0.5); got {min_res}")
+        
+        # Check for suitable time axis properties
+        dt = self.resolution().describe()['median']
+        if dt >= min_res:
+            raise ValueError(f"Data appears to be too coarse (median resolution: {dt:.1f} years >= {min_res}) for meaningful averages.")
+        if dt < 0:
+            warnings.warn("Series was retrograde; it has been sorted in ascending order so annualization runs properly", RuntimeWarning)
+            self = self.sort()
+        
+        # Set default months if not provided
+        if months is None:
+            months = list(range(1, 13))
+        
+        # Validate months parameter
+        if not isinstance(months, (list, tuple)):
+            raise ValueError("months must be a list or tuple of integers")
+        
+        if not all(isinstance(m, int) and 1 <= m <= 12 for m in months):
+            raise ValueError("months must contain integers between 1 and 12")
+        
+        if len(months) == 0:
+            raise ValueError("months cannot be empty")
+        
+        # Check if months are consecutive (allowing for year-end wrapping)
+        def is_consecutive_with_wrap(months_list):
+            """Check if months are consecutive, allowing wrapping around year boundary"""
+            if len(months_list) <= 1:
+                return True
+            
+            # Check normal consecutive case
+            is_normal_consecutive = True
+            for i in range(1, len(months_list)):
+                if months_list[i] != months_list[i-1] + 1:
+                    is_normal_consecutive = False
+                    break
+            
+            if is_normal_consecutive:
+                return True
+            
+            # Check wrap-around case (e.g., [11, 12, 1, 2] or [12, 1, 2])
+            # Find where the wrap occurs (where month decreases)
+            wrap_point = None
+            for i in range(1, len(months_list)):
+                if months_list[i] < months_list[i-1]:
+                    if wrap_point is None:
+                        wrap_point = i
+                    else:
+                        return False  # Multiple wraps not allowed
+            
+            if wrap_point is None:
+                return False  # No wrap found but not consecutive
+            
+            # Check consecutive before wrap
+            for i in range(1, wrap_point):
+                if months_list[i] != months_list[i-1] + 1:
+                    return False
+            
+            # Check consecutive after wrap
+            for i in range(wrap_point + 1, len(months_list)):
+                if months_list[i] != months_list[i-1] + 1:
+                    return False
+            
+            # Check that the wrap makes sense (December -> January)
+            if months_list[wrap_point-1] == 12 and months_list[wrap_point] == 1:
+                return True
+            
+            return False
+        
+        if not is_consecutive_with_wrap(months):
+            raise ValueError("months must be consecutive (e.g., [1,2,3] or [11,12,1,2])")
+        
+        # Determine start and end months (use original order, not sorted)
+        start_month = months[0]
+        end_month = months[-1]
+        
+        # Convert to pandas Series using existing method
+        try:
+            series = self.to_pandas()
+        except Exception as e:
+            raise ValueError(f"Could not convert Series to pandas: {e}")
+        
+        # Ensure the index is datetime
+        if not hasattr(series.index, 'month'):
+            try:
+                series.index = pd.to_datetime(series.index)
+            except Exception as e:
+                raise ValueError(f"Could not convert time axis to datetime: {e}")
+        
+        # Use the new custom_year_averages function
+        try:
+            annual_data = tsutils.custom_year_averages(
+                data=series,
+                start_month=start_month,
+                end_month=end_month,
+                years=None  # Use all available years
+            )
+        except Exception as e:
+            raise ValueError(f"Failed to compute annual averages: {e}")
+        
+        # Apply frac_req_months filtering
+        # Filter out years that don't meet the minimum fraction requirement
+        sufficient_years = []
+        
+        for year in annual_data.index:
+            # Determine the date range for this year's period
+            if start_month <= end_month:
+                # Same calendar year
+                period_start = pd.Timestamp(year=year, month=start_month, day=1)
+                period_end = pd.Timestamp(year=year, month=end_month, day=28)  # Use 28 to be safe
+            else:
+                # Spans calendar years
+                period_start = pd.Timestamp(year=year-1, month=start_month, day=1)
+                period_end = pd.Timestamp(year=year, month=end_month, day=28)  # Use 28 to be safe
+            
+            # Get data for this period
+            period_mask = (series.index >= period_start) & (series.index <= period_end)
+            period_data = series[period_mask]
+            
+            if len(period_data) == 0:
+                continue
+            
+            # Count available months (works for any temporal resolution, not just monthly)
+            available_months = set(period_data.index.month)
+            required_months = set(months)
+            available_required_months = available_months.intersection(required_months)
+            
+            # Calculate fraction of required months that are present
+            fraction_present = len(available_required_months) / len(required_months)
+            
+            if fraction_present >= frac_req_months:
+                sufficient_years.append(year)
+        
+        # Filter annual_data to only include years with sufficient data
+        if sufficient_years:
+            annual_data = annual_data[annual_data.index.isin(sufficient_years)]
+        else:
+            annual_data = pd.Series([], dtype=float, name=annual_data.name)
+        
+        # Report dropped years
+        total_years_before = len(tsutils.custom_year_averages(series, start_month, end_month, years=None).index)
+        dropped_years = total_years_before - len(annual_data)
+        
+        if dropped_years > 0:
+            warnings.warn(f"Dropped {dropped_years} of {total_years_before} years due to insufficient data coverage (< {frac_req_months:.1%} of requested months)", RuntimeWarning)
+        
+        if annual_data.empty:
+            raise ValueError(f"No years found with sufficient data coverage (>= {frac_req_months:.1%} of requested months). Consider lowering frac_req_months.")
+        
+        # Create new Series by copying self and replacing time/value
+        annual_series = self.copy()
+        annual_series.time = annual_data.index.values.astype(float)
+        annual_series.value = annual_data.values
+        
+        # Update label to indicate annualization
+        if self.label:
+            annual_series.label = f"{self.label} (annualized)"
+        
+        return annual_series
+    
 
     def gaussianize(self, keep_log = False):
         ''' Gaussianizes the timeseries (i.e. maps its values to a standard normal)
@@ -2770,7 +3010,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
             ts_slice = ts.slice([1972, 1998])
             print("New time bounds:",ts_slice.time.min(),ts_slice.time.max())
@@ -2966,7 +3205,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts = pyleo.utils.load_dataset('SOI')
             ts_std = ts.standardize()
 
@@ -2984,7 +3222,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import numpy as np
             psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
             psd_LS_freq = ts_std.spectral(method='lomb_scargle',freq=np.linspace(1/20, 1/0.2, 51))
             psd_LS_log = ts_std.spectral(method='lomb_scargle', freq='log')  # with frequency vector generated using REDFIT method
@@ -3222,13 +3459,11 @@ class Series:
         Examples
         --------
 
-        Wavelet analysis on the evenly-spaced SOI record. The CWT method will be applied by default.
+        Wavelet analysis on the evenly-spaced NINO3 record. The CWT method will be applied by default.
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-            ts = pyleo.utils.load_dataset('SOI')
-
+            ts = pyleo.utils.load_dataset('NINO3')
             scal1 = ts.wavelet()
             scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
             fig, ax = scal_signif.plot()
@@ -3402,11 +3637,8 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
-
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
-
             coh = ts_air.wavelet_coherence(ts_nino)
             coh.plot()
 
@@ -3625,7 +3857,7 @@ class Series:
     def correlation(self, target_series, alpha=0.05, statistic='pearsonr', method = 'phaseran',
                     number=1000, timespan=None,  settings=None, seed=None, 
                     common_time_kwargs=None, mute_pbar=False):
-        ''' Estimates the correlation and its associated significance between two time series (not ncessarily IID) as per [1]
+        ''' Estimates the correlation and its associated significance between two time series (not necessarily IID) as per [1]
 
         The significance of the correlation is assessed using one of the following methods:
 
@@ -3637,10 +3869,10 @@ class Series:
 
         Note: Up to version v0.14.0. ar1sim was called "isopersistent",  phaseran was called "isospectral"
 
-        The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
+        The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances (Gaussian, identically distributed data and moderate autocorrelation). 
         The others are non-parametric, but their computational requirements scale with the number of simulations.
 
-        The choise of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
+        The choice of significance test and associated number of Monte-Carlo simulations are passed through the `settings` parameter.
 
         Parameters
         ----------
@@ -3690,7 +3922,9 @@ class Series:
             the result object, containing
 
             - r : float
-                correlation coefficient
+                association metric (typically, correlation coefficient)
+            - r_crit : float
+                critical value of the statistic (unless 'method' = 'built-in', in which case this quantity is not computed, and output as np.nan)
             - p : float
                 the p-value
             - signif : bool
@@ -3701,8 +3935,6 @@ class Series:
 
         See also
         --------
-
-        pyleoclim.utils.correlation.corr_sig : Correlation function (marked for deprecation)
 
         pyleoclim.utils.correlation.association : SciPy measures of association between variables
 
@@ -3788,7 +4020,7 @@ class Series:
     
             if method == 'ttest':
                 if statistic == 'pearsonr':
-                    stat, signf, pval = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
+                    stat, signf, pval, stat_crit = corrutils.corr_ttest(ts0.value, ts1.value, alpha=alpha)
                     signif = bool(signf)
                 else:
                     raise ValueError(f"The adjusted T-test only applies to Pearson's r; got {statistic}")
@@ -3801,6 +4033,8 @@ class Series:
                     stat = res[0]
                     pval = res.pvalue if len(res) > 1 else np.nan
                     signif = pval <= alpha
+                    stat_crit = np.nan
+                    
             elif method in supported_surrogates:      
                 if 'nsim' in settings.keys(): # for legacy reasons
                     raise DeprecationWarning("The number of simulations is now governed by the parameter `number`. nsim will be removed in an upcoming release")
@@ -3825,15 +4059,18 @@ class Series:
                 pval = np.sum(np.abs(stat_surr) >= np.abs(stat)) / number
                 # establish significance
                 signif = pval <= alpha
+                # critical value
+                stat_crit = np.sign(stat) * np.quantile(np.abs(stat_surr), 1-alpha)
             else:
                 raise ValueError(f'Unknown method: {method}. Look up documentation for a wiser choice.')
         else:
             warnings.warn(f'The series have insufficient overlap ({ovrlp} {self.time_unit}); default values assigned to object',UserWarning, stacklevel=2)
             stat = np.nan
+            stat_crit = np.nan
             pval = np.nan
             signif = None
             
-        corr = Corr(stat, pval, signif, alpha) # assemble Correlation result object
+        corr = Corr(stat, pval, stat_crit, signif, alpha) # assemble Correlation result object
         return corr
 
     def causality(self, target_series, method='liang', timespan=None, settings=None, common_time_kwargs=None):
@@ -3876,7 +4113,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             ts_nino=pyleo.utils.load_dataset('NINO3')
             ts_air=pyleo.utils.load_dataset('AIR')
 
@@ -3968,7 +4204,7 @@ class Series:
 
     #     pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
     #     pyleoclim.utils.tsmodel.uar1_sim : maximum likelihood AR(1) simulator
-    #     pyleoclim.utils.tsutils.phaseran2 : phase randomization
+    #     pyleoclim.utils.tsutils.phaseran : phase randomization
     #     pyleoclim.utils.tsutils.random_time_axis : random time index vector according to a specific probability model
 
     #     '''
@@ -4010,7 +4246,7 @@ class Series:
 
     #     elif method == 'phaseran':
     #         if self.is_evenly_spaced() and time_pattern != "random":
-    #             y_surr = tsutils.phaseran2(self.value, number)
+    #             y_surr = tsutils.phaseran(self.value, number)
     #         else:
     #             raise ValueError("Phase-randomization presently requires evenly-spaced series.")
 
@@ -4109,7 +4345,6 @@ class Series:
 
         .. jupyter-execute::
 
-            import pyleoclim as pyleo
             LR04 = pyleo.utils.load_dataset('LR04')
             LR_out = LR04.detrend().standardize().outliers(method='kmeans')
 
@@ -4408,7 +4643,7 @@ class Series:
 
     def resample(self, rule, keep_log = False, **kwargs):
         """
-        Run analogue to pandas.Series.resample.
+        Analogue to pandas.Series.resample.
 
         This is a convenience method: doing
 
@@ -4419,6 +4654,8 @@ class Series:
             ser.pandas_method(lambda x: x.resample('AS').mean())
 
         but will also accept some extra resampling rules, such as `'Ga'` (see below).
+        
+        NOTE: this feature may break until [this pandas bug](https://github.com/pandas-dev/pandas/issues/57427) is fixed.
 
         Parameters
         ----------

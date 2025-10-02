@@ -187,6 +187,8 @@ class MultivariateDecomp:
         
         Includes: The temporal coefficient (PC or similar), its spectrum, and the loadings (EOF or similar), possibly geolocated. 
         If the object does not have geolocation information, a spaghetti plot of the standardized series is displayed.
+        
+        To see how to use the different parameters, consult the following tutorial: http://linked.earth/PyleoTutorials/notebooks/L2_principal_component_analysis.html
 
         Parameters
         ----------
@@ -246,7 +248,7 @@ class MultivariateDecomp:
             - scalar_mappable: matplotlib.cm.ScalarMappable; can be used to pass a matplotlib scalar mappable. See pyleoclim.utils.plotting.make_scalar_mappable for documentation on using the Pyleoclim utility, or the `Matplotlib tutorial on customizing colorbars <https://matplotlib.org/stable/users/explain/colors/colorbar_only.html>`_.
 
         scatter_kwargs : dict, optional
-            Optional arguments configuring how data are plotted on a map. See description of scatter_kwargs in pyleoclim.utils.mapping.scatter_map
+            Optional arguments configuring how data are plotted on a map. This allows you to configure information about the style of markers (e.g., triangle, squares, circles), their size (through `markersize`), edgecolor, etc...) See description of scatter_kwargs in pyleoclim.utils.mapping.scatter_map
 
         hue : str, optional
             (only applicable if using scatter map) Variable associated with color coding for points plotted on map. May correspond to a continuous or categorical variable.
@@ -258,7 +260,7 @@ class MultivariateDecomp:
 
         marker : string, optional
             (only applicable if using scatter map) Grouping variable that will produce points with different markers. Can have a numeric dtype but will always be treated as categorical.
-            The default is None, which will produce circle markers. Alternatively, pass the name of a categorical variable, e.g. 'archiveType'. If 'archiveType' is specified, will attempt to use pyleoclim archiveType markers mapping, defaulting to '?' where values are unavailable.
+            The default is None, which will produce circle markers. Alternatively, pass the name of a categorical variable, e.g. 'archiveType'. If 'archiveType' is specified, will attempt to use pyleoclim archiveType markers mapping, defaulting to '?' where values are unavailable. Caution: this is different from the `marker` argument in matplotlib. If you want to specify a marker style (e.g., cirle, square, triangle, use scatter_kwargs)
 
             
         Returns
