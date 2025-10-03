@@ -5,8 +5,6 @@ from pathlib import Path
 import pyleoclim as pyleo
 import yaml
 import pandas as pd
-from rdflib import Graph, Namespace, URIRef, Literal
-from rdflib.namespace import SKOS, RDF
 from ..utils import jsonutils
 
 DATA_DIR = Path(__file__).parents[1].joinpath("data").resolve()
@@ -217,9 +215,7 @@ def load_dataset(name):
     return ts
 
 
-TIME = Namespace("http://www.w3.org/2006/time#")
-SCHEMA = Namespace("https://schema.org/")
-GTS = Namespace("http://resource.geosciml.org/ontology/timescale/gts#")
+
 
 def _first(it):
     for x in it:
@@ -232,105 +228,127 @@ def _localname(term):
         return s.rsplit("#", 1)[1]
     return s.rstrip("/").rsplit("/", 1)[-1]
 
-def _find_ns_for_local(graph: Graph, local: str):
-    """
-    Find a predicate in the graph whose localname == `local` and
-    return its namespace base as an rdflib Namespace. Fallback to None.
-    """
-    for s, p, o in graph.triples((None, None, None)):
-        if isinstance(p, URIRef) and _localname(p) == local:
-            base = str(p)[: -len(local)]
-            return Namespace(base)
-    return None
+
 
 def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl", time_units='Ma') -> pd.DataFrame:
-    g = Graph()
-    g.parse(ttl_path_or_url, format="turtle")
 
-    # Resolve namespaces robustly
-    ischart_ns = _find_ns_for_local(g, "inMYA")  # e.g., https://w3id.org/isc/isc2020#
-    if ischart_ns is None:
-        # Hard fallback (current ICS charts use this)
-        ischart_ns = Namespace("https://w3id.org/isc/isc2020#")
+    try:
+        from rdflib import Graph, Namespace, URIRef, Literal
+        from rdflib.namespace import SKOS, RDF
 
-    # Rank mapping to your requested Rank labels
-    rank_map = {
-        "Eon": "Eon", "Eonothem": "Eon",
-        "Era": "Era", "Erathem": "Era",
-        "Period": "Period", "System": "Period",
-        "Epoch": "Epoch", "Series": "Epoch",
-        "Age": "Stage", "Stage": "Stage",
-        "Subepoch": "Subepoch", "Subseries": "Subepoch",
-        "Substage": "Substage", "Subperiod": "Subperiod",
-    }
+        print("Using rdflib to load GTS information from ICS")
+        TIME = Namespace("http://www.w3.org/2006/time#")
+        SCHEMA = Namespace("https://schema.org/")
+        GTS = Namespace("http://resource.geosciml.org/ontology/timescale/gts#")
 
-    rows = []
+        def _find_ns_for_local(graph, local):
+            """
+            Find a predicate in the graph whose localname == `local` and
+            return its namespace base as an rdflib Namespace. Fallback to None.
+            """
+            for s, p, o in graph.triples((None, None, None)):
+                if isinstance(p, URIRef) and _localname(p) == local:
+                    base = str(p)[: -len(local)]
+                    return Namespace(base)
+            return None
 
-    # An interval concept typically has skos:prefLabel and gts:rank
-    for subj in set(g.subjects(SKOS.prefLabel, None)):
-        rank_uri = _first(g.objects(subj, GTS.rank))
-        if rank_uri is None:
-            continue  # skip non-interval resources
+        g = Graph()
+        g.parse(ttl_path_or_url, format="turtle")
 
-        # Type
-        rank_local = _localname(rank_uri)
-        Rank = rank_map.get(rank_local, rank_local)
+        # Resolve namespaces robustly
+        ischart_ns = _find_ns_for_local(g, "inMYA")  # e.g., https://w3id.org/isc/isc2020#
+        if ischart_ns is None:
+            # Hard fallback (current ICS charts use this)
+            ischart_ns = Namespace("https://w3id.org/isc/isc2020#")
+            print("Warning: could not find 'inMYA' predicate in graph; using fallback namespace https://w3id.org/isc/isc2020#")
 
-        # Name
-        name_lit = _first(g.objects(subj, SKOS.prefLabel))
-        Name = str(name_lit) if name_lit is not None else ""
+        # Rank mapping to your requested Rank labels
+        rank_map = {
+            "Eon": "Eon", "Eonothem": "Eon",
+            "Era": "Era", "Erathem": "Era",
+            "Period": "Period", "System": "Period",
+            "Epoch": "Epoch", "Series": "Epoch",
+            "Age": "Stage", "Stage": "Stage",
+            "Subepoch": "Subepoch", "Subseries": "Subepoch",
+            "Substage": "Substage", "Subperiod": "Subperiod",
+        }
 
-        # Abbrev: skos:notation (typed literal is fine)
-        notation = _first(g.objects(subj, SKOS.notation))
-        Abbrev = str(notation) if notation is not None else ""
+        rows = []
 
-        # Color (hex) if present
-        col = _first(g.objects(subj, SCHEMA.color))
-        Color = str(col) if col is not None else ""
+        # An interval concept typically has skos:prefLabel and gts:rank
+        for subj in set(g.subjects(SKOS.prefLabel, None)):
+            rank_uri = _first(g.objects(subj, GTS.rank))
+            if rank_uri is None:
+                continue  # skip non-interval resources
 
-        # Helper to read a boundary node (blank node or URI) → inMYA float
-        def boundary_ma(node_pred):
-            node = _first(g.objects(subj, node_pred))
-            if node is None:
-                return None
-            # find a predicate with localname 'inMYA' under this node
-            val = None
-            for p, o in g.predicate_objects(node):
-                if _localname(p) == "inMYA":
-                    val = o
-                    break
-            try:
-                return float(val) if val is not None else None
-            except Exception:
-                return None
+            # Type
+            rank_local = _localname(rank_uri)
+            Rank = rank_map.get(rank_local, rank_local)
 
-        start_ma = boundary_ma(TIME.hasBeginning)
-        end_ma   = boundary_ma(TIME.hasEnd)
+            # Name
+            name_lit = _first(g.objects(subj, SKOS.prefLabel))
+            Name = str(name_lit) if name_lit is not None else ""
 
-        # UpperBoundary (younger/smaller Ma), LowerBoundary (older/larger Ma)
-        UpperBoundary = LowerBoundary = None
-        if start_ma is not None and end_ma is not None:
-            UpperBoundary = min(start_ma, end_ma)
-            LowerBoundary = max(start_ma, end_ma)
-        elif start_ma is not None:
-            UpperBoundary = start_ma
-        elif end_ma is not None:
-            UpperBoundary = end_ma
+            # Abbrev: skos:notation (typed literal is fine)
+            notation = _first(g.objects(subj, SKOS.notation))
+            Abbrev = str(notation) if notation is not None else ""
 
-        # Keep intervals only
-        if not Name or (UpperBoundary is None and LowerBoundary is None):
-            continue
+            # Color (hex) if present
+            col = _first(g.objects(subj, SCHEMA.color))
+            Color = str(col) if col is not None else ""
 
-        rows.append({
-            "Rank": Rank,
-            "Name": Name,
-            "Abbrev": Abbrev,
-            "Color": Color,
-            "UpperBoundary": UpperBoundary,
-            "LowerBoundary": LowerBoundary
-        })
+            # Helper to read a boundary node (blank node or URI) → inMYA float
+            def boundary_ma(node_pred):
+                node = _first(g.objects(subj, node_pred))
+                if node is None:
+                    return None
+                # find a predicate with localname 'inMYA' under this node
+                val = None
+                for p, o in g.predicate_objects(node):
+                    if _localname(p) == "inMYA":
+                        val = o
+                        break
+                try:
+                    return float(val) if val is not None else None
+                except Exception:
+                    return None
 
-    df = pd.DataFrame(rows).dropna(subset=["Name", "Rank"])
+            start_ma = boundary_ma(TIME.hasBeginning)
+            end_ma   = boundary_ma(TIME.hasEnd)
+
+            # UpperBoundary (younger/smaller Ma), LowerBoundary (older/larger Ma)
+            UpperBoundary = LowerBoundary = None
+            if start_ma is not None and end_ma is not None:
+                UpperBoundary = min(start_ma, end_ma)
+                LowerBoundary = max(start_ma, end_ma)
+            elif start_ma is not None:
+                UpperBoundary = start_ma
+            elif end_ma is not None:
+                UpperBoundary = end_ma
+
+            # Keep intervals only
+            if not Name or (UpperBoundary is None and LowerBoundary is None):
+                continue
+
+            rows.append({
+                "Rank": Rank,
+                "Name": Name,
+                "Abbrev": Abbrev,
+                "Color": Color,
+                "UpperBoundary": UpperBoundary,
+                "LowerBoundary": LowerBoundary
+            })
+
+        df = pd.DataFrame(rows).dropna(subset=["Name", "Rank"])
+    except ImportError as e:
+        print("Could not import rdflib; please install it to load GTS information from ICS. Loading from local CSV")
+        df = pd.read_csv(DATA_DIR.joinpath("i-c-stratigraphy_2024_11_24.csv"), skiprows=11 )
+        df['UpperBoundary'] = pd.to_numeric(df['UpperBoundary'], errors='coerce')
+        df['LowerBoundary'] = pd.to_numeric(df['LowerBoundary'], errors='coerce')
+        df['Color'] = df['Color'].astype(str)
+    # Clean up
+
+
     # Optional: order types, youngest first within each type
     type_order = ["Eon", "Era", "Period", "Epoch", "Stage", "Subepoch", "Substage", "Subperiod"]
     df["Rank"] = pd.Categorical(df["Rank"], categories=type_order + sorted(set(df["Rank"]) - set(type_order)), ordered=True)
@@ -343,6 +361,7 @@ def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-
         elif time_units in ['ka', 'kya', 'ky', 'kyr']:
             df['UpperBoundary'] = df['UpperBoundary'] * 1e3
             df['LowerBoundary'] = df['LowerBoundary'] * 1e3
+            print('converted to ka')
         elif time_units in ['Ga', 'Gya', 'Gy', 'Gyr']:
             df['UpperBoundary'] = df['UpperBoundary'] * 1e-3
             df['LowerBoundary'] = df['LowerBoundary'] * 1e-3
