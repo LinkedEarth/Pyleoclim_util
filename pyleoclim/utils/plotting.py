@@ -1520,8 +1520,9 @@ def text_loc(fig, ax, rect, label_text, width, yloc):
 
 def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', label_pref='full',
             allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=None, edgecolor='k',
-            edgewidth=0, alpha=1,zorder=10,reverse_rank_order=False,
+            edgewidth=0, alpha=1,zorder=10,reverse_rank_order=True,
             gts_url = "https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl"):
+
     '''
     Adds the Geologic Time Scale (GTS) to the plot.
     Parameters
@@ -1534,7 +1535,7 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
         DataFrame containing the GTS data with columns for 'Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary'.
         If None, the function will load the ICS chart from the provided URL.
     ranks : list of str, optional
-        List of ranks to include (e.g., ['Period', 'Epoch', 'Stage']). If None, defaults to ['Period', 'Epoch', 'Stage'].
+        List of ranks to include (e.g., ['Period', 'Epoch', 'Stage']). If None, defaults to ['Period', 'Epoch', 'Stage']. Ranks are ordered from outer-most to inner-most.
     time_units : str, optional
         Time units of the GTS data. Supported: 'Ma' (default), 'ka', 'Ga'.
     location : str, optional
@@ -1563,6 +1564,7 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
         Z-order for the GTS axis. Default is 10.
     gts_url : str, optional
         URL to load the ICS chart if GTS_df is None. Default is the ICS chart URL.
+
     Returns
     -------
     fig : matplotlib.figure.Figure
@@ -1585,16 +1587,8 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
         fig, ax = ms.stackplot(figsize=(10, 5),linewidth=0.5, fill_between_alpha=0)
         ax[0].invert_yaxis() # d18O is traditionally inverted
 
-        for ik, ax_name in enumerate(ax.keys()):
-            ax[ax_name].grid(visible=False)
-            ax[ax_name].invert_xaxis()
-
-        GTS_df = pyleo.utils.datasets.load_ics_chart_to_df()
-
-        GTS_df = pyleo.utils.plotting.datasets.apply_custom_traits(GTS_df, {'Rank':'Epoch', 'Name':'Pliocene', 'Abbrev':'Plio'}, target_col="Abbrev")
-        fig, ax = pyleo.utils.plotting.add_GTS(fig, ax, time_units='Ma', GTS_df=GTS_df, location='above', label_pref='full',
-                    allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=12, edgecolor='k',
-                    edgewidth=0, alpha=1)
+        fig, ax = pyleo.utils.plotting.add_GTS(fig, ax, time_units='Ma', location='above', label_pref='full',
+                    allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05)
 
     '''
 
@@ -1610,7 +1604,7 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
         assert all(col in GTS_df.columns for col in ['Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary']), "GTS_df must contain columns: ['Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary']"
         assert GTS_df['UpperBoundary'].dtype in [np.float64, np.float32, np.int64, np.int32], "GTS_df 'UpperBoundary' must be numeric"
         assert GTS_df['LowerBoundary'].dtype in [np.float64, np.float32, np.int64, np.int32], "GTS_df 'LowerBoundary' must be numeric"
-        duration = GTS_df['LowerBoundary']-GTS_df['UpperBoundary']
+        duration = GTS_df['LowerBoundary'].values-GTS_df['UpperBoundary'].values
         assert all(duration >= 0), "GTS_df 'LowerBoundary' must be greater than (further back in time) or equal to 'UpperBoundary (more modern)'"
 
     if GTS_df is None:
@@ -1655,7 +1649,8 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
 
     k = 0
     text_color_flag = text_color # None means auto, otherwise use specified color
-    for unit, unit_df in sub_df.groupby('Rank'):
+    for unit in ranks:
+        unit_df = sub_df[sub_df['Rank']==unit].copy()
         for i, row in unit_df.iterrows():
             color = row.Color
             (r, g, b) = mcolors.to_rgb(color)
@@ -1700,7 +1695,8 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
 
         k += 1
 
-    if reverse_rank_order is True:
+    # if reverse_rank_order is True:
+    if location in ['above', 'top']:
         ax[ax_name].invert_yaxis()
 
     for ik, ax_key in enumerate(ax.keys()):
