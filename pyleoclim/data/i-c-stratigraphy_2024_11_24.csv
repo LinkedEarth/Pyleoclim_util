@@ -1,0 +1,190 @@
+# International Chronostratigraphic Chart (ICS)
+# Constructed from the Turtle file at: https://github.com/i-c-stratigraphy/chart/blob/main/chart.ttl
+# Date of last update of Turtle file: 2024-11-24
+# Source: International Commission on Stratigraphy (ICS), chart.ttl (SKOS/RDF ontology)
+#
+# Notes:
+# - Units: All boundary values are in millions of years ago (Ma).
+# - Columns included: 'Type', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary'.
+# - Colors: official ICS chart hexadecimal colors.
+# - Abbreviations: from ICS skos:notation or custom overrides.
+#
+Rank,Name,Abbrev,Color,UpperBoundary,LowerBoundary
+Eon,Phanerozoic,PH,#9AD9DD,0.0,538.8
+Eon,Proterozoic,PR,#F73563,538.8,2500.0
+Eon,Archean,AR,#F0047F,2500.0,4031.0
+Eon,Hadean,HA,#AE027E,4031.0,4567.0
+Era,Cenozoic,CZ,#F2F91D,0.0,66.0
+Era,Mesozoic,MZ,#67C5CA,66.0,251.902
+Era,Paleozoic,PZ,#99C08D,251.902,538.8
+Era,Neoproterozoic,NP,#FEB342,538.8,1000.0
+Era,Mesoproterozoic,MP,#FDB462,1000.0,1600.0
+Era,Paleoproterozoic,PP,#F74370,1600.0,2500.0
+Era,Neoarchean,NA,#F99BC1,2500.0,2800.0
+Era,Mesoarchean,MA,#F768A9,2800.0,3200.0
+Era,Paleoarchean,PA,#F4449F,3200.0,3600.0
+Era,Eoarchean,EA,#DA037F,3600.0,4031.0
+Period,Quaternary,Q,#F9F97F,0.0,2.58
+Period,Neogene,N,#FFE619,2.58,23.04
+Period,Paleogene,E,#FD9A52,23.04,66.0
+Period,Cretaceous,K,#7FC64E,66.0,143.1
+Period,Jurassic,J,#34B2C9,143.1,201.4
+Period,Triassic,T,#812B92,201.4,251.902
+Period,Permian,P,#F04028,251.902,298.9
+Period,Carboniferous,C,#67A599,298.9,358.86
+Period,Devonian,D,#CB8C37,358.86,419.62
+Period,Silurian,S,#B3E1B6,419.62,443.1
+Period,Ordovician,O,#009270,443.1,486.85
+Period,Cambrian,Ep,#7FA056,486.85,538.8
+Period,Ediacaran,NP3,#FED96A,538.8,635.0
+Period,Cryogenian,NP2,#FECC5C,635.0,720.0
+Period,Tonian,NP1,#FEBF4E,720.0,1000.0
+Period,Stenian,MP3,#FED99A,1000.0,1200.0
+Period,Ectasian,MP2,#FDCC8A,1200.0,1400.0
+Period,Calymmian,MP1,#FDC07A,1400.0,1600.0
+Period,Statherian,PP4,#F875A7,1600.0,1800.0
+Period,Orosirian,PP3,#F76898,1800.0,2050.0
+Period,Rhyacian,PP2,#F75B89,2050.0,2300.0
+Period,Siderian,PP1,#F74F7C,2300.0,2500.0
+Epoch,Holocene,Q2,#FEEBD2,0.0,0.0117
+Epoch,Pleistocene,Q1,#FFEFAF,0.0117,2.58
+Epoch,Pliocene,N2,#FFFF99,2.58,5.333
+Epoch,Miocene,N1,#FFFF00,5.333,23.04
+Epoch,Oligocene,E3,#FEC07A,23.04,33.9
+Epoch,Eocene,E2,#FDB46C,33.9,56.0
+Epoch,Paleocene,E1,#FDA75F,56.0,66.0
+Epoch,Late,K2,#A6D84A,66.0,100.5
+Epoch,Early,K1,#8CCD57,100.5,143.1
+Epoch,Late Jurassic,J3,#B3E3EE,143.1,161.5
+Epoch,Middle Jurassic,J2,#80CFD8,161.5,174.7
+Epoch,Early Jurassic,J1,#42AED0,174.7,201.4
+Epoch,Late Triassic,T3,#BD8CC3,201.4,237.0
+Epoch,Middle Triassic,T2,#B168B1,237.0,246.7
+Epoch,Early Triassic,T1,#983999,246.7,251.902
+Epoch,Lopingian,P3,#FBA794,251.902,259.51
+Epoch,Guadalupian,P2,#FB745C,259.51,274.4
+Epoch,Cisuralian,P1,#EF5845,274.4,298.9
+Epoch,Late Pennsylvanian,C2c6c7,#BFD0BA,298.9,307.0
+Epoch,Middle Pennsylvanian,C2c5,#A6C7B7,307.0,315.2
+Epoch,Early Pennsylvanian,C2c4,#8CBEB4,315.2,323.4
+Epoch,Late Mississippian,C1c3,#B3BE6C,323.4,330.3
+Epoch,Middle Mississippian,C1c2,#99B46C,330.3,346.7
+Epoch,Early Mississippian,C1c1,#80AB6C,346.7,358.86
+Epoch,Late Devonian,D3,#F1E19D,358.86,382.31
+Epoch,Middle Devonian,D2,#F1C868,382.31,393.47
+Epoch,Early Devonian,D1,#E5AC4D,393.47,419.62
+Epoch,Ludlow,S3,#BFE6CF,419.62,426.7
+Epoch,Wenlock,S2,#B3E1C2,426.7,432.9
+Epoch,Llandovery,S1,#99D7B3,432.9,443.1
+Epoch,Late Ordovician,O3,#7FCA93,443.1,458.2
+Epoch,Middle Ordovician,O2,#4DB47E,458.2,471.3
+Epoch,Early Ordovician,O1,#1A9D6F,471.3,486.85
+Epoch,Furongian,Ep4,#B3E095,486.85,497.0
+Epoch,Miaolingian,Ep3,#A6CF86,497.0,506.5
+Epoch,Series 2,Ep2,#99C078,506.5,521.0
+Epoch,Terreneuvian,Ep1,#8CB06C,521.0,538.8
+Stage,Meghalayan,q7,#FDEDEC,0.0,0.0042
+Stage,Northgrippian,q6,#FDECE4,0.0042,0.0082
+Stage,Greenlandian,q5,#FEECDB,0.0082,0.0117
+Stage,Late,q4,#FFF2D3,0.0117,0.129
+Stage,Chibanian,q3,#FFF2C7,0.129,0.774
+Stage,Calabrian,q2,#FFF2BA,0.774,1.8
+Stage,Gelasian,q1,#FFEDB3,1.8,2.58
+Stage,Piacenzian,n8,#FFFFBF,2.58,3.6
+Stage,Zanclean,n7,#FFFFB3,3.6,5.333
+Stage,Messinian,n6,#FFFF73,5.333,7.246
+Stage,Tortonian,n5,#FFFF66,7.246,11.63
+Stage,Serravallian,n4,#FFFF59,11.63,13.82
+Stage,Langhian,n3,#FFFF4D,13.82,15.98
+Stage,Burdigalian,n2,#FFFF41,15.98,20.45
+Stage,Aquitanian,n1,#FFFF33,20.45,23.03
+Stage,Chattian,e9,#FEE6AA,23.04,27.3
+Stage,Rupelian,e8,#FED99A,27.3,33.9
+Stage,Priabonian,e7,#FDCDA1,33.9,37.71
+Stage,Bartonian,e6,#FDC091,37.71,41.03
+Stage,Lutetian,e5,#FDB482,41.03,48.07
+Stage,Ypresian,e4,#FCA773,48.07,56.0
+Stage,Thanetian,e3,#FDBF6F,56.0,59.24
+Stage,Selandian,e2,#FEBF65,59.24,61.66
+Stage,Danian,e1,#FDB462,61.66,66.0
+Stage,Maastrichtian,k6,#F2FA8C,66.0,72.2
+Stage,Campanian,k5,#E6F47F,72.2,83.6
+Stage,Santonian,k4,#D9EF74,83.6,85.7
+Stage,Coniacian,k3,#CCE968,85.7,89.8
+Stage,Turonian,k2,#BFE35D,89.8,93.9
+Stage,Cenomanian,k1,#B3DE53,93.9,100.5
+Stage,Albian,b6,#CCEA97,100.5,113.2
+Stage,Aptian,b5,#BFE48A,113.2,121.4
+Stage,Barremian,b4,#B3DF7F,121.4,125.77
+Stage,Hauterivian,b3,#A6D975,125.77,132.6
+Stage,Valanginian,b2,#99D36A,132.6,137.05
+Stage,Berriasian,b1,#8CCD60,137.05,143.1
+Stage,Tithonian,j7,#D9F1F7,143.1,149.2
+Stage,Kimmeridgian,j6,#CCECF4,149.2,154.8
+Stage,Oxfordian,j5,#BFE7F1,154.8,161.5
+Stage,Callovian,j4,#BFE7E5,161.5,165.3
+Stage,Bathonian,j3,#B3E2E3,165.3,168.2
+Stage,Bajocian,j2,#A6DDE0,168.2,170.9
+Stage,Aalenian,j1,#9AD9DD,170.9,174.7
+Stage,Toarcian,I4,#99CEE3,174.7,184.2
+Stage,Pliensbachian,I3,#80C5DD,184.2,192.9
+Stage,Sinemurian,I2,#67BCD8,192.9,199.5
+Stage,Hettangian,I1,#4EB3D3,199.5,201.4
+Stage,Rhaetian,t7,#E3B9DB,201.4,205.7
+Stage,Norian,t6,#D6AAD3,205.7,227.3
+Stage,Carnian,t5,#C99BCB,227.3,237.0
+Stage,Ladinian,t4,#C983BF,237.0,241.464
+Stage,Anisian,t3,#BC75B7,241.464,246.7
+Stage,Olenekian,t2,#B051A5,246.7,249.9
+Stage,Induan,t1,#A4469F,249.9,251.902
+Stage,Changhsingian,p9,#FCC0B2,251.902,254.14
+Stage,Wuchiapingian,p8,#FCB4A2,254.14,259.51
+Stage,Capitanian,p7,#FB9A85,259.51,264.28
+Stage,Wordian,p6,#FB8D76,264.28,266.9
+Stage,Roadian,p5,#FB8069,266.9,274.4
+Stage,Kungurian,p4,#E38776,274.4,283.3
+Stage,Artinskian,p3,#E37B68,283.3,290.1
+Stage,Sakmarian,p2,#E36F5C,290.1,293.52
+Stage,Asselian,p1,#E36350,293.52,298.9
+Stage,Gzhelian,c7,#CCD4C7,298.9,303.7
+Stage,Kasimovian,c6,#BFD0C5,303.7,307.0
+Stage,Moscovian,c5,#B3CBB9,307.0,315.2
+Stage,Bashkirian,c4,#99C2B5,315.2,323.4
+Stage,Serpukhovian,c3,#BFC26B,323.4,330.3
+Stage,Visean,c2,#A6B96C,330.3,346.7
+Stage,Tournaisian,c1,#8CB06C,346.7,358.86
+Stage,Famennian,d7,#F2EDB3,358.86,372.15
+Stage,Frasnian,d6,#F2EDAD,372.15,382.31
+Stage,Givetian,d5,#F1E185,382.31,387.95
+Stage,Eifelian,d4,#F1D576,387.95,393.47
+Stage,Emsian,d3,#E5D075,393.47,410.62
+Stage,Pragian,d2,#E5C468,410.62,413.02
+Stage,Lochkovian,d1,#E5B75A,413.02,419.62
+Stage,Pridoli,S4,#E6F5E1,419.62,422.7
+Stage,Ludfordian,s7,#D9F0DF,422.7,425.0
+Stage,Gorstian,s6,#CCECDD,425.0,426.7
+Stage,Homerian,s5,#CCEBD1,426.7,430.6
+Stage,Sheinwoodian,s4,#BFE6C3,430.6,432.9
+Stage,Telychian,s3,#BFE6CF,432.9,438.6
+Stage,Aeronian,s2,#B3E1C2,438.6,440.5
+Stage,Rhuddanian,s1,#A6DCB5,440.5,443.1
+Stage,Hirnantian,o7,#A6DBAB,443.1,445.2
+Stage,Katian,o6,#99D69F,445.2,452.8
+Stage,Sandbian,o5,#8CD094,452.8,458.2
+Stage,Darriwilian,o4,#74C69C,458.2,469.4
+Stage,Dapingian,o3,#66C092,469.4,471.3
+Stage,Floian,o2,#41B087,471.3,477.1
+Stage,Tremadocian,o1,#33A97E,477.1,486.85
+Stage,Stage 10,ep10,#E6F5C9,486.85,491.0
+Stage,Jiangshanian,ep9,#D9F0BB,491.0,494.2
+Stage,Paibian,ep8,#CCEBAE,494.2,497.0
+Stage,Guzhangian,ep7,#CCDFAA,497.0,500.5
+Stage,Drumian,ep6,#BFD99D,500.5,504.5
+Stage,Wuliuan,ep5,#B3D492,504.5,506.5
+Stage,Stage 4,ep4,#B3CA8E,506.5,514.5
+Stage,Stage 3,ep2,#A6C583,514.5,521.0
+Stage,Stage 2,ep3,#A6BA80,521.0,529.0
+Stage,Fortunian,ep1,#99B575,529.0,538.8
+Sub-Period,Pennsylvanian,C2,#7EBCC6,298.9,323.4
+Sub-Period,Mississippian,C1,#678F66,323.4,358.86
+Super-Eon,Precambrian,PE,#F74370,538.8,4567.0

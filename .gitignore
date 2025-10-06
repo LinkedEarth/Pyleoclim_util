@@ -19,9 +19,4 @@ __pycache__
 *.js
 *.png
 
-.coverage.*
-.coverage
-
-CLAUDE.md
-*.gz
-*.whl
+*.ipynb

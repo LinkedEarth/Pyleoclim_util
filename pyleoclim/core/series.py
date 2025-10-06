@@ -1118,6 +1118,19 @@ class Series:
             fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'}); pyleo.closefig(fig)
             pyleo.savefig(fig,path='ts_plot3.png')
 
+
+        Plot the CENOGRID d18O timeseries with added Geologic Time Scale annotation
+
+        .. jupyter-execute::
+
+            import pyleoclim as pyleo
+
+            ts_18 = pyleo.utils.load_dataset('cenogrid_d18O')
+            fig, ax = ts_18.plot(figsize=(10, 4),linewidth=0.5)
+            ax.invert_yaxis() # d18O is traditionally inverted
+
+            fig, ax = pyleo.add_GTS(fig, ax, ranks=['Period', 'Epoch'], location='above')
+
         '''
         # generate default axis labels
         time_label, value_label = self.make_labels()
