@@ -4,6 +4,17 @@ list) of multiple Series objects. This is handy in case you want to apply the sa
 to such a collection at once (e.g. process a bunch of series in a consistent fashion).
 """
 
+import sys
+import multiprocessing as mp
+
+if sys.platform == 'darwin':  # macOS
+    try:
+        mp.set_start_method('fork', force=True)
+    except RuntimeError:
+        pass  # Already set
+
+
+
 from ..utils import tsutils, plotting, jsonutils
 from ..utils import correlation as corrutils
 
@@ -28,22 +39,6 @@ import pandas as pd
 from tqdm import tqdm
 from scipy import stats
 from statsmodels.multivariate.pca import PCA
-
-import dill
-import multiprocessing
-
-# Set `dill` as the pickler for multiprocessing
-multiprocessing.set_start_method("spawn", force=True)  
-multiprocessing.get_context("spawn").reduce = dill.dumps
-multiprocessing.get_context("spawn").rebuild = dill.loads
-
-from contextlib import contextmanager
-
-@contextmanager
-def _get_process_pool():
-    ctx = multiprocessing.get_context("spawn")
-    with ProcessPoolExecutor(mp_context=ctx) as executor:
-        yield executor
 
 
 def _run_parallel_spectral(args):
@@ -1380,32 +1375,33 @@ class MultipleSeries:
                 
         # main function
         settings = {} if settings is None else settings.copy()
-        psd_list =[]
-        
-        if method in ['wwz','cwt'] and scalogram_list:
+        # Prepare arguments
+        if method in ['wwz', 'cwt'] and scalogram_list:
             scalogram_list_len = len(scalogram_list.scalogram_list)
             series_len = len(self.series_list)
-
-            # Prepare arguments for parallel execution
+            
             args = [
-                (s, idx, scalogram_list if scalogram_list_len >= series_len else None, method, settings, freq, freq_kwargs, label, verbose)
+                (s, idx, scalogram_list if scalogram_list_len >= series_len else None,
+                method, settings, freq, freq_kwargs, label, verbose)
                 for idx, s in enumerate(self.series_list)
-                ]
+            ]
         else:
             args = [
                 (s, idx, None, method, settings, freq, freq_kwargs, label, verbose)
                 for idx, s in enumerate(self.series_list)
-                ]
-            
-            
-       # Parallel processing with ProcessPoolExecutor
-        with _get_process_pool() as executor:
-            psd_list = list(tqdm(executor.map(_run_parallel_spectral, args), 
-                         total=len(args), 
-                         desc='Performing spectral analysis on individual series', 
-                         position=0, leave=True, disable=mute_pbar))
-
+            ]
+        
+        # Parallel processing
+        with mp.Pool(processes=mp.cpu_count()) as pool:
+            psd_list = list(tqdm(
+                pool.imap(_run_parallel_spectral, args),
+                total=len(args),
+                desc='Performing spectral analysis on individual series',
+                disable=mute_pbar
+            ))
+        
         return MultiplePSD(psd_list=psd_list)
+
 
     def wavelet(self, method='cwt', settings={}, freq=None, freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
@@ -1490,24 +1486,20 @@ class MultipleSeries:
         
         settings = {} if settings is None else settings.copy()
         
-        # Prepare arguments for parallel execution
+        # Prepare arguments
         args = [
             (s, method, settings, freq, freq_kwargs, verbose)
             for s in self.series_list
         ]
         
-        # Parallel processing of the wavelet functionality
-        with _get_process_pool() as executor:
-            scal_list = list(
-                tqdm(
-                    executor.map(_run_parallel_wavelet, args),
-                    total=len(args),
-                    desc='Performing wavelet analysis on individual series',
-                    position=0,
-                    leave=True,
-                    disable=mute_pbar,
-                )
-            )
+        # Parallel processing
+        with mp.Pool(processes=mp.cpu_count()) as pool:
+            scal_list = list(tqdm(
+                pool.imap(_run_parallel_wavelet, args),
+                total=len(args),
+                desc='Performing wavelet analysis on individual series',
+                disable=mute_pbar
+            ))
         
         return MultipleScalogram(scalogram_list=scal_list)
 
