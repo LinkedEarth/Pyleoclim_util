@@ -1375,6 +1375,7 @@ class MultipleSeries:
                 
         # main function
         settings = {} if settings is None else settings.copy()
+
         # Prepare arguments
         if method in ['wwz', 'cwt'] and scalogram_list:
             scalogram_list_len = len(scalogram_list.scalogram_list)
@@ -1390,15 +1391,44 @@ class MultipleSeries:
                 (s, idx, None, method, settings, freq, freq_kwargs, label, verbose)
                 for idx, s in enumerate(self.series_list)
             ]
-        
-        # Parallel processing
-        with mp.Pool(processes=mp.cpu_count()) as pool:
-            psd_list = list(tqdm(
-                pool.imap(_run_parallel_spectral, args),
-                total=len(args),
-                desc='Performing spectral analysis on individual series',
-                disable=mute_pbar
-            ))
+
+        if method == 'lomb_scargle' and sys.platform == 'darwin':
+            print('Using serial execution for this method on a Mac platform')
+            psd_list = []
+
+            for idx, s in enumerate(tqdm(self.series_list, 
+                                    desc='Performing spectral analysis on individual series',
+                                    disable=mute_pbar)):
+                if method in ['wwz', 'cwt'] and scalogram_list:
+                    scalogram_list_len = len(scalogram_list.scalogram_list)
+                    series_len = len(self.series_list)
+                    if scalogram_list_len >= series_len and idx < scalogram_list_len:
+                        psd = s.spectral(
+                            method=method, settings=settings, freq=freq,
+                            freq_kwargs=freq_kwargs, label=label, verbose=verbose,
+                            scalogram=scalogram_list.scalogram_list[idx],
+                        )
+                    else:
+                        psd = s.spectral(
+                            method=method, settings=settings, freq=freq,
+                            freq_kwargs=freq_kwargs, label=label, verbose=verbose,
+                        )
+                else:
+                    psd = s.spectral(
+                        method=method, settings=settings, freq=freq,
+                        freq_kwargs=freq_kwargs, label=label, verbose=verbose,
+                    )
+                psd_list.append(psd)
+
+        else:
+            # Parallel processing
+            with mp.Pool(processes=mp.cpu_count()) as pool:
+                psd_list = list(tqdm(
+                    pool.imap(_run_parallel_spectral, args),
+                    total=len(args),
+                    desc='Performing spectral analysis on individual series',
+                    disable=mute_pbar
+                ))
         
         return MultiplePSD(psd_list=psd_list)
 
