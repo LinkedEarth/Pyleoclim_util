@@ -34,8 +34,7 @@ dependencies = [
   "pyyaml",
   "beautifulsoup4",
   "scipy>=1.15.0",
-  "requests",
-  "dill",
+  "requests"
 ]
 
 [project.optional-dependencies]
