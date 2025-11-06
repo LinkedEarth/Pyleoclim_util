@@ -1594,10 +1594,10 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
 
     if isinstance(ax, dict) is False:
         ax = {0: ax}
+
     if fontsize is None:
-        pattern = re.compile(r".*(labelsize|fontsize).*")
-        fontsize_options = mpl.rcParams.find_all(pattern)
-        fontsize = min([value for value in fontsize_options.values() if isinstance(value, (int, float))])
+        fontsize= 'small'
+
 
     if GTS_df is not None:
         assert isinstance(GTS_df, pd.DataFrame)
