@@ -740,7 +740,7 @@ class PSD:
                 idx = np.argwhere(q.frequency==0)
                 signif_x_axis = 1/np.delete(q.frequency, idx) if in_period else np.delete(q.frequency, idx)
                 signif_y_axis = np.delete(q.amplitude, idx)
-                legend = True
+                #legend = True
                 if transpose:
                     signif_x_axis, signif_y_axis = signif_y_axis, signif_x_axis
 
