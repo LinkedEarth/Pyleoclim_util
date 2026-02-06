@@ -1086,7 +1086,7 @@ def label_intervals(fig, ax, labels, x_locs, orientation='north', overlapping_se
         ax['epochs'].set_ylim([-1,0])
 
         colors = ['r', 'm', 'orange', 'blue', 'green', 'aqua', 'navy', 'pink']#['r', 'b']#'r' if ik%2 ==0 else 'b' for ik, _ts in enumerate(geo_ts)]
-        ax['epochs'] = pyleo.utils.plotting.hightlight_intervals(ax['epochs'],
+        ax['epochs'] = pyleo.utils.plotting.highlight_intervals(ax['epochs'],
                                                     ceno_intervals_pairs, color=colors,
                                                                               alpha=.1)
 
@@ -2027,7 +2027,7 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
 #                 summarize_geol).sort_values('End').reset_index()
 #             ldf = ldf.loc[ldf.End <= max(xlims)]
 #             intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
-#             ax[stage_ax_name] = hightlight_intervals(ax[stage_ax_name], intervals, color=ldf['Color'].values, alpha=1)
+#             ax[stage_ax_name] = highlight_intervals(ax[stage_ax_name], intervals, color=ldf['Color'].values, alpha=1)
 #             add_geol_labels(fig, ax, ldf, key=stage_ax_name, y_gts=.5, fontsize=fontsize,
 #                             allow_abbreviations=allow_abbreviations, verbose=verbose)
 #             ax[stage_ax_name].grid(False)
@@ -2045,7 +2045,7 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
 #                 summarize_geol).sort_values('End').reset_index()
 #             ldf = ldf.loc[ldf.End <= max(xlims)]
 #             intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
-#             ax[epoch_ax_name] = hightlight_intervals(ax[epoch_ax_name], intervals, color=ldf['Color'].values, alpha=1)
+#             ax[epoch_ax_name] = highlight_intervals(ax[epoch_ax_name], intervals, color=ldf['Color'].values, alpha=1)
 #             add_geol_labels(fig, ax, ldf, key=epoch_ax_name, y_gts=.45, fontsize=fontsize,
 #                             allow_abbreviations=allow_abbreviations, orientation='north', verbose=verbose)
 #             ax[epoch_ax_name].grid(False)
@@ -2064,7 +2064,7 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
 #                 summarize_geol).sort_values('End').reset_index()
 #             ldf = ldf.loc[ldf.End <= max(xlims)]
 #             intervals = ldf[['End', 'Start']].values.reshape(-1, 2)
-#             ax[period_ax_name] = hightlight_intervals(ax[period_ax_name], intervals, color=ldf['Color'].values, alpha=1)
+#             ax[period_ax_name] = highlight_intervals(ax[period_ax_name], intervals, color=ldf['Color'].values, alpha=1)
 #             add_geol_labels(fig, ax, ldf, key=period_ax_name, y_gts=.5, fontsize=fontsize,
 #                             allow_abbreviations=allow_abbreviations, verbose=verbose)
 #             ax[period_ax_name].grid(False)
