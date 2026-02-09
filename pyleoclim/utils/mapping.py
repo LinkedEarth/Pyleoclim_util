@@ -795,7 +795,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             if edgecolor_var in _df.columns:
                 _df['edgecolor'] = _df[edgecolor_var].apply(lambda x: edgecolor[x])
 
-        _df = _df.apply(lambda x: tidy_labels(x) if x.dtype == "str" else x)
+        #_df = _df.apply(lambda x: tidy_labels(str(x)) if x.dtype == "str" else x)
+        _df = _df.map(lambda x: tidy_labels(str(x)) if isinstance(x, str) else x)
         hue_var = hue_var if hue_var in _df.columns else None
         hue_var_type_numeric = False
         if hue_var is not None:
@@ -900,6 +901,8 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
             palette = {key: value[0] for key, value in plot_defaults.items()}
         elif isinstance(hue_var,str): #hue_var) == str:
             hue_data = _df[_df[hue_var] != missing_val]
+            if isinstance(hue_data, pd.Series):
+                hue_data = hue_data.to_frame().T
             # If scalar mappable was passed, try to extract components.
             if ax_sm is not None:
                 try:
