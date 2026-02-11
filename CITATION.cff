@@ -1,4 +1,4 @@
-cff-version: 1.2.1
+cff-version: 1.2.2.0
 message: "If you use this software, please cite it as below."
 authors:
   - family-names: "Khider"
@@ -33,7 +33,7 @@ authors:
     
 
 title: "Pyleoclim: A Python package for the analysis and visualization of paleoclimate data"
-version: v1.2.1
+version: v1.2.2
 doi: 10.5281/zenodo.1205661
-date-released: 2025-07-09
+date-released: 2026-02-12
 url: "https://github.com/LinkedEarth/Pyleoclim_util"

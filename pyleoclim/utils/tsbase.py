@@ -226,7 +226,7 @@ def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
 
         time_unit = 'ga'
         time_name = None
-        dti = pd.date_range("2018-01-01", periods=5, freq="Y", unit='s')
+        dti = pd.date_range("2018-01-01", periods=5, freq="YE", unit='s')
         df = pd.DataFrame(np.array(range(5)), index=dti)
         time = convert_datetime_index_to_time(
                     df.index,

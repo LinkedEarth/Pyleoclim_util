@@ -605,7 +605,7 @@ class TestToPandas:
                 dtype="datetime64[s]",
             ),
             name="datetime",
-            freq="31556926S",
+            freq="31556926s",
         )
         expected = pd.DataFrame(
             {"foo": [7, 4, np.nan, 9], "bar": [7, np.nan, 8, 1]}, index=expected_index

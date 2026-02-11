@@ -20,3 +20,4 @@ __pycache__
 *.png
 
 *.ipynb
+/doc_build
