@@ -15,8 +15,8 @@ Notes on how to test:
 
 import pytest
 
-import pyleoclim as pyleo
 
+import pyleoclim as pyleo
 
 # Tests below
 class TestUiPsdPlot:
@@ -41,3 +41,12 @@ class TestUiPsdSignifTest:
         psd_signif = psd.signif_test(number=10, method=method)
         fig, ax = psd_signif.plot()
         pyleo.closefig(fig)
+
+    # Test specifically for Lomb-Scargle method
+
+    def test_signif_t1(self, gen_ts):
+        """Test with Lomb-Scargle to make sure parallel processing is working or bypassed correctly"""
+        ts = gen_ts()
+        psd = ts.spectral(method="lomb_scargle")
+        psd_signif = psd.signif_test(number=10)
+

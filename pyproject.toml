@@ -9,6 +9,7 @@ authors = [
   { name = "Julien Emile-Geay", email = "julieneg@usc.edu" },
   { name = "Feng Zhu"},
   { name = "Alexander James"}, 
+  { name = "Jordan Landers"},
   { name = "Jun Hu"},
   { name = "Myron Kwan"},
   { name = "Pratheek Athreya"},
@@ -35,8 +36,7 @@ dependencies = [
   "pyyaml",
   "beautifulsoup4",
   "scipy>=1.15.0",
-  "requests",
-  "dill",
+  "requests"
 ]
 
 [project.optional-dependencies]
