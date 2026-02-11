@@ -2068,7 +2068,7 @@ def custom_year_averages(
         import pyleoclim.utils.tsutils as ut
         
         # Create sample monthly data
-        dates = pd.date_range('2020-01-01', '2023-12-31', freq='M')
+        dates = pd.date_range('2020-01-01', '2023-12-31', freq='ME')
         values = np.arange(len(dates))  # Sequential values for clarity
         ts = pd.Series(values, index=dates, name='monthly_values')
         

@@ -4660,11 +4660,11 @@ class Series:
 
         This is a convenience method: doing
 
-            ser.resample('AS').mean()
+            ser.resample('YS').mean()
 
         will do the same thing as
 
-            ser.pandas_method(lambda x: x.resample('AS').mean())
+            ser.pandas_method(lambda x: x.resample('YS').mean())
 
         but will also accept some extra resampling rules, such as `'Ga'` (see below).
         
