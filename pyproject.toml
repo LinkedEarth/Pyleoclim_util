@@ -19,7 +19,7 @@ authors = [
   { name = "Dominik Stiller"},
   { name = "Jordan Landers"}
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
   "pandas>=2.1.4",
   "kneed>=0.7.0",
