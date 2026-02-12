@@ -7,7 +7,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.11.0
+  - python=3.12.*
   - ipykernel
   - pip:
     - pip
@@ -25,4 +25,3 @@ dependencies:
     - sphinx-copybutton
     - git+https://github.com/LinkedEarth/Pyleoclim_util.git@master
     - git+https://github.com/LinkedEarth/pylipd@main
-    - pandas==2.1.4
