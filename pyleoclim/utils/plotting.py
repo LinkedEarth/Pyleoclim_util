@@ -1518,9 +1518,9 @@ def text_loc(fig, ax, rect, label_text, width, yloc):
     text.remove()
     return loc
 
-def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', label_pref='full',
+def add_GTS(fig, ax, time_units, GTS_df=None, ranks=None, location='above', label_pref='full',
             allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=None, edgecolor='k',
-            edgewidth=0, alpha=1,zorder=10,reverse_rank_order=True,
+            edgewidth=0, alpha=1,zorder=10,reverse_rank_order=True, lang='en',
             gts_url = "https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl"):
 
     '''
@@ -1531,13 +1531,13 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
         The figure object where the GTS will be added.
     ax : dict
         The axis where the GTS will be plotted.
+    time_units : str
+        Time units of the GTS data. Supported: 'Ma' (default), 'ka', 'Ga'.
     GTS_df : pd.DataFrame, optional
         DataFrame containing the GTS data with columns for 'Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary'.
         If None, the function will load the ICS chart from the provided URL.
     ranks : list of str, optional
         List of ranks to include (e.g., ['Period', 'Epoch', 'Stage']). If None, defaults to ['Period', 'Epoch', 'Stage']. Ranks are ordered from outer-most to inner-most.
-    time_units : str, optional
-        Time units of the GTS data. Supported: 'Ma' (default), 'ka', 'Ga'.
     location : str, optional
         Specifies whether to place the GTS above or below the plot. Default is 'above'.
     label_pref : str, optional
@@ -1608,7 +1608,7 @@ def add_GTS(fig, ax, GTS_df=None, ranks=None, time_units='Ma',location='above', 
         assert all(duration >= 0), "GTS_df 'LowerBoundary' must be greater than (further back in time) or equal to 'UpperBoundary (more modern)'"
 
     if GTS_df is None:
-        GTS_df = datasets.load_ics_chart_to_df(gts_url, time_units=time_units)
+        GTS_df = datasets.load_ics_chart_to_df(gts_url, time_units=time_units, lang=lang)
 
     if ranks is None:
         ranks = ['Period', 'Epoch', 'Stage']

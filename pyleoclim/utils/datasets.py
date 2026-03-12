@@ -5,6 +5,8 @@ from pathlib import Path
 import pyleoclim as pyleo
 import yaml
 import pandas as pd
+
+from .tsbase import disambiguate_time_metadata
 from ..utils import jsonutils
 
 DATA_DIR = Path(__file__).parents[1].joinpath("data").resolve()
@@ -230,7 +232,15 @@ def _localname(term):
 
 
 
-def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl", time_units='Ma') -> pd.DataFrame:
+def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl",
+                         time_units='Ma', lang='en') -> pd.DataFrame:
+
+    def _first_lang(iterable, lang=None):
+        for lit in iterable:
+            if isinstance(lit, Literal) and (lang is None or lit.language == lang):
+                return lit
+        return None
+
 
     try:
         from rdflib import Graph, Namespace, URIRef, Literal
@@ -285,8 +295,10 @@ def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-
             rank_local = _localname(rank_uri)
             Rank = rank_map.get(rank_local, rank_local)
 
-            # Name
-            name_lit = _first(g.objects(subj, SKOS.prefLabel))
+
+            name_lit = _first_lang(g.objects(subj, SKOS.prefLabel), lang)
+            if name_lit is None:
+                name_lit = _first(g.objects(subj, SKOS.prefLabel))
             Name = str(name_lit) if name_lit is not None else ""
 
             # Abbrev: skos:notation (typed literal is fine)
@@ -354,19 +366,22 @@ def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-
     df["Rank"] = pd.Categorical(df["Rank"], categories=type_order + sorted(set(df["Rank"]) - set(type_order)), ordered=True)
     df = df.sort_values(["Rank", "UpperBoundary"], na_position="last").reset_index(drop=True)
 
-    if time_units not in ['Ma', 'Mya', 'My']:
-        if time_units in ['a', 'ya', 'y', 'yr']:
+    time_name, time_unit = disambiguate_time_metadata(time_units)
+    print(f"Time name: {time_name}")
+    print(f"Time unit: {time_unit}")
+    if time_unit not in ['Ma']:#['Ma', 'Mya', 'My']:
+        if  time_unit in ['a', 'ya', 'y', 'yr', 'yrs', 'year', 'years']:
             df['UpperBoundary'] = df['UpperBoundary'] * 1e6
             df['LowerBoundary'] = df['LowerBoundary'] * 1e6
-        elif time_units in ['ka', 'kya', 'ky', 'kyr']:
+        elif time_unit in ['ka']:#['ka', 'kya', 'ky', 'kyr']:
             df['UpperBoundary'] = df['UpperBoundary'] * 1e3
             df['LowerBoundary'] = df['LowerBoundary'] * 1e3
             print('converted to ka')
-        elif time_units in ['Ga', 'Gya', 'Gy', 'Gyr']:
+        elif time_unit in ['Ga']:#['Ga', 'Gya', 'Gy', 'Gyr']:
             df['UpperBoundary'] = df['UpperBoundary'] * 1e-3
             df['LowerBoundary'] = df['LowerBoundary'] * 1e-3
         else:
-            raise ValueError(f"Unsupported time_units '{time_units}'. Supported: 'Ma', 'ka', 'Ga'.")
+            raise ValueError(f"Unsupported time_units '{time_unit}'. Supported: 'Ma', 'ka', 'Ga'.")
 
     return df
 
