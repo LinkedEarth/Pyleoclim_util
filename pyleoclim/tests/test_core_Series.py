@@ -742,83 +742,41 @@ class TestSel:
         assert values_match
 
     @pytest.mark.parametrize(
-        ("time", "expected_time", "expected_value", "tolerance"),
+        ("ts_time", "time", "expected_time", "expected_value", "tolerance"),
         [
-            (1, np.array([1]), np.array([4]), 0),
-            (1, np.array([1, 2]), np.array([4, 6]), 1),
-            (
-                dt.datetime(1948, 1, 1),
-                np.array([2, 3]),
-                np.array([6, 1]),
-                dt.timedelta(days=365),
-            ),
-            ("1948", np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
-            (slice(1, 2), np.array([1, 2]), np.array([4, 6]), 0),
-            (slice(1, 2), np.array([1, 2, 3]), np.array([4, 6, 1]), 1),
-            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
-            (slice(None, 1), np.array([1]), np.array([4]), 0),
-            (slice("1948", "1949"), np.array([1, 2]), np.array([4, 6]), 0),
-            (slice("1947", None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
-            (slice(None, "1948"), np.array([3]), np.array([1]), 0),
-            (
-                slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)),
-                np.array([1, 2]),
-                np.array([4, 6]),
-                0,
-            ),
-            (
-                slice(dt.datetime(1947, 1, 1), None),
-                np.array([1, 2, 3]),
-                np.array([4, 6, 1]),
-                0,
-            ),
-            (slice(None, dt.datetime(1948, 1, 1)), np.array([3]), np.array([1]), 0),
-            (
-                slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)),
-                np.array([1, 2, 3]),
-                np.array([4, 6, 1]),
-                dt.timedelta(days=365),
-            ),
-            (
-                slice(dt.datetime(1947, 1, 1), None),
-                np.array([1, 2, 3]),
-                np.array([4, 6, 1]),
-                dt.timedelta(days=365),
-            ),
-            (
-                slice(None, dt.datetime(1948, 1, 1)),
-                np.array([2, 3]),
-                np.array([6, 1]),
-                dt.timedelta(days=365),
-            ),
-            (
-                slice("1948", "1949"),
-                np.array([1, 2, 3]),
-                np.array([4, 6, 1]),
-                dt.timedelta(days=365),
-            ),
-            (
-                slice("1947", None),
-                np.array([1, 2, 3]),
-                np.array([4, 6, 1]),
-                dt.timedelta(days=365),
-            ),
-            (
-                slice(None, "1948"),
-                np.array([2, 3]),
-                np.array([6, 1]),
-                dt.timedelta(days=365),
-            ),
+            # Integer/float selections — series spans years 1, 2, 3 CE
+            (np.array([1., 2., 3.]), 1, np.array([1.]), np.array([4]), 0),
+            (np.array([1., 2., 3.]), 1, np.array([1., 2.]), np.array([4, 6]), 1),
+            (np.array([1., 2., 3.]), slice(1, 2), np.array([1., 2.]), np.array([4, 6]), 0),
+            (np.array([1., 2., 3.]), slice(1, 2), np.array([1., 2., 3.]), np.array([4, 6, 1]), 1),
+            (np.array([1., 2., 3.]), slice(1, None), np.array([1., 2., 3.]), np.array([4, 6, 1]), 0),
+            (np.array([1., 2., 3.]), slice(None, 1), np.array([1.]), np.array([4]), 0),
+            # Datetime/string selections — series spans years 1947, 1948, 1949 CE
+            (np.array([1947., 1948., 1949.]), dt.datetime(1948, 1, 1), np.array([1948.]), np.array([6]), dt.timedelta(days=365)),
+            (np.array([1947., 1948., 1949.]), "1948", np.array([1948.]), np.array([6]), dt.timedelta(days=365)),
+            (np.array([1947., 1948., 1949.]), slice("1948", "1949"), np.array([1949.]), np.array([1]), 0),
+            (np.array([1947., 1948., 1949.]), slice("1947", None), np.array([1948., 1949.]), np.array([6, 1]), 0),
+            (np.array([1947., 1948., 1949.]), slice(None, "1948"), np.array([1947., 1948.]), np.array([4, 6]), 0),
+            (np.array([1947., 1948., 1949.]), slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1949.]), np.array([1]), 0),
+            (np.array([1947., 1948., 1949.]), slice(dt.datetime(1947, 1, 1), None), np.array([1948., 1949.]), np.array([6, 1]), 0),
+            (np.array([1947., 1948., 1949.]), slice(None, dt.datetime(1948, 1, 1)), np.array([1947., 1948.]), np.array([4, 6]), 0),
+            (np.array([1947., 1948., 1949.]), slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1948., 1949.]), np.array([6, 1]), dt.timedelta(days=365)),
+            (np.array([1947., 1948., 1949.]), slice(dt.datetime(1947, 1, 1), None), np.array([1947., 1948., 1949.]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (np.array([1947., 1948., 1949.]), slice(None, dt.datetime(1948, 1, 1)), np.array([1947., 1948.]), np.array([4, 6]), dt.timedelta(days=365)),
+            (np.array([1947., 1948., 1949.]), slice("1948", "1949"), np.array([1948., 1949.]), np.array([6, 1]), dt.timedelta(days=365)),
+            (np.array([1947., 1948., 1949.]), slice("1947", None), np.array([1947., 1948., 1949.]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (np.array([1947., 1948., 1949.]), slice(None, "1948"), np.array([1947., 1948.]), np.array([4, 6]), dt.timedelta(days=365)),
         ],
     )
-    @pytest.mark.xfail  # ask MARCO
-    def test_time(self, time, expected_time, expected_value, tolerance):
+    def test_time(self, ts_time, time, expected_time, expected_value, tolerance):
         ts = pyleo.Series(
-            time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit="years CE"
+            time=ts_time, value=np.array([4, 6, 1]), time_unit="years CE",
+            verbose=False, auto_time_params=False,
         )
         result = ts.sel(time=time, tolerance=tolerance)
         expected = pyleo.Series(
-            time=expected_time, value=expected_value, time_unit="years CE"
+            time=expected_time, value=expected_value, time_unit="years CE",
+            verbose=False, auto_time_params=False,
         )
         values_match, _ = result.equals(expected)
         assert values_match
@@ -1755,7 +1713,7 @@ class TestUISeriesSort:
         assert np.all(np.diff(ts.time) >= 0)
 
 
-@pytest.mark.skipif(pd.__version__ > "2.1.4", reason="this bug https://github.com/pandas-dev/pandas/issues/57427")
+#@pytest.mark.skipif(pd.__version__ > "2.1.4", reason="this bug https://github.com/pandas-dev/pandas/issues/57427")
 class TestResample:
     @pytest.mark.parametrize("rule", pyleo.utils.tsbase.MATCH_A)
     def test_resample_simple(self, rule, dataframe_dt, soi_metadata):

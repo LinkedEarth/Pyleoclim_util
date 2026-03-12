@@ -424,7 +424,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
         mval     = np.median(eigvals) # median eigenvalues
         mode_idx = np.where(eigvals>=mval)[0]
     elif trunc == 'var':
-        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)
+        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0][0]+1)
     elif trunc == 'knee':
         modes = np.arange(len(eigvals))
         knee = KneeLocator(x=modes,y=eigvals,curve='convex',direction='decreasing',online=online).knee
