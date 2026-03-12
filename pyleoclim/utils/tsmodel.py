@@ -64,7 +64,7 @@ def ar1_model(t, tau, output_sigma=1):
         scaled_dt = (t[i] - t[i-1]) / tau
         rho = np.exp(-scaled_dt)
         err = np.random.normal(0, np.sqrt(1 - rho**2)*output_sigma, 1)
-        y[i] = y[i-1]*rho + err
+        y[i] = y[i-1]*rho + err[0]
 
     return y
 
@@ -684,7 +684,7 @@ def uar1_sim(t, tau, sigma_2=1):
         Time axis 
         
     tau : float
-        Time decay parameter of the  AR(1) model ($\phi = e^{-\tau}$)
+        Time decay parameter of the  AR(1) model ($\\phi = e^{-\\tau}$)
         
     sigma_2 : float
         Variance of the innovations      
@@ -737,7 +737,7 @@ def random_time_axis(n, delta_t_dist = "exponential", param = [1.0], seed = None
         the probability distribution of the random time increments.
         possible choices include 'exponential', 'poisson', 'pareto', or 'random_choice'.
         
-        if 'exponential', `param` is expected to be a single scale parameter (traditionally denoted \lambda)
+        if 'exponential', `param` is expected to be a single scale parameter (traditionally denoted \\lambda)
         if 'poisson', `param` is expected to be a single parameter (rate)
         if 'pareto', expects a 2-list with 2 scalar shape & scale parameters (in that order)
         if 'random_choice', expects a 2-list containing the arrays:      

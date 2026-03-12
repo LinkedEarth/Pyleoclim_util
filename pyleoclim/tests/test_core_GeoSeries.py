@@ -65,7 +65,7 @@ class TestUIGeoSeriesInit:
             print(ts2.value)
             assert ~np.isnan(ts2.value[0])
 
-@pytest.mark.skipif(pd.__version__ > "2.1.4", reason="this bug https://github.com/pandas-dev/pandas/issues/57427")
+#@pytest.mark.skipif(pd.__version__ > "2.1.4", reason="this bug https://github.com/pandas-dev/pandas/issues/57427")
 class TestUIGeoSeriesResample():
     ''' test GeoSeries.Resample()
     '''
