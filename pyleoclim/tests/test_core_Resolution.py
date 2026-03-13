@@ -42,6 +42,14 @@ class TestUIHistPlot:
         fig, ax = resolution.histplot()
         pyleo.closefig(fig)
 
+    @pytest.mark.parametrize('series', ['unevenly_spaced_series','unevenly_spaced_series_nans'])
+    def test_histplot_plot_kwargs(self,series,request):
+        """plot_kwargs dict must be unpacked and forwarded to seaborn.histplot"""
+        series = request.getfixturevalue(series)
+        resolution = series.resolution()
+        fig, ax = resolution.histplot(plot_kwargs={'bins': 10})
+        pyleo.closefig(fig)
+
 class TestUIDashboard:
     """Tests for Resolution.dashboard()"""
     @pytest.mark.parametrize('series', ['unevenly_spaced_series','unevenly_spaced_series_nans'])
