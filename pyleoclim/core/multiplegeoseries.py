@@ -187,9 +187,18 @@ class MultipleGeoSeries(MultipleSeries):
             DESCRIPTION.
             The default is 'global'.
 
-        cmap : string or list, optional
-            Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_.
-            The default is None.
+        cmap : str, list, or None, optional
+            Colormap to use when `hue` is a **numeric** variable. Has no effect when `hue` is
+            categorical (e.g. ``'archiveType'``), in which case colors come from pyleoclim's
+            default archive-type palette or the ``hue_mapping`` kwarg.  Accepts:
+
+            - a named Matplotlib colormap string (e.g. ``'viridis'``, ``'RdBu_r'``, ``'terrain'``)
+            - a list of colors that will be interpolated into a continuous colormap
+              (e.g. ``['blue', 'white', 'red']``)
+
+            When ``None`` (default), pyleoclim selects ``'vlag'`` for data that span zero
+            and ``'viridis'`` otherwise.
+            See `choosing a matplotlib colormap <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
 
         fig : matplotlib.pyplot.figure, optional
             See matplotlib.pyplot.figure <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib-pyplot-figure>_.
@@ -204,8 +213,21 @@ class MultipleGeoSeries(MultipleSeries):
             For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>_. The default is None.
 
         kwargs: dict, optional
-            - 'missing_val_hue', 'missing_val_marker', 'missing_val_label' can all be used to change the way missing values are represented ('k', '?',  are default hue and marker values will be associated with the label: 'missing').
-            - 'hue_mapping' and 'marker_mapping' can be used to submit dictionaries mapping hue values to colors and marker values to markers. Does not replace passing a string value for hue or marker.
+            - ``'missing_val_hue'``, ``'missing_val_marker'``, ``'missing_val_label'`` — change
+              how missing values are represented (defaults: ``'k'``, ``'?'``, ``'missing'``).
+            - ``'hue_mapping'`` and ``'marker_mapping'`` — dicts mapping hue/marker values to
+              colors/markers explicitly.  Does not replace passing a string for ``hue`` or
+              ``marker``.
+            - ``'norm_kwargs'`` — dict forwarded to `~pyleoclim.utils.plotting.make_scalar_mappable`
+              when ``hue`` is numeric.  Supports ``'vcenter'`` (float, default ``0``) and
+              ``'clip'`` (bool, default ``False``) for `~matplotlib.colors.CenteredNorm`.  Use
+              this to shift the divergence center of the colormap (e.g.
+              ``norm_kwargs={'vcenter': 500}``).
+            - ``'scalar_mappable'`` — a `~matplotlib.cm.ScalarMappable` that gives **full control**
+              over both the colormap and the normalisation (including ``vmin`` / ``vmax``).
+              Overrides ``cmap`` and ``norm_kwargs``.  Build one with
+              ``matplotlib.cm.ScalarMappable(norm=matplotlib.colors.Normalize(vmin=…, vmax=…), cmap=…)``
+              or with `pyleoclim.utils.plotting.make_scalar_mappable`.
 
 
         Returns
@@ -249,6 +271,16 @@ class MultipleGeoSeries(MultipleSeries):
             eur_coord = {'central_latitude':45, 'central_longitude':20}
             Euro2k.map(projection='Orthographic',proj_default=eur_coord) 
         
+        Symbol size is controlled via the ``'s'`` key of ``scatter_kwargs``.  Note that ``s``
+        is inherited from `matplotlib.pyplot.scatter` and represents the marker **area** in
+        points², not the diameter or radius — so doubling ``s`` does *not* double the perceived
+        size.  A 4× increase in ``s`` is needed to double the apparent diameter:
+
+        .. jupyter-execute::
+
+            Euro2k.map(projection='Orthographic', proj_default=eur_coord,
+                       scatter_kwargs={'s': 400})
+
         By default, the shape and colors of symbols denote proxy archives; however, one can use either graphical device to convey other information. For instance, if elevation is available, it may be displayed by size, like so: 
         
         .. jupyter-execute::
@@ -262,11 +294,41 @@ class MultipleGeoSeries(MultipleSeries):
             Euro2k.map(projection='Orthographic', hue = 'observationType', proj_default=eur_coord) 
         
         All three sources of information may be combined, but the figure height will need to be enlarged manually to fit the legend:
-            
+
         .. jupyter-execute::
-            
+
             Euro2k.map(projection='Orthographic',hue='observationType',
-                       size='elevation', proj_default=eur_coord, figsize=[18, 8]) 
+                       size='elevation', proj_default=eur_coord, figsize=[18, 8])
+
+        When ``hue`` is a numeric variable, ``cmap`` selects the colormap.  Here elevation
+        is mapped to color using the ``'terrain'`` colormap:
+
+        .. jupyter-execute::
+
+            Euro2k.map(projection='Orthographic', hue='elevation', cmap='terrain',
+                       proj_default=eur_coord)
+
+        To control the color range (``vmin`` / ``vmax``), pass a
+        `~matplotlib.cm.ScalarMappable` via the ``scalar_mappable`` keyword argument.
+        For example, to cap the elevation color scale at 2 000 m:
+
+        .. jupyter-execute::
+
+            import matplotlib as mpl
+            sm = mpl.cm.ScalarMappable(
+                norm=mpl.colors.Normalize(vmin=0, vmax=2000),
+                cmap=mpl.colormaps['terrain']
+            )
+            Euro2k.map(projection='Orthographic', hue='elevation',
+                       proj_default=eur_coord, scalar_mappable=sm)
+
+        For diverging colormaps, shift the neutral centre with ``norm_kwargs``
+        (e.g. centred at 500 m):
+
+        .. jupyter-execute::
+
+            Euro2k.map(projection='Orthographic', hue='elevation', cmap='RdBu_r',
+                       proj_default=eur_coord, norm_kwargs={'vcenter': 500})
 
         '''
 

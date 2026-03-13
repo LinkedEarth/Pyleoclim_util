@@ -256,7 +256,7 @@ class Resolution:
         return res
     
     def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                    ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
+                    ax=None, ylabel='KDE', vertical=False, edgecolor='w', plot_kwargs=None):
         ''' Plot the distribution of the resolution values
 
         Parameters
@@ -293,9 +293,12 @@ class Resolution:
 
             The color of the edges of the bar
 
-        plot_kwargs : dict
+        plot_kwargs : dict, optional
 
-            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
+            Keyword arguments passed to `seaborn.histplot <https://seaborn.pydata.org/generated/seaborn.histplot.html>`_.
+            Useful keys include ``'bins'`` (int or sequence), ``'binwidth'`` (float),
+            ``'stat'`` (``'count'``, ``'frequency'``, ``'probability'``, ``'density'``),
+            and ``'color'``.  The default is None.
 
         See also
         --------
@@ -311,14 +314,21 @@ class Resolution:
             res = ts.resolution()
             res.histplot()
 
+        To set the number of bins explicitly, pass ``bins`` via ``plot_kwargs``:
+
+        .. jupyter-execute::
+
+            res.histplot(plot_kwargs={'bins': 20})
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
         #make the data into a dataframe so we can flip the figure
         _,value_label = self.make_labels()
-        
+
         if vertical == True:
             data=pd.DataFrame({'value':self.resolution})
             ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
