@@ -233,7 +233,7 @@ def _localname(term):
 
 
 def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl",
-                         time_units='Ma', lang='en') -> pd.DataFrame:
+                         time_unit='Ma', lang='en') -> pd.DataFrame:
 
     def _first_lang(iterable, lang=None):
         for lit in iterable:

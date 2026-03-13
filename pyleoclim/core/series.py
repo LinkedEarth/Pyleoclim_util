@@ -1129,7 +1129,7 @@ class Series:
             fig, ax = ts_18.plot(figsize=(10, 4),linewidth=0.5)
             ax.invert_yaxis() # d18O is traditionally inverted
 
-            fig, ax = pyleo.add_GTS(fig, ax, ranks=['Period', 'Epoch'], location='above')
+            fig, ax = pyleo.add_GTS(fig, ax, time_unit=ts_18.time_unit, ranks=['Period', 'Epoch'], location='above')
 
         '''
         # generate default axis labels

@@ -1518,7 +1518,7 @@ def text_loc(fig, ax, rect, label_text, width, yloc):
     text.remove()
     return loc
 
-def add_GTS(fig, ax, time_units, GTS_df=None, ranks=None, location='above', label_pref='full',
+def add_GTS(fig, ax, time_unit, GTS_df=None, ranks=None, location='above', label_pref='full',
             allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=None, edgecolor='k',
             edgewidth=0, alpha=1,zorder=10,reverse_rank_order=True, lang='en',
             gts_url = "https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl"):
@@ -1531,7 +1531,7 @@ def add_GTS(fig, ax, time_units, GTS_df=None, ranks=None, location='above', labe
         The figure object where the GTS will be added.
     ax : dict
         The axis where the GTS will be plotted.
-    time_units : str
+    time_unit : str
         Time units of the GTS data. Supported: 'Ma' (default), 'ka', 'Ga'.
     GTS_df : pd.DataFrame, optional
         DataFrame containing the GTS data with columns for 'Rank', 'Name', 'Abbrev', 'Color', 'UpperBoundary', 'LowerBoundary'.
@@ -1587,7 +1587,7 @@ def add_GTS(fig, ax, time_units, GTS_df=None, ranks=None, location='above', labe
         fig, ax = ms.stackplot(figsize=(10, 5),linewidth=0.5, fill_between_alpha=0)
         ax[0].invert_yaxis() # d18O is traditionally inverted
 
-        fig, ax = pyleo.utils.plotting.add_GTS(fig, ax, time_units='Ma', location='above', label_pref='full',
+        fig, ax = pyleo.utils.plotting.add_GTS(fig, ax, 'Ma', location='above', label_pref='full',
                     allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05)
 
     '''
@@ -1608,7 +1608,7 @@ def add_GTS(fig, ax, time_units, GTS_df=None, ranks=None, location='above', labe
         assert all(duration >= 0), "GTS_df 'LowerBoundary' must be greater than (further back in time) or equal to 'UpperBoundary (more modern)'"
 
     if GTS_df is None:
-        GTS_df = datasets.load_ics_chart_to_df(gts_url, time_units=time_units, lang=lang)
+        GTS_df = datasets.load_ics_chart_to_df(gts_url, time_unit=time_unit, lang=lang)
 
     if ranks is None:
         ranks = ['Period', 'Epoch', 'Stage']
