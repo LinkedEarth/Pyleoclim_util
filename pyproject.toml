@@ -21,21 +21,21 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-  "pandas>=2.1.4",
-  "kneed>=0.7.0",
-  "statsmodels>=0.13.2",
-  "seaborn>=0.13.0",
-  "scikit-learn>=0.24.2",
-  "pathos>=0.2.8",
+  "pandas>=3.0.1",
+  "kneed>=0.8.5",
+  "statsmodels>=0.14.6",
+  "seaborn>=0.13.2",
+  "scikit-learn>=1.8.0",
+  "pathos>=0.3.5",
   "tqdm",
   "wget>=3.2",
-  "numba>=0.56",
-  "nitime>=0.9",
-  "tabulate>=0.8.9",
-  "cartopy>=0.22.0",
+  "numba>=0.64.0",
+  "nitime>=0.12.1",
+  "tabulate>=0.10.0",
+  "cartopy>=0.25.0",
   "pyyaml",
   "beautifulsoup4",
-  "scipy>=1.15.0",
+  "scipy>=1.17.1",
   "requests"
 ]
 
