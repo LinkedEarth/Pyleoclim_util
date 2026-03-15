@@ -1519,8 +1519,8 @@ def text_loc(fig, ax, rect, label_text, width, yloc):
     return loc
 
 def add_GTS(fig, ax, time_unit, GTS_df=None, ranks=None, location='above', label_pref='full',
-            allow_abbreviations=True, ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=None, edgecolor='k',
-            edgewidth=0, alpha=1,zorder=10,reverse_rank_order=True, lang='en',
+            allow_abbreviations=True, lang='en', ax_name='gts', v_offset=0, height=.05, text_color=None, fontsize=None, edgecolor='k',
+            edgewidth=0, alpha=1,zorder=10,reverse_rank_order=True,
             gts_url = "https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl"):
 
     '''
@@ -1544,6 +1544,8 @@ def add_GTS(fig, ax, time_unit, GTS_df=None, ranks=None, location='above', label
         Preference for labels: 'full' (default) for full names, 'abbrev' for abbreviations, 'none' for no labels (only colors).
     allow_abbreviations : bool, optional
         If True, allows abbreviations for labels that don't fit. Default is True.
+    lang : str, optional
+        Language for GTS labels. Default is 'en'.
     ax_name : str, optional
         Name of the axis to create for the GTS. Default is 'gts'.
     v_offset : float, optional
