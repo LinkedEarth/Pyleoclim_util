@@ -233,7 +233,7 @@ def _localname(term):
 
 
 def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-stratigraphy/chart/refs/heads/main/chart.ttl",
-                         time_units='Ma', lang='en') -> pd.DataFrame:
+                         time_unit='Ma', lang='en') -> pd.DataFrame:
 
     def _first_lang(iterable, lang=None):
         for lit in iterable:
@@ -366,7 +366,7 @@ def load_ics_chart_to_df(ttl_path_or_url="https://raw.githubusercontent.com/i-c-
     df["Rank"] = pd.Categorical(df["Rank"], categories=type_order + sorted(set(df["Rank"]) - set(type_order)), ordered=True)
     df = df.sort_values(["Rank", "UpperBoundary"], na_position="last").reset_index(drop=True)
 
-    time_name, time_unit = disambiguate_time_metadata(time_units)
+    time_name, time_unit = disambiguate_time_metadata(time_unit)
     print(f"Time name: {time_name}")
     print(f"Time unit: {time_unit}")
     if time_unit not in ['Ma']:#['Ma', 'Mya', 'My']:
