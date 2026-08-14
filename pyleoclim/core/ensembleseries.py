@@ -13,8 +13,6 @@ from ..core.correns import CorrEns
 from ..core.multipleseries import MultipleSeries
 
 import warnings
-warnings.filterwarnings("ignore")
-
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np

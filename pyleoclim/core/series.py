@@ -3320,9 +3320,6 @@ class Series:
             fig, ax = psd_cwt_signif.plot(title='PSD using the CWT method')
 
         '''
-        if not verbose:
-            warnings.simplefilter('ignore')
-
         settings = {} if settings is None else settings.copy()
         spec_func = {
             'wwz': specutils.wwz_psd,
@@ -3383,7 +3380,10 @@ class Series:
             args['cwt'].update({'cwt_res':res})
 
 
-        spec_res = spec_func[method](self.value, self.time, **args[method])
+        with warnings.catch_warnings():
+            if not verbose:
+                warnings.simplefilter('ignore')
+            spec_res = spec_func[method](self.value, self.time, **args[method])
         if type(spec_res) is dict:
             spec_res = dict2namedtuple(spec_res)
 
@@ -3510,9 +3510,6 @@ class Series:
             fig, ax = scal4.plot(title='WWZ scalogram with finer time axis')
 
         '''
-        if not verbose:
-            warnings.simplefilter('ignore')
-
         # Assign method
         if method == 'cwt' and not(self.is_evenly_spaced()):
             raise ValueError("The chosen method is cwt but the series is unevenly spaced. You can either interpolate/bin or set method='wwz'.")
@@ -3556,7 +3553,10 @@ class Series:
         args[method].update(settings)
 
         # Apply wavelet method
-        wave_res = wave_func[method](self.value, self.time, **args[method])
+        with warnings.catch_warnings():
+            if not verbose:
+                warnings.simplefilter('ignore')
+            wave_res = wave_func[method](self.value, self.time, **args[method])
 
         # Export result
         if method == 'wwz':
@@ -3704,9 +3704,6 @@ class Series:
 
 
         '''
-        if not verbose:
-            warnings.simplefilter('ignore')
-
         settings = {} if settings is None else settings.copy()
 
         wtc_func = {
@@ -3740,7 +3737,9 @@ class Series:
 
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):
-            warnings.warn("Series have different time axes. Applying common_time().")
+            warnings.warn("Series have different time axes. Applying common_time(), which will "
+                           "interpolate/resample the data onto a shared time axis.",
+                           category=tsbase.DataConformationWarning)
             ms = MultipleSeries([self, target_series])
             common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
             ct_args = {'method': 'interp'}
@@ -3776,7 +3775,10 @@ class Series:
         args[method].update(settings)
 
         # Apply WTC method
-        wtc_res = wtc_func[method](ts1.value, ts1.time, ts2.value, ts2.time, **args[method])
+        with warnings.catch_warnings():
+            if not verbose:
+                warnings.simplefilter('ignore')
+            wtc_res = wtc_func[method](ts1.value, ts1.time, ts2.value, ts2.time, **args[method])
 
         # Export result
         coh = Coherence(
