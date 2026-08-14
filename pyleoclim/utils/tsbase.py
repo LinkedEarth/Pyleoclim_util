@@ -19,7 +19,17 @@ __all__ = [
     'sort_ts',
     'is_evenly_spaced',
     'reduce_duplicated_timestamps',
+    'DataConformationWarning',
 ]
+
+class DataConformationWarning(UserWarning):
+    '''Warning raised when pyleoclim silently modifies user data (e.g. interpolation,
+    resampling onto a common time axis) rather than merely commenting on it.
+
+    Unlike ordinary UserWarnings, these are not meant to be silenced by verbose=False,
+    since they signal that the data being analyzed differs from what the user supplied.
+    '''
+    pass
 
 # UDUNITS, see: http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate
 SECONDS_PER_YEAR = 31556925.974592  # 86400 * 365.24219878
