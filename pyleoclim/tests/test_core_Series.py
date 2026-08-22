@@ -296,6 +296,34 @@ class TestUISeriesSpectral:
         sig_psd = ts.spectral(method=spec_method, scalogram=scal)
         sig_psd.signif_test(number=2, scalogram=signif).plot()
 
+    @pytest.mark.parametrize("spec_method", ["welch", "mtm", "periodogram", "cwt"])
+    def test_spectral_uneven_raises_with_guidance(self, spec_method):
+        """Evenly-spaced-only methods must refuse uneven series and name the fix"""
+
+        rng = np.random.default_rng(42)
+        t = np.sort(rng.uniform(0, 100, 60))
+        ts = pyleo.Series(time=t, value=rng.standard_normal(60), verbose=False)
+        assert not ts.is_evenly_spaced()
+
+        with pytest.raises(ValueError, match="unevenly spaced") as excinfo:
+            ts.spectral(method=spec_method)
+
+        message = str(excinfo.value)
+        assert spec_method in message
+        # the message must say what to do about it, not just what went wrong
+        assert "interp" in message
+        assert "lomb_scargle" in message
+
+    @pytest.mark.parametrize("spec_method", ["lomb_scargle", "wwz"])
+    def test_spectral_uneven_allowed_methods(self, spec_method):
+        """lomb_scargle and wwz are designed for uneven series and must still run"""
+
+        rng = np.random.default_rng(42)
+        t = np.sort(rng.uniform(0, 100, 60))
+        ts = pyleo.Series(time=t, value=rng.standard_normal(60), verbose=False)
+
+        assert ts.spectral(method=spec_method) is not None
+
 
 class TestUISeriesBin:
     """Tests for Series.bin()
