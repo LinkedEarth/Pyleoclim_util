@@ -47,6 +47,11 @@ from pprint import pprint
 from importlib.metadata import version
 
 
+# Spectral methods that require a fixed sampling interval. 'lomb_scargle' and
+# 'wwz' are omitted deliberately: both are designed for unevenly-spaced series.
+EVENLY_SPACED_SPECTRAL_METHODS = ['welch', 'mtm', 'periodogram', 'cwt']
+
+
 def dict2namedtuple(d):
     ''' Convert a dictionary to a namedtuple
     '''
@@ -3320,6 +3325,17 @@ class Series:
             fig, ax = psd_cwt_signif.plot(title='PSD using the CWT method')
 
         '''
+        # Methods that operate on a fixed sampling interval. Checked here, at the
+        # call site, so the message can name the fix -- as Series.wavelet() does
+        # for cwt. The utils layer keeps its own guard as a backstop for callers
+        # who reach specutils directly.
+        if method in EVENLY_SPACED_SPECTRAL_METHODS and not self.is_evenly_spaced():
+            raise ValueError(
+                f"The chosen method is {method} but the series is unevenly spaced. "
+                "You can either interpolate/bin (e.g. .interp(), .bin(), .gkernel()) "
+                "or set method='lomb_scargle' or 'wwz', which handle unevenly-spaced series."
+            )
+
         settings = {} if settings is None else settings.copy()
         spec_func = {
             'wwz': specutils.wwz_psd,
