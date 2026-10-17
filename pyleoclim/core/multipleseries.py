@@ -1060,7 +1060,7 @@ class MultipleSeries:
         if flag == False:
             raise ValueError(
                 "All series must be of the same length to perform PCA; "
-                f"got lengths {lengths}. Apply common_time() first."
+                f"got lengths {lengths}. Please apply common_time(), or a suitable method of your choosing, prior to running PCA."
             )
         else: # if all series have equal length
             p = len(lengths)
