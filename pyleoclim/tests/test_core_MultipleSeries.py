@@ -313,6 +313,19 @@ class TestMultipleSeriesPca:
         # check that all variance was recovered
         assert abs(res.pctvar.sum() - 100) < 0.001
 
+    def test_pca_t4(self, gen_ts):
+        """
+        Series of unequal length must raise, not return None
+
+        """
+        signal = gen_ts(model="colored_noise", nt=100, alpha=1.0).standardize()
+        long = pyleo.Series(time=np.arange(100), value=signal.value)
+        short = pyleo.Series(time=np.arange(80), value=signal.value[:80])
+        ms = pyleo.MultipleSeries([long, short])
+
+        with pytest.raises(ValueError, match="common_time"):
+            ms.pca()
+
 
 class TestMultipleSeriesIncrements:
     """Test for MultipleSeries.increments()"""
