@@ -286,6 +286,18 @@ class TestUIEnsembleSeriesQuantiles:
 
         ens_qs = ts_ens.quantiles()
 
+    def test_quantiles_mismatched_time_axes(self):
+        """axis='value' requires a shared time axis; the error must name the fix"""
+        nt = 50
+        t, v = pyleo.utils.gen_ts(model="colored_noise", nt=nt, alpha=1.0)
+        base = pyleo.Series(t, v, verbose=False)
+        shifted = pyleo.Series(t + 1, v, verbose=False)
+
+        ts_ens = pyleo.EnsembleSeries([base, shifted])
+
+        with pytest.raises(ValueError, match="common_time"):
+            ts_ens.quantiles(axis="value")
+
     def test_quantiles_t1(self):
 
         nn = 30  # number of age models
