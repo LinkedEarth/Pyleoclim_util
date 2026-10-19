@@ -51,9 +51,9 @@ def _run_global_coherence(args):
 
 
 @contextmanager
-def _get_process_pool():
+def _get_process_pool(nproc=None):
     ctx = multiprocessing.get_context("spawn")
-    with ProcessPoolExecutor(mp_context=ctx) as executor:
+    with ProcessPoolExecutor(mp_context=ctx, max_workers=nproc) as executor:
         yield executor
 
 
@@ -753,6 +753,7 @@ class Coherence:
         qs=[0.95],
         settings=None,
         mute_pbar=False,
+        nproc=None,
     ):
         """Significance testing for Coherence objects
 
@@ -787,6 +788,12 @@ class Coherence:
         mute_pbar : bool, optional
 
             Mute the progress bar. The default is False.
+
+        nproc : int | None, optional
+
+            Number of worker processes for the surrogate coherences. None (default) uses
+            one per available CPU. 1 runs serially in the calling process with no pool
+            startup cost.
 
         Returns
         -------
@@ -888,15 +895,21 @@ class Coherence:
         ]
 
         # Perform wavelet coherence calculations in parallel
-        with _get_process_pool() as executor:
-            results = list(
+        def get_results(map_fn):
+            return list(
                 tqdm(
-                    executor.map(_run_wavelet_coherence, args),
+                    map_fn(_run_wavelet_coherence, args),
                     total=number,
                     desc="Performing wavelet coherence on surrogate pairs",
                     disable=mute_pbar,
                 )
             )
+
+        if nproc == 1:
+            results = get_results(map)
+        else:
+            with _get_process_pool(nproc) as executor:
+                results = get_results(executor.map)
 
         # Split results into wtcs and xwts
         wtcs = [result.wtc for result in results]
