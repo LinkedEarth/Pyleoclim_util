@@ -99,7 +99,7 @@ class Series:
         Default is None
 
     log : dict
-        Dictionary of tuples documentating the various transformations applied to the object
+        Dictionary of tuples documenting the various transformations applied to the object
 
     keep_log : bool
         Whether to keep a log of applied transformations. False by default

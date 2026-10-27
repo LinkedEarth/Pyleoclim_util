@@ -71,7 +71,7 @@ PLOT_DEFAULT = {'GlacierIce': ['deepskyblue', '*'],
 
 
 """
-The followng functions handle web scrapping to grab information regarding the controlled vocabulary
+The following functions handle web scrapping to grab information regarding the controlled vocabulary
 
 """
 
@@ -81,73 +81,78 @@ def get_archive_type():
 
     Returns
     -------
-    res : Dictionary
+    res : Dictionary 
         Keys correspond to the preferred terms and values represent known synonyms
 
     '''
-    url = "https://lipdverse.org/vocabulary/archivetype/"
-    response = requests.get(url)
+    try:
+        url = "https://lipdverse.org/vocabulary/archivetype/"
+        response = requests.get(url, verify=False)
 
-    if response.status_code == 200:
-        # Parse the content of the request with BeautifulSoup
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Get the names of the archiveTypes   
-        
-        h3_tags = soup.find_all('h3')
-        archiveName = []
-        for item in h3_tags:
-            archiveName.append(item.get_text())
+        if response.status_code == 200:
+            # Parse the content of the request with BeautifulSoup
+            soup = BeautifulSoup(response.content, 'html.parser')
             
-        
+            # Get the names of the archiveTypes   
             
-        # Get the known synonyms
-        h4_tags = soup.find_all('h4', string="Known synonyms")
-        
-        synonyms=[]
-        
-        
-        for h4_tag in h4_tags:
-            next_element = h4_tag.find_next_sibling()
-
-            found_p = False
-            while next_element and next_element.name != 'div':
-                if next_element.name == 'p':
-                    synonyms_text = next_element.get_text()
-                    words = [word.strip() for word in synonyms_text.split(',')]
-                    synonyms.append(words)
-                    found_p = True
-                    break
-
-                next_element = next_element.find_next_sibling()
+            h3_tags = soup.find_all('h3')
+            archiveName = []
+            for item in h3_tags:
+                archiveName.append(item.get_text())
+                
             
-            # If a <p> tag was not found, insert an empty string
-            if not found_p:
-                synonyms.append([])
-        
-        #create a dictionary for the results
-        res= {}
-        for idx,item in enumerate(archiveName):
-            res[item]=synonyms[idx]
+                
+            # Get the known synonyms
+            h4_tags = soup.find_all('h4', string="Known synonyms")
+            
+            synonyms=[]
+            
+            
+            for h4_tag in h4_tags:
+                next_element = h4_tag.find_next_sibling()
 
-    else:
+                found_p = False
+                while next_element and next_element.name != 'div':
+                    if next_element.name == 'p':
+                        synonyms_text = next_element.get_text()
+                        words = [word.strip() for word in synonyms_text.split(',')]
+                        synonyms.append(words)
+                        found_p = True
+                        break
+
+                    next_element = next_element.find_next_sibling()
+                
+                # If a <p> tag was not found, insert an empty string
+                if not found_p:
+                    synonyms.append([])
+            
+            #create a dictionary for the results
+            res= {}
+            for idx,item in enumerate(archiveName):
+                res[item]=synonyms[idx]
+
+    except:
         print("failed to retrieve the webpage; returning static list, which may be out of date")
-        
-        res = ["Borehole",
-                       "Coral",
-                       "FluvialSediment",
-                       "GlacierIce",
-                       "GroundIce",
-                       "LakeSediment",
-                       "MarineSediment",
-                       "Midden",
-                       "MolluskShell",
-                       "Peat",
-                       "Scelorosponge",
-                       "Shoreline",
-                       "Spleleothem",
-                       "TerrestrialSediment",
-                       "Wood"]
+        res = {
+                "Borehole": ["borehole"],
+                "Coral": ["coral"],
+                "Documents": [],
+                "FluvialSediment": ["Creek", "Fluvial", "River", "Stream"],
+                "GlacierIce": ["glacier ice", "ice cores"],
+                "GroundIce": ["bulk ice"],
+                "LakeSediment": ["Lagoon", "Lake", "Lake Sediment"],
+                "MarineSediment": ["Marine", "Delta", "Marine Sediment", "Ocean"],
+                "Midden": [],
+                "MolluskShell": ["MolluskShells", "bivalve"],
+                "Other": ["Marl", "Meadow", "Archaeological", "Coast", "Farmland",
+                        "Forest", "Sediment", "Spring", "Hybrid", "Valley"],
+                "Peat": ["Wetland", "Bog", "Fen", "Marsh", "Mire", "Swamp", "peat"],
+                "Sclerosponge": ["sclerosponge"],
+                "Shoreline": ["LakeDeposit", "LakeDeposits", "lake levels"],
+                "Speleothem": ["Cave", "speleothems"],
+                "TerrestrialSediment": ["Paleosol", "Dune", "Loess", "Terrestrial Sediment"],
+                "Wood": ["tree ring", "tree"],
+            }
     
     return res
 
