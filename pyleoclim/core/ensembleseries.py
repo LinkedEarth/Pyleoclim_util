@@ -469,7 +469,10 @@ class EnsembleSeries(MultipleSeries):
             vals = []
             for ts in self.series_list:
                 if not np.array_equal(ts.time, time):
-                    raise ValueError('Time axis not consistent across the ensemble!')
+                    raise ValueError(
+                        'Time axis not consistent across the ensemble! '
+                        'Apply common_time() first to place all members on a shared time axis.'
+                    )
     
                 vals.append(ts.value)
     

@@ -1057,8 +1057,11 @@ class MultipleSeries:
         '''
         flag, lengths = self.equal_lengths()
 
-        if flag==False:
-            print('All Time Series should be of same length. Apply common_time() first')
+        if flag == False:
+            raise ValueError(
+                "All series must be of the same length to perform PCA; "
+                f"got lengths {lengths}. Please apply common_time(), or a suitable method of your choosing, prior to running PCA."
+            )
         else: # if all series have equal length
             p = len(lengths)
             n = lengths[0]
