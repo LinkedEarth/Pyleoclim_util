@@ -36,8 +36,6 @@ def granger_causality(y1, y2, maxlag=1,addconst=True):
         If an integer, computes the test for all lags up to maxlag. If an iterable, computes the tests only for the lags in maxlag.
     addconst : bool, optional
         Include a constant in the model.
-    verbose : bool, optional
-        Print results
 
     Returns
     -------
