@@ -19,7 +19,7 @@ from scipy.stats.mstats import mquantiles
 #-------
 #Main functions
 #--------
-def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
+def granger_causality(y1, y2, maxlag=1,addconst=True):
     '''Granger causality tests
     
     Four tests for the Granger non-causality of 2 time series.
@@ -36,8 +36,6 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
         If an integer, computes the test for all lags up to maxlag. If an iterable, computes the tests only for the lags in maxlag.
     addconst : bool, optional
         Include a constant in the model.
-    verbose : bool, optional
-        Print results
 
     Returns
     -------
@@ -81,7 +79,7 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
         raise ValueError('Timeseries must be of same length')
 
     x=np.array([y1,y2]).T
-    res = grangercausalitytests(x,maxlag=maxlag,addconst=addconst,verbose=verbose)
+    res = grangercausalitytests(x,maxlag=maxlag,addconst=addconst)
     return res
 
 def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
