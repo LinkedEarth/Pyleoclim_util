@@ -5,22 +5,22 @@ sphinx:
   configuration: docs/conf.py
 channels:
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
-  - python=3.12.*
+  - python=3.12
   - ipykernel
+  - pip
   - pip:
-    - pip
     - cartopy
-    - Sphinx<6.0
+    - "Sphinx<6.0"
     - pylint
     - chardet
     - pytest
-    - numpydoc>=1.1.0
+    - "numpydoc>=1.1.0"
     - nbsphinx
     - IPython
-    - readthedocs-sphinx-search>=0.3.2
-    - sphinx-rtd-theme>=1.0.0
+    - "readthedocs-sphinx-search>=0.3.2"
+    - "sphinx-rtd-theme>=1.0.0"
     - jupyter-sphinx
     - sphinx-copybutton
     - git+https://github.com/LinkedEarth/Pyleoclim_util.git@master
