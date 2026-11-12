@@ -1472,6 +1472,37 @@ class TestUISeriesWaveletCoherence:
         elif isinstance(freq, str):
             assert coh.freq_method == freq
 
+    def test_wavelet_coherence_implicit_alignment_warns(self):
+        """cwt on differing axes without common_time_kwargs: align, but warn (#699)"""
+        ts1, ts2 = _offset_pair()
+        with pytest.warns(FutureWarning, match="common_time_kwargs"):
+            ts1.wavelet_coherence(ts2, method="cwt")
+
+    def test_wavelet_coherence_opt_in_is_silent(self):
+        """Explicit opt-in on differing axes must not warn"""
+        ts1, ts2 = _offset_pair()
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts1.wavelet_coherence(ts2, method="cwt", common_time_kwargs={})
+
+    def test_wavelet_coherence_shared_uneven_axis(self):
+        """A shared uneven axis follows the same rule: refuse with guidance, unless opted in (#699)"""
+        rng = np.random.default_rng(42)
+        t = np.sort(rng.uniform(0, 100, 80))
+        ts1 = pyleo.Series(time=t, value=rng.standard_normal(80), verbose=False)
+        ts2 = pyleo.Series(time=t, value=rng.standard_normal(80), verbose=False)
+        assert not ts1.is_evenly_spaced()
+
+        with pytest.raises(ValueError, match="unevenly-spaced") as excinfo:
+            ts1.wavelet_coherence(ts2, method="cwt")
+        message = str(excinfo.value)
+        assert "common_time_kwargs" in message
+        assert "wwz" in message
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts1.wavelet_coherence(ts2, method="cwt", common_time_kwargs={})
+
 
 class TestUISeriesGlobalCoherence:
     """Test global coherence"""

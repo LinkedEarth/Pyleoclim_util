@@ -23,11 +23,12 @@ __all__ = [
 ]
 
 class DataConformationWarning(UserWarning):
-    '''Warning raised when pyleoclim silently modifies user data (e.g. interpolation,
-    resampling onto a common time axis) rather than merely commenting on it.
+    '''Deprecated: no longer emitted anywhere in pyleoclim, and will be removed in
+    Pyleoclim 2.0.0 (see #697). Kept until then only because it shipped as a public
+    name in 1.3.0, so code that filters on it keeps working.
 
-    Unlike ordinary UserWarnings, these are not meant to be silenced by verbose=False,
-    since they signal that the data being analyzed differs from what the user supplied.
+    It was emitted by Series.wavelet_coherence() when it aligned two series onto a
+    common time axis; that case now emits a FutureWarning instead.
     '''
     pass
 

@@ -3648,8 +3648,14 @@ class Series:
         freq_kwargs : dict
             Arguments for frequency vector
 
-        common_time_kwargs : dict
-            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+        common_time_kwargs : dict or None
+            Only used with method='cwt', which needs both series on one evenly-spaced
+            time axis. Passing a dict (even ``{}``) opts in to aligning them with
+            `MultipleSeries.common_time()`, using interpolation unless the dict says
+            otherwise. If None (default) and the time axes differ, the series are still
+            aligned, but with a FutureWarning: this implicit alignment will raise a
+            ValueError in Pyleoclim 2.0.0. If None and the series share an
+            unevenly-spaced axis, a ValueError is raised.
 
         settings : dict
             Arguments for the specific wavelet method (e.g. decay constant for WWZ, mother wavelet for CWT)
@@ -3775,24 +3781,26 @@ class Series:
         args['wwz'] = {'freq': freq_vec, 'verbose': verbose}
         args['cwt'] = {'freq': freq_vec}
 
-        # put on same time axes if necessary
-        if method == 'cwt' and not np.array_equal(self.time, target_series.time):
-            warnings.warn("Series have different time axes. Applying common_time(), which will "
-                           "interpolate/resample the data onto a shared time axis.",
-                           category=tsbase.DataConformationWarning)
-            ms = MultipleSeries([self, target_series])
-            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
-            ct_args = {'method': 'interp'}
-            ct_args.update(common_time_kwargs)
-            ms = ms.common_time(**ct_args)
-            ts1 = ms.series_list[0]
-            ts2 = ms.series_list[1]
-        elif method == 'cwt' and (not self.is_evenly_spaced() or not target_series.is_evenly_spaced()):
-            raise ValueError("The chosen method is cwt but at least one the series is unevenly spaced. You can either apply common_time() or use 'wwz'.")
-
-        else:
-            ts1 = self
-            ts2 = target_series
+        # cwt needs both series on one evenly-spaced time axis. Whether the axes
+        # differ or are shared but uneven, the same rule applies (#697, #699):
+        # passing common_time_kwargs opts in to alignment via common_time().
+        ts1 = self
+        ts2 = target_series
+        if method == 'cwt':
+            if tsbase.time_axes_differ(self.time, target_series.time):
+                ts1, ts2 = _conform_pair(self, target_series, common_time_kwargs,
+                                         'Series.wavelet_coherence()')
+            elif not self.is_evenly_spaced():
+                if common_time_kwargs is None:
+                    raise ValueError(
+                        "The chosen method is cwt but the series share an unevenly-spaced time axis. "
+                        "You can opt in to regularizing it with common_time_kwargs={} "
+                        "(or e.g. {'method': 'bin'}), align the series yourself with "
+                        "MultipleSeries([ts1, ts2]).common_time(), or set method='wwz', "
+                        "which handles unevenly-spaced series."
+                    )
+                ts1, ts2 = _conform_pair(self, target_series, common_time_kwargs,
+                                         'Series.wavelet_coherence()', force=True)
 
         if method == 'wwz':
             if 'ntau' in settings.keys():
@@ -3880,7 +3888,8 @@ class Series:
             soi = pyleo.utils.load_dataset('SOI')
             nino3 = pyleo.utils.load_dataset('NINO3')
 
-            gcoh = soi.global_coherence(nino3)
+            # SOI and NINO3 have different time axes: opt in to aligning them
+            gcoh = soi.global_coherence(nino3, wavelet_kwargs={"common_time_kwargs": {}})
             gcoh.plot()
             '''
         
