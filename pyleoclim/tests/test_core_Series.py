@@ -33,6 +33,16 @@ test_dirpath = pathlib.Path(__file__).parent.absolute()
 import pyleoclim as pyleo
 import pyleoclim.utils.tsbase as tsbase
 import pyleoclim.utils.tsmodel as tsmodel
+import warnings
+
+
+def _offset_pair(nt=120):
+    """Two evenly-spaced series whose time axes overlap but differ by half a step"""
+    rng = np.random.default_rng(0)
+    t = np.arange(nt, dtype=float)
+    ts1 = pyleo.Series(time=t, value=rng.standard_normal(nt), verbose=False)
+    ts2 = pyleo.Series(time=t + 0.5, value=rng.standard_normal(nt), verbose=False)
+    return ts1, ts2
 
 
 class TestUISeriesInit:
@@ -1090,6 +1100,23 @@ class TestUISeriesCausality:
         ts2 = pyleo.Series(time=ts.time, value=v2)
 
         _ = ts1.causality(ts2, method=method, timespan=(0, 67))
+
+    def test_causality_implicit_alignment_warns(self):
+        """Differing time axes without common_time_kwargs: align, but warn of deprecation (#697)"""
+        ts1, ts2 = _offset_pair()
+        with pytest.warns(FutureWarning, match="common_time_kwargs"):
+            ts1.causality(ts2, method="granger")
+
+    def test_causality_opt_in_is_silent(self):
+        """Explicit opt-in, or a retrograde copy of the same axis, must not warn"""
+        ts1, ts2 = _offset_pair()
+        rng = np.random.default_rng(1)
+        ts_retro = pyleo.Series(time=ts1.time[::-1], value=rng.standard_normal(len(ts1.time)),
+                                verbose=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts1.causality(ts2, method="granger", common_time_kwargs={})
+            ts1.causality(ts_retro, method="granger")
 
 
 class TestUISeriesOutliers:

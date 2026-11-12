@@ -58,6 +58,29 @@ def dict2namedtuple(d):
     tupletype = namedtuple('tupletype', sorted(d))
     return tupletype(**d)
 
+def _conform_pair(ts1, ts2, common_time_kwargs, caller, force=False):
+    '''Put two series on a common time axis, if their axes differ (see #697).
+
+    If the axes are identical (and force is False), both series are returned
+    untouched. force=True aligns anyway, e.g. to regularize a shared uneven axis
+    for cwt; callers only use it once the user has opted in. Otherwise:
+
+    - common_time_kwargs is a dict (even empty): the caller opted in, so align
+      with MultipleSeries.common_time(), interpolating by default. No warning.
+    - common_time_kwargs is None: same alignment, but emit a FutureWarning, since
+      implicit alignment will raise in Pyleoclim 2.0.0.
+    '''
+    if not force and not tsbase.time_axes_differ(ts1.time, ts2.time):
+        return ts1, ts2
+    if common_time_kwargs is None:
+        # stacklevel 3: _conform_pair -> public method -> user code
+        tsbase.warn_implicit_common_time(caller, stacklevel=3)
+        common_time_kwargs = {}
+    ct_args = {'method': 'interp'}
+    ct_args.update(common_time_kwargs)
+    ms = MultipleSeries([ts1, ts2]).common_time(**ct_args)
+    return ms.series_list[0], ms.series_list[1]
+
 class Series:
     '''The Series class describes the most basic objects in Pyleoclim.
     A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
@@ -4122,8 +4145,12 @@ class Series:
         settings : dict
             Parameters associated with the causality methods. Note that each method has different parameters. See individual methods for details
 
-        common_time_kwargs : dict
-            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+        common_time_kwargs : dict or None
+            How to handle series with different time axes. Passing a dict (even ``{}``)
+            opts in to aligning them with `MultipleSeries.common_time()`, using
+            interpolation unless the dict says otherwise. If None (default) and the time
+            axes differ, the series are still aligned, but with a FutureWarning: this
+            implicit alignment will raise a ValueError in Pyleoclim 2.0.0.
 
         Returns
         -------
@@ -4171,21 +4198,16 @@ class Series:
         Note that the output is fundamentally different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use.
         '''
 
-        # ensure prograde time
-        ms = MultipleSeries([self.sort(), target_series.sort()])
-        # Put on common axis if necessary
-        if list(self.time) != list(target_series.time):
-            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
-            ct_args = {'method': 'interp'}
-            ct_args.update(common_time_kwargs)
-            ms = ms.common_time(**ct_args)
+        # ensure prograde time, then put on a common axis if necessary. Compare the
+        # sorted axes: a retrograde copy of the same axis needs no interpolation.
+        ts1, ts2 = _conform_pair(self.sort(), target_series.sort(), common_time_kwargs,
+                                 'Series.causality()')
 
-        if timespan is None:
-            value1 = ms.series_list[0].value
-            value2 = ms.series_list[1].value
-        else:
-            value1 = ms.series_list[0].slice(timespan).value
-            value2 = ms.series_list[1].slice(timespan).value
+        if timespan is not None:
+            ts1 = ts1.slice(timespan)
+            ts2 = ts2.slice(timespan)
+        value1 = ts1.value
+        value2 = ts2.value
 
 
         settings = {} if settings is None else settings.copy()
