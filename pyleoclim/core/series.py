@@ -790,7 +790,8 @@ class Series:
         if time_pars_left == time_pars_right:
             ovrlp = tsbase.overlap(self.time, ts.time)
             if ovrlp>5:
-                corr = self.correlation(ts,method='built-in')
+                # comparing records on different axes is the point here, so opt in
+                corr = self.correlation(ts,method='built-in',common_time_kwargs={})
                 ttl = f'Shared variance: {100*corr.r**2:3.2f} % over a {ovrlp} {ts.time_unit} overlap'
             else:
                 ttl = 'No suitable overlap'
@@ -3960,9 +3961,13 @@ class Series:
 
         settings : dict
             optional parameters for the measures of association. See https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
-             
-        common_time_kwargs : dict
-            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+
+        common_time_kwargs : dict or None
+            How to handle series with different time axes. Passing a dict (even ``{}``)
+            opts in to aligning them with `MultipleSeries.common_time()`, using
+            interpolation unless the dict says otherwise. If None (default) and the time
+            axes differ, the series are still aligned, but with a FutureWarning: this
+            implicit alignment will raise a ValueError in Pyleoclim 2.0.0.
 
         seed : float or int
             random seed for isopersistent and isospectral methods
@@ -4054,20 +4059,12 @@ class Series:
         
         ovrlp = self.overlap(target_series)
         if ovrlp>5: # require at least 5-point overlap
-            ms = MultipleSeries([self, target_series])
-            if list(self.time) != list(target_series.time):
-                
-                common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
-                ct_args = {'method': 'interp'}
-                ct_args.update(common_time_kwargs)
-                ms = ms.common_time(**ct_args)
-    
-            if timespan is None:
-                ts0 = ms.series_list[0]
-                ts1 = ms.series_list[1]
-            else:
-                ts0 = ms.series_list[0].slice(timespan)
-                ts1 = ms.series_list[1].slice(timespan)
+            ts0, ts1 = _conform_pair(self, target_series, common_time_kwargs,
+                                     'Series.correlation()')
+
+            if timespan is not None:
+                ts0 = ts0.slice(timespan)
+                ts1 = ts1.slice(timespan)
     
             if seed is not None:
                 np.random.seed(seed)

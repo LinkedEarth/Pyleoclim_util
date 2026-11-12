@@ -1063,6 +1063,21 @@ class TestUISeriesCorrelation:
         else:
             assert np.isfinite(corr_res.r_crit)
 
+    def test_correlation_implicit_alignment_warns(self):
+        """Differing time axes without common_time_kwargs: align, but warn of deprecation (#697)"""
+        ts1, ts2 = _offset_pair()
+        with pytest.warns(FutureWarning, match="common_time_kwargs") as record:
+            ts1.correlation(ts2, method="built-in")
+        assert len([w for w in record if issubclass(w.category, FutureWarning)]) == 1
+
+    def test_correlation_opt_in_is_silent(self):
+        """Passing common_time_kwargs (even {}) is the explicit opt-in: no warning"""
+        ts1, ts2 = _offset_pair()
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts1.correlation(ts2, method="built-in", common_time_kwargs={})
+            ts1.correlation(ts1.copy(), method="built-in")  # same axes: nothing to align
+
 
 class TestUISeriesCausality:
     """Test Series.causality()"""
