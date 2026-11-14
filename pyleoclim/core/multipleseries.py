@@ -15,7 +15,7 @@ if sys.platform == 'darwin':  # macOS
 
 
 
-from ..utils import tsutils, plotting, jsonutils
+from ..utils import tsutils, plotting, jsonutils, tsbase
 from ..utils import correlation as corrutils
 
 from ..core.correns import CorrEns
@@ -832,9 +832,14 @@ class MultipleSeries:
         
             Parameters for the FDR function
 
-        common_time_kwargs : dict
-        
-            Parameters for the method MultipleSeries.common_time()
+        common_time_kwargs : dict or None
+
+            How to handle members whose time axis differs from the target's. Passing a
+            dict (even ``{}``) opts in to aligning each pair with
+            `MultipleSeries.common_time()`, using interpolation unless the dict says
+            otherwise. If None (default) and any axes differ, the pairs are still aligned,
+            but with a single FutureWarning for the whole collection: this implicit
+            alignment will raise a ValueError in Pyleoclim 2.0.0.
 
         mute_pbar : bool; {True,False}
         
@@ -914,6 +919,14 @@ class MultipleSeries:
 
         if target is None:
             target = self.series_list[0]
+
+        # Warn about implicit alignment once for the whole collection, then opt in
+        # for the per-pair calls so Series.correlation() doesn't repeat it per member
+        # (that can flood stdout and crash a notebook kernel on large collections).
+        if common_time_kwargs is None and any(
+                tsbase.time_axes_differ(ts.time, target.time) for ts in self.series_list):
+            tsbase.warn_implicit_common_time('MultipleSeries.correlation()', stacklevel=2)
+            common_time_kwargs = {}
 
         print(f"Looping over {len(self.series_list)} Series in collection")
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):

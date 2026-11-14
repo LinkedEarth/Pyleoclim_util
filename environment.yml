@@ -2,8 +2,8 @@
 # packages for this repo including running the test suite.
 name: pyleo
 channels:
-  - default
   - conda-forge
+  - nodefaults
 dependencies:
   - python=3.12.*
   - cartopy

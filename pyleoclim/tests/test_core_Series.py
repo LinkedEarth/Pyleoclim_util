@@ -33,6 +33,16 @@ test_dirpath = pathlib.Path(__file__).parent.absolute()
 import pyleoclim as pyleo
 import pyleoclim.utils.tsbase as tsbase
 import pyleoclim.utils.tsmodel as tsmodel
+import warnings
+
+
+def _offset_pair(nt=120):
+    """Two evenly-spaced series whose time axes overlap but differ by half a step"""
+    rng = np.random.default_rng(0)
+    t = np.arange(nt, dtype=float)
+    ts1 = pyleo.Series(time=t, value=rng.standard_normal(nt), verbose=False)
+    ts2 = pyleo.Series(time=t + 0.5, value=rng.standard_normal(nt), verbose=False)
+    return ts1, ts2
 
 
 class TestUISeriesInit:
@@ -1053,6 +1063,21 @@ class TestUISeriesCorrelation:
         else:
             assert np.isfinite(corr_res.r_crit)
 
+    def test_correlation_implicit_alignment_warns(self):
+        """Differing time axes without common_time_kwargs: align, but warn of deprecation (#697)"""
+        ts1, ts2 = _offset_pair()
+        with pytest.warns(FutureWarning, match="common_time_kwargs") as record:
+            ts1.correlation(ts2, method="built-in")
+        assert len([w for w in record if issubclass(w.category, FutureWarning)]) == 1
+
+    def test_correlation_opt_in_is_silent(self):
+        """Passing common_time_kwargs (even {}) is the explicit opt-in: no warning"""
+        ts1, ts2 = _offset_pair()
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts1.correlation(ts2, method="built-in", common_time_kwargs={})
+            ts1.correlation(ts1.copy(), method="built-in")  # same axes: nothing to align
+
 
 class TestUISeriesCausality:
     """Test Series.causality()"""
@@ -1090,6 +1115,23 @@ class TestUISeriesCausality:
         ts2 = pyleo.Series(time=ts.time, value=v2)
 
         _ = ts1.causality(ts2, method=method, timespan=(0, 67))
+
+    def test_causality_implicit_alignment_warns(self):
+        """Differing time axes without common_time_kwargs: align, but warn of deprecation (#697)"""
+        ts1, ts2 = _offset_pair()
+        with pytest.warns(FutureWarning, match="common_time_kwargs"):
+            ts1.causality(ts2, method="granger")
+
+    def test_causality_opt_in_is_silent(self):
+        """Explicit opt-in, or a retrograde copy of the same axis, must not warn"""
+        ts1, ts2 = _offset_pair()
+        rng = np.random.default_rng(1)
+        ts_retro = pyleo.Series(time=ts1.time[::-1], value=rng.standard_normal(len(ts1.time)),
+                                verbose=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts1.causality(ts2, method="granger", common_time_kwargs={})
+            ts1.causality(ts_retro, method="granger")
 
 
 class TestUISeriesOutliers:
@@ -1429,6 +1471,37 @@ class TestUISeriesWaveletCoherence:
             assert coh.freq_method == "user_specified"
         elif isinstance(freq, str):
             assert coh.freq_method == freq
+
+    def test_wavelet_coherence_implicit_alignment_warns(self):
+        """cwt on differing axes without common_time_kwargs: align, but warn (#699)"""
+        ts1, ts2 = _offset_pair()
+        with pytest.warns(FutureWarning, match="common_time_kwargs"):
+            ts1.wavelet_coherence(ts2, method="cwt")
+
+    def test_wavelet_coherence_opt_in_is_silent(self):
+        """Explicit opt-in on differing axes must not warn"""
+        ts1, ts2 = _offset_pair()
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts1.wavelet_coherence(ts2, method="cwt", common_time_kwargs={})
+
+    def test_wavelet_coherence_shared_uneven_axis(self):
+        """A shared uneven axis follows the same rule: refuse with guidance, unless opted in (#699)"""
+        rng = np.random.default_rng(42)
+        t = np.sort(rng.uniform(0, 100, 80))
+        ts1 = pyleo.Series(time=t, value=rng.standard_normal(80), verbose=False)
+        ts2 = pyleo.Series(time=t, value=rng.standard_normal(80), verbose=False)
+        assert not ts1.is_evenly_spaced()
+
+        with pytest.raises(ValueError, match="unevenly-spaced") as excinfo:
+            ts1.wavelet_coherence(ts2, method="cwt")
+        message = str(excinfo.value)
+        assert "common_time_kwargs" in message
+        assert "wwz" in message
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts1.wavelet_coherence(ts2, method="cwt", common_time_kwargs={})
 
 
 class TestUISeriesGlobalCoherence:

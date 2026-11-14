@@ -14,6 +14,7 @@ Notes on how to test:
 """
 
 import datetime as dt
+import warnings
 import os
 
 import numpy as np
@@ -509,6 +510,26 @@ class TestMultipleSeriesCorrelation:
         ms = ts2 & ts3
         corr = ms.correlation(ts1, method="built-in")
         corr.plot()  # make sure a plot is produced
+
+    def test_correlation_implicit_alignment_warns_once(self):
+        """The deprecation warning fires once per collection, not once per member (#697)"""
+        rng = np.random.default_rng(0)
+        t = np.arange(100, dtype=float)
+        target = pyleo.Series(time=t, value=rng.standard_normal(100), verbose=False)
+        members = [pyleo.Series(time=t + 0.5, value=rng.standard_normal(100), verbose=False)
+                   for _ in range(25)]
+        ms = pyleo.MultipleSeries(members)
+
+        with warnings.catch_warnings(record=True) as record:
+            warnings.simplefilter("always")  # defeat Python's own de-duplication
+            ms.correlation(target, method="built-in", mute_pbar=True)
+        future = [w for w in record if issubclass(w.category, FutureWarning)]
+        assert len(future) == 1
+        assert "MultipleSeries.correlation()" in str(future[0].message)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ms.correlation(target, method="built-in", mute_pbar=True, common_time_kwargs={})
 
 
 class TestMultipleSeriesSpectral:

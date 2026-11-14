@@ -23,13 +23,41 @@ __all__ = [
 ]
 
 class DataConformationWarning(UserWarning):
-    '''Warning raised when pyleoclim silently modifies user data (e.g. interpolation,
-    resampling onto a common time axis) rather than merely commenting on it.
+    '''Deprecated: no longer emitted anywhere in pyleoclim, and will be removed in
+    Pyleoclim 2.0.0 (see #697). Kept until then only because it shipped as a public
+    name in 1.3.0, so code that filters on it keeps working.
 
-    Unlike ordinary UserWarnings, these are not meant to be silenced by verbose=False,
-    since they signal that the data being analyzed differs from what the user supplied.
+    It was emitted by Series.wavelet_coherence() when it aligned two series onto a
+    common time axis; that case now emits a FutureWarning instead.
     '''
     pass
+
+# Release in which implicit common_time() alignment becomes a ValueError, and in which
+# DataConformationWarning is removed (#697). The checklist for that release lives in
+# pyleoclim/tests/test_deprecations.py, which fails once the version reaches it.
+IMPLICIT_COMMON_TIME_REMOVAL = '2.0.0'
+
+def time_axes_differ(time1, time2):
+    '''Return True if two time axes are not identical, element for element.'''
+    return not np.array_equal(np.asarray(time1), np.asarray(time2))
+
+def warn_implicit_common_time(caller, stacklevel=2):
+    '''Emit the deprecation warning for implicit common_time() alignment (see #697).
+
+    Pairwise methods (correlation, causality, wavelet_coherence) currently put two
+    series with different time axes onto a common axis without being asked. This
+    will raise a ValueError in Pyleoclim 2.0.0; passing ``common_time_kwargs``
+    explicitly (even ``{}``) opts in to the alignment and silences this warning.
+    '''
+    warnings.warn(
+        f"{caller}: the series have different time axes, so they are being "
+        "interpolated onto a common time axis (common_time(method='interp')). "
+        "This implicit alignment is deprecated and will raise a ValueError in "
+        f"Pyleoclim {IMPLICIT_COMMON_TIME_REMOVAL}. Interpolation is a methodological choice that can affect "
+        "the result. To keep the current behavior, opt in explicitly with "
+        "common_time_kwargs={} (or e.g. {'method': 'bin'}); or align the series "
+        "yourself first with MultipleSeries([ts1, ts2]).common_time().",
+        FutureWarning, stacklevel=stacklevel + 1)
 
 # UDUNITS, see: http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate
 SECONDS_PER_YEAR = 31556925.974592  # 86400 * 365.24219878
