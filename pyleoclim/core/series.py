@@ -1661,6 +1661,57 @@ class Series:
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
 
+        - Comparing the sharpness of the filters
+
+        The methods differ in how sharply they separate the band from the rest of the spectrum.
+        Here we extract the ENSO band (2-7 years) from the Southern Oscillation Index with each method,
+        and compare the spectra of the results (without standardization, so the power is comparable).
+        Firwin and Lanczos have the steepest band edges; Butterworth (3rd order by default) rolls off more gradually;
+        Savitzky-Golay, designed as a smoother rather than a band-selective filter, leaks substantial power at periods shorter than the band. 
+        We do not recommend using Savitzky-Golay if a sharp frequency response is desired. 
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI').interp() # filtering requires even spacing
+            band = [2, 7]  # periods, in years
+            psd_kw = {'method': 'mtm', 'settings': {'standardize': False}}
+
+            fig, ax = soi.spectral(**psd_kw).plot(label='SOI', color='k')
+            for method in ['butterworth', 'firwin', 'lanczos', 'savitzky-golay']:
+                soi.filter(cutoff_scale=band, method=method).spectral(**psd_kw).plot(ax=ax, label=method)
+            ax.axvspan(*band, color='gray', alpha=0.2)
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.15), ncol=5)
+
+        - Phase distortion
+
+        All four methods are zero-phase: Butterworth and firwin are applied forward and backward
+        (`scipy.signal.filtfilt <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html>`_),
+        while Lanczos and Savitzky-Golay use symmetric, centered kernels. They therefore do not shift
+        the timing of events, which matters when comparing the phasing of records. By contrast, a causal
+        (one-pass) filter delays the signal by an amount that depends on frequency. The comparison below
+        uses a one-pass Butterworth from scipy for contrast; note how its ENSO peaks lag those of the original series.
+        Two caveats: forward-backward filtering squares the magnitude response (so the effective Butterworth order is doubled),
+        and all methods are less reliable near the ends of the series, where they depend on padding.
+
+        .. jupyter-execute::
+
+            from scipy import signal
+
+            soi_filt = {method: soi.filter(cutoff_scale=band, method=method)
+                        for method in ['butterworth', 'firwin', 'lanczos', 'savitzky-golay']}
+
+            fs = 1/np.mean(np.diff(soi.time))  # sampling frequency (1/year)
+            b, a = signal.butter(3, [1/band[1], 1/band[0]], btype='band', fs=fs)
+            soi_causal = soi.copy()
+            soi_causal.value = signal.lfilter(b, a, soi.value - soi.value.mean())
+
+            period = [1975, 2005]
+            fig, ax = soi.slice(period).plot(label='SOI', color='gray', alpha=0.5)
+            for method, ts_f in soi_filt.items():
+                ts_f.slice(period).plot(ax=ax, label=method)
+            soi_causal.slice(period).plot(ax=ax, label='causal Butterworth (one pass)', color='k', linestyle='--')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.2), ncol=3)
+
         - Applying a high-pass filter
 
         .. jupyter-execute::
