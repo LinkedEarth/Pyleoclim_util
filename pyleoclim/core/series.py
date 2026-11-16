@@ -58,6 +58,29 @@ def dict2namedtuple(d):
     tupletype = namedtuple('tupletype', sorted(d))
     return tupletype(**d)
 
+def _conform_pair(ts1, ts2, common_time_kwargs, caller, force=False):
+    '''Put two series on a common time axis, if their axes differ (see #697).
+
+    If the axes are identical (and force is False), both series are returned
+    untouched. force=True aligns anyway, e.g. to regularize a shared uneven axis
+    for cwt; callers only use it once the user has opted in. Otherwise:
+
+    - common_time_kwargs is a dict (even empty): the caller opted in, so align
+      with MultipleSeries.common_time(), interpolating by default. No warning.
+    - common_time_kwargs is None: same alignment, but emit a FutureWarning, since
+      implicit alignment will raise in Pyleoclim 2.0.0.
+    '''
+    if not force and not tsbase.time_axes_differ(ts1.time, ts2.time):
+        return ts1, ts2
+    if common_time_kwargs is None:
+        # stacklevel 3: _conform_pair -> public method -> user code
+        tsbase.warn_implicit_common_time(caller, stacklevel=3)
+        common_time_kwargs = {}
+    ct_args = {'method': 'interp'}
+    ct_args.update(common_time_kwargs)
+    ms = MultipleSeries([ts1, ts2]).common_time(**ct_args)
+    return ms.series_list[0], ms.series_list[1]
+
 class Series:
     '''The Series class describes the most basic objects in Pyleoclim.
     A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
@@ -767,7 +790,8 @@ class Series:
         if time_pars_left == time_pars_right:
             ovrlp = tsbase.overlap(self.time, ts.time)
             if ovrlp>5:
-                corr = self.correlation(ts,method='built-in')
+                # comparing records on different axes is the point here, so opt in
+                corr = self.correlation(ts,method='built-in',common_time_kwargs={})
                 ttl = f'Shared variance: {100*corr.r**2:3.2f} % over a {ovrlp} {ts.time_unit} overlap'
             else:
                 ttl = 'No suitable overlap'
@@ -3624,8 +3648,14 @@ class Series:
         freq_kwargs : dict
             Arguments for frequency vector
 
-        common_time_kwargs : dict
-            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+        common_time_kwargs : dict or None
+            Only used with method='cwt', which needs both series on one evenly-spaced
+            time axis. Passing a dict (even ``{}``) opts in to aligning them with
+            `MultipleSeries.common_time()`, using interpolation unless the dict says
+            otherwise. If None (default) and the time axes differ, the series are still
+            aligned, but with a FutureWarning: this implicit alignment will raise a
+            ValueError in Pyleoclim 2.0.0. If None and the series share an
+            unevenly-spaced axis, a ValueError is raised.
 
         settings : dict
             Arguments for the specific wavelet method (e.g. decay constant for WWZ, mother wavelet for CWT)
@@ -3751,24 +3781,26 @@ class Series:
         args['wwz'] = {'freq': freq_vec, 'verbose': verbose}
         args['cwt'] = {'freq': freq_vec}
 
-        # put on same time axes if necessary
-        if method == 'cwt' and not np.array_equal(self.time, target_series.time):
-            warnings.warn("Series have different time axes. Applying common_time(), which will "
-                           "interpolate/resample the data onto a shared time axis.",
-                           category=tsbase.DataConformationWarning)
-            ms = MultipleSeries([self, target_series])
-            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
-            ct_args = {'method': 'interp'}
-            ct_args.update(common_time_kwargs)
-            ms = ms.common_time(**ct_args)
-            ts1 = ms.series_list[0]
-            ts2 = ms.series_list[1]
-        elif method == 'cwt' and (not self.is_evenly_spaced() or not target_series.is_evenly_spaced()):
-            raise ValueError("The chosen method is cwt but at least one the series is unevenly spaced. You can either apply common_time() or use 'wwz'.")
-
-        else:
-            ts1 = self
-            ts2 = target_series
+        # cwt needs both series on one evenly-spaced time axis. Whether the axes
+        # differ or are shared but uneven, the same rule applies (#697, #699):
+        # passing common_time_kwargs opts in to alignment via common_time().
+        ts1 = self
+        ts2 = target_series
+        if method == 'cwt':
+            if tsbase.time_axes_differ(self.time, target_series.time):
+                ts1, ts2 = _conform_pair(self, target_series, common_time_kwargs,
+                                         'Series.wavelet_coherence()')
+            elif not self.is_evenly_spaced():
+                if common_time_kwargs is None:
+                    raise ValueError(
+                        "The chosen method is cwt but the series share an unevenly-spaced time axis. "
+                        "You can opt in to regularizing it with common_time_kwargs={} "
+                        "(or e.g. {'method': 'bin'}), align the series yourself with "
+                        "MultipleSeries([ts1, ts2]).common_time(), or set method='wwz', "
+                        "which handles unevenly-spaced series."
+                    )
+                ts1, ts2 = _conform_pair(self, target_series, common_time_kwargs,
+                                         'Series.wavelet_coherence()', force=True)
 
         if method == 'wwz':
             if 'ntau' in settings.keys():
@@ -3856,7 +3888,8 @@ class Series:
             soi = pyleo.utils.load_dataset('SOI')
             nino3 = pyleo.utils.load_dataset('NINO3')
 
-            gcoh = soi.global_coherence(nino3)
+            # SOI and NINO3 have different time axes: opt in to aligning them
+            gcoh = soi.global_coherence(nino3, wavelet_kwargs={"common_time_kwargs": {}})
             gcoh.plot()
             '''
         
@@ -3937,9 +3970,13 @@ class Series:
 
         settings : dict
             optional parameters for the measures of association. See https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
-             
-        common_time_kwargs : dict
-            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+
+        common_time_kwargs : dict or None
+            How to handle series with different time axes. Passing a dict (even ``{}``)
+            opts in to aligning them with `MultipleSeries.common_time()`, using
+            interpolation unless the dict says otherwise. If None (default) and the time
+            axes differ, the series are still aligned, but with a FutureWarning: this
+            implicit alignment will raise a ValueError in Pyleoclim 2.0.0.
 
         seed : float or int
             random seed for isopersistent and isospectral methods
@@ -4031,20 +4068,12 @@ class Series:
         
         ovrlp = self.overlap(target_series)
         if ovrlp>5: # require at least 5-point overlap
-            ms = MultipleSeries([self, target_series])
-            if list(self.time) != list(target_series.time):
-                
-                common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
-                ct_args = {'method': 'interp'}
-                ct_args.update(common_time_kwargs)
-                ms = ms.common_time(**ct_args)
-    
-            if timespan is None:
-                ts0 = ms.series_list[0]
-                ts1 = ms.series_list[1]
-            else:
-                ts0 = ms.series_list[0].slice(timespan)
-                ts1 = ms.series_list[1].slice(timespan)
+            ts0, ts1 = _conform_pair(self, target_series, common_time_kwargs,
+                                     'Series.correlation()')
+
+            if timespan is not None:
+                ts0 = ts0.slice(timespan)
+                ts1 = ts1.slice(timespan)
     
             if seed is not None:
                 np.random.seed(seed)
@@ -4122,8 +4151,12 @@ class Series:
         settings : dict
             Parameters associated with the causality methods. Note that each method has different parameters. See individual methods for details
 
-        common_time_kwargs : dict
-            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+        common_time_kwargs : dict or None
+            How to handle series with different time axes. Passing a dict (even ``{}``)
+            opts in to aligning them with `MultipleSeries.common_time()`, using
+            interpolation unless the dict says otherwise. If None (default) and the time
+            axes differ, the series are still aligned, but with a FutureWarning: this
+            implicit alignment will raise a ValueError in Pyleoclim 2.0.0.
 
         Returns
         -------
@@ -4171,21 +4204,16 @@ class Series:
         Note that the output is fundamentally different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use.
         '''
 
-        # ensure prograde time
-        ms = MultipleSeries([self.sort(), target_series.sort()])
-        # Put on common axis if necessary
-        if list(self.time) != list(target_series.time):
-            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
-            ct_args = {'method': 'interp'}
-            ct_args.update(common_time_kwargs)
-            ms = ms.common_time(**ct_args)
+        # ensure prograde time, then put on a common axis if necessary. Compare the
+        # sorted axes: a retrograde copy of the same axis needs no interpolation.
+        ts1, ts2 = _conform_pair(self.sort(), target_series.sort(), common_time_kwargs,
+                                 'Series.causality()')
 
-        if timespan is None:
-            value1 = ms.series_list[0].value
-            value2 = ms.series_list[1].value
-        else:
-            value1 = ms.series_list[0].slice(timespan).value
-            value2 = ms.series_list[1].slice(timespan).value
+        if timespan is not None:
+            ts1 = ts1.slice(timespan)
+            ts2 = ts2.slice(timespan)
+        value1 = ts1.value
+        value2 = ts2.value
 
 
         settings = {} if settings is None else settings.copy()

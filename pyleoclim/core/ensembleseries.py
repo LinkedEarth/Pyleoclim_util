@@ -6,7 +6,7 @@ In addition to a MultipleSeries object, an EnsembleSeries object has the followi
 
 """
 
-from ..utils import plotting, lipdutils
+from ..utils import plotting, lipdutils, tsbase
 from ..utils import correlation as corrutils
 from ..core.series import Series
 from ..core.correns import CorrEns
@@ -557,9 +557,14 @@ class EnsembleSeries(MultipleSeries):
 
             Parameters for the FDR function
 
-        common_time_kwargs : dict
+        common_time_kwargs : dict or None
 
-            Parameters for the method MultipleSeries.common_time()
+            How to handle members whose time axis differs from the target's. Passing a
+            dict (even ``{}``) opts in to aligning each pair with
+            `MultipleSeries.common_time()`, using interpolation unless the dict says
+            otherwise. If None (default) and any axes differ, the pairs are still aligned,
+            but with a single FutureWarning for the whole ensemble: this implicit
+            alignment will raise a ValueError in Pyleoclim 2.0.0.
 
         mute_pbar : bool; {True,False}
 
@@ -623,6 +628,17 @@ class EnsembleSeries(MultipleSeries):
         '''
         if target is None:
             target = self.series_list[0]
+
+        # Warn about implicit alignment once for the whole ensemble, then opt in for
+        # the per-member calls so Series.correlation() doesn't repeat it per member
+        # (that can flood stdout and crash a notebook kernel on large ensembles).
+        # Pairing mirrors the loop below: member idx goes with target member idx mod nEns.
+        if common_time_kwargs is None:
+            targets = target.series_list if hasattr(target, 'series_list') else [target]
+            if any(tsbase.time_axes_differ(ts.time, targets[idx % len(targets)].time)
+                   for idx, ts in enumerate(self.series_list)):
+                tsbase.warn_implicit_common_time('EnsembleSeries.correlation()', stacklevel=2)
+                common_time_kwargs = {}
 
         r_list = []
         p_list = []

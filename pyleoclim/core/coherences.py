@@ -1181,7 +1181,8 @@ class GlobalCoherence:
             soi = pyleo.utils.load_dataset('SOI')
             nino3 = pyleo.utils.load_dataset('NINO3')
 
-            gcoh = soi.global_coherence(nino3)
+            # SOI and NINO3 have different time axes: opt in to aligning them
+            gcoh = soi.global_coherence(nino3, wavelet_kwargs={"common_time_kwargs": {}})
             gcoh_sig = gcoh.signif_test(number=10)
             gcoh_sig.plot()
         """
@@ -1328,7 +1329,8 @@ class GlobalCoherence:
             soi = pyleo.utils.load_dataset('SOI')
             nino3 = pyleo.utils.load_dataset('NINO3')
 
-            gcoh = soi.global_coherence(nino3)
+            # SOI and NINO3 have different time axes: opt in to aligning them
+            gcoh = soi.global_coherence(nino3, wavelet_kwargs={"common_time_kwargs": {}})
             gcoh.plot()"""
 
         coh_plot_kwargs = {} if coh_plot_kwargs is None else coh_plot_kwargs.copy()

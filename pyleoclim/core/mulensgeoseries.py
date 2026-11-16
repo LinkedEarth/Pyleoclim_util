@@ -118,7 +118,8 @@ class MulEnsGeoSeries():
                     t = pca_tmp.orig.series_list[0].time
                     pc_series = Series(time=t,value=pcs,verbose=False)
                     base_pc_series = Series(time=base_t,value=base_pcs[:,idx],verbose=False)
-                    r = pc_series.correlation(base_pc_series,settings={'nsim':1},seed=seed,mute_pbar=True).r
+                    r = pc_series.correlation(base_pc_series,settings={'nsim':1},seed=seed,mute_pbar=True,
+                                              common_time_kwargs={}).r
                     if r > delta:
                         pass
                     else:

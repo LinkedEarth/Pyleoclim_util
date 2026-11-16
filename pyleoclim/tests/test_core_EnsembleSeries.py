@@ -13,6 +13,8 @@ Notes on how to test:
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 """
 
+import warnings
+
 import numpy as np
 import pytest
 
@@ -21,6 +23,29 @@ import pyleoclim as pyleo
 
 # Tests below
 class TestUIEnsembleSeriesCorrelation:
+    @pytest.mark.parametrize("ensemble_target", [False, True])
+    def test_correlation_implicit_alignment_warns_once(self, ensemble_target):
+        """The deprecation warning fires once per ensemble, not once per member (#697)"""
+        rng = np.random.default_rng(0)
+        t = np.arange(100, dtype=float)
+        members = [pyleo.Series(time=t + 0.5, value=rng.standard_normal(100), verbose=False)
+                   for _ in range(20)]
+        ts_ens = pyleo.EnsembleSeries(members)
+        target = pyleo.Series(time=t, value=rng.standard_normal(100), verbose=False)
+        if ensemble_target:
+            target = pyleo.EnsembleSeries([target.copy() for _ in range(10)])
+
+        with warnings.catch_warnings(record=True) as record:
+            warnings.simplefilter("always")  # defeat Python's own de-duplication
+            ts_ens.correlation(target, method="built-in", mute_pbar=True)
+        future = [w for w in record if issubclass(w.category, FutureWarning)]
+        assert len(future) == 1
+        assert "EnsembleSeries.correlation()" in str(future[0].message)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", FutureWarning)
+            ts_ens.correlation(target, method="built-in", mute_pbar=True, common_time_kwargs={})
+
     def test_correlation_t0(self, gen_ts, nt=100):
         """Test for EnsembleSeries.correlation() when the target is a Series"""
 
