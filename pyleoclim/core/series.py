@@ -1564,16 +1564,18 @@ class Series:
             - 'lanczos': Lanczos zero-phase filter
 
         cutoff_freq : float or list
-            The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
-            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
-            Note that only the Butterworth option (default) currently supports bandpass filtering.
+            If a list,  it is interpreted as a frequency band (f1, f2) (bandpass).
+            Bandpass filtering is supported by all methods. Butterworth and firwin
+            design a bandpass filter directly; for Lanczos and Savitzky-Golay,
+            the bandpass is obtained as the difference of two lowpass filters
+            (lowpass at f2 minus lowpass at f1).
 
         cutoff_scale : float or list
             cutoff_freq = 1 / cutoff_scale
-            The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
+            Only used when cutoff_freq is None.
             If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
-            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+            If a list,  it is interpreted as a scale band (s1, s2) (bandpass).
 
         keep_log : Boolean
             if True, adds this step and its parameters to the series log.
@@ -1650,6 +1652,66 @@ class Series:
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
 
+        Methods that are natively lowpass (Lanczos, Savitzky-Golay) also accept a band:
+
+        .. jupyter-execute::
+
+            fig, ax = ts.plot(label='mix')
+            ts.filter(cutoff_freq=[15, 25], method='lanczos').plot(ax=ax, label='After 15-25 Hz Lanczos band-pass filter')
+            ts2.plot(ax=ax, label='20 Hz')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+
+        - Comparing the sharpness of the filters
+
+        The methods differ in how sharply they separate the band from the rest of the spectrum.
+        Here we extract the ENSO band (2-7 years) from the Southern Oscillation Index with each method,
+        and compare the spectra of the results (without standardization, so the power is comparable).
+        Firwin and Lanczos have the steepest band edges; Butterworth (3rd order by default) rolls off more gradually;
+        Savitzky-Golay, designed as a smoother rather than a band-selective filter, leaks substantial power at periods shorter than the band. 
+        We do not recommend using Savitzky-Golay if a sharp frequency response is desired. 
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI').interp() # filtering requires even spacing
+            band = [2, 7]  # periods, in years
+            psd_kw = {'method': 'mtm', 'settings': {'standardize': False}}
+
+            fig, ax = soi.spectral(**psd_kw).plot(label='SOI', color='k')
+            for method in ['butterworth', 'firwin', 'lanczos', 'savitzky-golay']:
+                soi.filter(cutoff_scale=band, method=method).spectral(**psd_kw).plot(ax=ax, label=method)
+            ax.axvspan(*band, color='gray', alpha=0.2)
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.15), ncol=5)
+
+        - Phase distortion
+
+        All four methods are zero-phase: Butterworth and firwin are applied forward and backward
+        (`scipy.signal.filtfilt <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.filtfilt.html>`_),
+        while Lanczos and Savitzky-Golay use symmetric, centered kernels. They therefore do not shift
+        the timing of events, which matters when comparing the phasing of records. By contrast, a causal
+        (one-pass) filter delays the signal by an amount that depends on frequency. The comparison below
+        uses a one-pass Butterworth from scipy for contrast; note how its ENSO peaks lag those of the original series.
+        Two caveats: forward-backward filtering squares the magnitude response (so the effective Butterworth order is doubled),
+        and all methods are less reliable near the ends of the series, where they depend on padding.
+
+        .. jupyter-execute::
+
+            from scipy import signal
+
+            soi_filt = {method: soi.filter(cutoff_scale=band, method=method)
+                        for method in ['butterworth', 'firwin', 'lanczos', 'savitzky-golay']}
+
+            fs = 1/np.mean(np.diff(soi.time))  # sampling frequency (1/year)
+            b, a = signal.butter(3, [1/band[1], 1/band[0]], btype='band', fs=fs)
+            soi_causal = soi.copy()
+            soi_causal.value = signal.lfilter(b, a, soi.value - soi.value.mean())
+
+            period = [1975, 2005]
+            fig, ax = soi.slice(period).plot(label='SOI', color='gray', alpha=0.5)
+            for method, ts_f in soi_filt.items():
+                ts_f.slice(period).plot(ax=ax, label=method)
+            soi_causal.slice(period).plot(ax=ax, label='causal Butterworth (one pass)', color='k', linestyle='--')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.2), ncol=3)
+
         - Applying a high-pass filter
 
         .. jupyter-execute::
@@ -1682,42 +1744,40 @@ class Series:
         if method not in method_func.keys():
             raise ValueError('Method value is not an appropriate method for filters')
 
-        args = {}
+        # resolve cutoff into a frequency: scalar (lowpass) or sorted pair (bandpass)
+        if cutoff_freq is None:
+            if cutoff_scale is None:
+                raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
+            if np.isscalar(cutoff_scale):
+                cutoff_freq = 1 / cutoff_scale
+            elif len(cutoff_scale) == 2:
+                cutoff_freq = list(np.sort(1 / np.asarray(cutoff_scale, dtype=float)))
+            else:
+                raise ValueError('Wrong cutoff_scale; should be either one float value (lowpass) or a list of two float values (bandpass).')
+        elif not np.isscalar(cutoff_freq):
+            if len(cutoff_freq) == 2:
+                cutoff_freq = list(np.sort(np.asarray(cutoff_freq, dtype=float)))
+            else:
+                raise ValueError('Wrong cutoff_freq; should be either one float value (lowpass) or a list of two float values (bandpass).')
 
-        if method in ['butterworth', 'firwin', 'lanczos']:
-            if cutoff_freq is None:
-                if cutoff_scale is None:
-                    raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
-                else:
-                    if np.isscalar(cutoff_scale):
-                        cutoff_freq = 1 / cutoff_scale
-                    elif len(cutoff_scale) == 2 and method in ['butterworth', 'firwin']:
-                        cutoff_scale = np.array(cutoff_scale)
-                        cutoff_freq = np.sort(1 / cutoff_scale)
-                        cutoff_freq = list(cutoff_freq)
-                    elif len(cutoff_scale) > 1 and method == 'lanczos':
-                        raise ValueError('Lanczos filter requires a scalar input as cutoff scale/frequency')
-                    else:
-                        raise ValueError('Wrong cutoff_scale; should be either one float value (lowpass) or a list two float values (bandpass).')
-            # assign optional arguments
-            args['butterworth'] = {'fc': cutoff_freq, 'fs': fs}
-            args['firwin'] = {'fc': cutoff_freq, 'fs': fs}
-            args['lanczos'] = {'fc': cutoff_freq, 'fs': fs}
+        def lowpass_args(fc):
+            if method == 'savitzky-golay':
+                window_length = int(np.round(fs / fc, 8))  # guard against float round-trip of 1/scale
+                if window_length % 2 == 0:
+                    window_length += 1   # window length needs to be an odd integer
+                args = {'window_length': window_length}
+            else:
+                args = {'fc': fc, 'fs': fs}
+            args.update(kwargs)
+            return args
 
-        else: # for Savitzky-Golay only
-            if cutoff_scale is None and cutoff_freq is None:
-                raise ValueError('No cutoff_scale or cutoff_freq argument provided')
-            elif cutoff_freq is not None:
-                cutoff_scale = 1 / cutoff_freq
-
-            window_length = int(cutoff_scale*fs)
-            if window_length % 2 == 0:
-                window_length += 1   # window length needs to be an odd integer
-            args['savitzky-golay'] = {'window_length': window_length}
-        
-        args[method].update(kwargs)
-
-        new_val = method_func[method](y, **args[method])
+        func = method_func[method]
+        if np.isscalar(cutoff_freq) or method in ['butterworth', 'firwin']:
+            new_val = func(y, **lowpass_args(cutoff_freq))
+        else:
+            # methods without native bandpass support: difference of two lowpass filters
+            f1, f2 = cutoff_freq
+            new_val = func(y, **lowpass_args(f2)) - func(y, **lowpass_args(f1))
         new.value = new_val + mu # restore the mean
 
         if keep_log == True:

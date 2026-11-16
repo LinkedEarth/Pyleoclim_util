@@ -1706,9 +1706,11 @@ class TestUISeriesFilter:
         val_diff = ts_lp.value - ts1.value
         assert np.mean(val_diff**2) < 0.2
 
-    @pytest.mark.parametrize("method", ["butterworth", "firwin"])
+    @pytest.mark.parametrize(
+        "method", ["butterworth", "firwin", "lanczos", "savitzky-golay"]
+    )
     def test_filter_t1(self, method):
-        """Band-pass filtering with Butterworth or FIR with window"""
+        """Band-pass filtering with all methods"""
         t = np.linspace(0, 1, 1000)
         sig1 = np.sin(2 * np.pi * 10 * t)
         sig2 = np.sin(2 * np.pi * 20 * t)
@@ -1717,7 +1719,21 @@ class TestUISeriesFilter:
         ts = pyleo.Series(time=t, value=sig)
         ts_bp = ts.filter(cutoff_freq=[15, 25], method=method)
         val_diff = ts_bp.value - ts2.value
-        assert np.mean(val_diff**2) < 0.1
+        # Savitzky-Golay has a much less sharp frequency response
+        tol = 0.2 if method == "savitzky-golay" else 0.1
+        assert np.mean(val_diff**2) < tol
+
+    @pytest.mark.parametrize(
+        "method", ["butterworth", "firwin", "lanczos", "savitzky-golay"]
+    )
+    def test_filter_bandpass_scale(self, method):
+        """Band-pass via cutoff_scale (any order) matches cutoff_freq; issue #426"""
+        t = np.linspace(0, 1, 1000)
+        sig = np.sin(2 * np.pi * 10 * t) + np.sin(2 * np.pi * 20 * t)
+        ts = pyleo.Series(time=t, value=sig)
+        ts_f = ts.filter(cutoff_freq=[15, 25], method=method)
+        ts_s = ts.filter(cutoff_scale=[1 / 15, 1 / 25], method=method)
+        np.testing.assert_allclose(ts_f.value, ts_s.value)
 
     @pytest.mark.parametrize(
         "method", ["butterworth", "firwin", "lanczos"]
