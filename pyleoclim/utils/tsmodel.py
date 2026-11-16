@@ -6,7 +6,7 @@ import numpy as np
 from statsmodels.tsa.arima_process import arma_generate_sample
 from statsmodels.tsa.arima.model import ARIMA
 # from tqdm import tqdm
-from .tsutils import standardize
+from .tsutils import standardize, detrend
 # from stochastic.processes.noise import ColoredNoise
 # from stochastic.processes.noise import FractionalGaussianNoise
 
@@ -212,7 +212,9 @@ def ar1_fit_evenly(y):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
     Uses `statsmodels.tsa.arima.model.ARIMA <https://www.statsmodels.org/devel/generated/statsmodels.tsa.arima.model.ARIMA.html>`_. to
-    calculate lag-1 autocorrelation
+    calculate lag-1 autocorrelation. NaNs are dropped, then the series is linearly
+    detrended and standardized before fitting an AR(1) model with a constant.
+    This makes the maximum likelihood optimization better conditioned (cf. issue #712).
 
     MARK FOR DEPRECATION once uar1_fit is adopted
     
@@ -230,8 +232,11 @@ def ar1_fit_evenly(y):
     # syntax compatible with statsmodels v0.11.1
     #ar1_mod = sm.tsa.ARMA(y, (1, 0), missing='drop').fit(trend='nc', disp=0)
     # syntax compatible with statsmodels v0.12
-    ar1_mod = ARIMA(y, order = (1, 0, 0), missing='drop',trend='ct').fit()
-    g = ar1_mod.params[2]
+    y = np.asarray(y, dtype=float)
+    y = y[~np.isnan(y)]
+    z = standardize(detrend(y, method='linear')[0])[0]
+    ar1_mod = ARIMA(z, order = (1, 0, 0), trend='c').fit()
+    g = ar1_mod.params[1]
 
     if g > 1:
         print('Warning: AR(1) fitted autocorrelation greater than 1; setting to 1-eps^{1/4}')
