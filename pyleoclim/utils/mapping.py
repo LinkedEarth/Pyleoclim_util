@@ -367,7 +367,7 @@ def map(lat, lon, criteria, marker=None, color=None,
 
         Dictionary of arguments for matplotlib.pyplot.saveFig.
 
-        - "path" must be specified; it can be any existed or non-existed path,
+        - "path" must be specified; it can be an existing or new path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -653,7 +653,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
     savefig_settings : dict, optional
         Dictionary of arguments for matplotlib.pyplot.saveFig.
 
-         - "path" must be specified; it can be any existed or non-existed path,
+         - "path" must be specified; it can be an existing or new path,
            with or without a suffix; if the suffix is not given in "path", it will follow "format"
          - "format" can be one of {"pdf", "eps", "png", "ps"}
 

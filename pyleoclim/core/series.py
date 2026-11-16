@@ -1093,7 +1093,7 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -1257,7 +1257,7 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -1800,7 +1800,7 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
-              - "path" must be specified; it can be any existed or non-existed path,
+              - "path" must be specified; it can be an existing or new path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
               - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -1877,7 +1877,7 @@ class Series:
 
     #     savefig_settings : dict
     #         the dictionary of arguments for plt.savefig(); some notes below:
-    #           - "path" must be specified; it can be any existed or non-existed path,
+    #           - "path" must be specified; it can be an existing or new path,
     #             with or without a suffix; if the suffix is not given in "path", it will follow "format"
     #           - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -2018,7 +2018,7 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -4427,7 +4427,7 @@ class Series:
             Arguments for the plot displaying the outliers. The default is None.
         savefigoutliers_settings : dict, optional
             Saving options for the outlier plot. The default is None.
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         fig_clusters : bool, optional
@@ -4438,7 +4438,7 @@ class Series:
             Arguments for the cluster plot. The default is None.
         savefigclusters_settings : dict, optional
             Saving options for the cluster plot. The default is None.
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         keep_log : Boolean
