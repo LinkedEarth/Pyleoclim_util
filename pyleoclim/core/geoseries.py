@@ -399,7 +399,7 @@ class GeoSeries(Series):
 
         savefig_settings : dict, optional
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
@@ -517,7 +517,7 @@ class GeoSeries(Series):
 
         savefig_settings : dict, optional
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
             
@@ -710,7 +710,7 @@ class GeoSeries(Series):
 
         savefig_settings : dict, optional
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}.
             The default is None.
