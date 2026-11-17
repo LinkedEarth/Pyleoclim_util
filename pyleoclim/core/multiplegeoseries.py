@@ -78,7 +78,7 @@ class MultipleGeoSeries(MultipleSeries):
             background=True, borders=False, coastline=True,rivers=False, lakes=False, land=True,ocean=True,
             figsize=None, fig=None, scatter_kwargs=None, gridspec_kwargs=None, legend=True, gridspec_slot=None,
             lgd_kwargs=None, savefig_settings=None, **kwargs):
-        '''Mapping of the collection of GeoSeries objects.
+        r'''Mapping of the collection of GeoSeries objects.
         
 
         Parameters
@@ -170,7 +170,7 @@ class MultipleGeoSeries(MultipleSeries):
             Default is True.
 
         color_scale_type : str, optional
-            Setting to "discrete" will force a discrete color scale with a default bin number of max(11, n) where n=number of unique values$^{\frac{1}{2}}$
+            Setting to "discrete" will force a discrete color scale with a default number of bins equal to :math:`\max(10, \lceil \sqrt{N} \rceil)`, where :math:`N` is the number of unique values.
             Default is None
 
         lgd_kwargs : dict, optional

@@ -928,7 +928,7 @@ class EnsembleSeries(MultipleSeries):
 
         outer_shade_label : str, optional
 
-            Label for the envelope. The default is '95\% CI'.
+            Label for the envelope. The default is '95% CI'.
 
         lgd_kwargs : dict, optional
 

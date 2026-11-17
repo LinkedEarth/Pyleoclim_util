@@ -181,7 +181,7 @@ class SurrogateSeries(EnsembleSeries):
         self.series_list = s_list
                   
     def from_param(self, param, length=50, time_pattern = 'even', settings=None):
-        '''
+        r'''
         Simulate the SurrogateSeries from a parametric model
 
         Parameters
@@ -214,7 +214,7 @@ class SurrogateSeries(EnsembleSeries):
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
 
-        pyleoclim.utils.tsmodel.colored_noise: simulating from a power law spectrum, $S(f) \propto f^{-\beta}$
+        pyleoclim.utils.tsmodel.colored_noise : simulating from a power law spectrum, :math:`S(f) \propto f^{-\beta}`
 
         pyleoclim.utils.tsmodel.random_time_axis : Generate time increment vector according to a specific probability model
         

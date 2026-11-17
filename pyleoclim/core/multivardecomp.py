@@ -183,7 +183,7 @@ class MultivariateDecomp:
                  hue='EOF', marker=None, size=None, scatter_kwargs=None,
                  flip = False, map_kwargs=None, gridspec_kwargs=None):
 
-        '''Dashboard visualizing the properties of a given mode.
+        r'''Dashboard visualizing the properties of a given mode.
         
         Includes: The temporal coefficient (PC or similar), its spectrum, and the loadings (EOF or similar), possibly geolocated. 
         If the object does not have geolocation information, a spaghetti plot of the standardized series is displayed.
@@ -244,7 +244,7 @@ class MultivariateDecomp:
             - gridspec_kwargs: dict; Optional values for adjusting the arrangement of the colorbar, map and legend in the map subplot
             - legend: bool; Whether to draw a legend on the figure. Default is True
             - colorbar: bool; Whether to draw a colorbar on the figure if the data associated with hue are numeric. Default is True
-            - color_scale_type : str; Setting to "discrete" will force a discrete color scale with a default bin number of max(11, n) where n=number of unique values$^{\frac{1}{2}}$. Default is None
+            - color_scale_type : str; Setting to "discrete" will force a discrete color scale with a default number of bins equal to :math:`\max(10, \lceil \sqrt{N} \rceil)`, where :math:`N` is the number of unique values. Default is None
             - scalar_mappable: matplotlib.cm.ScalarMappable; can be used to pass a matplotlib scalar mappable. See pyleoclim.utils.plotting.make_scalar_mappable for documentation on using the Pyleoclim utility, or the `Matplotlib tutorial on customizing colorbars <https://matplotlib.org/stable/users/explain/colors/colorbar_only.html>`_.
 
         scatter_kwargs : dict, optional

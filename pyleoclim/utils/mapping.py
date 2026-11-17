@@ -568,7 +568,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
                 figsize=None, scatter_kwargs=None, gridspec_kwargs=None, extent='global', edgecolor_var=None,
                 lgd_kwargs=None, legend=True, colorbar=True, cmap=None, color_scale_type=None,
                 fig=None, gs_slot=None, **kwargs):
-    '''
+    r'''
 
 
     Parameters
@@ -644,7 +644,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         Default is True.
 
     color_scale_type : str, optional
-        Setting to "discrete" will force a discrete color scale with a default bin number of max(11, n) where n=number of unique values$^{\frac{1}{2}}$
+        Setting to "discrete" will force a discrete color scale with a default number of bins equal to :math:`\max(10, \lceil \sqrt{N} \rceil)`, where :math:`N` is the number of unique values.
         Default is None
 
     lgd_kwargs : dict, optional
