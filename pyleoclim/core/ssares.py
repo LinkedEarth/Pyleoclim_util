@@ -193,6 +193,7 @@ class SsaRes:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}

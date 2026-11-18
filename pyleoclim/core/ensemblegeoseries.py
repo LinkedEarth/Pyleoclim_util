@@ -558,13 +558,15 @@ class EnsembleGeoSeries(EnsembleSeries):
 
         gridspec_kwargs : dict, optional
             Optional dictionary for configuring dashboard layout using gridspec
-            For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>_. The default is None.
+            For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>`_. The default is None.
 
         savefig_settings : dict, optional
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}.
+
             The default is None.
 
         Returns

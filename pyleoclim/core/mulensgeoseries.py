@@ -192,19 +192,22 @@ class MulEnsGeoSeries():
         savefig_settings : dictionary
         
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
             
         time_unit : str
         
-            the target time unit, possible inputs:
+            the target time unit, possible inputs::
+
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
+
             default is None, in which case the code picks the most common time unit in the collection.
             If no discernible winner can be found, the unit of the first series in the collection is used. 
             

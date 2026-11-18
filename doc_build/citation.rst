@@ -10,26 +10,28 @@ BibTeX entry
 
 For example (please check for version updates on Zenodo)
 
-@misc{Pyleoclim,
-   DOI= {10.5281/zenodo.1205661},
-   url = {https://doi.org/10.5281/zenodo.1205661},
-   year = {2022},
-   type = {Computer Program},
-   title = {Pyleoclim: A Python package for the analysis of paleoclimate data},
-   authors = {Deborah Khider and Feng Zhu and Julien Emile-Geay and Jun Hu and Alexander James and Pratheek Athreya and Myron Kwan and Daniel Garijo}
-    }
+.. code-block:: bibtex
+
+    @misc{Pyleoclim,
+       DOI= {10.5281/zenodo.1205661},
+       url = {https://doi.org/10.5281/zenodo.1205661},
+       year = {2022},
+       type = {Computer Program},
+       title = {Pyleoclim: A Python package for the analysis of paleoclimate data},
+       authors = {Deborah Khider and Feng Zhu and Julien Emile-Geay and Jun Hu and Alexander James and Pratheek Athreya and Myron Kwan and Daniel Garijo}
+        }
 
 
-@article{Pyleoclim:PP2022,
-    author = {Khider, Deborah and Emile-Geay, Julien and Zhu, Feng and James, Alexander and Landers, Jordan and Ratnakar, Varun and Gil, Yolanda},
-    journal = {Paleoceanography and Paleoclimatology},
-    number = {10},
-    pages = {e2022PA004509},
-    title = {Pyleoclim: Paleoclimate Timeseries Analysis and Visualization With Python},
-    volume = {37},
-    year = {2022},
-    doi = {10.1029/2022PA004509}
-    }
+    @article{Pyleoclim:PP2022,
+        author = {Khider, Deborah and Emile-Geay, Julien and Zhu, Feng and James, Alexander and Landers, Jordan and Ratnakar, Varun and Gil, Yolanda},
+        journal = {Paleoceanography and Paleoclimatology},
+        number = {10},
+        pages = {e2022PA004509},
+        title = {Pyleoclim: Paleoclimate Timeseries Analysis and Visualization With Python},
+        volume = {37},
+        year = {2022},
+        doi = {10.1029/2022PA004509}
+        }
 
 
 AGU style entry

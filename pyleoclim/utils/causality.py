@@ -114,6 +114,7 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
     -------
     res : dict
         A dictionary of results including:
+
         - T21 : float
             information flow from y2 to y1 (Note: not y1 -> y2!)
         - tau21 : float

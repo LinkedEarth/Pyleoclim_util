@@ -280,12 +280,14 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
 
     trunc : str
         if present, truncates the expansion to a level K < M owing to one of 4 criteria:
+
             1. 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
             2. 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
             3. 'var': first K modes that explain at least var_thresh % of the variance.
-        Default is None, which bypasses truncation (K = M)
             4. 'knee': Wherever the "knee" of the screeplot occurs.
-        Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
+               Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
+
+        Default is None, which bypasses truncation (K = M).
         While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton, 
         then the knee-finding method is a good compromise between objectivity and efficiency.
         See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
