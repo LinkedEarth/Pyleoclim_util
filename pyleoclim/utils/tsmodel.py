@@ -689,7 +689,7 @@ def uar1_sim(t, tau, sigma_2=1):
         Time axis 
         
     tau : float
-        Time decay parameter of the  AR(1) model ($\\phi = e^{-\\tau}$)
+        Time decay parameter of the  AR(1) model (:math:`\\phi = e^{-\\tau}`)
         
     sigma_2 : float
         Variance of the innovations      
