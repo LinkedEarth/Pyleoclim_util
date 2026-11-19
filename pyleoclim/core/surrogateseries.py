@@ -194,9 +194,10 @@ class SurrogateSeries(EnsembleSeries):
             
         time_pattern : str {even, random, specified}
             The pattern used to generate the surrogate time axes
+
             * 'even' uses an evenly-spaced time with spacing `delta_t` specified in settings (if not specified, defaults to 1.0)
             * 'random' uses random_time_axis() with specified distribution and parameters 
-               Relevant settings are `delta_t_dist` and `param`. (default: 'exponential' with parameter = 1.0)
+              Relevant settings are `delta_t_dist` and `param`. (default: 'exponential' with parameter = 1.0)
             * 'specified': uses time axis `time` from `settings`.  
             
         seed : int

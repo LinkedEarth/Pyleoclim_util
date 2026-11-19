@@ -210,7 +210,7 @@ class MultipleGeoSeries(MultipleSeries):
 
         gridspec_kwargs : dict, optional
             Function assumes the possibility of a colorbar, map, and legend. A list of floats associated with the keyword `width_ratios` will assume the first (index=0) is the relative width of the colorbar, the second to last (index = -2) is the relative width of the map, and the last (index = -1) is the relative width of the area for the legend.
-            For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>_. The default is None.
+            For information about Gridspec configuration, refer to `Matplotlib documentation <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.gridspec.GridSpec.html#matplotlib.gridspec.GridSpec>`_. The default is None.
 
         kwargs: dict, optional
             - ``'missing_val_hue'``, ``'missing_val_marker'``, ``'missing_val_label'`` — change
@@ -571,13 +571,15 @@ class MultipleGeoSeries(MultipleSeries):
             
         time_unit : str
         
-            the target time unit, possible input:
+            the target time unit, possible input::
+
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
+
             default is None, in which case the code picks the most common time unit in the collection.
             If no unambiguous winner can be found, the unit of the first series in the collection is used. 
             
@@ -613,6 +615,7 @@ class MultipleGeoSeries(MultipleSeries):
         savefig_settings : dictionary, optional
         
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.

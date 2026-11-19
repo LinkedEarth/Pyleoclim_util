@@ -245,33 +245,35 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
     BW : float
         The sampling-relative bandwidth of the data tapers
     detrend : str
-          If None, no detrending is applied. Available detrending methods:
-              - None - no detrending will be applied (default);
-              - linear - a linear least-squares fit to `ys` is subtracted;
-              - constant - the mean of `ys` is subtracted
-              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-              - emd - Empirical mode decomposition
-      sg_kwargs : dict
-          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
-      gaussianize : bool
-          If True, gaussianizes the timeseries
-      standardize : bool
-          If True, standardizes the timeseries
-      adaptive : {True/False}
-          Use an adaptive weighting routine to combine the PSD estimates of
-          different tapers.
-      jackknife : {True/False}
-          Use the jackknife method to make an estimate of the PSD variance
-          at each point.
-      low_bias : {True/False}
-          Rather than use 2NW tapers, only use the tapers that have better than
-          90% spectral concentration within the bandwidth (still using
-          a maximum of 2NW tapers)
-      sides : str (optional)   [ 'default' | 'onesided' | 'twosided' ]
-          This determines which sides of the spectrum to return.
-          For complex-valued inputs, the default is two-sided, for real-valued
-          inputs, default is one-sided Indicates whether to return a one-sided
-          or two-sided
+        If None, no detrending is applied. Available detrending methods:
+
+            - None - no detrending will be applied (default);
+            - linear - a linear least-squares fit to `ys` is subtracted;
+            - constant - the mean of `ys` is subtracted
+            - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+            - emd - Empirical mode decomposition
+    sg_kwargs : dict
+
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+    adaptive : {True/False}
+        Use an adaptive weighting routine to combine the PSD estimates of
+        different tapers.
+    jackknife : {True/False}
+        Use the jackknife method to make an estimate of the PSD variance
+        at each point.
+    low_bias : {True/False}
+        Rather than use 2NW tapers, only use the tapers that have better than
+        90% spectral concentration within the bandwidth (still using
+        a maximum of 2NW tapers)
+    sides : str (optional)   [ 'default' | 'onesided' | 'twosided' ]
+        This determines which sides of the spectrum to return.
+        For complex-valued inputs, the default is two-sided, for real-valued
+        inputs, default is one-sided Indicates whether to return a one-sided
+        or two-sided
 
     Returns
     -------

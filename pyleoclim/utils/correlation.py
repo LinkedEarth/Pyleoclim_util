@@ -107,6 +107,7 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
         
             - 'original' follows Benjamini & Hochberg (1995);
             - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
+
             'original' is recommended, and if desired, using 'adj_method="mean"' to increase power.
 
     adj_method: {'mean', 'storey', 'two-stage'}

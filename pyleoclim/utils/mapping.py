@@ -31,6 +31,7 @@ def pick_proj(lat, lon, crit_dist=5000):
     '''
     Pick projection based on the degree of clustering of coordinates.
     At the moment, returns only one of two options:
+
         - 'Robinson' for R > crit_dist
         - 'Orthographic' for R <= crit_dist
 

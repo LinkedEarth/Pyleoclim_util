@@ -1325,6 +1325,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
         - 'welch'
         - 'scale'
         - 'nfft'
+
         See :func:`pyleoclim.utils.wavelet.make_freq_vector()` for details
 
     freq_kwargs : str
@@ -1351,7 +1352,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
         - 'linear': a linear least-squares fit to `ys` is subtracted;
         - 'constant': the mean of `ys` is subtracted
         - 'savitzy-golay': ys is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+        - 'emd': Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
 
     sg_kwargs : dict
 
@@ -1546,7 +1547,7 @@ def wwz_coherence(y1, t1, y2, t2, smooth_factor=0.25,
         - 'linear': a linear least-squares fit to `ys` is subtracted;
         - 'constant': the mean of `ys` is subtracted
         - 'savitzy-golay': ys is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+        - 'emd': Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
 
     sg_kwargs : dict
 
@@ -2956,7 +2957,7 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
         - chi-square: a regular chi-square test Eq(18) from Torrence and Compo
         - time-average: DOF should be set to NA, the number of local wavelet spectra that were averaged together.
              For the Global Wavelet Spectrum, this would be NA=N, where N is the number of points in your time series. Eq23 in Torrence and Compo
-        -scale-average: In this case, DOF should be set to a two-element vector [S1,S2], which gives the scale range that was averaged together.
+        - scale-average: In this case, DOF should be set to a two-element vector [S1,S2], which gives the scale range that was averaged together.
              e.g. if one scale-averaged scales between 2 and 8, then DOF=[2,8].
 
     qs : list, optional
@@ -2969,7 +2970,7 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
 
             - chi-square: DOF = 2 (or 1 for MOTHER='DOG')
             - time-average: DOF = NA, the number of times averaged together.
-            -scale-average: DOF = [S1,S2], the range of scales averaged.
+            - scale-average: DOF = [S1,S2], the range of scales averaged.
 
     gws : np.array, optional
     

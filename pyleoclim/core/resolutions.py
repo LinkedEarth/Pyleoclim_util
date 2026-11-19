@@ -167,6 +167,7 @@ class Resolution:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -550,6 +551,7 @@ class MultipleResolution:
         savefig_settings : dictionary, optional
         
             the dictionary of arguments for pyleo.utils.plotting.savefig(); some notes below:
+
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.

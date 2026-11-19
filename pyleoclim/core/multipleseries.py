@@ -277,7 +277,8 @@ class MultipleSeries:
         ----------
         time_unit : str
         
-            the target time unit, possible input:
+            the target time unit, possible input::
+
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
@@ -806,8 +807,8 @@ class MultipleSeries:
 
         statistic : str
             statistic being evaluated. Can use any of the SciPy-supported ones:
-                https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
-                Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
+            https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+            Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
             Default: 'pearsonr'.
 
         method : str, {'ttest','built-in','ar1sim','phaseran','CN'}
@@ -1275,6 +1276,7 @@ class MultipleSeries:
         
             The method for detrending. The default is 'emd'.
             Options include:
+
                 * linear: the result of a linear least-squares fit to y is subtracted from y.
                 * constant: only the mean of data is subtrated.
                 * 'savitzky-golay', y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
@@ -1610,13 +1612,15 @@ class MultipleSeries:
             
         time_unit : str
         
-            the target time unit, possible input:
+            the target time unit, possible input::
+
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
+
             default is None, in which case the code picks the most common time unit in the collection.
             If no unambiguous winner can be found, the unit of the first series in the collection is used. 
             
@@ -1635,6 +1639,7 @@ class MultipleSeries:
         savefig_settings : dictionary, optional
         
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
@@ -1758,19 +1763,22 @@ class MultipleSeries:
         savefig_settings : dictionary
         
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
             
         time_unit : str
         
-            the target time unit, possible inputs:
+            the target time unit, possible inputs::
+
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
+
             default is None, in which case the code picks the most common time unit in the collection.
             If no discernible winner can be found, the unit of the first series in the collection is used. 
             
@@ -2108,13 +2116,15 @@ class MultipleSeries:
             - 'format' can be one of {"pdf", 'eps', 'png', ps'} The default is None.
             
         time_unit : str
-            the target time unit, possible inputs:
+            the target time unit, possible inputs::
+
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
+
             default is None, in which case the code picks the most common time unit in the collection.
             If no discernible winner can be found, the unit of the first series in the collection is used. 
                 
@@ -2483,13 +2493,15 @@ class MultipleSeries:
             
         time_unit : str
         
-            the target time unit, possible input:
+            the target time unit, possible input::
+
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
+
             default is None, in which case the code picks the most common time unit in the collection.
             If no unambiguous winner can be found, the unit of the first series in the collection is used. 
             
@@ -2525,6 +2537,7 @@ class MultipleSeries:
         savefig_settings : dictionary, optional
         
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.

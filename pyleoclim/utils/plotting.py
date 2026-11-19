@@ -94,9 +94,11 @@ def scatter_xy(x, y, c=None, figsize=None, xlabel=None, ylabel=None, title=None,
         Limits for the y-axis. The default is None.
     savefig_settings : dict, optional
         the dictionary of arguments for plt.savefig(); some notes below:
+
         - "path" must be specified; it can be any existing or non-existing path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
+
        The default is None.
     ax : pyplot.axis, optional
         The axis object. The default is None.
@@ -189,6 +191,7 @@ def plot_scatter_xy(x1, y1, x2, y2, figsize=None, xlabel=None,
         the keyword arguments for ax.plot()
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
+
         - "path" must be specified; it can be any existing or non-existing path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -280,9 +283,10 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     mute : bool
         if True, the plot will not show;
         recommend to turn on when more modifications are going to be made on ax
-         (going to be deprecated)
+        (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
+
         - "path" must be specified; it can be any existing or non-existing path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -410,6 +414,7 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
+
         - "path" must be specified; it can be any existing or non-existing path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -509,6 +514,7 @@ def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
         resolution in dot (pixels) per inch. Default: 300. 
     settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
+
         - "path" must be specified in settings if not assigned with the keyword argument;
           it can be any existing or non-existing path, with or without a suffix;
           if the suffix is not given in "path", it will follow "format"
@@ -1525,6 +1531,7 @@ def add_GTS(fig, ax, time_unit, GTS_df=None, ranks=None, location='above', label
 
     '''
     Adds the Geologic Time Scale (GTS) to the plot.
+
     Parameters
     ----------
     fig : matplotlib.figure.Figure

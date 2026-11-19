@@ -745,11 +745,13 @@ def random_time_axis(n, delta_t_dist = "exponential", param = [1.0], seed = None
         if 'exponential', `param` is expected to be a single scale parameter (traditionally denoted \\lambda)
         if 'poisson', `param` is expected to be a single parameter (rate)
         if 'pareto', expects a 2-list with 2 scalar shape & scale parameters (in that order)
-        if 'random_choice', expects a 2-list containing the arrays:      
+        if 'random_choice', expects a 2-list containing the arrays:
+
             value_random_choice: 
                 elements from which the random sample is generated (e.g. [1,2])
             prob_random_choice: 
                 probabilities associated with each entry value_random_choice  (e.g. [.95,.05])
+
             (These two arrays must be of the same size)
    
         

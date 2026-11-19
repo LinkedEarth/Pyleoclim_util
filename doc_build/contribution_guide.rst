@@ -288,7 +288,7 @@ You may use existing docstrings as examples. A good docstring explains:
   * what it does, with what properties/inputs/outputs)
   * how to use it, via a minimal working example.
 
-For the latter, make sure the example is prefaced by:
+For the latter, make sure the example is prefaced by::
 
       .. jupyter-execute::
 

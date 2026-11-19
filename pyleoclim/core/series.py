@@ -163,14 +163,6 @@ class Series:
     --------
     Import the Southern Oscillation Index (SOI) and display a quick synopsis:
 
-     .. jupyter-execute::
-         :hide-code:
-         import pyleoclim as pyleo 
-         import numpy as np
-         import matplotlib.pyplot as plt
-         import warnings
-         warnings.filterwarnings('ignore')
-        
     .. jupyter-execute::
 
         import pyleoclim as pyleo
@@ -853,7 +845,8 @@ class Series:
         Parameters
         ----------
         time_unit : str
-            the target time unit, possible input:
+            the target time unit, possible input::
+
             {
                 'year', 'years', 'yr', 'yrs', 'CE', 'AD',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
@@ -1093,6 +1086,7 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -1257,6 +1251,7 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -1472,6 +1467,7 @@ class Series:
         including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) 
         are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. 
         This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
+
             * there was not much rhyme or reason for picking 14 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
             * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies,  you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves dominant features and excludes the rest.
             * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
@@ -1800,6 +1796,7 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
+
               - "path" must be specified; it can be an existing or new path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
               - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -1991,14 +1988,17 @@ class Series:
         psd_plot_kwargs : dict
             arguments to be passed to the psd plot, see PSD.plot for details
             Certain psd plot settings are required by summary plot formatting. These include:
+
                 - ylabel
                 - legend
                 - tick parameters
+
             These will be overriden by summary plot to prevent formatting errors
 
         gridspec_kwargs : dict
             arguments used to build the specifications for gridspec configuration
             The plot is constructed with six slots:
+
                 - slot [0] contains a subgridspec containing the timeseries and scalogram (shared x axis)
                 - slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with scalogram)
                 - slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
@@ -2018,6 +2018,7 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
+
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -3190,6 +3191,7 @@ class Series:
         method : str, optional
             The method for detrending. The default is 'emd'.
             Options include:
+
                 * "linear": the result of a n ordinary least-squares stright line fit to y is subtracted.
                 * "constant": only the mean of data is subtracted.
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
@@ -3522,6 +3524,7 @@ class Series:
                 is appropriate for evenly-spaced series.
             wwz - the weighted wavelet Z-transform [2]
                 is appropriate for unevenly-spaced series.
+
             Default is cwt, returning an error if the Series is unevenly-spaced.
 
         freq : str or array, optional
@@ -4008,8 +4011,8 @@ class Series:
 
         statistic : str
             statistic being evaluated. Can use any of the SciPy-supported ones:
-                https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
-                Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
+            https://docs.scipy.org/doc/scipy/reference/stats.html#association-correlation-tests
+            Currently supported: ['pearsonr','spearmanr','pointbiserialr','kendalltau','weightedtau']
             Default: 'pearsonr'.
 
         method : str, {'ttest','built-in','ar1sim','phaseran','CN'}
@@ -4427,6 +4430,7 @@ class Series:
             Arguments for the plot displaying the outliers. The default is None.
         savefigoutliers_settings : dict, optional
             Saving options for the outlier plot. The default is None.
+
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
@@ -4438,6 +4442,7 @@ class Series:
             Arguments for the cluster plot. The default is None.
         savefigclusters_settings : dict, optional
             Saving options for the cluster plot. The default is None.
+
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
