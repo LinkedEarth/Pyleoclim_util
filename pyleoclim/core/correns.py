@@ -155,7 +155,7 @@ class CorrEns:
 
             - "path" must be specified; it can be any existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         hist_kwargs : dict
         

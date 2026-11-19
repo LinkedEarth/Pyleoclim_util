@@ -337,7 +337,7 @@ def map(lat, lon, criteria, marker=None, color=None,
         If True, uses a shaded relief background (only one available in Cartopy)
 
     borders : bool
-        Draws the countries border. Defaults is off (False).
+        Draws the countries border. Default is off (False).
 
     rivers : bool
         Draws major rivers. Default is off (False).
@@ -619,7 +619,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
 
     borders : bool, optional
         Draws the countries border.
-        Defaults is off (False).
+        Default is off (False).
 
     rivers : bool, optional
         Draws major rivers.

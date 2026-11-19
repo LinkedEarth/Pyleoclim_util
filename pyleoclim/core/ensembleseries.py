@@ -747,7 +747,7 @@ class EnsembleSeries(MultipleSeries):
 
             - "path" must be specified; it can be an existing or new path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         ax : matplotlib.ax, optional
 
@@ -898,7 +898,7 @@ class EnsembleSeries(MultipleSeries):
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         ax : matplotlib.ax, optional
 
@@ -1067,7 +1067,7 @@ class EnsembleSeries(MultipleSeries):
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         xlim : list
 
@@ -1279,7 +1279,7 @@ class EnsembleSeries(MultipleSeries):
 
               - "path" must be specified; it can be an existing or new path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
-              - "format" can be one of {"pdf", "eps", "png", "ps"}.
+              - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
             The default is None.
 

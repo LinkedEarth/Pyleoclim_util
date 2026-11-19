@@ -195,7 +195,7 @@ class MulEnsGeoSeries():
 
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
             
         time_unit : str
         

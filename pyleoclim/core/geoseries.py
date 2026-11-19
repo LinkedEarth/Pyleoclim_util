@@ -317,22 +317,22 @@ class GeoSeries(Series):
         borders : bool or dict, optional
             Draws the countries border.
             If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
-            Defaults is off (False).
+            Default is off (False).
 
         coastline : bool or dict, optional
             Draws the coastline.
             If a dictionary of formatting arguments is supplied (e.g. linewidth, alpha), will draw according to specifications.
-            Defaults is on (True).
+            Default is on (True).
 
         land : bool or dict, optional
             Colors land masses.
             If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
-            Default is off (True). Overriden if background=True.
+            Default is on (True). Drawn semi-transparently over the relief if background=True.
 
         ocean : bool or dict, optional
             Colors oceans.
             If a dictionary of formatting arguments is supplied (e.g. color, alpha), will draw according to specifications.
-            Default is on (True). Overriden if background=True.
+            Default is on (True). Drawn semi-transparently over the relief if background=True.
 
         rivers : bool or dict, optional
             Draws major rivers.
@@ -715,7 +715,7 @@ class GeoSeries(Series):
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}.
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
             The default is None.
 
