@@ -97,7 +97,7 @@ class SsaRes:
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
               
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         title_kwargs : dict
             the keyword arguments for ax.set_title()
@@ -196,7 +196,7 @@ class SsaRes:
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         title_kwargs : dict
             the keyword arguments for ax.set_title()

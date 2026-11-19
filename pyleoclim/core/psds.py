@@ -536,7 +536,7 @@ class PSD:
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         ax : ax, optional
 
@@ -1046,7 +1046,7 @@ class MultiplePSD:
 
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
             
         ax : matplotlib axis, optional
         
@@ -1250,7 +1250,7 @@ class MultiplePSD:
 
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
             
         ax : matplotlib.ax, optional
         
@@ -1476,7 +1476,7 @@ class MultiplePSD:
 
             - "path" must be specified; it can be an existing or new path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         ax : matplotlib.ax, optional
 

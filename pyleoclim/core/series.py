@@ -1089,7 +1089,7 @@ class Series:
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         ax : matplotlib.axis, optional
             the axis object from matplotlib
@@ -1254,7 +1254,7 @@ class Series:
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         ax : matplotlib.axis, optional
             the axis object from matplotlib
@@ -1799,7 +1799,7 @@ class Series:
 
               - "path" must be specified; it can be an existing or new path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
-              - "format" can be one of {"pdf", "eps", "png", "ps"}
+              - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         ax : matplotlib.axis, optional
             A matplotlib axis
@@ -1993,7 +1993,7 @@ class Series:
                 - legend
                 - tick parameters
 
-            These will be overriden by summary plot to prevent formatting errors
+            These will be overridden by summary plot to prevent formatting errors
 
         gridspec_kwargs : dict
             arguments used to build the specifications for gridspec configuration
@@ -2021,7 +2021,7 @@ class Series:
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
 
         See also
         --------
@@ -4108,7 +4108,7 @@ class Series:
             corr_res = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'phaseran', number=20)
             print(corr_res)
             
-            # To use the built-in signficance test:
+            # To use the built-in significance test:
             corr_res2s = ts_nino.correlation(ts_air, statistic='spearmanr', method = 'built-in')
             print(corr_res2s)
             
@@ -4433,7 +4433,7 @@ class Series:
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
         fig_clusters : bool, optional
             Whether to display the clusters. The default is True.
         figsize_clusters : list, optional
@@ -4445,7 +4445,7 @@ class Series:
 
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
         keep_log : Boolean
             if True, adds the previous method parameters to the series log.
 
