@@ -53,7 +53,7 @@ To remove the environment:
 
   conda remove --name pyleo --all
 
-More information about managing conda environments can be found `here <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#>`_.
+More information about managing conda environments can be found `here <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#>`__.
 
 Installing Pyleoclim
 """"""""""""""""""""
@@ -63,7 +63,7 @@ Once the pyleo environment is activated, simply run:
 
   pip install pyleoclim
 
-This will install the latest official release, which you can view `here <https://pypi.org/project/pyleoclim/>`_. To install the latest version, which contains the most up-to-date features, you can install directly from the GitHub source:
+This will install the latest official release, which you can view `here <https://pypi.org/project/pyleoclim/>`__. To install the latest version, which contains the most up-to-date features, you can install directly from the GitHub source:
 
 .. code-block:: bash
 

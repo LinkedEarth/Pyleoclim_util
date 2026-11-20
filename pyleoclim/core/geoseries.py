@@ -380,7 +380,7 @@ class GeoSeries(Series):
             Parameters for the scatter plot. The default is None.
         
         cmap : string or list, optional
-            Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_.
+            Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`__.
             The default is None.
         
         colorbar : bool, optional

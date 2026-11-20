@@ -403,7 +403,7 @@ def dropna(ys, ts, verbose=False):
 
     See Also
     --------
-    https://pandas.pydata.org/docs/reference/api/pandas.Series.dropna.html
+    pandas.Series.dropna : `pandas documentation <https://pandas.pydata.org/docs/reference/api/pandas.Series.dropna.html>`__
 
     '''
     ys = np.asarray(ys, dtype=float)
@@ -442,7 +442,7 @@ def dropna_matrix(matrix, verbose=False):
     See Also
     --------
 
-    https://pandas.pydata.org/docs/reference/api/pandas.Series.dropna.html
+    pandas.Series.dropna : `pandas documentation <https://pandas.pydata.org/docs/reference/api/pandas.Series.dropna.html>`__
 
     '''
     matrix = matrix[:, ~np.isnan(matrix).any(axis=0)]
@@ -589,7 +589,7 @@ def resolution(x):
     See Also
     --------
 
-    https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html
+    scipy.stats.describe : `SciPy documentation <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html>`__
     '''
     res = np.diff(x)
     stats = st.describe(res)

@@ -198,7 +198,7 @@ class MultipleGeoSeries(MultipleSeries):
 
             When ``None`` (default), pyleoclim selects ``'vlag'`` for data that span zero
             and ``'viridis'`` otherwise.
-            See `choosing a matplotlib colormap <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
+            See `choosing a matplotlib colormap <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`__.
 
         fig : matplotlib.pyplot.figure, optional
             See matplotlib.pyplot.figure <https://matplotlib.org/3.5.0/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib-pyplot-figure>_.

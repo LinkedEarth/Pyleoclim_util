@@ -94,8 +94,8 @@ class MultivariateDecomp:
         uq : str, optional
         
             Method used for uncertainty quantification of the eigenvalues.
-            'N82' uses the North et al "rule of thumb" [1] with effective sample size
-            computed as in [2].
+            'N82' uses the North et al "rule of thumb" [1]_ with effective sample size
+            computed as in [2]_.
             'MC' uses Monte-Carlo simulations (e.g. MC-EOF). Returns an error if no ensemble is found.
 
         clr_eig : str, optional
@@ -110,9 +110,9 @@ class MultivariateDecomp:
         References
         ----------
         
-        [1]_ North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), Sampling errors in the estimation of empirical orthogonal functions, Mon. Weather Rev., 110, 699–706.
+        .. [1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), Sampling errors in the estimation of empirical orthogonal functions, Mon. Weather Rev., 110, 699–706.
         
-        [2]_ Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical orthogonal functions and related techniques in atmospheric science: A review, International Journal of Climatology, 27(9), 1119–1152, doi:10.1002/joc.1499.
+        .. [2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical orthogonal functions and related techniques in atmospheric science: A review, International Journal of Climatology, 27(9), 1119–1152, doi:10.1002/joc.1499.
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

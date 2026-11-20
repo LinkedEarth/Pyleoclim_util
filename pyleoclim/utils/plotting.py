@@ -428,9 +428,9 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     See Also
     --------
 
-    https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.pcolormesh.html
+    matplotlib.axes.Axes.pcolormesh : `Matplotlib documentation <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.pcolormesh.html>`__
 
-    https://matplotlib.org/stable/tutorials/colors/colormapnorms.html
+    matplotlib.colors.Normalize : `Colormap normalization tutorial <https://matplotlib.org/stable/tutorials/colors/colormapnorms.html>`__
 
 
     '''
