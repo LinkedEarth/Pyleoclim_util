@@ -144,7 +144,7 @@ class EnsMultivarDecomp():
 
             mul_ens = pyleo.MulEnsGeoSeries([nino3_ens,soi_ens])
             mcpca = mul_ens.mcpca(nsim=10,seed=42)
-            mcpca.modeplot()'''
+            fig, axs = mcpca.modeplot()'''
 
         plot_envelope_kwargs = {} if plot_envelope_kwargs is None else plot_envelope_kwargs.copy()
         psd_envelope_kwargs = {} if psd_envelope_kwargs is None else psd_envelope_kwargs.copy()
@@ -332,7 +332,7 @@ class EnsMultivarDecomp():
 
             mul_ens = pyleo.MulEnsGeoSeries([nino3_ens,soi_ens])
             mcpca = mul_ens.mcpca(nsim=10,seed=42)
-            mcpca.screeplot()'''
+            fig, ax = mcpca.screeplot()'''
         
         violin_kwargs = {} if violin_kwargs is None else violin_kwargs.copy()
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

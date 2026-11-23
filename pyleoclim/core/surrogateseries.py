@@ -226,7 +226,7 @@ class SurrogateSeries(EnsembleSeries):
 
             ar1 = pyleo.SurrogateSeries(method='ar1sim', number=10)
             ar1.from_param(length=100, param = [2,2])
-            ar1.plot_envelope(title=rf'AR(1) synthetic series ($\tau={2},\sigma^2={2}$)')
+            fig, ax = ar1.plot_envelope(title=rf'AR(1) synthetic series ($\tau={2},\sigma^2={2}$)')
 
         '''    
         param = param if isinstance(param, list) else [param] # coerce param into a list, no matter the original format

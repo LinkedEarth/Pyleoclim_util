@@ -58,7 +58,7 @@ class MultipleGeoSeries(MultipleSeries):
                                            label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
     
         Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
-        Euro2k.map()
+        fig, axs = Euro2k.map()
 
     '''
 
@@ -262,14 +262,14 @@ class MultipleGeoSeries(MultipleSeries):
                                                label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
         
             Euro2k = pyleo.MultipleGeoSeries(ts_list, label='Euro2k',time_unit='years AD')  
-            Euro2k.map() 
+            fig, axs = Euro2k.map() 
          
         By default, a projection is picked based on the degree of geographic clustering of the sites. To focus on Europe and use a more local projection, do:   
             
         .. jupyter-execute::     
             
             eur_coord = {'central_latitude':45, 'central_longitude':20}
-            Euro2k.map(projection='Orthographic',proj_default=eur_coord) 
+            fig, axs = Euro2k.map(projection='Orthographic',proj_default=eur_coord) 
         
         Symbol size is controlled via the ``'s'`` key of ``scatter_kwargs``.  Note that ``s``
         is inherited from `matplotlib.pyplot.scatter` and represents the marker **area** in
@@ -278,35 +278,35 @@ class MultipleGeoSeries(MultipleSeries):
 
         .. jupyter-execute::
 
-            Euro2k.map(projection='Orthographic', proj_default=eur_coord,
-                       scatter_kwargs={'s': 400})
+            fig, axs = Euro2k.map(projection='Orthographic', proj_default=eur_coord,
+                                  scatter_kwargs={'s': 400})
 
         By default, the shape and colors of symbols denote proxy archives; however, one can use either graphical device to convey other information. For instance, if elevation is available, it may be displayed by size, like so: 
         
         .. jupyter-execute::
             
-            Euro2k.map(projection='Orthographic', size='elevation', proj_default=eur_coord) 
+            fig, axs = Euro2k.map(projection='Orthographic', size='elevation', proj_default=eur_coord) 
             
         Same with observationType:
             
         .. jupyter-execute::
             
-            Euro2k.map(projection='Orthographic', hue = 'observationType', proj_default=eur_coord) 
+            fig, axs = Euro2k.map(projection='Orthographic', hue = 'observationType', proj_default=eur_coord) 
         
         All three sources of information may be combined, but the figure height will need to be enlarged manually to fit the legend:
 
         .. jupyter-execute::
 
-            Euro2k.map(projection='Orthographic',hue='observationType',
-                       size='elevation', proj_default=eur_coord, figsize=[18, 8])
+            fig, axs = Euro2k.map(projection='Orthographic',hue='observationType',
+                                  size='elevation', proj_default=eur_coord, figsize=[18, 8])
 
         When ``hue`` is a numeric variable, ``cmap`` selects the colormap.  Here elevation
         is mapped to color using the ``'terrain'`` colormap:
 
         .. jupyter-execute::
 
-            Euro2k.map(projection='Orthographic', hue='elevation', cmap='terrain',
-                       proj_default=eur_coord)
+            fig, axs = Euro2k.map(projection='Orthographic', hue='elevation', cmap='terrain',
+                                  proj_default=eur_coord)
 
         To control the color range (``vmin`` / ``vmax``), pass a
         `~matplotlib.cm.ScalarMappable` via the ``scalar_mappable`` keyword argument.
@@ -319,16 +319,16 @@ class MultipleGeoSeries(MultipleSeries):
                 norm=mpl.colors.Normalize(vmin=0, vmax=2000),
                 cmap=mpl.colormaps['terrain']
             )
-            Euro2k.map(projection='Orthographic', hue='elevation',
-                       proj_default=eur_coord, scalar_mappable=sm)
+            fig, axs = Euro2k.map(projection='Orthographic', hue='elevation',
+                                  proj_default=eur_coord, scalar_mappable=sm)
 
         For diverging colormaps, shift the neutral centre with ``norm_kwargs``
         (e.g. centred at 500 m):
 
         .. jupyter-execute::
 
-            Euro2k.map(projection='Orthographic', hue='elevation', cmap='RdBu_r',
-                       proj_default=eur_coord, norm_kwargs={'vcenter': 500})
+            fig, axs = Euro2k.map(projection='Orthographic', hue='elevation', cmap='RdBu_r',
+                                  proj_default=eur_coord, norm_kwargs={'vcenter': 500})
 
         '''
 
@@ -427,41 +427,41 @@ class MultipleGeoSeries(MultipleSeries):
             
         .. jupyter-execute::
             
-            res.screeplot() 
+            fig, ax = res.screeplot() 
             
         To plot the first mode, equivalent to `res.modeplot(index=0)`:
             
         .. jupyter-execute::
             
-            res.modeplot() 
+            fig, axs = res.modeplot() 
             
         To plot the second (note the zero-based indexing):
             
         .. jupyter-execute::    
             
-            res.modeplot(index=1)  
+            fig, axs = res.modeplot(index=1)  
             
         One can use map semantics to display the observation type as well:
             
         .. jupyter-execute::    
             
-            res.modeplot(index=1, marker='observationType', size='elevation')
+            fig, axs = res.modeplot(index=1, marker='observationType', size='elevation')
 
         There are many ways to configure the map component. As a simple example, specifying the projection:
 
         .. jupyter-execute::
 
-            res.modeplot(index=1, marker='observationType', size='elevation',
-                map_kwargs={'projection':'Robinson'})
+            fig, axs = res.modeplot(index=1, marker='observationType', size='elevation',
+                           map_kwargs={'projection':'Robinson'})
 
         Or dive into the nuances of gridspec and legend configurations:
 
         .. jupyter-execute::
 
-            res.modeplot(index=1, marker='observationType', size='elevation',
-                        map_kwargs={'projection':'Robinson',
-                                    'gridspec_kwargs': {'width_ratios': [.5, 1,14, 4], 'wspace':-.065},
-                                    'lgd_kwargs':{'bbox_to_anchor':[-.015,1]}})
+            fig, axs = res.modeplot(index=1, marker='observationType', size='elevation',
+                                   map_kwargs={'projection':'Robinson',
+                                               'gridspec_kwargs': {'width_ratios': [.5, 1,14, 4], 'wspace':-.065},
+                                               'lgd_kwargs':{'bbox_to_anchor':[-.015,1]}})
 
 
         One can also configure how hue information gets displayed:
@@ -469,14 +469,14 @@ class MultipleGeoSeries(MultipleSeries):
         .. jupyter-execute::
 
             # Dashboard with hue as a legend category
-            res.modeplot(index=1, size='elevation', map_kwargs= dict(colorbar=False))
+            fig, axs = res.modeplot(index=1, size='elevation', map_kwargs= dict(colorbar=False))
 
             # Dashboard with discrete colorbar
-            res.modeplot(index=1, size='elevation', map_kwargs= dict(color_scale_type='discrete'))
+            fig, axs = res.modeplot(index=1, size='elevation', map_kwargs= dict(color_scale_type='discrete'))
 
             # Dashboard with custom scalar mappable
             sm = pyleo.utils.mapping.make_scalar_mappable(cmap='vlag', hue_vect=res.eigvecs[:, 1], n=21,norm_kwargs={'vcenter': -.5})
-            res.modeplot(index=1, size='elevation', map_kwargs= dict(scalar_mappable=sm))
+            fig, axs = res.modeplot(index=1, size='elevation', map_kwargs= dict(scalar_mappable=sm))
 
 
         and customize the marker variable:
@@ -484,10 +484,10 @@ class MultipleGeoSeries(MultipleSeries):
         .. jupyter-execute::
 
             # Dashboard with marker set to archiveType
-            res.modeplot(index=1, marker='archiveType', size='elevation', map_kwargs= dict(colorbar=True))
+            fig, axs = res.modeplot(index=1, marker='archiveType', size='elevation', map_kwargs= dict(colorbar=True))
 
             # Dashboard with marker set to archiveType
-            res.modeplot(index=1, marker='observationType', size='elevation', map_kwargs= dict(colorbar=True))
+            fig, axs = res.modeplot(index=1, marker='observationType', size='elevation', map_kwargs= dict(colorbar=True))
 
 
         '''
@@ -671,7 +671,7 @@ class MultipleGeoSeries(MultipleSeries):
                                             label=row['dataSetName']+'_'+row['paleoData_variableName'])) 
 
             ms = pyleo.MultipleGeoSeries(ts_list, time_unit='years AD')  
-            ms.time_geo_plot()
+            fig, ax = ms.time_geo_plot()
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

@@ -609,7 +609,7 @@ class PSD:
             tsn = ts.standardize()
     
             psd_sim = tsn.spectral(method='mtm').signif_test(number=20)
-            psd_sim.plot()
+            fig, ax = psd_sim.plot()
 
         If you add the estimate of the scaling exponent, the line of best fit 
         will be added to the plot, and the estimated exponent to its legend. For instance:

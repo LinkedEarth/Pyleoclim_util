@@ -337,7 +337,7 @@ class MulEnsGeoSeries():
                 ens_list.append(ts_ens)
 
             mul_ens = pyleo.MulEnsGeoSeries(ens_list)
-            mul_ens.stackplot()
+            fig, axs = mul_ens.stackplot()
 
         If you'd like to adjust the plot parameters, you can pass them via the `plot_kwargs` argument.
 
@@ -364,7 +364,7 @@ class MulEnsGeoSeries():
                 ens_list.append(ts_ens)
 
             mul_ens = pyleo.MulEnsGeoSeries(ens_list)
-            mul_ens.stackplot(plot_kwargs={'shade_alpha':0.5})
+            fig, axs = mul_ens.stackplot(plot_kwargs={'shade_alpha':0.5})
 
         If you'd like to plot traces instead, you can use the modify the `plot_style` argument
 
@@ -391,7 +391,7 @@ class MulEnsGeoSeries():
                 ens_list.append(ts_ens)
 
             mul_ens = pyleo.MulEnsGeoSeries(ens_list)
-            mul_ens.stackplot(plot_style='traces')
+            fig, axs = mul_ens.stackplot(plot_style='traces')
         '''
         # Create a figure with a specified size
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
