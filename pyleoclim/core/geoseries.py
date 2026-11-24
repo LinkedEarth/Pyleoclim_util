@@ -406,7 +406,11 @@ class GeoSeries(Series):
 
         Returns
         -------
-        res : fig,ax_d
+        fig : matplotlib.figure.Figure
+            The figure.
+
+        ax_d : dict
+            Dictionary of matplotlib.axes.Axes, with keys ``'map'`` and, if a legend is drawn, ``'leg'``.
 
         See also
         --------
@@ -529,7 +533,11 @@ class GeoSeries(Series):
 
         Returns
         -------
-        res : fig,ax_d
+        fig : matplotlib.figure.Figure
+            The figure.
+
+        ax_d : dict
+            Dictionary of matplotlib.axes.Axes, with keys ``'map'`` and, if a legend is drawn, ``'leg'``.
 
         See also
         --------
@@ -895,9 +903,9 @@ class GeoSeries(Series):
 
         Returns
         -------
-        res : MultiplegGeoSeries or GeoSeries
-            If gaps were detected, returns the segments in a MultipleGeoSeries object,
-            else, returns the original timeseries.
+        res : MultipleGeoSeries or GeoSeries
+            If gaps were detected, the segments in a MultipleGeoSeries object;
+            otherwise, the original GeoSeries.
 
         Examples
         --------
@@ -1018,6 +1026,27 @@ class GeoSeriesResampler:
     then they will get back a pyleoclim.GeoSeries, and `GeoSeriesResampler`
     will only be used in an intermediate step. Think of it as an
     implementation detail.
+
+    Parameters
+    ----------
+    rule : str
+        pandas offset alias (e.g. ``'1000YS'``), as built by :meth:`pyleoclim.core.geoseries.GeoSeries.resample` from the user's rule.
+
+    series : pandas.Series
+        The GeoSeries, converted with ``to_pandas()``.
+
+    metadata : dict
+        Metadata of the original GeoSeries, used to rebuild it after resampling.
+
+    keep_log : bool
+        If True, adds the resampling step to the log of the returned GeoSeries.
+
+    kwargs : dict
+        Additional arguments passed to ``pandas.Series.resample``.
+
+    See also
+    --------
+    pyleoclim.core.geoseries.GeoSeries.resample : the public method, with examples
     """
     def __init__(self, rule, series, metadata, keep_log, kwargs):
         self.rule = rule

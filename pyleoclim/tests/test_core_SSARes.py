@@ -48,6 +48,15 @@ class TestUiSSAResScreeplot:
         fig, ax = cn_ssa.screeplot(title="MC-SSA scree plot")
         pyleo.closefig(fig)
 
+    def test_plot_t2(self, gen_ts):
+        """Test SSARes.screeplot on a provided axis: returns only the axis"""
+        import matplotlib.pyplot as plt
+        cn = gen_ts(model="colored_noise", nt=500, alpha=1.0)
+        fig, ax0 = plt.subplots()
+        ax = cn.ssa().screeplot(ax=ax0)
+        assert ax is ax0
+        pyleo.closefig(fig)
+
 
 class TestUiSSAResModeplot:
     """Tests for SSARes.modeplot()"""

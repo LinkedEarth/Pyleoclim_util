@@ -857,6 +857,11 @@ class Series:
         keep_log : Boolean
             if True, adds this step and its parameter to the series log.
 
+        Returns
+        -------
+        new_ts : Series
+            A new Series object with the time axis expressed in ``time_unit``.
+
         Examples
         --------
 
@@ -942,9 +947,9 @@ class Series:
 
         Returns
         -------
-        res : dictionary
-            Contains the mean, median, minimum value, maximum value, standard
-            deviation, and interquartile range for the Series.
+        res : dict
+            Keys ``'mean'``, ``'median'``, ``'min'``, ``'max'``, ``'std'`` and ``'IQR'``
+            (interquartile range), computed while ignoring NaNs.
 
         Examples
         --------
@@ -1385,21 +1390,17 @@ class Series:
 
         Returns
         -------
-        res : object of the SsaRes class containing:
+        resc : SsaRes
+            Object with the following attributes:
 
-        eigvals : (M, ) array of eigenvalues
-
-        eigvecs : (M, M) Matrix of temporal eigenvectors (T-EOFs)
-
-        PC : (N - M + 1, M) array of principal components (T-PCs)
-
-        RCmat : (N,  M) array of reconstructed components
-
-        RCseries : (N,) reconstructed series, with mean and variance restored (same type as original)
-
-        pctvar: (M, ) array of the fraction of variance (%) associated with each mode
-
-        eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
+            - eigvals : (M, ) array of eigenvalues
+            - eigvecs : (M, M) matrix of temporal eigenvectors (T-EOFs)
+            - PC : (N - M + 1, M) array of principal components (T-PCs)
+            - RCmat : (N, M) array of reconstructed components
+            - RCseries : (N, ) reconstructed series, with mean and variance restored (same type as the original)
+            - pctvar : (M, ) array of the fraction of variance (%) associated with each mode
+            - mode_idx : indices of the modes retained according to ``trunc``
+            - eigvals_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum (only if nMC > 0)
 
         References
         ----------
@@ -1534,6 +1535,7 @@ class Series:
         Returns
         -------
         res : bool
+            True if all time increments are within ``tol`` of each other, False otherwise.
 
         '''
 
@@ -1816,6 +1818,14 @@ class Series:
         plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
 
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure. Only returned if ``ax`` is None.
+
+        ax : matplotlib.axes.Axes
+            The axis with the distribution plot. If ``ax`` was provided, only ``ax`` is returned.
+
         See also
         --------
 
@@ -2022,6 +2032,15 @@ class Series:
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure.
+
+        ax : dict
+            Dictionary of matplotlib.axes.Axes, with keys ``'ts'`` (timeseries), ``'scal'`` (scalogram),
+            ``'psd'`` (power spectrum), ``'cb'`` (colorbar) and, if ``legend`` is True, ``'leg'`` (legend).
 
         See also
         --------
@@ -2749,13 +2768,15 @@ class Series:
     def gaussianize(self, keep_log = False):
         ''' Gaussianizes the timeseries (i.e. maps its values to a standard normal)
 
+        Parameters
+        ----------
+        keep_log : bool
+            If True, adds this transformation to the series log. The default is False.
+
         Returns
         -------
         new : Series
-            The Gaussianized series object
-
-        keep_log : Boolean
-            if True, adds this transformation to the series log.
+            The Gaussianized series object.
 
         References
         ----------
@@ -2849,8 +2870,8 @@ class Series:
         Returns
         -------
         res : MultipleSeries or Series
-            If gaps were detected, returns the segments in a MultipleSeries object,
-            else, returns the original timeseries.
+            If gaps were detected, the segments in a MultipleSeries object;
+            otherwise, the original Series.
 
         """
         seg_y, seg_t, n_segs = tsutils.ts2segments(self.value,self.time,factor=factor)
@@ -4221,8 +4242,12 @@ class Series:
 
         Returns
         -------
-        res : dict
-            Dictionary containing the results of the the causality analysis. See indivudal methods for details
+        causal_res : dict
+            Results of the causality analysis. For ``method='liang'``, keys include ``'T21'``, ``'tau21'``
+            and ``'Z'`` (information flow from ``target_series`` to this series), plus significance
+            estimates; see :func:`pyleoclim.utils.causality.liang_causality`. For ``method='granger'``,
+            the dictionary returned by statsmodels' ``grangercausalitytests``, keyed by lag;
+            see :func:`pyleoclim.utils.causality.granger_causality`.
 
         See also
         --------
@@ -4924,6 +4949,27 @@ class SeriesResampler:
     then they will get back a pyleoclim.Series, and `SeriesResampler`
     will only be used in an intermediate step. Think of it as an
     implementation detail.
+
+    Parameters
+    ----------
+    rule : str
+        pandas offset alias (e.g. ``'1000YS'``), as built by :meth:`pyleoclim.core.series.Series.resample` from the user's rule.
+
+    series : pandas.Series
+        The Series, converted with ``to_pandas()``.
+
+    metadata : dict
+        Metadata of the original Series, used to rebuild it after resampling.
+
+    keep_log : bool
+        If True, adds the resampling step to the log of the returned Series.
+
+    kwargs : dict
+        Additional arguments passed to ``pandas.Series.resample``.
+
+    See also
+    --------
+    pyleoclim.core.series.Series.resample : the public method, with examples
     """
     def __init__(self, rule, series, metadata, keep_log, kwargs):
         self.rule = rule

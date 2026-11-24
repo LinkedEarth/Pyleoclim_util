@@ -286,6 +286,11 @@ class MultipleSeries:
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
 
+        Returns
+        -------
+        new_ms : MultipleSeries
+            A new MultipleSeries object with all series converted to ``time_unit``.
+
         Examples
         --------
         
@@ -1041,9 +1046,9 @@ class MultipleSeries:
 
         Returns
         -------
-        res: MultivariateDecomp
-
-            Resulting pyleoclim.MultivariateDecomp object
+        res : MultivariateDecomp
+            Object holding the eigenvalues, eigenvectors (EOFs), principal components (PCs),
+            fraction of variance explained, and effective sample size. See :class:`pyleoclim.core.multivardecomp.MultivariateDecomp`.
         
         See also
         --------
@@ -2683,11 +2688,8 @@ class MultipleSeries:
         E.g. for time_axis = [0,1,3], resolution.resolution = [1,2] resolution.time = [0,1].
         Note that the MultipleResolution class requires a shared time unit. If the time_unit parameter is not passed, a time unit will be automatically determined.
 
-        Returns
-        -------
-        multipleresolution : pyleoclim.MultipleResolution
-            MultipleResolution object
-
+        Parameters
+        ----------
         time_unit : str
             Time unit to convert objects to. See pyleo.Series.convert_time_unit for options.
 
@@ -2695,8 +2697,15 @@ class MultipleSeries:
             Whether or not to print messages warning the user about automated decisions.
 
         statistic : str; {'median','mean',None}
-            If a recognized statistic is passed, this function will simply output that statistic applied to the resolution of each series in the MulitipleSeries object. Options are 'mean' or 'median'.
+            If a recognized statistic is passed, this function will simply output that statistic applied to the resolution of each series in the MultipleSeries object. Options are 'mean' or 'median'.
             If statistic is None, then the function will return a new MultipleResolution class with plotting capabilities.
+            The default is 'median', which will be deprecated in favor of None.
+
+        Returns
+        -------
+        res : list or pyleoclim.MultipleResolution
+            If ``statistic`` is 'median' or 'mean', a list with that statistic of the resolution of each series.
+            If ``statistic`` is None, a MultipleResolution object.
 
         See also
         --------
