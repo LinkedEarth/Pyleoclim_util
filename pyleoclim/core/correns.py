@@ -192,6 +192,24 @@ class CorrEns:
         seaborn.histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
         
         pyleoclim.utils.plotting.savefig : save figures in Pyleoclim
+
+        Examples
+        --------
+
+        Correlate a toy ensemble (SOI plus noise) with NINO3, then plot the distribution of correlations, color-coded by significance:
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI').interp()
+            # a toy ensemble: SOI plus independent noise realizations
+            rng = np.random.default_rng(42)
+            ens = pyleo.EnsembleSeries([pyleo.Series(time=soi.time, value=soi.value + rng.normal(size=len(soi.value)),
+                                                     time_unit=soi.time_unit, verbose=False) for _ in range(20)])
+            nino3 = pyleo.utils.load_dataset('NINO3')
+            corr = ens.correlation(nino3, number=20, mute_pbar=True, seed=42,
+                                   common_time_kwargs={})
+            fig, ax = corr.plot()
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         hist_kwargs = {} if hist_kwargs is None else hist_kwargs.copy()

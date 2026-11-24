@@ -1389,8 +1389,11 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
         df : pandas.DataFrame
-            A Pandas DataFrame containing members of the ensemble as columns. 
-        
+            A Pandas DataFrame containing members of the ensemble as columns.
+
+        Examples
+        --------
+
         .. jupyter-execute::
             
             nn = 30 #number of age models

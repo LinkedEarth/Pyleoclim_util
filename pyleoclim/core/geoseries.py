@@ -258,7 +258,7 @@ class GeoSeries(Series):
 
     @classmethod
     def from_json(cls, path):
-        ''' Creates a pyleoclim.Series from a JSON file
+        ''' Creates a pyleoclim.GeoSeries from a JSON file
 
         The keys in the JSON file must correspond to the parameter associated with a GeoSeries object
 
@@ -271,6 +271,19 @@ class GeoSeries(Series):
         -------
         ts : pyleoclim.core.series.Series
             A Pyleoclim Series object.
+
+        Examples
+        --------
+
+        Write the EPICA Dome C deuterium record to a JSON file, then read it back:
+
+        .. jupyter-execute::
+
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            edc.to_json('edc.json')
+            edc_json = pyleo.GeoSeries.from_json('edc.json')
+            print(edc_json.lat, edc_json.lon)
+            edc_json.equals(edc)
 
         '''
 
@@ -754,7 +767,7 @@ class GeoSeries(Series):
 
         pyleoclim.core.psds.PSD.plot : plot power spectrum
 
-        pyleoclim.core.psds.MulitplePSD.plot : plot envelope of power spectrum
+        pyleoclim.core.psds.MultiplePSD.plot : plot envelope of power spectrum
 
         pyleoclim.core.geoseries.GeoSeries.map : map location of dataset
 

@@ -1057,7 +1057,7 @@ class MultipleSeries:
 
         pyleoclim.core.multivardecomp.MultivariateDecomp : The spatial decomposition object
         
-        pyleoclim.core.mulitpleseries.MulitpleSeries.common_time : align time axes
+        pyleoclim.core.multipleseries.MultipleSeries.common_time : align time axes
         
         Examples
         --------
@@ -1302,6 +1302,18 @@ class MultipleSeries:
         pyleoclim.core.series.Series.detrend : Detrending for a single series
 
         pyleoclim.utils.tsutils.detrend : Detrending function
+
+        Examples
+        --------
+
+        Remove a linear trend from HadCRUT5 and NINO3:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset('HadCRUT5'), pyleo.utils.load_dataset('NINO3')])
+            ms_dt = ms.detrend(method='linear')
+            fig, axs = ms_dt.stackplot()
+
         '''
         ms=self.copy()
         for idx,item in enumerate(ms.series_list):
@@ -2287,6 +2299,23 @@ class MultipleSeries:
         -------
         pandas.DataFrame
 
+        Examples
+        --------
+
+        By default, the series are aligned on the union of their time points, with NaN where a series has no value:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset('SOI'), pyleo.utils.load_dataset('NINO3')])
+            df = ms.to_pandas()
+            df.head()
+
+        With ``use_common_time=True``, the series are first placed on a common time axis (see ``common_time``):
+
+        .. jupyter-execute::
+
+            ms.to_pandas(use_common_time=True).head()
+
         """
         if use_common_time:
             ms = self.common_time(*args, **kwargs)
@@ -2340,7 +2369,7 @@ class MultipleSeries:
     
     def sel(self, value=None, time=None, tolerance=0):
         '''
-        Slice MulitpleSeries based on 'value' or 'time'. See examples in pyleoclim.series.Series for usage. 
+        Slice MultipleSeries based on 'value' or 'time'. See examples in pyleoclim.series.Series for usage. 
 
         Parameters
         ----------
@@ -2363,13 +2392,24 @@ class MultipleSeries:
 
         Returns
         -------
-        ms_new : pyleoclim.mulitpleseries.MultipleSeries
+        ms_new : pyleoclim.core.multipleseries.MultipleSeries
             Copy of `self`, sliced according to `value` and `time`.
             
         See also
         --------
         
         pyleoclim.series.Series.sel : Slicing a series by `value` and `time`. 
+
+        Examples
+        --------
+
+        Select the 1950-2000 interval of SOI and NINO3:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset('SOI'), pyleo.utils.load_dataset('NINO3')])
+            ms_sel = ms.sel(time=slice(1950, 2000))
+            fig, axs = ms_sel.stackplot()
 
         '''
         
@@ -2395,12 +2435,22 @@ class MultipleSeries:
         Parameters
         ----------
         path : string, optional
-            The path to the file. The default is None, resulting in a file saved in the current working directory using the label for the dataset as filename if available or 'mulitpleseries.json' if label is not provided.
+            The path to the file. The default is None, resulting in a file saved in the current working directory, named after the label of the first series if available, or 'multipleseries.json' otherwise.
 
         Returns
         -------
         None.
-        
+
+        Examples
+        --------
+
+        Write a MultipleSeries to a JSON file:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset('SOI'), pyleo.utils.load_dataset('NINO3')], label='ENSO')
+            ms.to_json('enso.json')
+
         '''
         
         if path is None:        
@@ -2410,9 +2460,9 @@ class MultipleSeries:
     
     @classmethod    
     def from_json(cls, path):
-        ''' Creates a pyleoclim.MulitpleSeries from a JSON file
+        ''' Creates a pyleoclim.MultipleSeries from a JSON file
         
-        The keys in the JSON file must correspond to the parameter associated with MulitpleSeries and Series objects
+        The keys in the JSON file must correspond to the parameter associated with MultipleSeries and Series objects
 
         Parameters
         ----------
@@ -2421,8 +2471,20 @@ class MultipleSeries:
 
         Returns
         -------
-        ts : pyleoclim.core.series.MulitplesSeries
+        ms : pyleoclim.core.multipleseries.MultipleSeries
             A Pyleoclim MultipleSeries object. 
+
+        Examples
+        --------
+
+        Write a MultipleSeries to a JSON file, then read it back:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset('SOI'), pyleo.utils.load_dataset('NINO3')], label='ENSO')
+            ms.to_json('enso.json')
+            ms_json = pyleo.MultipleSeries.from_json('enso.json')
+            [s.label for s in ms_json.series_list]
 
         '''
         

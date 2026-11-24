@@ -898,6 +898,22 @@ class MultiplePSD:
         -------
         psds : pyleoclim.core.psds.MultiplePSD
 
+        Examples
+        --------
+
+        Spectra of a toy ensemble (SOI plus noise), summarized by their 5%, 50% and 95% quantiles:
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI').interp()
+            # a toy ensemble: SOI plus independent noise realizations
+            rng = np.random.default_rng(42)
+            ens = pyleo.EnsembleSeries([pyleo.Series(time=soi.time, value=soi.value + rng.normal(size=len(soi.value)),
+                                                     time_unit=soi.time_unit, verbose=False) for _ in range(20)])
+            psds = ens.spectral(method='mtm', mute_pbar=True)
+            psd_qs = psds.quantiles()
+            fig, ax = psd_qs.plot()
+
         '''
         if self.psd_list[0].timeseries is not None:
             period_unit = self.psd_list[0].timeseries.time_unit
@@ -962,6 +978,21 @@ class MultiplePSD:
         --------
 
         pyleoclim.core.psds.PSD.beta_est : scaling exponent estimation for a single PSD object
+
+        Examples
+        --------
+
+        Estimate the spectral slope of each member of an ensemble of colored noise realizations with exponent 1:
+
+        .. jupyter-execute::
+
+            rng = np.random.default_rng(42)
+            t = np.arange(1000)
+            ens = pyleo.EnsembleSeries([pyleo.Series(time=t, value=pyleo.utils.gen_ts(model='colored_noise', t=t, alpha=1.0, seed=int(s))[1],
+                                                     verbose=False) for s in rng.integers(0, 10**6, 10)])
+            psds = ens.spectral(method='mtm', mute_pbar=True).beta_est()
+            betas = [psd.beta_est_res['beta'] for psd in psds.psd_list]
+            print(np.round(betas, 2))
 
         '''
 
@@ -1083,6 +1114,17 @@ class MultiplePSD:
         
         pyleoclim.core.psds.PSD.plot : plotting method for PSD objects
 
+        Examples
+        --------
+
+        Plot the spectra of SOI and NINO3 together:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset('SOI').interp(), pyleo.utils.load_dataset('NINO3')])
+            psds = ms.spectral(method='mtm', mute_pbar=True)
+            fig, ax = psds.plot()
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
@@ -1184,6 +1226,31 @@ class MultiplePSD:
         --------
 
         pyleoclim.utils.wavelet.AliasFilter.alias_filter : anti-aliasing filter
+
+        Examples
+        --------
+
+        Sampling a process that has power at frequencies above the Nyquist frequency aliases that power into the resolved frequencies, which flattens the spectrum. Here, colored noise with spectral exponent 1 is generated on a fine time grid and kept only every 10th point; the anti-aliasing filter brings the estimated exponent back close to 1:
+
+        .. jupyter-execute::
+
+            t = np.arange(10000)
+            ens = pyleo.EnsembleSeries([pyleo.Series(time=t[::10],
+                                                     value=pyleo.utils.gen_ts(model='colored_noise', t=t, alpha=1.0, seed=s)[1][::10],
+                                                     verbose=False) for s in range(5)])
+            psds = ens.spectral(method='mtm', mute_pbar=True)
+            psds_aa = psds.anti_alias(mute_pbar=True)
+            for name, mpsd in [('before', psds), ('after', psds_aa)]:
+                betas = [psd.beta_est_res['beta'] for psd in mpsd.beta_est().psd_list]
+                print(f'mean spectral exponent {name} anti-aliasing: {np.mean(betas):.2f}')
+
+        Compare the spectra before (colors) and after (black) anti-aliasing:
+
+        .. jupyter-execute::
+
+            fig, ax = psds.plot(legend=False)
+            ax = psds_aa.plot(ax=ax, colors=['k']*5, legend=False)
+
         '''
         psd_aa_list = []
         for psd_obj in tqdm(self.psd_list,  total=len(self.psd_list), disable=mute_pbar, desc='Applying the anti-alias filter'):

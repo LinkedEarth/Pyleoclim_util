@@ -122,6 +122,17 @@ class MultivariateDecomp:
         
         .. [2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical orthogonal functions and related techniques in atmospheric science: A review, International Journal of Climatology, 27(9), 1119–1152, doi:10.1002/joc.1499.
 
+        Examples
+        --------
+
+        PCA of three ENSO-related series, then the eigenvalue spectrum with North et al. (1982) uncertainties:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset(name) for name in ['SOI', 'NINO3', 'AIR']], label='ENSO indices')
+            pca = ms.common_time().standardize().pca()
+            fig, ax = pca.screeplot()
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
@@ -297,6 +308,16 @@ class MultivariateDecomp:
 
         pyleoclim.utils.plotting.make_scalar_mappable : Custom scalar mappable
 
+        Examples
+        --------
+
+        Plot the first mode of the PCA of three ENSO-related series: its principal component, its spectrum and its loadings:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset(name) for name in ['SOI', 'NINO3', 'AIR']], label='ENSO indices')
+            pca = ms.common_time().standardize().pca()
+            fig, axs = pca.modeplot(index=0)
 
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
