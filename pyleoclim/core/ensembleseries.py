@@ -1303,6 +1303,14 @@ class EnsembleSeries(MultipleSeries):
 
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
 
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure. Only returned if ``ax`` is None.
+
+        ax : matplotlib.axes.Axes
+            The axis with the distribution plot. If ``ax`` was provided, only ``ax`` is returned.
+
         See also
         --------
 
@@ -1381,8 +1389,11 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
         df : pandas.DataFrame
-            A Pandas DataFrame containing members of the ensemble as columns. 
-        
+            A Pandas DataFrame containing members of the ensemble as columns.
+
+        Examples
+        --------
+
         .. jupyter-execute::
             
             nn = 30 #number of age models

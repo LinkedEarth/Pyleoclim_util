@@ -51,6 +51,19 @@ class TestUiMultivariateDecompScreeplot:
         fig, ax = res.screeplot(uq=uq)
         pyleo.closefig(fig)
 
+    def test_plot_t1(self, gen_ts):
+        """Test MultivariateDecomp.screeplot on a provided axis: returns only the axis"""
+        n, p = 100, 5
+        signal = gen_ts(model="colored_noise", nt=n, alpha=1.0).standardize()
+        X = signal.value[:, None] + np.random.randn(n, p)
+        ms = pyleo.MultipleSeries(
+            [pyleo.Series(time=np.arange(n), value=X[:, i], verbose=False) for i in range(p)]
+        )
+        fig, ax0 = plt.subplots()
+        ax = ms.pca().screeplot(ax=ax0)
+        assert ax is ax0
+        pyleo.closefig(fig)
+
 
 class TestUiMultivariateDecompModeplot:
     """Tests for SSARes.modeplot()"""

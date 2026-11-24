@@ -433,6 +433,19 @@ class Series:
         This method first checks if the index of the pandas Series is a DatetimeIndex. If it is, it converts the index to seconds if it's not already in that unit. Then it converts the datetime index to a time array using the 'time_unit' and 'time_name' from the metadata.
 
         The method then returns a new Series object with the converted time and values, and the provided metadata.
+
+        Examples
+        --------
+
+        Round-trip through pandas: export SOI to a pandas Series, then rebuild a pyleoclim Series using the original metadata.
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI')
+            ser = soi.to_pandas()
+            soi2 = pyleo.Series.from_pandas(ser, metadata=soi.metadata)
+            soi2.equals(soi)
+
         """
 
         # First fill metadata gaps
@@ -468,6 +481,23 @@ class Series:
         Returns
         -------
         ser : pd.Series representation of the pyleo.Series object
+
+        Examples
+        --------
+
+        By default, the index is a datetime index:
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI')
+            ser = soi.to_pandas()
+            ser.head()
+
+        With ``paleo_style=True``, the index holds the original time values, and the index and Series are named after the time and value labels:
+
+        .. jupyter-execute::
+
+            soi.to_pandas(paleo_style=True).head()
 
         '''
         ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
@@ -551,6 +581,18 @@ class Series:
 
         pyleoclim.Series.to_csv
 
+        Examples
+        --------
+
+        Write SOI to a CSV file (with a metadata header), then read it back:
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI')
+            soi.to_csv(path='soi_data.csv')
+            soi_csv = pyleo.Series.from_csv('soi_data.csv')
+            soi_csv.equals(soi)
+
         '''
         metadata = {}
         # read in metadata header
@@ -622,6 +664,18 @@ class Series:
         ts : pyleoclim.core.series.Series
             A Pyleoclim Series object.
 
+        Examples
+        --------
+
+        Write SOI to a JSON file, then read it back:
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI')
+            soi.to_json('soi.json')
+            soi_json = pyleo.Series.from_json('soi.json')
+            soi_json.equals(soi)
+
         '''
 
         a = jsonutils.open_json(path)
@@ -635,13 +689,26 @@ class Series:
 
         Parameters
         ----------
-        method : str
-            The name of the pandas method to apply to the Series object
+        method : callable
+            A function that takes a pandas Series and returns a pandas Series,
+            e.g. ``lambda s: s.rolling(12).mean()``.
 
         Returns
         -------
         Series
             A new Series object with the result of the method applied to the original Series object
+
+        Examples
+        --------
+
+        Apply any function that takes and returns a pandas Series, here a centered 12-month running mean of NINO3:
+
+        .. jupyter-execute::
+
+            nino3 = pyleo.utils.load_dataset('NINO3')
+            nino3_rm = nino3.pandas_method(lambda s: s.rolling(12, center=True).mean())
+            fig, ax = nino3.plot(alpha=0.5, label='monthly')
+            ax = nino3_rm.plot(ax=ax, label='12-month running mean')
 
         '''
         ser = self.to_pandas()
@@ -736,6 +803,17 @@ class Series:
         See also
         --------
         pyleoclim.utils.tsbase.overlap : compute length of overlap
+
+        Examples
+        --------
+
+        SOI and NINO3 share part of their time span; ``overlap`` returns its length in the time units of the calling series:
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI')
+            nino3 = pyleo.utils.load_dataset('NINO3')
+            soi.overlap(nino3)
 
         '''
         time_pars_left = tsbase.time_unit_to_datum_exp_dir(self.time_unit,time_name=self.time_name)
@@ -857,6 +935,11 @@ class Series:
         keep_log : Boolean
             if True, adds this step and its parameter to the series log.
 
+        Returns
+        -------
+        new_ts : Series
+            A new Series object with the time axis expressed in ``time_unit``.
+
         Examples
         --------
 
@@ -942,9 +1025,9 @@ class Series:
 
         Returns
         -------
-        res : dictionary
-            Contains the mean, median, minimum value, maximum value, standard
-            deviation, and interquartile range for the Series.
+        res : dict
+            Keys ``'mean'``, ``'median'``, ``'min'``, ``'max'``, ``'std'`` and ``'IQR'``
+            (interquartile range), computed while ignoring NaNs.
 
         Examples
         --------
@@ -1385,21 +1468,17 @@ class Series:
 
         Returns
         -------
-        res : object of the SsaRes class containing:
+        resc : SsaRes
+            Object with the following attributes:
 
-        eigvals : (M, ) array of eigenvalues
-
-        eigvecs : (M, M) Matrix of temporal eigenvectors (T-EOFs)
-
-        PC : (N - M + 1, M) array of principal components (T-PCs)
-
-        RCmat : (N,  M) array of reconstructed components
-
-        RCseries : (N,) reconstructed series, with mean and variance restored (same type as original)
-
-        pctvar: (M, ) array of the fraction of variance (%) associated with each mode
-
-        eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
+            - eigvals : (M, ) array of eigenvalues
+            - eigvecs : (M, M) matrix of temporal eigenvectors (T-EOFs)
+            - PC : (N - M + 1, M) array of principal components (T-PCs)
+            - RCmat : (N, M) array of reconstructed components
+            - RCseries : (N, ) reconstructed series, with mean and variance restored (same type as the original)
+            - pctvar : (M, ) array of the fraction of variance (%) associated with each mode
+            - mode_idx : indices of the modes retained according to ``trunc``
+            - eigvals_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum (only if nMC > 0)
 
         References
         ----------
@@ -1534,6 +1613,17 @@ class Series:
         Returns
         -------
         res : bool
+            True if all time increments are within ``tol`` of each other, False otherwise.
+
+        Examples
+        --------
+
+        SOI is not exactly evenly spaced, but its interpolated version is:
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI')
+            print(soi.is_evenly_spaced(), soi.interp().is_evenly_spaced())
 
         '''
 
@@ -1816,6 +1906,14 @@ class Series:
         plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
 
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure. Only returned if ``ax`` is None.
+
+        ax : matplotlib.axes.Axes
+            The axis with the distribution plot. If ``ax`` was provided, only ``ax`` is returned.
+
         See also
         --------
 
@@ -2022,6 +2120,15 @@ class Series:
             - "path" must be specified; it can be an existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure.
+
+        ax : dict
+            Dictionary of matplotlib.axes.Axes, with keys ``'ts'`` (timeseries), ``'scal'`` (scalogram),
+            ``'psd'`` (power spectrum), ``'cb'`` (colorbar) and, if ``legend`` is True, ``'leg'`` (legend).
 
         See also
         --------
@@ -2458,6 +2565,18 @@ class Series:
         new : Series
             Series object with removed NaNs and sorting
 
+        Examples
+        --------
+
+        Remove NaNs and sort the time axis:
+
+        .. jupyter-execute::
+
+            ts = pyleo.Series(time=[3, 1, 4, 2, 5], value=[3., np.nan, 4., 2., 5.],
+                             dropna=False, sort_ts=None, verbose=False)
+            ts_clean = ts.clean()
+            print(ts_clean.time, ts_clean.value)
+
         '''
         new = self.copy()
         v_mod, t_mod = tsbase.clean_ts(self.value, self.time, verbose=verbose)
@@ -2485,6 +2604,18 @@ class Series:
         -------
         new : Series
             Series object with removed NaNs and sorting
+
+        Examples
+        --------
+
+        A Series with a decreasing time axis is sorted to increasing time by default:
+
+        .. jupyter-execute::
+
+            ts = pyleo.Series(time=[5, 4, 3, 2, 1], value=[5., 4., 3., 2., 1.],
+                             sort_ts=None, verbose=False)
+            print(ts.sort().time)
+            print(ts.sort(ascending=False).time)
 
         '''
         new = self.copy()
@@ -2749,18 +2880,37 @@ class Series:
     def gaussianize(self, keep_log = False):
         ''' Gaussianizes the timeseries (i.e. maps its values to a standard normal)
 
+        Parameters
+        ----------
+        keep_log : bool
+            If True, adds this transformation to the series log. The default is False.
+
         Returns
         -------
         new : Series
-            The Gaussianized series object
-
-        keep_log : Boolean
-            if True, adds this transformation to the series log.
+            The Gaussianized series object.
 
         References
         ----------
 
         Emile-Geay, J., and M. Tingley (2016), Inferring climate variability from nonlinear proxies: application to palaeo-enso studies, Climate of the Past, 12 (1), 31–50, doi:10.5194/cp- 12-31-2016.
+
+        Examples
+        --------
+
+        The LR04 benthic stack has a skewed distribution:
+
+        .. jupyter-execute::
+
+            lr04 = pyleo.utils.load_dataset('LR04')
+            fig, ax = lr04.histplot()
+
+        After gaussianization, its values follow a standard normal distribution:
+
+        .. jupyter-execute::
+
+            fig, ax = lr04.gaussianize().histplot()
+
         '''
         new = self.copy()
         v_mod = tsutils.gaussianize(self.value)
@@ -2814,6 +2964,25 @@ class Series:
         new : Series
             The centered series object
 
+        Examples
+        --------
+
+        Remove the mean of the whole series:
+
+        .. jupyter-execute::
+
+            hadcrut = pyleo.utils.load_dataset('HadCRUT5')
+            hadcrut_c = hadcrut.center()
+            print(hadcrut_c.value.mean())
+
+        Or the mean over a reference period, here 1961-1990, to express the series as anomalies relative to that period:
+
+        .. jupyter-execute::
+
+            hadcrut_ref = hadcrut.center(timespan=[1961, 1990])
+            fig, ax = hadcrut_c.plot(label='centered on full record')
+            ax = hadcrut_ref.plot(ax=ax, label='centered on 1961-1990')
+
         '''
         new = self.copy()
         if timespan is not None:
@@ -2849,8 +3018,22 @@ class Series:
         Returns
         -------
         res : MultipleSeries or Series
-            If gaps were detected, returns the segments in a MultipleSeries object,
-            else, returns the original timeseries.
+            If gaps were detected, the segments in a MultipleSeries object;
+            otherwise, the original Series.
+
+        Examples
+        --------
+
+        Remove 20 years from NINO3 to create a gap, then segment the series at that gap:
+
+        .. jupyter-execute::
+
+            nino3 = pyleo.utils.load_dataset('NINO3')
+            keep = (nino3.time < 1900) | (nino3.time > 1920)
+            gappy = pyleo.Series(time=nino3.time[keep], value=nino3.value[keep],
+                                 time_unit=nino3.time_unit, label='NINO3 with a gap', verbose=False)
+            segments = gappy.segment()
+            fig, ax = segments.plot()
 
         """
         seg_y, seg_t, n_segs = tsutils.ts2segments(self.value,self.time,factor=factor)
@@ -3141,7 +3324,7 @@ class Series:
             If None, will use the start point and end point of the original timeseries
 
         dt : float
-            The time spacing to fill the NaNs; default is 1.
+            The spacing of the new, regular time axis; default is 1.
 
         keep_log : Boolean
             if True, adds this step and its parameters to the series log.
@@ -3149,7 +3332,21 @@ class Series:
         Returns
         -------
         new : Series
-            The sliced Series object.
+            Series on a regular time axis spanning ``timespan`` with spacing ``dt``. Values are kept
+            where a new time point exactly matches an original one, and set to NaN elsewhere.
+
+        Examples
+        --------
+
+        Drop a few years from the annual HadCRUT5 series, then put them back as NaNs on a regular, 1-year axis:
+
+        .. jupyter-execute::
+
+            hadcrut = pyleo.utils.load_dataset('HadCRUT5')
+            keep = ~np.isin(hadcrut.time, [1900, 1901, 1902])
+            gappy = pyleo.Series(time=hadcrut.time[keep], value=hadcrut.value[keep], verbose=False)
+            filled = gappy.fill_na(dt=1)
+            print(len(gappy.time), len(filled.time), np.isnan(filled.value).sum())
 
         '''
         new = self.copy()
@@ -4221,8 +4418,12 @@ class Series:
 
         Returns
         -------
-        res : dict
-            Dictionary containing the results of the the causality analysis. See indivudal methods for details
+        causal_res : dict
+            Results of the causality analysis. For ``method='liang'``, keys include ``'T21'``, ``'tau21'``
+            and ``'Z'`` (information flow from ``target_series`` to this series), plus significance
+            estimates; see :func:`pyleoclim.utils.causality.liang_causality`. For ``method='granger'``,
+            the dictionary returned by statsmodels' ``grangercausalitytests``, keyed by lag;
+            see :func:`pyleoclim.utils.causality.granger_causality`.
 
         See also
         --------
@@ -4670,6 +4871,18 @@ class Series:
 
         pyleoclim.utils.tsutils.interp : interpolation function
 
+        Examples
+        --------
+
+        LR04 is unevenly spaced. Linearly interpolate it onto a regular 1-ky axis:
+
+        .. jupyter-execute::
+
+            lr04 = pyleo.utils.load_dataset('LR04')
+            lr04_i = lr04.interp(step=1)
+            fig, ax = lr04.plot(marker='o', linestyle='', markersize=3, label='original', xlim=[0, 500])
+            ax = lr04_i.plot(ax=ax, label='interpolated (step = 1 ky)')
+
         '''
         new = self.copy()
         ti, vi = tsutils.interp(self.time,self.value,interp_type=method,**kwargs)
@@ -4715,6 +4928,19 @@ class Series:
         --------
 
         pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
+
+        Examples
+        --------
+
+        Coarse-grain the GISP2 record, whose spacing ranges from about 3 to 500 years, with a Gaussian kernel:
+
+        .. jupyter-execute::
+
+            gisp2 = pyleo.utils.load_dataset('GISP2')
+            gisp2_gk = gisp2.gkernel(step=200)
+            fig, ax = gisp2.plot(alpha=0.5, label='original')
+            ax = gisp2_gk.plot(ax=ax, label='Gaussian kernel (step = 200 y)')
+
         '''
         if step_type is not None:
             warnings.warn("step_type is deprecated. Please use step_style instead",
@@ -4751,6 +4977,18 @@ class Series:
         --------
 
         pyleoclim.utils.tsutils.bin : bin the series values into evenly-spaced time bins
+
+        Examples
+        --------
+
+        Bin the GISP2 record into 200-year bins (by default, the mean of the values in each bin):
+
+        .. jupyter-execute::
+
+            gisp2 = pyleo.utils.load_dataset('GISP2')
+            gisp2_bin = gisp2.bin(bin_size=200)
+            fig, ax = gisp2.plot(alpha=0.5, label='original')
+            ax = gisp2_bin.plot(ax=ax, label='200-y bins')
 
         '''
         new=self.copy()
@@ -4924,6 +5162,27 @@ class SeriesResampler:
     then they will get back a pyleoclim.Series, and `SeriesResampler`
     will only be used in an intermediate step. Think of it as an
     implementation detail.
+
+    Parameters
+    ----------
+    rule : str
+        pandas offset alias (e.g. ``'1000YS'``), as built by :meth:`pyleoclim.core.series.Series.resample` from the user's rule.
+
+    series : pandas.Series
+        The Series, converted with ``to_pandas()``.
+
+    metadata : dict
+        Metadata of the original Series, used to rebuild it after resampling.
+
+    keep_log : bool
+        If True, adds the resampling step to the log of the returned Series.
+
+    kwargs : dict
+        Additional arguments passed to ``pandas.Series.resample``.
+
+    See also
+    --------
+    pyleoclim.core.series.Series.resample : the public method, with examples
     """
     def __init__(self, rule, series, metadata, keep_log, kwargs):
         self.rule = rule

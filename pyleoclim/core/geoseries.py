@@ -258,7 +258,7 @@ class GeoSeries(Series):
 
     @classmethod
     def from_json(cls, path):
-        ''' Creates a pyleoclim.Series from a JSON file
+        ''' Creates a pyleoclim.GeoSeries from a JSON file
 
         The keys in the JSON file must correspond to the parameter associated with a GeoSeries object
 
@@ -271,6 +271,19 @@ class GeoSeries(Series):
         -------
         ts : pyleoclim.core.series.Series
             A Pyleoclim Series object.
+
+        Examples
+        --------
+
+        Write the EPICA Dome C deuterium record to a JSON file, then read it back:
+
+        .. jupyter-execute::
+
+            edc = pyleo.utils.load_dataset('EDC-dD')
+            edc.to_json('edc.json')
+            edc_json = pyleo.GeoSeries.from_json('edc.json')
+            print(edc_json.lat, edc_json.lon)
+            edc_json.equals(edc)
 
         '''
 
@@ -406,7 +419,11 @@ class GeoSeries(Series):
 
         Returns
         -------
-        res : fig,ax_d
+        fig : matplotlib.figure.Figure
+            The figure.
+
+        ax_d : dict
+            Dictionary of matplotlib.axes.Axes, with keys ``'map'`` and, if a legend is drawn, ``'leg'``.
 
         See also
         --------
@@ -529,7 +546,11 @@ class GeoSeries(Series):
 
         Returns
         -------
-        res : fig,ax_d
+        fig : matplotlib.figure.Figure
+            The figure.
+
+        ax_d : dict
+            Dictionary of matplotlib.axes.Axes, with keys ``'map'`` and, if a legend is drawn, ``'leg'``.
 
         See also
         --------
@@ -746,7 +767,7 @@ class GeoSeries(Series):
 
         pyleoclim.core.psds.PSD.plot : plot power spectrum
 
-        pyleoclim.core.psds.MulitplePSD.plot : plot envelope of power spectrum
+        pyleoclim.core.psds.MultiplePSD.plot : plot envelope of power spectrum
 
         pyleoclim.core.geoseries.GeoSeries.map : map location of dataset
 
@@ -895,9 +916,9 @@ class GeoSeries(Series):
 
         Returns
         -------
-        res : MultiplegGeoSeries or GeoSeries
-            If gaps were detected, returns the segments in a MultipleGeoSeries object,
-            else, returns the original timeseries.
+        res : MultipleGeoSeries or GeoSeries
+            If gaps were detected, the segments in a MultipleGeoSeries object;
+            otherwise, the original GeoSeries.
 
         Examples
         --------
@@ -1018,6 +1039,27 @@ class GeoSeriesResampler:
     then they will get back a pyleoclim.GeoSeries, and `GeoSeriesResampler`
     will only be used in an intermediate step. Think of it as an
     implementation detail.
+
+    Parameters
+    ----------
+    rule : str
+        pandas offset alias (e.g. ``'1000YS'``), as built by :meth:`pyleoclim.core.geoseries.GeoSeries.resample` from the user's rule.
+
+    series : pandas.Series
+        The GeoSeries, converted with ``to_pandas()``.
+
+    metadata : dict
+        Metadata of the original GeoSeries, used to rebuild it after resampling.
+
+    keep_log : bool
+        If True, adds the resampling step to the log of the returned GeoSeries.
+
+    kwargs : dict
+        Additional arguments passed to ``pandas.Series.resample``.
+
+    See also
+    --------
+    pyleoclim.core.geoseries.GeoSeries.resample : the public method, with examples
     """
     def __init__(self, rule, series, metadata, keep_log, kwargs):
         self.rule = rule

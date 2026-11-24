@@ -383,9 +383,9 @@ class MultipleGeoSeries(MultipleSeries):
 
         Returns
         -------
-        res: MultivariateDecomp
-
-            Resulting pyleoclim.MultivariateDecomp object
+        pca_res : MultivariateDecomp
+            Object holding the eigenvalues, eigenvectors (EOFs), principal components (PCs),
+            fraction of variance explained, and effective sample size. See :class:`pyleoclim.core.multivardecomp.MultivariateDecomp`.
 
         See also
         --------

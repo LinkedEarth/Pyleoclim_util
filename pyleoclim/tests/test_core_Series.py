@@ -125,9 +125,40 @@ class TestSeriesIO:
         ts1.to_csv()
         filename = ts1.label.replace(" ", "_") + ".csv"
         ts2 = pyleo.Series.from_csv(path=filename)
-        assert ts1.equals(ts2)
+        assert all(ts1.equals(ts2))  # equals() returns a (values, metadata) tuple
         # clean up file
         os.unlink(filename)
+
+    @pytest.mark.parametrize("ds_name", ["SOI", "LR04"])
+    def test_json_roundtrip(self, ds_name, tmp_path):
+        ts1 = pyleo.utils.load_dataset(ds_name)
+        path = str(tmp_path / "ts.json")
+        ts1.to_json(path)
+        # exporting must not modify the original object
+        assert isinstance(ts1.time, np.ndarray) and isinstance(ts1.value, np.ndarray)
+        ts2 = pyleo.Series.from_json(path)
+        assert all(ts1.equals(ts2))
+
+    def test_json_roundtrip_geoseries(self, tmp_path):
+        gs1 = pyleo.utils.load_dataset("EDC-dD")
+        path = str(tmp_path / "gs.json")
+        gs1.to_json(path)
+        gs2 = pyleo.GeoSeries.from_json(path)
+        assert isinstance(gs2, pyleo.GeoSeries)
+        assert all(gs1.equals(gs2))
+        assert (gs2.lat, gs2.lon) == (gs1.lat, gs1.lon)
+
+    def test_json_roundtrip_multipleseries(self, tmp_path):
+        ms1 = pyleo.MultipleSeries(
+            [pyleo.utils.load_dataset("SOI"), pyleo.utils.load_dataset("NINO3")]
+        )
+        path = str(tmp_path / "ms.json")
+        ms1.to_json(path)
+        assert isinstance(ms1.series_list[0].time, np.ndarray)
+        ms2 = pyleo.MultipleSeries.from_json(path)
+        assert len(ms2.series_list) == 2
+        for s1, s2 in zip(ms1.series_list, ms2.series_list):
+            assert all(s1.equals(s2))
 
 
 class TestUISeriesMakeLabels:

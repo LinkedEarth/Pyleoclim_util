@@ -61,10 +61,11 @@ def PyleoObj_to_dict(obj):
 
     '''
     
+    # work on a shallow copy, so that encoding does not modify the object itself
     if isinstance(obj,(dict)):
-        s=obj
+        s=dict(obj)
     else:
-        s=vars(obj)
+        s=dict(vars(obj))
     for k in s.keys():
         #print(k)
         if isinstance(s[k],(np.ndarray)):            
@@ -174,8 +175,6 @@ def objname_to_obj(objname):
                       'CorrEns':pyleo.core.CorrEns,
                       'MultivariateDecomp':pyleo.core.MultivariateDecomp,
                       'SsaRes':pyleo.core.SsaRes,
-                      'Lipd':pyleo.core.Lipd,
-                      'LipdSeries':pyleo.core.LipdSeries,
                       'GeoSeries':pyleo.core.GeoSeries,
         }
     

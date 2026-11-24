@@ -616,7 +616,23 @@ class MultipleScalogram:
         Returns
         -------
         scals : pyleoclim.core.scalograms.MultipleScalogram
-        
+
+        Examples
+        --------
+
+        Wavelet transforms of a toy ensemble (SOI plus noise), summarized by their 5%, 50% and 95% quantiles. Plot the median scalogram:
+
+        .. jupyter-execute::
+
+            soi = pyleo.utils.load_dataset('SOI').interp()
+            # a toy ensemble: SOI plus independent noise realizations
+            rng = np.random.default_rng(42)
+            ens = pyleo.EnsembleSeries([pyleo.Series(time=soi.time, value=soi.value + rng.normal(size=len(soi.value)),
+                                                     time_unit=soi.time_unit, verbose=False) for _ in range(20)])
+            scals = ens.wavelet(mute_pbar=True)
+            scal_qs = scals.quantiles()
+            fig, ax = scal_qs.scalogram_list[1].plot(title='Median scalogram')
+
         '''
         freq = np.copy(self.scalogram_list[0].frequency)
         scale = np.copy(self.scalogram_list[0].scale)

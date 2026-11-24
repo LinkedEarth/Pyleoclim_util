@@ -102,6 +102,14 @@ class MultivariateDecomp:
         
             color to be used for plotting eigenvalues
             
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure. Only returned if ``ax`` is None.
+
+        ax : matplotlib.axes.Axes
+            The axis with the eigenvalue spectrum. If ``ax`` was provided, only ``ax`` is returned.
+
         See also
         --------
 
@@ -113,6 +121,17 @@ class MultivariateDecomp:
         .. [1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), Sampling errors in the estimation of empirical orthogonal functions, Mon. Weather Rev., 110, 699–706.
         
         .. [2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical orthogonal functions and related techniques in atmospheric science: A review, International Journal of Climatology, 27(9), 1119–1152, doi:10.1002/joc.1499.
+
+        Examples
+        --------
+
+        PCA of three ENSO-related series, then the eigenvalue spectrum with North et al. (1982) uncertainties:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset(name) for name in ['SOI', 'NINO3', 'AIR']], label='ENSO indices')
+            pca = ms.common_time().standardize().pca()
+            fig, ax = pca.screeplot()
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -174,10 +193,12 @@ class MultivariateDecomp:
             t_args.update(title_kwargs)
             ax.set_title(title, **t_args)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
-
-        return fig, ax
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax
 
     def modeplot(self, index=0, figsize=[8, 8], fig=None, savefig_settings=None,gs=None,
                  title=None, title_kwargs=None, spec_method='mtm', cmap=None,
@@ -287,6 +308,16 @@ class MultivariateDecomp:
 
         pyleoclim.utils.plotting.make_scalar_mappable : Custom scalar mappable
 
+        Examples
+        --------
+
+        Plot the first mode of the PCA of three ENSO-related series: its principal component, its spectrum and its loadings:
+
+        .. jupyter-execute::
+
+            ms = pyleo.MultipleSeries([pyleo.utils.load_dataset(name) for name in ['SOI', 'NINO3', 'AIR']], label='ENSO indices')
+            pca = ms.common_time().standardize().pca()
+            fig, axs = pca.modeplot(index=0)
 
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
