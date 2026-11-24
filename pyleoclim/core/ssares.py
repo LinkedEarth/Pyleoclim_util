@@ -119,6 +119,14 @@ class SsaRes:
         clr_signif : str, optional
             color of the highlights for significant eigenvalue. (default: teal)
        
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure. Only returned if ``ax`` is None.
+
+        ax : matplotlib.axes.Axes
+            The axis with the eigenvalue spectrum. If ``ax`` was provided, only ``ax`` is returned.
+
         See also
         --------
         
@@ -170,10 +178,12 @@ class SsaRes:
             t_args.update(title_kwargs)
             ax.set_title(title, **t_args)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
-
-        return fig, ax
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax
 
     def modeplot(self, index=0, figsize=[10, 5], savefig_settings=None,
              title_kwargs=None, spec_method = 'mtm', plot_original=True):
@@ -207,6 +217,14 @@ class SsaRes:
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'.
             'wwz' is relevant too if scaling exponents need to be estimated.
           
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure.
+
+        ax : matplotlib.axes.Axes
+            The axis of the last panel drawn (the spectrum of the reconstructed component, bottom right).
+
         See also
         --------
         

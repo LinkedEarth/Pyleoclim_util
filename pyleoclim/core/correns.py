@@ -174,6 +174,14 @@ class CorrEns:
         
             x-axis limits. The default is None.
 
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure. Only returned if ``ax`` is None.
+
+        ax : matplotlib.axes.Axes
+            The axis with the histogram of correlations. If ``ax`` was provided, only ``ax`` is returned.
+
         See also
         --------
         

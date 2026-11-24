@@ -102,6 +102,14 @@ class MultivariateDecomp:
         
             color to be used for plotting eigenvalues
             
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure. Only returned if ``ax`` is None.
+
+        ax : matplotlib.axes.Axes
+            The axis with the eigenvalue spectrum. If ``ax`` was provided, only ``ax`` is returned.
+
         See also
         --------
 
@@ -174,10 +182,12 @@ class MultivariateDecomp:
             t_args.update(title_kwargs)
             ax.set_title(title, **t_args)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
-
-        return fig, ax
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax
 
     def modeplot(self, index=0, figsize=[8, 8], fig=None, savefig_settings=None,gs=None,
                  title=None, title_kwargs=None, spec_method='mtm', cmap=None,
