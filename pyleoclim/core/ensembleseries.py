@@ -623,7 +623,7 @@ class EnsembleSeries(MultipleSeries):
         
         .. jupyter-execute::
             
-            corr_res.plot()
+            fig, ax = corr_res.plot()
 
         '''
         if target is None:
@@ -1138,7 +1138,7 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
 
-            fig, ax = ts_ens.stackplot()
+            fig, axs = ts_ens.stackplot()
 
         '''
         current_style = deepcopy(mpl.rcParams)

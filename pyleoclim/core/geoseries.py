@@ -123,7 +123,7 @@ class GeoSeries(Series):
 
          ts = pyleo.utils.datasets.load_dataset('EDC-dD')
          ts_interp = ts.convert_time_unit('kyr BP').interp(step=.5) # interpolate for a faster result
-         fig, ax = ts_interp.dashboard()
+         fig, axs = ts_interp.dashboard()
 
 
     '''
@@ -419,20 +419,20 @@ class GeoSeries(Series):
         .. jupyter-execute::
 
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
-            fig, ax = ts.map()
+            fig, axs = ts.map()
             
         By default, the figure has no title. For a title built from the available labels:
             
         .. jupyter-execute::
             
-           fig, ax = ts.map(title=True) 
+           fig, axs = ts.map(title=True) 
            
         For a custom title, and custom projection:
             
         .. jupyter-execute::
             
-           fig, ax = ts.map(title='Insert title here', projection='RotatedPole',
-                            proj_default={'pole_longitude':0.0, 'pole_latitude':-90.0, 'central_rotated_longitude':45.0}) 
+           fig, axs = ts.map(title='Insert title here', projection='RotatedPole',
+                             proj_default={'pole_longitude':0.0, 'pole_latitude':-90.0, 'central_rotated_longitude':45.0}) 
 
 
         '''
@@ -558,19 +558,19 @@ class GeoSeries(Series):
 
             mgs = pyleo.MultipleGeoSeries(series_list=ts_list,time_unit='years AD',label='Euro2k') 
             gs = ts_list[6] # extract one record as the target one
-            gs.map_neighbors(mgs, radius=4000)
+            fig, axs = gs.map_neighbors(mgs, radius=4000)
             
         By default, the figure has no title. For a title built from the available labels:
             
         .. jupyter-execute::
             
-           gs.map_neighbors(mgs, radius=4000, title=True) 
+           fig, axs = gs.map_neighbors(mgs, radius=4000, title=True) 
            
         For a custom title:
             
         .. jupyter-execute::
             
-           gs.map_neighbors(mgs, radius=4000, title='Insert title here') 
+           fig, axs = gs.map_neighbors(mgs, radius=4000, title='Insert title here') 
               
         '''
         from ..core.multiplegeoseries import MultipleGeoSeries
@@ -759,7 +759,7 @@ class GeoSeries(Series):
 
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
             ts_interp = ts.convert_time_unit('kyr BP').interp(step=.5) # interpolate for a faster result
-            fig, ax = ts_interp.dashboard()
+            fig, axs = ts_interp.dashboard()
 
 
         '''
@@ -908,7 +908,7 @@ class GeoSeries(Series):
             gs = pyleo.utils.datasets.load_dataset('EDC-dD')
             gs.value[4000:5000] = np.nan # cut a large gap in the middle
             mgs = gs.segment()
-            mgs.plot()
+            fig, ax = mgs.plot()
 
         """
         from ..core.multiplegeoseries import MultipleGeoSeries

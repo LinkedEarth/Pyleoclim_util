@@ -204,7 +204,7 @@ class Resolution:
 
             ts = pyleo.utils.load_dataset('EDC-dD')
             resolution = ts.resolution()
-            resolution.plot()
+            fig, ax = resolution.plot()
 
         '''
 
@@ -313,13 +313,13 @@ class Resolution:
 
             ts = pyleo.utils.load_dataset('EDC-dD')
             res = ts.resolution()
-            res.histplot()
+            fig, ax = res.histplot()
 
         To set the number of bins explicitly, pass ``bins`` via ``plot_kwargs``:
 
         .. jupyter-execute::
 
-            res.histplot(plot_kwargs={'bins': 20})
+            fig, ax = res.histplot(plot_kwargs={'bins': 20})
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -400,7 +400,7 @@ class Resolution:
 
             ts = pyleo.utils.load_dataset('EDC-dD')
             resolution = ts.resolution()
-            resolution.dashboard()
+            fig, axs = resolution.dashboard()
 
         '''
 
@@ -575,7 +575,7 @@ class MultipleResolution:
             edc = pyleo.utils.load_dataset('EDC-dD')
             ms = edc & co2ts # create MS object
             ms_resolution = ms.resolution(statistic=None)
-            ms_resolution.summary_plot()
+            fig, ax = ms_resolution.summary_plot()
 
         """
         

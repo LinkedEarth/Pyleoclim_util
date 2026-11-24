@@ -609,7 +609,7 @@ class EnsembleGeoSeries(EnsembleSeries):
 
             ts = pyleo.utils.datasets.load_dataset('EDC-dD')
             ts_interp = ts.convert_time_unit('kyr BP').interp(step=.5) # interpolate for a faster result
-            fig, ax = ts_interp.dashboard()
+            fig, axs = ts_interp.dashboard()
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

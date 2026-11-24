@@ -298,14 +298,14 @@ class Coherence:
             ts_nino = pyleo.utils.load_dataset('NINO3')
 
             coh = ts_air.wavelet_coherence(ts_nino)
-            coh.plot()
+            fig, ax = coh.plot()
 
         Establish significance against an AR(1) benchmark:
 
         .. jupyter-execute::
 
             coh_sig = coh.signif_test(number=20, qs=[.9,.95,.99])
-            coh_sig.plot()
+            fig, ax = coh_sig.plot()
 
         Note that specifiying 3 significance thresholds does not take any more time as the quantiles are
         simply estimated from the same ensemble. By default, the plot function looks
@@ -313,7 +313,7 @@ class Coherence:
 
         .. jupyter-execute::
 
-            coh_sig.plot(signif_thresh = 0.99)
+            fig, ax = coh_sig.plot(signif_thresh = 0.99)
 
         By default, the function plots the wavelet transform coherency (WTC), which quantifies where
         two timeseries exhibit similar behavior in time-frequency space, regardless of whether this
@@ -322,7 +322,7 @@ class Coherence:
 
         .. jupyter-execute::
 
-            coh_sig.plot(var='xwt')
+            fig, ax = coh_sig.plot(var='xwt')
 
         """
         if ax is None:
@@ -656,19 +656,19 @@ class Coherence:
             coh = ts_air.wavelet_coherence(ts_nino)
             coh_sig = coh.signif_test(number=10)
 
-            coh_sig.dashboard()
+            fig, axs = coh_sig.dashboard()
 
         You may customize colors like so:
 
         .. jupyter-execute::
 
-            coh_sig.dashboard(line_colors=['teal','gold'])
+            fig, axs = coh_sig.dashboard(line_colors=['teal','gold'])
 
         To export the figure, use `savefig_settings`:
 
         .. jupyter-execute::
 
-            coh_sig.dashboard(savefig_settings={'path':'./coh_dash.png','dpi':300})
+            fig, axs = coh_sig.dashboard(savefig_settings={'path':'./coh_dash.png','dpi':300})
 
         """
         # prepare options dictionaries
@@ -831,7 +831,7 @@ class Coherence:
 
             coh = ts_air.wavelet_coherence(ts_nino)
             coh_sig = coh.signif_test(number=20)
-            coh_sig.plot()
+            fig, ax = coh_sig.plot()
 
         By default, significance is assessed against a 95% benchmark derived from
         an AR(1) process fit to the data, using 200 Monte Carlo simulations.
@@ -841,14 +841,14 @@ class Coherence:
         .. jupyter-execute::
 
             coh_sig2 = coh.signif_test(number=100, qs=[.9,.95,.99])
-            coh_sig2.plot()
+            fig, ax = coh_sig2.plot()
 
         The plot() function will represent the 95% level as contours by default.
         If you need to show 99%, say, use the `signif_thresh` argument:
 
         .. jupyter-execute::
 
-            coh_sig2.plot(signif_thresh=0.99)
+            fig, ax = coh_sig2.plot(signif_thresh=0.99)
 
         Note that if the 99% quantile is not present, the plot method will look
         for the closest match, but lines are always labeled appropriately.
@@ -1186,7 +1186,7 @@ class GlobalCoherence:
             # SOI and NINO3 have different time axes: opt in to aligning them
             gcoh = soi.global_coherence(nino3, wavelet_kwargs={"common_time_kwargs": {}})
             gcoh_sig = gcoh.signif_test(number=10)
-            gcoh_sig.plot()
+            fig, ax = gcoh_sig.plot()
         """
 
         from ..core.surrogateseries import SurrogateSeries
@@ -1333,7 +1333,7 @@ class GlobalCoherence:
 
             # SOI and NINO3 have different time axes: opt in to aligning them
             gcoh = soi.global_coherence(nino3, wavelet_kwargs={"common_time_kwargs": {}})
-            gcoh.plot()"""
+            fig, ax = gcoh.plot()"""
 
         coh_plot_kwargs = {} if coh_plot_kwargs is None else coh_plot_kwargs.copy()
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

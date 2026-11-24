@@ -1138,7 +1138,7 @@ class Series:
 
         .. jupyter-execute::
 
-            fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'}); pyleo.closefig(fig)
+            fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'})
             pyleo.savefig(fig,path='ts_plot3.png')
 
 
@@ -2047,16 +2047,14 @@ class Series:
             psd = series.spectral(freq = 'welch')
             scalogram = series.wavelet(freq = 'welch')
 
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
-            pyleo.closefig(fig)
+            fig, axs = series.summary_plot(psd = psd,scalogram = scalogram)
 
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
         .. jupyter-execute::
 
             psd = series.spectral(freq = 'welch').signif_test(number=20)
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [0,5], ts_plot_kwargs = {'color':'Purple','linewidth':.5}, psd_plot_kwargs = {'color':'Purple','linewidth':1.5})
-            pyleo.closefig(fig)
+            fig, axs = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [0,5], ts_plot_kwargs = {'color':'Purple','linewidth':.5}, psd_plot_kwargs = {'color':'Purple','linewidth':1.5})
         '''
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -3762,7 +3760,7 @@ class Series:
             ts_air = pyleo.utils.load_dataset('AIR')
             ts_nino = pyleo.utils.load_dataset('NINO3')
             coh = ts_air.wavelet_coherence(ts_nino)
-            coh.plot()
+            fig, ax = coh.plot()
 
         Note that in this example both timeseries area already on a common,
         evenly-spaced time axis. If they are not (either because the data are unevenly spaced,
@@ -3775,7 +3773,7 @@ class Series:
         .. jupyter-execute::
 
              coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz')
-             coh_wwz.plot()
+             fig, ax = coh_wwz.plot()
 
         As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
         For instance, one can adjust the resolution of the time axis on which coherence is evaluated:
@@ -3783,14 +3781,14 @@ class Series:
         .. jupyter-execute::
 
              coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz', settings = {'ntau':20})
-             coh_wwz.plot()
+             fig, ax = coh_wwz.plot()
 
         The frequency (scale) axis can also be customized, e.g. to focus on scales from 1 to 20y, with 24 scales:
 
         .. jupyter-execute::
 
              coh = ts_air.wavelet_coherence(ts_nino, freq_kwargs={'fmin':1/20,'fmax':1,'nf':24})
-             coh.plot()
+             fig, ax = coh.plot()
 
         Significance is assessed similarly to PSD or Scalogram objects:
 
@@ -3798,7 +3796,7 @@ class Series:
 
             cwt_sig = coh.signif_test(number=20, qs=[.9,.95]) # specifiying 2 significance thresholds does not take any more time.
             # by default, the plot function will look for the closest quantile to 0.95, but it is easy to adjust:
-            cwt_sig.plot(signif_thresh = 0.9)
+            fig, ax = cwt_sig.plot(signif_thresh = 0.9)
 
         Another plotting option, `dashboard()`, allows to visualize both
         timeseries as well as the wavelet transform coherency (WTC), which quantifies where
@@ -3807,7 +3805,7 @@ class Series:
 
         .. jupyter-execute::
 
-            cwt_sig.dashboard()
+            fig, axs = cwt_sig.dashboard()
 
         Note: this design balances many considerations, and is not easily customizable.
 
@@ -3953,7 +3951,7 @@ class Series:
 
             # SOI and NINO3 have different time axes: opt in to aligning them
             gcoh = soi.global_coherence(nino3, wavelet_kwargs={"common_time_kwargs": {}})
-            gcoh.plot()
+            fig, ax = gcoh.plot()
             '''
         
         wavelet_kwargs = {} if wavelet_kwargs is None else wavelet_kwargs.copy()
@@ -4876,19 +4874,19 @@ class Series:
 
         .. jupyter-execute::
 
-            resolution.plot()
+            fig, ax = resolution.plot()
 
         The distribution of resolution
 
         .. jupyter-execute::
 
-            resolution.histplot()
+            fig, ax = resolution.histplot()
 
         Or a dashboard combining plot() and histplot() side by side:
 
         .. jupyter-execute::
 
-            resolution.dashboard()
+            fig, axs = resolution.dashboard()
 
         """
 

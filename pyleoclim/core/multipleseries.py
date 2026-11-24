@@ -481,7 +481,7 @@ class MultipleSeries:
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
             ms.name = 'ENSO'
-            fig, ax = ms.flip().stackplot()
+            fig, axs = ms.flip().stackplot()
         
         
         Note that labels have been updated to reflect the flip
@@ -1387,7 +1387,7 @@ class MultipleSeries:
             nino = pyleo.utils.load_dataset('NINO3')
             ms = air & nino
             ms_psd = ms.spectral(method='mtm')
-            ms_psd.plot()
+            fig, ax = ms_psd.plot()
                     
         '''
                 
@@ -1879,31 +1879,31 @@ class MultipleSeries:
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
-            fig, ax = ms.stackplot()
+            fig, axs = ms.stackplot()
 
         Let's change the labels on the left
 
         .. jupyter-execute::
 
-            fig, ax = ms.stackplot(labels=['SOI','NINO3'])
+            fig, axs = ms.stackplot(labels=['SOI','NINO3'])
 
         And let's remove them completely
 
         .. jupyter-execute::
 
-            fig, ax = ms.stackplot(labels=None)
+            fig, axs = ms.stackplot(labels=None)
 
         Now, let's add markers to the timeseries.
 
         .. jupyter-execute::
 
-            fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
+            fig, axs = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
 
         Using different marker types on each series:
 
         .. jupyter-execute::
 
-            fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
+            fig, axs = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
             
         By default, the y axes are kept very minimal to allow stacking many records. In some instances, however,
         one may want more detailed axes, with major and minor ticks. We also show how to enlarge the ylabels and
@@ -1911,8 +1911,8 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            fig, ax = ms.stackplot(labels=None, ylabel_fontsize = 12, v_shift_factor = 0.9,
-                                   yticks_minor=True, xticks_minor=True, ylims='auto')
+            fig, axs = ms.stackplot(labels=None, ylabel_fontsize = 12, v_shift_factor = 0.9,
+                                    yticks_minor=True, xticks_minor=True, ylims='auto')
             
         This approach makes sense with small stacks, but quickly becomes unwieldy with large ones. Use at your own risk!
 
@@ -2729,7 +2729,7 @@ class MultipleSeries:
 
         .. jupyter-execute::
 
-            ms_resolution.summary_plot()
+            fig, ax = ms_resolution.summary_plot()
             """
          
         if statistic=='median':
