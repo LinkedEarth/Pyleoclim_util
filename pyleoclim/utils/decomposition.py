@@ -259,9 +259,9 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
     '''Singular spectrum analysis
 
     Nonparametric eigendecomposition of timeseries into orthogonal oscillations.
-    This implementation  uses the method of [1], with applications presented in [2].
-    Optionally (nMC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
-    The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
+    This implementation  uses the method of [1]_, with applications presented in [2]_.
+    Optionally (nMC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3]_.
+    The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]_).
 
     Parameters
     ----------
@@ -290,7 +290,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
         Default is None, which bypasses truncation (K = M).
         While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton, 
         then the knee-finding method is a good compromise between objectivity and efficiency.
-        See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
+        See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`__ for more details on the knee finding algorithm.
 
     var_thresh : float
         variance threshold for reconstruction (only impactful if trunc is set to 'var')
@@ -298,7 +298,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
     online : bool; {True,False}
         Whether or not to conduct knee finding analysis online or offline. 
         Only called when trunc = 'knee'. Default is True
-        See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`_ for details.
+        See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`__ for details.
 
     Returns
     -------
@@ -322,20 +322,20 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
 
     References
     ----------
-    [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
-    dynamics, with applications to paleoclimatic time series, Physica D, 35,
-    395–424.
+    .. [1] Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+       dynamics, with applications to paleoclimatic time series, Physica D, 35,
+       395–424.
 
-    [2]_ Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
-    A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
-    Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
-    1003–1052, doi:10.1029/2000RG000092.
+    .. [2] Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
+       A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
+       Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
+       1003–1052, doi:10.1029/2000RG000092.
 
-    [3]_ Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
-    oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
+    .. [3] Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
+       oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
 
-    [4]_ Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with
-    missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
+    .. [4] Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with
+       missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
 
     See also
     --------

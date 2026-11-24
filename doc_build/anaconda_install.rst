@@ -1,3 +1,5 @@
+:orphan:
+
 .. _anaconda_installation:
 
 Installing Miniconda (Mac, Linux)

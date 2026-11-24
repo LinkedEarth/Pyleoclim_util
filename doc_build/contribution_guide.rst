@@ -8,7 +8,7 @@ Contributing to Pyleoclim
 GitHub, GitHub, GitHub
 =======================
 All contributions, bug reports, bug fixes, documentation improvements, enhancements,
-and ideas are welcome, and take place through `GitHub <https://github.com/LinkedEarth/Pyleoclim_util/issues>`_
+and ideas are welcome, and take place through `GitHub <https://github.com/LinkedEarth/Pyleoclim_util/issues>`__
 
 There are several levels of contributions to an open development software package like Pyleoclim, including:
 
@@ -46,7 +46,7 @@ Version control, Git, and GitHub
 
 To the neophyte, working with Git is one of the more daunting aspects of contributing to open source projects.
 It can very quickly become overwhelming, but sticking to the guidelines below will help keep the process straightforward and mostly trouble free. As always, if you are having difficulties please feel free to ask for help.
-The code is hosted on `GitHub <https://github.com/LinkedEarth/Pyleoclim_util>`_. To contribute you will need to `sign up for a (free) GitHub account <https://github.com/signup/free>`_. `Git <https://git*scm.com/>`_ is the industry standard for version control to allow many people to work together on the project, keep track of issues, manage the project, and much more.
+The code is hosted on `GitHub <https://github.com/LinkedEarth/Pyleoclim_util>`__. To contribute you will need to `sign up for a (free) GitHub account <https://github.com/signup/free>`_. `Git <https://git-scm.com/>`_ is the industry standard for version control to allow many people to work together on the project, keep track of issues, manage the project, and much more.
 
 Some great resources for learning Git:
   * the `GitHub help pages <https://help.github.com/>`_

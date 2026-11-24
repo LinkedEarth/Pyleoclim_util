@@ -600,7 +600,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
 
-    `scipy.stats.binned_statistic <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binned_statistic.html>`_ : Scipy function around which this function is written
+    scipy.stats.binned_statistic : Scipy function around which this function is written (`SciPy documentation <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binned_statistic.html>`__)
 
     Examples
     --------

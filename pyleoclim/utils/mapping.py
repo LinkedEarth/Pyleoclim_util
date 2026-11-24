@@ -663,7 +663,7 @@ def scatter_map(geos, hue='archiveType', size=None, marker='archiveType', edgeco
         The default is 'global'.
 
     cmap : string or list, optional
-        Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`_.
+        Matplotlib supported colormap id or list of colors for creating a colormap. See `choosing a matplotlib colormap <https://matplotlib.org/3.5.0/tutorials/colors/colormaps.html>`__.
         The default is None.
 
     fig : matplotlib.pyplot.figure, optional
@@ -1464,7 +1464,7 @@ def centroid_coords(lat, lon, true_centroid=False):
     See also
     --------
 
-    https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon
+    shapely.Polygon : `Shapely documentation <https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon>`__
 
 
     '''

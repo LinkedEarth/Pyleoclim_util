@@ -1369,7 +1369,7 @@ class Series:
                 1. 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
                 2. 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
                 3. 'var': first K modes that explain at least var_thresh % of the variance. Default is None, which bypasses truncation (K = M)
-                4. 'knee': Wherever the "knee" of the screeplot occurs. (See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_)
+                4. 'knee': Wherever the "knee" of the screeplot occurs. (See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`__)
             
             The knee method is recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
             While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton,
@@ -1381,7 +1381,7 @@ class Series:
         online : bool; {True,False}
             Whether or not to conduct knee finding analysis online or offline.
             Only called when trunc = 'knee'. Default is True
-            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`_ for details.
+            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`__ for details.
 
         Returns
         -------
