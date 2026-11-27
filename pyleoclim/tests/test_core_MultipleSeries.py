@@ -667,7 +667,7 @@ class TestToPandas:
             paleo_style=paleo_style, method="bin", use_common_time=True, start=2
         )
         if paleo_style:
-            expected_index = pd.Index([3.0], dtype="float64", name="Time")
+            expected_index = pd.Index([3.0], dtype="float64", name="Time [years CE]")
         else:
             expected_index = pd.DatetimeIndex(
                 np.array(["0002-12-31 17:26:17"], dtype="datetime64[s]"),

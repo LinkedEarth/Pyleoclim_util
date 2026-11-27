@@ -12,6 +12,7 @@ from matplotlib import pyplot as plt, transforms as transforms
 from matplotlib.ticker import MaxNLocator
 from tabulate import tabulate
 from copy import deepcopy
+from ..utils import display
 
 from ..utils import plotting
 
@@ -99,25 +100,32 @@ class CorrEns:
         '''
         return deepcopy(self)
 
-    def __str__(self):
-        '''
-        Prints out the correlation results
-        '''
-
+    def _table(self):
         pi_list = []
         for pi in self.p:
             pi_list.append(pval_format(pi, threshold=self.p_fmt_td, style=self.p_fmt_style))
 
-        table = {
+        return {
             'correlation': self.r,
             'p-value': pi_list,
             f'signif. w/o FDR (α: {self.alpha})': self.signif,
             f'signif. w/ FDR (α: {self.alpha})': self.signif_fdr,
         }
 
-        msg = print(tabulate(table, headers='keys'))
+    def __str__(self):
+        '''
+        Returns the correlation results as a table (only the first and last rows of a large ensemble)
+        '''
+        return display.text_table(self._table()) + f'\nEnsemble size: {len(self.r)}'
 
-        return f'Ensemble size: {len(self.r)}'
+    def __repr__(self):
+        return display.text_header(self, details=f'ensemble size: {len(self.r)}') + '\n' + display.text_table(self._table())
+
+    def _repr_html_(self):
+        ''' Rich display in Jupyter notebooks
+        '''
+        return (display.html_header(self, details=f'ensemble size: {len(self.r)}')
+                + display.html_table(self._table()))
 
     def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None,
              title_kwargs=None, xlim=None, alpha = 0.8, multiple = 'layer',

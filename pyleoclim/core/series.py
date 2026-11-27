@@ -43,7 +43,8 @@ import csv
 from tqdm import tqdm
 import warnings
 import collections
-from pprint import pprint
+from pprint import pformat
+import html
 from importlib.metadata import version
 
 
@@ -341,13 +342,32 @@ class Series:
             self.archiveType = None
 
 
+    def _display_metadata(self):
+        ''' Metadata shown when the object is displayed (non-empty entries only)
+        '''
+        d = self.metadata
+        keys = ['label', 'importedFrom', 'archiveType', 'lat', 'lon', 'elevation', 'log']
+        return {key: d[key] for key in keys if d.get(key) is not None}
+
     def __repr__(self):
         ser = self.to_pandas(paleo_style=True)
-        d   = self.metadata
-        keys = ['importedFrom', 'label', 'archiveType', 'log']
-        metadata = {key: d[key] for key in keys if d[key] is not None}
-        #df = ser.to_frame()
-        return f'{pprint(metadata)}\n{repr(ser)}'
+        return f'{pformat(self._display_metadata(), sort_dicts=False)}\n{repr(ser)}'
+
+    def _repr_html_(self):
+        ''' Rich display in Jupyter notebooks: a metadata table above the data table
+        '''
+        metadata = self._display_metadata()
+        log = metadata.pop('log', None)
+        rows = ''.join(f'<tr><th style="text-align:left">{html.escape(str(k))}</th>'
+                       f'<td style="text-align:left">{html.escape(str(v))}</td></tr>'
+                       for k, v in metadata.items())
+        out = f'<p><b>pyleoclim.{type(self).__name__}</b> ({len(self.time)} points)</p>'
+        if rows:
+            out += f'<table>{rows}</table>'
+        if log:
+            entries = ''.join(f'<li>{html.escape(str(entry))}</li>' for entry in log)
+            out += f'<details><summary>log ({len(log)} entries)</summary><ol>{entries}</ol></details>'
+        return out + self.to_pandas(paleo_style=True).to_frame()._repr_html_()
 
     def __and__(self, other):
         """
