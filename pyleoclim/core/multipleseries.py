@@ -27,6 +27,8 @@ from ..core.resolutions import MultipleResolution
 from concurrent.futures import ProcessPoolExecutor #parallel processing library
 
 import warnings
+import html
+import collections
 import numpy as np
 from copy import deepcopy
 
@@ -140,7 +142,16 @@ class MultipleSeries:
             self.series_list = new_ts_list
             
     def __repr__(self):
-        return repr(self.to_pandas()) 
+        return repr(self.to_pandas(paleo_style=True))
+
+    def _repr_html_(self):
+        ''' Rich display in Jupyter notebooks: a short header above the data table
+        '''
+        header = f'<b>pyleoclim.{type(self).__name__}</b>'
+        if self.label is not None:
+            header += f': {html.escape(str(self.label))}'
+        header += f' ({len(self.series_list)} series)'
+        return f'<p>{header}</p>' + self.to_pandas(paleo_style=True)._repr_html_()
     
     def __len__(self):
         return self.series_list.__len__()
@@ -2263,13 +2274,15 @@ class MultipleSeries:
         """
         Align Series and place in DataFrame.
 
-        Column names will be taken from each Series' label. 
+        Column names will be taken from each Series' label. Series that share a label
+        (e.g. ensemble members) get a numbered suffix (label_0, label_1, ...), so none are dropped.
 
         Parameters
         ----------
         paleo_style : boolean, optional
             If True, will format datetime as the common time vector and assign as 
-            index name the time_name of the first series in the object. 
+            index name the time_name and time_unit of the first series in the object,
+            e.g. "Time [year C.E.]". 
             
         *args, **kwargs
             Arguments and keyword arguments to pass to ``common_time``.
@@ -2288,10 +2301,22 @@ class MultipleSeries:
         else:
             ms = self
         
-        df = pd.DataFrame({ser.metadata['label']: ser.to_pandas(paleo_style=paleo_style) for ser in ms.series_list})
+        labels = [ser.metadata['label'] for ser in ms.series_list]
+        if len(set(labels)) < len(labels):
+            # a dict keyed by label would drop series sharing a label (e.g. ensemble members), so number the duplicates
+            counts = collections.Counter(labels)
+            seen = collections.defaultdict(int)
+            unique_labels = []
+            for label in labels:
+                if counts[label] > 1:
+                    unique_labels.append(f'{label}_{seen[label]}')
+                    seen[label] += 1
+                else:
+                    unique_labels.append(label)
+            labels = unique_labels
+        df = pd.DataFrame({label: ser.to_pandas(paleo_style=paleo_style) for label, ser in zip(labels, ms.series_list)})
         if paleo_style:
-            tl = ms.series_list[0].time_name
-            df.index.name = tl if tl is not None else 'time' 
+            df.index.name = ms.series_list[0].make_labels()[0]
         return df
         
     def to_csv(self, path = None, *args, use_common_time=False,  **kwargs):

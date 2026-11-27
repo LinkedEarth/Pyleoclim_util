@@ -8,6 +8,7 @@ and/or MultipleSeries. Its main purpose is to allow a print function to display 
 import numpy as np
 from tabulate import tabulate
 from copy import deepcopy
+from ..utils import display
 
 def pval_format(p, threshold=0.01, style='exp'):
     ''' Print p-value with proper format when p is close to 0
@@ -80,19 +81,25 @@ class Corr:
         '''
         return deepcopy(self)
 
-    def __str__(self):
-        '''
-        Prints out the correlation results
-        '''
+    def _table(self):
         formatted_p = pval_format(self.p, threshold=self.p_fmt_td, style=self.p_fmt_style)
-
-        table = {
+        return {
             'statistic': [self.r],
             'critical value': [self.r_crit],
             'p-value': [formatted_p],
             f'signif. (α: {self.alpha})': [self.signif],
         }
 
-        msg = print(tabulate(table, headers='keys'))
+    def __str__(self):
+        '''
+        Returns the correlation results as a table
+        '''
+        return tabulate(self._table(), headers='keys')
 
-        return ''
+    def __repr__(self):
+        return display.text_header(self) + '\n' + str(self)
+
+    def _repr_html_(self):
+        ''' Rich display in Jupyter notebooks
+        '''
+        return display.html_header(self) + display.html_table(self._table())

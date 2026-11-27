@@ -120,7 +120,10 @@ def load_dataset(name):
         
         time_column =  metadata['time_column']
         value_column = metadata['value_column']
-        pandas_kwargs = metadata.get('pandas_kwargs', {})
+        pandas_kwargs = dict(metadata.get('pandas_kwargs', {}))
+        if 'skipfooter' in pandas_kwargs:
+            # only the python engine supports skipfooter; say so to avoid pandas' ParserWarning
+            pandas_kwargs.setdefault('engine', 'python')
         pyleo_kwargs = metadata.get('pyleo_kwargs', {})
         
         # load into pandas

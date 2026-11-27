@@ -6,13 +6,14 @@ In addition to a MultipleSeries object, an EnsembleSeries object has the followi
 
 """
 
-from ..utils import plotting, lipdutils, tsbase
+from ..utils import plotting, lipdutils, tsbase, display
 from ..utils import correlation as corrutils
 from ..core.series import Series
 from ..core.correns import CorrEns
 from ..core.multipleseries import MultipleSeries
 
 import warnings
+import html
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
@@ -42,6 +43,66 @@ class EnsembleSeries(MultipleSeries):
                 series_list[i].label = f"#{i}"  # assign labels if missing
         self.series_list = series_list
         self.label = label
+
+    #: ensembles with at least this many members are displayed as a summary rather than one column per member
+    display_summary_threshold = 10
+
+    def _display_quantiles(self, qs=(0.05, 0.5, 0.95)):
+        ''' Quantiles across members, from ``quantiles()``, as a DataFrame; or a note if ``quantiles()`` doesn't apply
+
+        Returns (title, DataFrame or None)
+        '''
+        try:  # members share a time axis: quantiles of the values at each time
+            ens_qs = self.quantiles(qs=list(qs), axis='value')
+            return 'Value quantiles across members:', ens_qs.to_pandas(paleo_style=True)
+        except ValueError:
+            pass
+        try:  # members share their values (e.g. an age ensemble): quantiles of the time of each value
+            ens_qs = self.quantiles(qs=list(qs), axis='time')
+            _, value_label = self.series_list[0].make_labels()
+            df = pd.DataFrame({ts.label: ts.time for ts in ens_qs.series_list},
+                              index=pd.Index(ens_qs.series_list[0].value, name=value_label))
+            return 'Time quantiles across members:', df
+        except ValueError:
+            return ('Quantiles not shown: members have neither a common time axis nor common values '
+                    '(use common_time() then quantiles()).'), None
+
+    def _display_summary(self):
+        ''' Summary of the ensemble for display: a few fields, and the quantiles across members from ``quantiles()``
+        '''
+        first = self.series_list[0]
+        time_label, value_label = first.make_labels()
+        fields = {
+            'members': len(self.series_list),
+            'member label': first.label,
+            'value': value_label,
+            time_label: self._display_time_span(),
+        }
+        return fields, *self._display_quantiles()
+
+    def _display_time_span(self):
+        npts = [len(ts.time) for ts in self.series_list]
+        tmin = min(np.nanmin(ts.time) for ts in self.series_list)
+        tmax = max(np.nanmax(ts.time) for ts in self.series_list)
+        points = f'{npts[0]}' if min(npts) == max(npts) else f'{min(npts)} to {max(npts)}'
+        return f'{tmin:.4g} to {tmax:.4g} ({points} points per member)'
+
+    def __repr__(self):
+        if len(self.series_list) < self.display_summary_threshold:
+            return super().__repr__()
+        fields, title, quantiles = self._display_summary()
+        out = display.text_header(self, self.label) + '\n' + display.text_fields(fields) + '\n' + title
+        return out + ('\n' + repr(quantiles) if quantiles is not None else '')
+
+    def _repr_html_(self):
+        ''' Rich display in Jupyter notebooks: one column per member for small ensembles, a summary for large ones
+        '''
+        if len(self.series_list) < self.display_summary_threshold:
+            return super()._repr_html_()
+        fields, title, quantiles = self._display_summary()
+        out = (display.html_header(self, self.label, f'{len(self.series_list)} members')
+               + display.html_fields(fields) + f'<p>{html.escape(title)}</p>')
+        return out + (quantiles._repr_html_() if quantiles is not None else '')
 
     @classmethod
     def from_AgeEnsembleArray(self, series, age_array, value_depth = None, age_depth = None, extrapolate=True,verbose=True):
@@ -464,6 +525,9 @@ class EnsembleSeries(MultipleSeries):
             ens_qs = time_ens.quantiles(axis='time')            
 
         '''
+        first = self.series_list[0]
+        units = dict(time_name=first.time_name, time_unit=first.time_unit,
+                     value_name=first.value_name, value_unit=first.value_unit)
         if axis == 'value':
             time = np.copy(self.series_list[0].time)
             vals = []
@@ -482,7 +546,8 @@ class EnsembleSeries(MultipleSeries):
     
             ts_list = []
             for i, quant in enumerate(ens_qs):
-                ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%', verbose=False)
+                ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%', verbose=False,
+                            **units)
                 ts_list.append(ts)
         
         elif axis == 'time':
@@ -501,7 +566,8 @@ class EnsembleSeries(MultipleSeries):
     
             ts_list = []
             for i, quant in enumerate(ens_qs):
-                ts = Series(time=quant, value=value, label=f'{qs[i]*100:g}%', verbose=False)
+                ts = Series(time=quant, value=value, label=f'{qs[i]*100:g}%', verbose=False,
+                            **units)
                 ts_list.append(ts)
         
         else:

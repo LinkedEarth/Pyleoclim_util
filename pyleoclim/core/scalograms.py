@@ -1,7 +1,7 @@
 
 # It is unclear why the documentation for these two modules does not build automatically using automodule. It therefore had to be built using autoclass
 
-from ..utils import plotting, tsutils
+from ..utils import plotting, tsutils, display
 from ..utils import wavelet as waveutils
 
 import matplotlib.pyplot as plt
@@ -171,15 +171,33 @@ class Scalogram:
         '''
         return deepcopy(self)
 
-    def __str__(self):
-        table = {
-            'Frequency': self.frequency,
-            'Time': self.time,
-            'Amplitude': self.amplitude,
+    def _summary(self):
+        ''' Short description of the scalogram: its axes and amplitude shape, not its values
+        '''
+        freq_unit = f'1/{self.scale_unit}' if self.scale_unit else None
+        fields = {
+            'method': self.wave_method,
+            'frequency': display.value_range(self.frequency, freq_unit),
+            (self.time_label or 'time'): display.value_range(self.time),
+            'amplitude': f'{np.shape(self.amplitude)[0]} (time) x {np.shape(self.amplitude)[1]} (frequency) array'
+                         if np.ndim(self.amplitude) == 2 else f'shape {np.shape(self.amplitude)}',
         }
+        if self.signif_qs is not None:
+            fields['significance'] = f'{self.signif_method}, quantiles {self.qs}'
+        return {key: val for key, val in fields.items() if val is not None}
 
-        msg = print(tabulate(table, headers='keys'))
-        return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
+    def __str__(self):
+        ''' Returns a summary of the scalogram (its axes and dimensions)
+        '''
+        return display.text_fields(self._summary())
+
+    def __repr__(self):
+        return display.text_header(self, self.label) + '\n' + str(self)
+
+    def _repr_html_(self):
+        ''' Rich display in Jupyter notebooks
+        '''
+        return display.html_header(self, self.label) + display.html_fields(self._summary())
 
     def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8],

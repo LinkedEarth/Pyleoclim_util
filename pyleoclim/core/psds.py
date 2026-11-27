@@ -1,4 +1,5 @@
 from ..utils import plotting
+from ..utils import display
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 
@@ -131,14 +132,31 @@ class PSD:
         '''
         return deepcopy(self)
 
-    def __str__(self):
-        table = {
+    def _table(self):
+        return {
             'Frequency': self.frequency,
             'Amplitude': self.amplitude,
         }
 
-        msg = print(tabulate(table, headers='keys'))
-        return f'Length: {np.size(self.frequency)}'
+    def _details(self):
+        details = [str(self.spec_method)] if self.spec_method is not None else []
+        details.append(f'{np.size(self.frequency)} frequencies')
+        if self.signif_qs is not None:
+            details.append(f'significance: {self.signif_method}')
+        return ', '.join(details)
+
+    def __str__(self):
+        ''' Returns the frequencies and amplitudes as a table (only the first and last rows)
+        '''
+        return display.text_table(self._table()) + f'\nLength: {np.size(self.frequency)}'
+
+    def __repr__(self):
+        return display.text_header(self, self.label, self._details()) + '\n' + display.text_table(self._table())
+
+    def _repr_html_(self):
+        ''' Rich display in Jupyter notebooks
+        '''
+        return display.html_header(self, self.label, self._details()) + display.html_table(self._table())
 
     def signif_test(self, method='ar1sim', number=None, seed=None, qs=[0.95],
                     settings=None, scalogram = None):
