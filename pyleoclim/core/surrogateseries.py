@@ -34,16 +34,22 @@ class SurrogateSeries(EnsembleSeries):
             
         method : str {ar1sim, phaseran, uar1, CN}
             The name of the method used to generate surrogates of the timeseries (no default)
-            - 'ar1sim' fits an AR(1) model using the method of moments (MoM) as per [1]
-            - 'phaseran' applies phase randomization as per [2, 3]
-            - 'CN' fits a "colored noise" model (power-law spectrum) as per [4] (Eq 15)
+
+            - 'ar1sim' fits an AR(1) model using the method of moments (MoM) as per [1]_
+            - 'phaseran' applies phase randomization as per [2]_, [3]_
+            - 'uar1' fits an AR(1) model to evenly or unevenly spaced series by maximum likelihood (MLE)
+            - 'CN' fits a "colored noise" model (power-law spectrum) as per [4]_ (Eq 15)
             
         param : list 
             a list of parameters for the method in question. Ignored if the method does not require parameters. 
             
         label : str
             label of the collection of timeseries (e.g. 'SOI surrogates [AR(1) MoM]')
-            If not provided, defaults to "series surrogates [{method}]"
+            If not provided, defaults to a description of the method, e.g. "AR(1) surrogates (MoM)"
+
+        seed : int
+            Random seed, for reproducibility. It seeds NumPy's global random number generator
+            each time ``from_series()`` or ``from_param()`` is called. The default is None (no seeding).
 
         Raises
         ------
@@ -53,10 +59,10 @@ class SurrogateSeries(EnsembleSeries):
         References
         ----------
 
-        _ [1] Mudelsee, M. (2002), TAUEST: a computer program for estimating persistence in unevenly spaced weather/climate time series, Computers and Geosciences, 28, 69–72, doi:10.1016/S0098- 3004(01)00041-3.
-        _ [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correlation when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
-        _ [3] Prichard, D., and J. Theiler (1994), Generating surrogate data for time series with several simultaneously measured variables, Phys. Rev. Lett., 73, 951–954, doi: 10.1103/PhysRevLett.73.951.
-        _ [4] Kirchner, J. W., Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+        .. [1] Mudelsee, M. (2002), TAUEST: a computer program for estimating persistence in unevenly spaced weather/climate time series, Computers and Geosciences, 28, 69–72, doi:10.1016/S0098- 3004(01)00041-3.
+        .. [2] Ebisuzaki, W. (1997), A method to estimate the statistical significance of a correlation when the data are serially correlated, Journal of Climate, 10(9), 2147–2153, doi:10.1175/1520- 0442(1997)010¡2147:AMTETS¿2.0.CO;2.
+        .. [3] Prichard, D., and J. Theiler (1994), Generating surrogate data for time series with several simultaneously measured variables, Phys. Rev. Lett., 73, 951–954, doi: 10.1103/PhysRevLett.73.951.
+        .. [4] Kirchner, J. W., Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies. Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
 
         '''
         self.series_list = series_list
@@ -95,13 +101,11 @@ class SurrogateSeries(EnsembleSeries):
         ----------
         target_series : Series object
             target Series used to infer surrogate properties
-            
-        seed : int
-            Control random seed option for reproducibility
 
         Returns
         -------
-        surr : SurrogateSeries
+        None
+            The surrogates are stored in ``series_list``. To make them reproducible, pass ``seed`` when creating the object.
 
         See also
         --------
@@ -114,14 +118,16 @@ class SurrogateSeries(EnsembleSeries):
         
         Examples
         --------
-        
-        SOI = pyleo.utils.load_dataset('SOI').interp()
-        SOI_surr = pyleo.SurrogateSeries(method='phaseran', number=4) 
-        SOI_surr.from_series(SOI)
-        fig, ax = SOI_surr.plot_traces()
-        SOI.plot(ax=ax,color='black',linewidth=1, ylim=[-6,3])
-        ax.legend(loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2)
-        ax.set_title(SOI_surr.label)
+
+        .. jupyter-execute::
+
+            SOI = pyleo.utils.load_dataset('SOI').interp()
+            SOI_surr = pyleo.SurrogateSeries(method='phaseran', number=4, seed=42)
+            SOI_surr.from_series(SOI)
+            fig, ax = SOI_surr.plot_traces()
+            SOI.plot(ax=ax,color='black',linewidth=1, ylim=[-6,3])
+            ax.legend(loc='lower center', bbox_to_anchor=(0.5, 0), ncol=2)
+            ax.set_title(SOI_surr.label)
 
         '''    
         #settings = {} if settings is None else settings.copy()
@@ -130,7 +136,8 @@ class SurrogateSeries(EnsembleSeries):
             raise TypeError(f"Expected pyleo.Series, got: {type(target_series)}")
             
         if self.seed is not None:
-            np.random.default_rng(self.seed)
+            # the simulators draw from NumPy's global random generator, so seed that (as in from_param)
+            np.random.seed(self.seed)
         
         # apply surrogate method
         if self.method == 'ar1sim':
@@ -199,16 +206,14 @@ class SurrogateSeries(EnsembleSeries):
             * 'random' uses random_time_axis() with specified distribution and parameters 
               Relevant settings are `delta_t_dist` and `param`. (default: 'exponential' with parameter = 1.0)
             * 'specified': uses time axis `time` from `settings`.  
-            
-        seed : int
-            Control random seed option for reproducibility
 
         settings : dict
             Parameters for surrogate generator. See individual methods for details.    
 
         Returns
         -------
-        surr : SurrogateSeries
+        None
+            The surrogates are stored in ``series_list``. To make them reproducible, pass ``seed`` when creating the object.
 
         See also
         --------
@@ -291,7 +296,7 @@ class SurrogateSeries(EnsembleSeries):
                 s_list.append(ts)
         else:
             ts = Series(time=np.squeeze(times), value=np.squeeze(y_surr),  
-                        label = str(self.label or '') + " #`",
+                        label = str(self.label or '') + " #1",
                         verbose=False, auto_time_params=True)
             s_list.append(ts)
 

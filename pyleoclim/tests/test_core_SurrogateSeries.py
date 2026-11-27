@@ -49,6 +49,20 @@ class TestSurrogateSeriesFromSeries:
             assert_array_equal(s.time, ts.time)  # test time axis match
 
 
+    @pytest.mark.parametrize("method", ["ar1sim", "uar1", "phaseran", "CN"])
+    def test_from_series_seed_t0(self, method):
+        """The same seed gives the same surrogates; a different seed gives different ones (#729)"""
+        t, v = pyleo.utils.gen_ts(model="colored_noise", nt=100, seed=0)
+        ts = pyleo.Series(time=t, value=v, verbose=False, auto_time_params=True)
+        values = []
+        for seed in [42, 42, 43]:
+            surr = pyleo.SurrogateSeries(method=method, number=2, seed=seed)
+            surr.from_series(ts)
+            values.append(np.array([s.value for s in surr.series_list]))
+        assert np.allclose(values[0], values[1])
+        assert not np.allclose(values[0], values[2])
+
+
 class TestSurrogateSeriesFromParam:
     """Tests for SurrogateSeries.from_param() method"""
 
@@ -205,3 +219,9 @@ class TestSurrogateSeriesFromParam:
         surr = pyleo.SurrogateSeries(method="phaseran", number=number)
         with pytest.raises(ValueError):
             surr.from_param(param=[5, 1])  # check that this returns an error
+
+    def test_from_param_label_t0(self):
+        """A single surrogate is labeled '#1' (#729)"""
+        surr = pyleo.SurrogateSeries(method="ar1sim", number=1)
+        surr.from_param(param=[2, 2])
+        assert surr.series_list[0].label == "AR(1) surrogates (MoM) #1"
