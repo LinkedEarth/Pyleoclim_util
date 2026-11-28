@@ -95,7 +95,7 @@ def scatter_xy(x, y, c=None, figsize=None, xlabel=None, ylabel=None, title=None,
     savefig_settings : dict, optional
         the dictionary of arguments for plt.savefig(); some notes below:
 
-        - "path" must be specified; it can be any existing or non-existing path,
+        - "path" must be specified; it can be an existing or new path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -192,7 +192,7 @@ def plot_scatter_xy(x1, y1, x2, y2, figsize=None, xlabel=None,
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
 
-        - "path" must be specified; it can be any existing or non-existing path,
+        - "path" must be specified; it can be an existing or new path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -287,7 +287,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
 
-        - "path" must be specified; it can be any existing or non-existing path,
+        - "path" must be specified; it can be an existing or new path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     invert_xaxis : bool, optional
@@ -415,7 +415,7 @@ def stripes_xy(x, y, cmap='coolwarm', figsize=None, ax=None,
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
 
-        - "path" must be specified; it can be any existing or non-existing path,
+        - "path" must be specified; it can be an existing or new path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     invert_xaxis : bool, optional
@@ -516,9 +516,10 @@ def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
         the dictionary of arguments for plt.savefig(); some notes below:
 
         - "path" must be specified in settings if not assigned with the keyword argument;
-          it can be any existing or non-existing path, with or without a suffix;
-          if the suffix is not given in "path", it will follow "format"
-        - "format" can be one of {"pdf", "eps", "png", "ps"}
+          it can be an existing or new path, with or without a suffix;
+          if "path" has no suffix (or one matplotlib does not recognize), the suffix is taken
+          from "format", or is ".pdf" if "format" is not given
+        - "format" can be one of {"pdf", "eps", "png", "ps"}, or any other format matplotlib supports
     verbose : bool, {True,False}
         If True, print the path of the saved file.
         
@@ -538,11 +539,13 @@ def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
         if verbose:
             print(f'Directory created at: "{dirpath}"')
 
-    path_str = str(path)
-    if path.suffix not in ['.eps', '.pdf', '.png', '.ps']:
-        path = pathlib.Path(f'{path_str}.pdf')
+    supported = fig.canvas.get_supported_filetypes()
+    if path.suffix.lstrip('.').lower() not in supported:
+        # no (recognized) suffix: take it from "format", defaulting to pdf, so that the saved file and the message agree
+        fmt = savefig_args.get('format') or 'pdf'
+        path = pathlib.Path(f'{path}.{fmt}')
 
-    fig.savefig(path_str, **savefig_args)
+    fig.savefig(path, **savefig_args)
     plt.close(fig)
 
     if verbose:
